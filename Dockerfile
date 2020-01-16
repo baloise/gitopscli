@@ -2,9 +2,10 @@ FROM python:3.7-slim-buster
 
 WORKDIR /opt/gitopscli
 
-COPY . .
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-RUN pip install -r requirements.txt \
- && pip install .
+COPY . .
+RUN pip install .
 
 ENTRYPOINT ["gitopscli"]
