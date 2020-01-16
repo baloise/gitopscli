@@ -8,6 +8,13 @@ gitopscli deploy -repo git@github.com:ora/repo.git \
                  -branch deployment-xyz 
                  -values "{a.c: foo, a.b: '1'}" 
 ```
+or with `docker run`
+```bash
+docker run --rm -it gitopscli deploy -repo git@github.com:ora/repo.git \
+                                     -file namespace/values.yaml \
+                                     -branch deployment-xyz 
+                                     -values "{a.c: foo, a.b: '1'}" 
+```
 
 ## Dev
 Install via
@@ -16,7 +23,7 @@ Install via
 make install
 ```
 
-The use it normally like
+Then use it normally like
 
 ```bash
 gitopscli deploy --help
