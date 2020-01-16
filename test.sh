@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Just a simple script for testing during dev.
+# Should be replaced by proper tests...
+
 # create test repo
 rm -rf testrepo
 mkdir testrepo
