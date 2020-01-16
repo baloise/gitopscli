@@ -8,4 +8,7 @@ install:
 uninstall:
 	pip3 uninstall gitopscli
 
-.PHONY: format install uninstall
+build:
+	docker build -t gitopscli:latest .
+
+.PHONY: format install uninstall, build
