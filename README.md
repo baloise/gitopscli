@@ -9,7 +9,16 @@ gitopscli deploy \
 --branch deployment-xyz \
 --values "{a.c: foo, a.b: '1'}" 
 ```
-or with `docker run`
+### Basic Auth
+To use Basic Auth when HTTP(S) is used, simply add the arguments
+```bash
+gitopscli deploy \
+[...]
+--username $GIT_USERNAME
+--password $GIT_PASSWORD
+```
+
+### Usage with Docker
 ```bash
 docker run --rm -it gitopscli deploy \
 --repo git@github.com:ora/repo.git \
