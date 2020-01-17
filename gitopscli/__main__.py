@@ -16,7 +16,7 @@ def main():
     deploy_p.add_argument(
         "-v", "--values", help="YAML string with key-value pairs to write", type=yaml_load, required=True,
     )
-    deploy_p.add_argument("-b", "--branch", help="the branch to create (default: random UUID)")
+    deploy_p.add_argument("-b", "--branch", help="the branch to push the changes to", default="master")
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -29,8 +29,6 @@ def main():
 
 
 def deploy(repo, file_path, values, branch_name):
-    if not branch_name:
-        branch_name = str(uuid.uuid4())
 
     git = GitUtil(repo, branch_name)
     full_file_path = git.get_full_file_path(file_path)
