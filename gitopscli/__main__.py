@@ -17,7 +17,7 @@ def main():
     deploy_p.add_argument(
         "-v", "--values", help="YAML string with key-value pairs to write", type=yaml_load, required=True,
     )
-    deploy_p.add_argument("-b", "--branch", help="the branch to create (default: random UUID)")
+    deploy_p.add_argument("-b", "--branch", help="the branch to push the changes to", default="master")
     deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
     deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
 
@@ -33,8 +33,6 @@ def main():
 
 def deploy(repo, file_path, values, branch_name, username, password):
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    if not branch_name:
-        branch_name = str(uuid.uuid4())
 
     git = GitUtil(repo, branch_name, tmp_dir, username, password)
 
