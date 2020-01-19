@@ -1,6 +1,9 @@
 format:
 	black -l 120 -t py37 gitopscli
 
+lint:
+	pylint gitopscli
+
 install:
 	pip3 install -r requirements.txt
 	pip3 install --editable .
@@ -11,4 +14,4 @@ uninstall:
 build:
 	docker build -t gitopscli:latest .
 
-.PHONY: format install uninstall, build
+.PHONY: format install uninstall build lint

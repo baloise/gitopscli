@@ -4,7 +4,6 @@ import uuid
 import shutil
 import json
 from atlassian import Bitbucket
-from pprint import pprint
 from .git_util import GitUtil
 from .yaml_util import yaml_load, update_yaml_file
 
@@ -20,47 +19,17 @@ def main():
     args = parser.parse_args()
 
     if args.command == "deploy":
-        deploy(
-            args.repo,
-            args.file,
-            args.values,
-            args.branch,
-            args.username,
-            args.password,
-            args.create_pr,
-            args.auto_merge,
-            args.organisation,
-            args.repository_name,
-            args.git_provider,
-            args.git_provider_url,
-        )
+        deploy(**vars(args))
 
 
 def create_cli_parser():
     parser = argparse.ArgumentParser(description="GitOps CLI")
-    subparsers = parser.add_subparsers(title="commands")
+    subparsers = parser.add_subparsers(title="commands", dest="command")
     return parser, subparsers
-
-
-# Example
-"""
-gitopscli deploy --repo https://bitbucket.baloise.dev/scm/dpl/incubator-non-prod.git \
---file example/values.yaml \
---branch deploy-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 5 | head -n 1) \
---values "{image.tag: v0.3.0}" \
---username $GIT_USERNAME \
---password $GIT_PASSWORD \
---create-pr \
---auto-merge \
---organisation "DPL" \
---repository-name "incubator-non-prod" \
---git-provider-url https://bitbucket.baloise.dev
-"""
 
 
 def add_deploy_parser(subparsers):
     deploy_p = subparsers.add_parser("deploy", help="Trigger a new deployment by changing YAML values")
-    deploy_p.set_defaults(command="deploy")
     deploy_p.add_argument("-r", "--repo", help="Git repository URL", required=True)
     deploy_p.add_argument("-f", "--file", help="YAML file path", required=True)
     deploy_p.add_argument(
@@ -73,7 +42,6 @@ def add_deploy_parser(subparsers):
     deploy_p.add_argument("-b", "--branch", help="Branch to push the changes to", default="master")
     deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
     deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
-
     deploy_p.add_argument(
         "-c",
         "--create-pr",
@@ -92,7 +60,6 @@ def add_deploy_parser(subparsers):
         const=True,
         default=False,
     )
-
     deploy_p.add_argument("-o", "--organisation", help="Git organisation/projectKey", required=True)
     deploy_p.add_argument(
         "-n", "--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True
@@ -104,24 +71,26 @@ def add_deploy_parser(subparsers):
 
 
 def deploy(
+    command,
     repo,
-    file_path,
+    file,
     values,
-    branch_name,
+    branch,
     username,
     password,
-    create_pr_bool,
+    create_pr,
     auto_merge,
     organisation,
     repository_name,
     git_provider,
     git_provider_url,
 ):
+    assert command == "deploy"
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
 
-    git = GitUtil(repo, branch_name, tmp_dir, username, password)
+    git = GitUtil(repo, branch, tmp_dir, username, password)
 
-    full_file_path = git.get_full_file_path(file_path)
+    full_file_path = git.get_full_file_path(file)
 
     for key in values:
         value = values[key]
@@ -130,17 +99,17 @@ def deploy(
 
     git.push()
     shutil.rmtree(tmp_dir, ignore_errors=True)
-    if create_pr_bool and branch_name is not "master":
+    if create_pr and branch != "master":
         if git_provider == "bitbucket-server":
-            title = f"Updated values in {file_path}"
+            title = f"Updated values in {file}"
             description = f"""
 This Pull Request is automatically created through gitopscli. 
-Files changed: {file_path}
+Files changed: {file}
 Values changed:
 {json.dumps(values)}
 """
-            pull_request = create_pr(
-                branch_name,
+            pull_request = create_bitbucket_pr(
+                branch,
                 "master",
                 organisation,
                 repository_name,
@@ -151,7 +120,7 @@ Values changed:
                 description,
             )
             if auto_merge:
-                merge_pr(
+                merge_bitbucket_pr(
                     pull_request["id"],
                     pull_request["version"],
                     organisation,
@@ -161,11 +130,11 @@ Values changed:
                     password,
                 )
         else:
-            print(f"Git provider {git_provider} is not supported.")
-            exit(1)
+            print(f"Git provider {git_provider} is not supported.", file=sys.stderr)
+            sys.exit(1)
 
 
-def create_pr(
+def create_bitbucket_pr(
     from_branch, to_branch, organisation, repository_name, git_provider_url, username, password, title, description
 ):
     bitbucket = create_bitbucket_client(git_provider_url, username, password)
@@ -173,21 +142,19 @@ def create_pr(
         organisation, repository_name, organisation, repository_name, from_branch, to_branch, title, description
     )
 
-    # pprint(pull_request)
     if "errors" in pull_request:
-        for e in pull_request["errors"]:
-            print(e["message"])
-        exit(1)
+        for error in pull_request["errors"]:
+            print(error["message"], file=sys.stderr)
+        sys.exit(1)
     pull_request_url = pull_request["links"]["self"][0]["href"]
     print(f"Pull request created: {pull_request_url}")
     return pull_request
 
 
-def merge_pr(pr_id, pr_version, organisation, repository_name, git_provider_url, username, password):
+def merge_bitbucket_pr(pr_id, pr_version, organisation, repository_name, git_provider_url, username, password):
     bitbucket = create_bitbucket_client(git_provider_url, username, password)
     merged = bitbucket.merge_pull_request(organisation, repository_name, pr_id, pr_version)
     print("Pull request merged")
-    # pprint(merged)
     return merged
 
 
@@ -195,15 +162,14 @@ def create_bitbucket_client(git_provider_url, username, password):
     return Bitbucket(git_provider_url, username, password)
 
 
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ("yes", "true", "t", "y", "1"):
+def str2bool(value):
+    if isinstance(value, bool):
+        return value
+    if value.lower() in ("yes", "true", "t", "y", "1"):
         return True
-    elif v.lower() in ("no", "false", "f", "n", "0"):
+    if value.lower() in ("no", "false", "f", "n", "0"):
         return False
-    else:
-        raise argparse.ArgumentTypeError("Boolean value expected.")
+    raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
 if __name__ == "__main__":
