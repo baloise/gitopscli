@@ -130,7 +130,7 @@ Values changed:
                     password,
                 )
         else:
-            print(f"Git provider {git_provider} is not supported.")
+            print(f"Git provider {git_provider} is not supported.", file=sys.stderr)
             sys.exit(1)
 
 
@@ -144,7 +144,7 @@ def create_bitbucket_pr(
 
     if "errors" in pull_request:
         for error in pull_request["errors"]:
-            print(error["message"])
+            print(error["message"], file=sys.stderr)
         sys.exit(1)
     pull_request_url = pull_request["links"]["self"][0]["href"]
     print(f"Pull request created: {pull_request_url}")
