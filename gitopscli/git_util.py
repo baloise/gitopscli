@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class GitUtil:
-    def __init__(self, repo, branch_name, tmp_dir, username = None, password = None):
+    def __init__(self, repo, branch_name, tmp_dir, username=None, password=None):
         shutil.rmtree(tmp_dir, ignore_errors=True)
         os.makedirs(tmp_dir)
         git_options = []
@@ -40,4 +40,3 @@ echo password={password}
         text_file.close()
         os.chmod(text_file.name, 0o700)
         return text_file
-
