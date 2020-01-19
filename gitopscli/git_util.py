@@ -1,7 +1,7 @@
 import os
 import shutil
-from git import Repo
 from pathlib import Path
+from git import Repo
 
 
 class GitUtil:
@@ -30,13 +30,13 @@ class GitUtil:
     def push(self):
         self._repo.git.push("origin", self._branch_name)
 
-    def create_credentials_file(self, tmp_dir, username, password):
+    @staticmethod
+    def create_credentials_file(tmp_dir, username, password):
         credentials_file = f"""#!/bin/bash
 echo username={username}
 echo password={password}
     """
-        text_file = open(f"{tmp_dir}/credentials.sh", "w+")
-        text_file.write(credentials_file)
-        text_file.close()
+        with open(f"{tmp_dir}/credentials.sh", "w+") as text_file:
+            text_file.write(credentials_file)
         os.chmod(text_file.name, 0o700)
         return text_file

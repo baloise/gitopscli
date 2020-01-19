@@ -1,4 +1,3 @@
-import os
 from ruamel.yaml import YAML
 
 
