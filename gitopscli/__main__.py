@@ -3,8 +3,8 @@ import sys
 import uuid
 import shutil
 import json
-from atlassian import Bitbucket
-from .git_util import GitUtil
+import os
+from .bitbucket_git_util import BitBucketGitUtil
 from .yaml_util import yaml_load, update_yaml_file
 
 
@@ -84,24 +84,32 @@ def deploy(
     git_provider_url,
 ):
     assert command == "deploy"
-    repo_url = get_bitbucket_repo_url(organisation, repository_name, git_provider_url, username, password)
+
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    os.makedirs(tmp_dir)
 
-    git = GitUtil(repo_url, branch, tmp_dir, username, password)
-
-    full_file_path = git.get_full_file_path(file)
-
-    for key in values:
-        value = values[key]
-        update_yaml_file(full_file_path, key, value)
-        git.commit(f"changed '{key}' to '{value}'")
-
-    git.push()
-    shutil.rmtree(tmp_dir, ignore_errors=True)
-    if create_pr and branch != "master":
+    try:
         if git_provider == "bitbucket-server":
-            title = f"Updated values in {file}"
-            description = f"""
+            git = BitBucketGitUtil(tmp_dir, git_provider_url, organisation, repository_name, username, password)
+        else:
+            print(f"Git provider '{git_provider}' is not supported.", file=sys.stderr)
+            sys.exit(1)
+
+        git.checkout(branch)
+
+        full_file_path = git.get_full_file_path(file)
+        for key in values:
+            value = values[key]
+            update_yaml_file(full_file_path, key, value)
+            git.commit(f"changed '{key}' to '{value}'")
+
+        git.push(branch)
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    if create_pr and branch != "master":
+        title = f"Updated values in {file}"
+        description = f"""
 This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
 Files changed: `{file}`
 Values changed:
@@ -109,73 +117,12 @@ Values changed:
 {json.dumps(values)}
 ```
 """
-            pull_request = create_bitbucket_pr(
-                branch,
-                "master",
-                organisation,
-                repository_name,
-                git_provider_url,
-                username,
-                password,
-                title,
-                description,
-            )
-            if auto_merge:
-                merge_bitbucket_pr(
-                    pull_request["id"],
-                    pull_request["version"],
-                    organisation,
-                    repository_name,
-                    git_provider_url,
-                    username,
-                    password,
-                )
-        else:
-            print(f"Git provider '{git_provider}' is not supported.", file=sys.stderr)
-            sys.exit(1)
+        pull_request = git.create_pull_request(branch, "master", title, description,)
+        print(f"Pull request created: {git.get_pull_request_url(pull_request)}")
 
-
-def get_bitbucket_repo_url(organisation, repository_name, git_provider_url, username, password):
-    bitbucket = create_bitbucket_client(git_provider_url, username, password)
-    repo = bitbucket.get_repo(organisation, repository_name)
-    if "links" not in repo:
-        print(f"Repository '{repository_name}' or organisation '{organisation}' does not exist.", file=sys.stderr)
-        sys.exit(1)
-    for clone_link in repo["links"]["clone"]:
-        if clone_link["name"] == "http":
-            repo_url = clone_link["href"]
-    if not repo_url:
-        print("Couldn't determine repository URL.", file=sys.stderr)
-        sys.exit(1)
-    return repo_url
-
-
-def create_bitbucket_pr(
-    from_branch, to_branch, organisation, repository_name, git_provider_url, username, password, title, description
-):
-    bitbucket = create_bitbucket_client(git_provider_url, username, password)
-    pull_request = bitbucket.open_pull_request(
-        organisation, repository_name, organisation, repository_name, from_branch, to_branch, title, description
-    )
-
-    if "errors" in pull_request:
-        for error in pull_request["errors"]:
-            print(error["message"], file=sys.stderr)
-        sys.exit(1)
-    pull_request_url = pull_request["links"]["self"][0]["href"]
-    print(f"Pull request created: {pull_request_url}")
-    return pull_request
-
-
-def merge_bitbucket_pr(pr_id, pr_version, organisation, repository_name, git_provider_url, username, password):
-    bitbucket = create_bitbucket_client(git_provider_url, username, password)
-    merged = bitbucket.merge_pull_request(organisation, repository_name, pr_id, pr_version)
-    print("Pull request merged")
-    return merged
-
-
-def create_bitbucket_client(git_provider_url, username, password):
-    return Bitbucket(git_provider_url, username, password)
+        if auto_merge:
+            git.merge_pull_request(pull_request)
+            print("Pull request merged")
 
 
 def str2bool(value):
