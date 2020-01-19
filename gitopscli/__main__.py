@@ -30,7 +30,6 @@ def create_cli_parser():
 
 def add_deploy_parser(subparsers):
     deploy_p = subparsers.add_parser("deploy", help="Trigger a new deployment by changing YAML values")
-    deploy_p.add_argument("-r", "--repo", help="Git repository URL", required=True)
     deploy_p.add_argument("-f", "--file", help="YAML file path", required=True)
     deploy_p.add_argument(
         "-v",
@@ -72,7 +71,6 @@ def add_deploy_parser(subparsers):
 
 def deploy(
     command,
-    repo,
     file,
     values,
     branch,
@@ -86,9 +84,10 @@ def deploy(
     git_provider_url,
 ):
     assert command == "deploy"
+    repo_url = get_bitbucket_repo_url(organisation, repository_name, git_provider_url, username, password)
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
 
-    git = GitUtil(repo, branch, tmp_dir, username, password)
+    git = GitUtil(repo_url, branch, tmp_dir, username, password)
 
     full_file_path = git.get_full_file_path(file)
 
@@ -103,10 +102,12 @@ def deploy(
         if git_provider == "bitbucket-server":
             title = f"Updated values in {file}"
             description = f"""
-This Pull Request is automatically created through gitopscli. 
-Files changed: {file}
+This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
+Files changed: `{file}`
 Values changed:
+```json
 {json.dumps(values)}
+```
 """
             pull_request = create_bitbucket_pr(
                 branch,
@@ -130,8 +131,23 @@ Values changed:
                     password,
                 )
         else:
-            print(f"Git provider {git_provider} is not supported.", file=sys.stderr)
+            print(f"Git provider '{git_provider}' is not supported.", file=sys.stderr)
             sys.exit(1)
+
+
+def get_bitbucket_repo_url(organisation, repository_name, git_provider_url, username, password):
+    bitbucket = create_bitbucket_client(git_provider_url, username, password)
+    repo = bitbucket.get_repo(organisation, repository_name)
+    if "links" not in repo:
+        print(f"Repository '{repository_name}' or organisation '{organisation}' does not exist.", file=sys.stderr)
+        sys.exit(1)
+    for clone_link in repo["links"]["clone"]:
+        if clone_link["name"] == "http":
+            repo_url = clone_link["href"]
+    if not repo_url:
+        print("Couldn't determine repository URL.", file=sys.stderr)
+        sys.exit(1)
+    return repo_url
 
 
 def create_bitbucket_pr(
