@@ -20,25 +20,12 @@ def main():
     args = parser.parse_args()
 
     if args.command == "deploy":
-        deploy(
-            args.repo,
-            args.file,
-            args.values,
-            args.branch,
-            args.username,
-            args.password,
-            args.create_pr,
-            args.auto_merge,
-            args.organisation,
-            args.repository_name,
-            args.git_provider,
-            args.git_provider_url,
-        )
+        deploy(**vars(args))
 
 
 def create_cli_parser():
     parser = argparse.ArgumentParser(description="GitOps CLI")
-    subparsers = parser.add_subparsers(title="commands")
+    subparsers = parser.add_subparsers(title="commands", dest="command")
     return parser, subparsers
 
 
@@ -60,7 +47,6 @@ gitopscli deploy --repo https://bitbucket.baloise.dev/scm/dpl/incubator-non-prod
 
 def add_deploy_parser(subparsers):
     deploy_p = subparsers.add_parser("deploy", help="Trigger a new deployment by changing YAML values")
-    deploy_p.set_defaults(command="deploy")
     deploy_p.add_argument("-r", "--repo", help="Git repository URL", required=True)
     deploy_p.add_argument("-f", "--file", help="YAML file path", required=True)
     deploy_p.add_argument(
@@ -104,24 +90,26 @@ def add_deploy_parser(subparsers):
 
 
 def deploy(
+    command,
     repo,
-    file_path,
+    file,
     values,
-    branch_name,
+    branch,
     username,
     password,
-    create_pr_bool,
+    create_pr,
     auto_merge,
     organisation,
     repository_name,
     git_provider,
     git_provider_url,
 ):
+    assert command == "deploy"
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
 
-    git = GitUtil(repo, branch_name, tmp_dir, username, password)
+    git = GitUtil(repo, branch, tmp_dir, username, password)
 
-    full_file_path = git.get_full_file_path(file_path)
+    full_file_path = git.get_full_file_path(file)
 
     for key in values:
         value = values[key]
@@ -130,17 +118,17 @@ def deploy(
 
     git.push()
     shutil.rmtree(tmp_dir, ignore_errors=True)
-    if create_pr_bool and branch_name is not "master":
+    if create_pr and branch is not "master":
         if git_provider == "bitbucket-server":
-            title = f"Updated values in {file_path}"
+            title = f"Updated values in {file}"
             description = f"""
 This Pull Request is automatically created through gitopscli. 
-Files changed: {file_path}
+Files changed: {file}
 Values changed:
 {json.dumps(values)}
 """
             pull_request = create_pr(
-                branch_name,
+                branch,
                 "master",
                 organisation,
                 repository_name,
