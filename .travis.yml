@@ -1,0 +1,9 @@
+services:
+  - docker
+
+env:
+  global:
+    - IMAGE_NAME=baloiseincubator/gitopscli
+
+script:
+  - docker build -t $IMAGE_NAME:latest .
