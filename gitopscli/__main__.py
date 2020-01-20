@@ -65,23 +65,23 @@ def add_deploy_parser(subparsers):
     )
     deploy_p.add_argument("-s", "--git-provider", help="Git server provider", default="bitbucket-server")
     deploy_p.add_argument(
-        "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)"
+        "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)", required=True
     )
 
 
 def deploy(
-    command,
-    file,
-    values,
-    branch,
-    username,
-    password,
-    create_pr,
-    auto_merge,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
+        command,
+        file,
+        values,
+        branch,
+        username,
+        password,
+        create_pr,
+        auto_merge,
+        organisation,
+        repository_name,
+        git_provider,
+        git_provider_url,
 ):
     assert command == "deploy"
     repo_url = get_bitbucket_repo_url(organisation, repository_name, git_provider_url, username, password)
@@ -151,7 +151,7 @@ def get_bitbucket_repo_url(organisation, repository_name, git_provider_url, user
 
 
 def create_bitbucket_pr(
-    from_branch, to_branch, organisation, repository_name, git_provider_url, username, password, title, description
+        from_branch, to_branch, organisation, repository_name, git_provider_url, username, password, title, description
 ):
     bitbucket = create_bitbucket_client(git_provider_url, username, password)
     pull_request = bitbucket.open_pull_request(
