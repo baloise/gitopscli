@@ -5,6 +5,7 @@ import shutil
 import json
 import os
 from .bitbucket_git_util import BitBucketGitUtil
+from .github_git_util import GithubGitUtil
 from .yaml_util import yaml_load, update_yaml_file
 
 
@@ -65,23 +66,23 @@ def add_deploy_parser(subparsers):
     )
     deploy_p.add_argument("-s", "--git-provider", help="Git server provider", default="bitbucket-server")
     deploy_p.add_argument(
-        "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)", required=True
+        "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)"
     )
 
 
 def deploy(
-        command,
-        file,
-        values,
-        branch,
-        username,
-        password,
-        create_pr,
-        auto_merge,
-        organisation,
-        repository_name,
-        git_provider,
-        git_provider_url,
+    command,
+    file,
+    values,
+    branch,
+    username,
+    password,
+    create_pr,
+    auto_merge,
+    organisation,
+    repository_name,
+    git_provider,
+    git_provider_url,
 ):
     assert command == "deploy"
 
@@ -90,7 +91,12 @@ def deploy(
 
     try:
         if git_provider == "bitbucket-server":
+            if not git_provider_url:
+                print(f"Please provide --git-provider-url for bitbucket-server", file=sys.stderr)
+                sys.exit(1)
             git = BitBucketGitUtil(tmp_dir, git_provider_url, organisation, repository_name, username, password)
+        elif git_provider == "github":
+            git = GithubGitUtil(tmp_dir, organisation, repository_name, username, password)
         else:
             print(f"Git provider '{git_provider}' is not supported.", file=sys.stderr)
             sys.exit(1)
