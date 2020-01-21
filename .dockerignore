@@ -1,5 +1,7 @@
 *
 !gitopscli/
+!tests/
 !.pylintrc
+!requirements-dev.txt
 !requirements.txt
 !setup.py

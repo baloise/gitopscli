@@ -9,17 +9,20 @@ WORKDIR /opt/gitopscli
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . .
+COPY gitopscli gitopscli
+COPY setup.py .
+
+RUN pip install .
 
 FROM base AS quality-gate
 
-RUN pip install black pylint
+COPY . .
+RUN pip install -r requirements-dev.txt
+
 RUN black --check -l 120 -t py37 gitopscli tests
 RUN pylint gitopscli
-RUN pytest -v
+RUN python -m pytest -v
 
 FROM base AS final
-
-RUN pip install .
 
 ENTRYPOINT ["gitopscli"]
