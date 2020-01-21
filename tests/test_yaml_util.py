@@ -1,3 +1,5 @@
+import os
+import shutil
 import unittest
 import uuid
 
@@ -5,12 +7,21 @@ from gitopscli.yaml_util import yaml_load, update_yaml_file
 
 
 class YamlUtilTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp_dir = f"/tmp/gitopscli-test-{uuid.uuid4()}"
+        os.makedirs(cls.tmp_dir)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp_dir, ignore_errors=True)
+
     def test_yaml_load(self):
         self.assertEqual(yaml_load("{answer: '42'}"), {"answer": "42"})
         self.assertEqual(yaml_load("{answer: 42}"), {"answer": 42})
 
     def test_update_yaml_file(self):
-        test_file = f"/tmp/{uuid.uuid4()}.yml"
+        test_file = f"{self.tmp_dir}/{uuid.uuid4()}.yml"
         with open(test_file, "w+") as stream:
             stream.write("a: # comment\n")
             stream.write("# comment\n")
