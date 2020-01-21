@@ -45,7 +45,7 @@ def add_deploy_parser(subparsers):
     deploy_p.add_argument(
         "-c",
         "--create-pr",
-        help="Creates a Pull Request (only when --branch is not master/default branch",
+        help="Creates a Pull Request (only when --branch is not master/default branch)",
         type=str2bool,
         nargs="?",
         const=True,
@@ -123,12 +123,15 @@ Values changed:
 {json.dumps(values)}
 ```
 """
-        pull_request = git.create_pull_request(branch, "master", title, description,)
+        pull_request = git.create_pull_request(branch, "master", title, description)
         print(f"Pull request created: {git.get_pull_request_url(pull_request)}")
 
         if auto_merge:
             git.merge_pull_request(pull_request)
             print("Pull request merged")
+
+            git.delete_branch(branch)
+            print(f"Branch '{branch}' deleted")
 
 
 def str2bool(value):

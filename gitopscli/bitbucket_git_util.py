@@ -51,3 +51,16 @@ class BitBucketGitUtil(AbstractGitUtil):
         self._bitbucket.merge_pull_request(
             self._organisation, self._repository_name, pull_request["id"], pull_request["version"]
         )
+
+    def delete_branch(self, branch):
+        branches = self._bitbucket.get_branches(self._organisation, self._repository_name, filter=branch, limit=1)
+        if not branches:
+            print(f"Branch '{branch}' not found'", file=sys.stderr)
+            sys.exit(1)
+        result = self._bitbucket.delete_branch(
+            self._organisation, self._repository_name, branch, branches[0]["latestCommit"]
+        )
+        if result and "errors" in result:
+            for error in result["errors"]:
+                print(error["message"], file=sys.stderr)
+            sys.exit(1)

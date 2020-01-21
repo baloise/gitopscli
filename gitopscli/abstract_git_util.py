@@ -60,3 +60,7 @@ class AbstractGitUtil(ABC):
     @abstractmethod
     def merge_pull_request(self, pull_request):
         pass
+
+    @abstractmethod
+    def delete_branch(self, branch):
+        pass
