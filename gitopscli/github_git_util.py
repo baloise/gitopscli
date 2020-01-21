@@ -14,9 +14,7 @@ class GithubGitUtil(AbstractGitUtil):
         try:
             repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
         except UnknownObjectException:
-            print(
-                f"Repository '{self._organisation}/{self._repository_name}' does not exist.", file=sys.stderr,
-            )
+            print(f"Repository '{self._organisation}/{self._repository_name}' does not exist.", file=sys.stderr)
             sys.exit(1)
         return repo.clone_url
 
@@ -30,3 +28,8 @@ class GithubGitUtil(AbstractGitUtil):
 
     def merge_pull_request(self, pull_request):
         pull_request.merge()
+
+    def delete_branch(self, branch):
+        repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
+        git_ref = repo.get_git_ref(f"heads/{branch}")
+        git_ref.delete()
