@@ -7,12 +7,15 @@ def yaml_load(doc):
 
 def update_yaml_file(file_path, key, value):
     yaml = YAML()
-    content = yaml.load(file_path)
+    with open(file_path, "r") as stream:
+        content = yaml.load(stream)
 
     keys, obj = key.split("."), content
     for k in keys[:-1]:
+        if k not in obj or not isinstance(obj[k], dict):
+            obj[k] = dict()
         obj = obj[k]
     obj[keys[-1]] = value
 
-    with open(file_path, "w+") as output:
-        yaml.dump(content, output)
+    with open(file_path, "w+") as stream:
+        yaml.dump(content, stream)

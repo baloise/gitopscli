@@ -1,0 +1,56 @@
+import unittest
+import uuid
+
+from gitopscli.yaml_util import yaml_load, update_yaml_file
+
+
+class YamlUtilTest(unittest.TestCase):
+    def test_yaml_load(self):
+        self.assertEqual(yaml_load("{answer: '42'}"), {"answer": "42"})
+        self.assertEqual(yaml_load("{answer: 42}"), {"answer": 42})
+
+    def test_update_yaml_file(self):
+        test_file = f"/tmp/{uuid.uuid4()}.yml"
+        with open(test_file, "w+") as stream:
+            stream.write("a: # comment\n")
+            stream.write("# comment\n")
+            stream.write("  b:\n")
+            stream.write("    d: 1 # comment\n")
+            stream.write("    c: 2 # comment\n")
+
+        update_yaml_file(test_file, "a.b.c", "2")
+
+        with open(test_file, "r+") as stream:
+            self.assertEqual(stream.readline(), "a: # comment\n")
+            self.assertEqual(stream.readline(), "# comment\n")
+            self.assertEqual(stream.readline(), "  b:\n")
+            self.assertEqual(stream.readline(), "    d: 1 # comment\n")
+            self.assertEqual(stream.readline(), "    c: '2' # comment\n")
+            self.assertEqual(stream.readline(), "")
+
+        update_yaml_file(test_file, "a.x", "foo")
+
+        with open(test_file, "r+") as stream:
+            self.assertEqual(stream.readline(), "a: # comment\n")
+            self.assertEqual(stream.readline(), "# comment\n")
+            self.assertEqual(stream.readline(), "  b:\n")
+            self.assertEqual(stream.readline(), "    d: 1 # comment\n")
+            self.assertEqual(stream.readline(), "    c: '2' # comment\n")
+            self.assertEqual(stream.readline(), "  x: foo\n")
+            self.assertEqual(stream.readline(), "")
+
+        update_yaml_file(test_file, "a.x.z", "foo_z")
+        update_yaml_file(test_file, "a.x.y", "foo_y")
+        update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
+
+        with open(test_file, "r+") as stream:
+            self.assertEqual(stream.readline(), "a: # comment\n")
+            self.assertEqual(stream.readline(), "# comment\n")
+            self.assertEqual(stream.readline(), "  b:\n")
+            self.assertEqual(stream.readline(), "    d: 1 # comment\n")
+            self.assertEqual(stream.readline(), "    c: '2' # comment\n")
+            self.assertEqual(stream.readline(), "  x:\n")
+            self.assertEqual(stream.readline(), "    z: foo_z\n")
+            self.assertEqual(stream.readline(), "    y:\n")
+            self.assertEqual(stream.readline(), "      z: foo_y_z\n")
+            self.assertEqual(stream.readline(), "")

@@ -14,8 +14,9 @@ COPY . .
 FROM base AS quality-gate
 
 RUN pip install black pylint
-RUN black --check -l 120 -t py37 gitopscli
+RUN black --check -l 120 -t py37 gitopscli tests
 RUN pylint gitopscli
+RUN pytest -v
 
 FROM base AS final
 
