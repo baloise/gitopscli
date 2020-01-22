@@ -1,6 +1,7 @@
 FROM quay.balgroupit.com/baloise-base-images/python:3-ubuntu18.04 AS base
 
-RUN apt-get install -y --no-install-recommends git \
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/gitopscli
