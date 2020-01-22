@@ -99,7 +99,9 @@ def deploy(
             if not git_provider_url:
                 print(f"Please provide --git-provider-url for bitbucket-server", file=sys.stderr)
                 sys.exit(1)
-            git = BitBucketGitUtil(tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email)
+            git = BitBucketGitUtil(
+                tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email
+            )
         elif git_provider == "github":
             git = GithubGitUtil(tmp_dir, organisation, repository_name, username, password)
         else:

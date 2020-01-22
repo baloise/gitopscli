@@ -14,8 +14,7 @@ class AbstractGitUtil(ABC):
         self._git_user = git_user
         self._git_email = git_email
 
-
-def get_full_file_path(self, file_path):
+    def get_full_file_path(self, file_path):
         return Path(os.path.join(self._repo.working_dir, file_path))
 
     def checkout(self, branch):
