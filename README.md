@@ -13,6 +13,22 @@ Currently, we support both BitBucket Server and GitHub.
 make install
 ```
 
+## Example
+```bash
+gitopscli deploy --git-provider-url https://bitbucket.baloise.dev \
+--username $GIT_USERNAME \
+--password $GIT_PASSWORD \
+--git-user "GitOpsCLI" \
+--git-email "gitopscli@baloise.dev" \
+--organisation "DPL" \
+--repository-name "incubator-non-prod" \
+--file example/values.yaml \
+--branch deploy-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 5 | head -n 1) \
+--values "{image.tag: v0.3.0}" \
+--create-pr \
+--auto-merge
+```
+
 ## Usage
 ```bash
 gitopscli deploy [options]
