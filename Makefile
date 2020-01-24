@@ -5,10 +5,11 @@ lint:
 	pylint gitopscli
 
 test:
-	pytest -v -s
+	python3 -m pytest -v -s
 
 install:
 	pip3 install -r requirements.txt
+	pip3 install -r requirements-dev.txt
 	pip3 install --editable .
 
 uninstall:
