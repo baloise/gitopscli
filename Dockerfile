@@ -10,9 +10,6 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY gitopscli gitopscli
-COPY setup.py .
-
-RUN pip install .
 
 FROM base AS quality-gate
 
@@ -24,5 +21,8 @@ RUN pylint gitopscli
 RUN python -m pytest -v
 
 FROM base AS final
+
+COPY setup.py .
+RUN pip install .
 
 ENTRYPOINT ["gitopscli"]
