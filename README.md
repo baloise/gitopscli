@@ -36,7 +36,7 @@ gitopscli deploy [options]
 
 ### Usage with Docker
 ```bash
-docker run --rm -it gitopscli deploy [options]
+docker run --rm -it baloiseincubator/gitopscli deploy [options]
 ```
 
 ## Supported Options
