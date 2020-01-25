@@ -42,6 +42,11 @@ Parameter        | Description   | Default
 -w, --git-provider-url (required if BitBucket) | Git provider base API URL (e.g. https://bitbucket.example.tld) |
 
 
+## Screenshots
+
+![Example PR Overview](/doc/example_pr_overview.png?raw=true "Example of a created PR")
+![Example PR Diff](/doc/example_pr_diff.png?raw=true "Example of a PR yaml file diff")
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
