@@ -42,6 +42,9 @@ def add_deploy_parser(subparsers):
     deploy_p.add_argument("-b", "--branch", help="Branch to push the changes to", default="master")
     deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
     deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
+    deploy_p.add_argument("-j", "--git-user", help="Git Username", default="GitOpsCLI")
+    deploy_p.add_argument("-e", "--git-email", help="Git User Email", default="gitopscli@baloise.dev")
+
     deploy_p.add_argument(
         "-c",
         "--create-pr",
@@ -77,6 +80,8 @@ def deploy(
     branch,
     username,
     password,
+    git_user,
+    git_email,
     create_pr,
     auto_merge,
     organisation,
@@ -94,7 +99,9 @@ def deploy(
             if not git_provider_url:
                 print(f"Please provide --git-provider-url for bitbucket-server", file=sys.stderr)
                 sys.exit(1)
-            git = BitBucketGitUtil(tmp_dir, git_provider_url, organisation, repository_name, username, password)
+            git = BitBucketGitUtil(
+                tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email
+            )
         elif git_provider == "github":
             git = GithubGitUtil(tmp_dir, organisation, repository_name, username, password)
         else:

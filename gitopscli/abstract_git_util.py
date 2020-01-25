@@ -7,10 +7,12 @@ from git import Repo
 class AbstractGitUtil(ABC):
     _repo = None
 
-    def __init__(self, tmp_dir, username, password):
+    def __init__(self, tmp_dir, username, password, git_user, git_email):
         self._tmp_dir = tmp_dir
         self._username = username
         self._password = password
+        self._git_user = git_user
+        self._git_email = git_email
 
     def get_full_file_path(self, file_path):
         return Path(os.path.join(self._repo.working_dir, file_path))
@@ -28,8 +30,8 @@ class AbstractGitUtil(ABC):
     def commit(self, message):
         self._repo.git.add(u=True)
         if self._repo.index.diff("HEAD"):
-            self._repo.config_writer().set_value("user", "name", "gitopscli").release()
-            self._repo.config_writer().set_value("user", "email", "gitopscli@baloise.com").release()
+            self._repo.config_writer().set_value("user", "name", self._git_user).release()
+            self._repo.config_writer().set_value("user", "email", self._git_email).release()
             self._repo.git.commit("-m", message)
 
     def push(self, branch):
