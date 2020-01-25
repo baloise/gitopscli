@@ -4,6 +4,9 @@
 
 GitOps CLI is a command line utility to perform operations on git ops managed infrastructure repositories, including updates in yaml files.
 
+## Git Provider support
+Currently, we support both BitBucket Server and GitHub.
+
 ## Installation (dev)
 
 ```bash
@@ -24,11 +27,19 @@ gitopscli deploy --git-provider-url https://bitbucket.baloise.dev \
 --auto-merge
 ```
 
-## Usage with Docker
+### Usage with Docker
 ```bash
 docker run --rm -it gitopscli deploy [...]
 ```
 
+## Supported Operations
+
+### Deploy
+
+Param        | Description
+------------ | -------------
+-f, --file (required) | YAML file path
+-v, --values (required)| YAML/JSON object with the YAML path as key and the desired value as value
 
 
 ## Contributing
