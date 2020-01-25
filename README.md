@@ -34,12 +34,21 @@ docker run --rm -it gitopscli deploy [...]
 
 ## Supported Operations
 
-### Deploy
-
-Param        | Description
------------- | -------------
--f, --file (required) | YAML file path
--v, --values (required)| YAML/JSON object with the YAML path as key and the desired value as value
+Parameter        | Description   | Default
+------------ | ------------- | -------------
+-f, --file (required) | YAML file path | 
+-v, --values (required)| YAML/JSON object with the YAML path as key and the desired value as value |
+-b, --branch | Branch to push the changes to | `master`
+-u, --username (required)| Git username if Basic Auth should be used |
+-p, --password (required)| Git password if Basic Auth should be used |
+-j, --git-user| Git Username | `GitOpsCLI`
+-e, --git-email| Git User Email | `gitopscli@baloise.dev`
+-c, --create-pr| Creates a Pull Request (only when --branch is not master/default branch) | `false`
+-a, --auto-merge| Automatically merge the created PR (only valid with --create-pr) | `false`
+-o, --organisation (required)| Git organisation/projectKey |
+-n, --repository-name (required)| Git repository name (not the URL, e.g. my-repo) |
+-s, --git-provider | Git server provider | `bitbucket-server`
+-w, --git-provider-url (required if BitBucket) | Git provider base API URL (e.g. https://bitbucket.example.tld) |
 
 
 ## Contributing
