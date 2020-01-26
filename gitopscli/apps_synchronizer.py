@@ -41,7 +41,8 @@ def sync_apps(apps_git, root_git):
                 app_config_path = str(apps_config_file)
             else:
                 path_to_app_config[str(apps_config_file)] = app_config_content
-                all_other_apps += app_config_content["applications"].keys()
+                if "applications" in app_config_content and app_config_content["applications"] is not None:
+                    all_other_apps += app_config_content["applications"].keys()
     pprint.pprint(all_other_apps)
     if selected_app_config is None:
         raise Exception("Could't find config file with repository " + apps_git.get_clone_url() + " in apps/ directory")
