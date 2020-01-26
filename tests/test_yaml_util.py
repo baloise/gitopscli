@@ -28,9 +28,6 @@ class YamlUtilTest(unittest.TestCase):
             stream.write("  b:\n")
             stream.write("    d: 1 # comment\n")
             stream.write("    c: 2 # comment\n")
-            stream.write("list:\n")
-            stream.write("  - listentry1\n")
-            stream.write("  - listentry2\n")
 
         update_yaml_file(test_file, "a.b.c", "2")
 
@@ -40,9 +37,6 @@ class YamlUtilTest(unittest.TestCase):
             self.assertEqual(stream.readline(), "  b:\n")
             self.assertEqual(stream.readline(), "    d: 1 # comment\n")
             self.assertEqual(stream.readline(), "    c: '2' # comment\n")
-            self.assertEqual(stream.readline(), "list:\n")
-            self.assertEqual(stream.readline(), "  - listentry1\n")
-            self.assertEqual(stream.readline(), "  - listentry2\n")
             self.assertEqual(stream.readline(), "")
 
         update_yaml_file(test_file, "a.x", "foo")
@@ -54,9 +48,6 @@ class YamlUtilTest(unittest.TestCase):
             self.assertEqual(stream.readline(), "    d: 1 # comment\n")
             self.assertEqual(stream.readline(), "    c: '2' # comment\n")
             self.assertEqual(stream.readline(), "  x: foo\n")
-            self.assertEqual(stream.readline(), "list:\n")
-            self.assertEqual(stream.readline(), "  - listentry1\n")
-            self.assertEqual(stream.readline(), "  - listentry2\n")
             self.assertEqual(stream.readline(), "")
 
         update_yaml_file(test_file, "a.x.z", "foo_z")
@@ -73,12 +64,9 @@ class YamlUtilTest(unittest.TestCase):
             self.assertEqual(stream.readline(), "    z: foo_z\n")
             self.assertEqual(stream.readline(), "    y:\n")
             self.assertEqual(stream.readline(), "      z: foo_y_z\n")
-            self.assertEqual(stream.readline(), "list:\n")
-            self.assertEqual(stream.readline(), "  - listentry1\n")
-            self.assertEqual(stream.readline(), "  - listentry2\n")
             self.assertEqual(stream.readline(), "")
 
-        update_yaml_file(test_file, "list", "newlistentry")
+        update_yaml_file(test_file, "newlist", ["val1", "val2"])
 
         with open(test_file, "r+") as stream:
             self.assertEqual(stream.readline(), "a: # comment\n")
@@ -90,8 +78,26 @@ class YamlUtilTest(unittest.TestCase):
             self.assertEqual(stream.readline(), "    z: foo_z\n")
             self.assertEqual(stream.readline(), "    y:\n")
             self.assertEqual(stream.readline(), "      z: foo_y_z\n")
-            self.assertEqual(stream.readline(), "list:\n")
-            self.assertEqual(stream.readline(), "  - listentry1\n")
-            self.assertEqual(stream.readline(), "  - listentry2\n")
-            self.assertEqual(stream.readline(), "  - newlistentry\n")
+            self.assertEqual(stream.readline(), "newlist:\n")
+            # TODO: These values should be intendet
+            self.assertEqual(stream.readline(), "- val1\n")
+            self.assertEqual(stream.readline(), "- val2\n")
+            self.assertEqual(stream.readline(), "")
+
+        update_yaml_file(test_file, "newlist", ["new_val1", "val2"])
+
+        with open(test_file, "r+") as stream:
+            self.assertEqual(stream.readline(), "a: # comment\n")
+            self.assertEqual(stream.readline(), "# comment\n")
+            self.assertEqual(stream.readline(), "  b:\n")
+            self.assertEqual(stream.readline(), "    d: 1 # comment\n")
+            self.assertEqual(stream.readline(), "    c: '2' # comment\n")
+            self.assertEqual(stream.readline(), "  x:\n")
+            self.assertEqual(stream.readline(), "    z: foo_z\n")
+            self.assertEqual(stream.readline(), "    y:\n")
+            self.assertEqual(stream.readline(), "      z: foo_y_z\n")
+            self.assertEqual(stream.readline(), "newlist:\n")
+            # TODO: These values should be intendet
+            self.assertEqual(stream.readline(), "- new_val1\n")
+            self.assertEqual(stream.readline(), "- val2\n")
             self.assertEqual(stream.readline(), "")
