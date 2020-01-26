@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 from abc import ABC, abstractmethod
 from git import Repo
+from gitopscli.bitbucket_git_util import BitBucketGitUtil
+from gitopscli.github_git_util import GithubGitUtil
 
 
 def create_git(
@@ -12,13 +14,11 @@ def create_git(
         if not git_provider_url:
             print(f"Please provide --git-provider-url for bitbucket-server", file=sys.stderr)
             sys.exit(1)
-        from gitopscli.bitbucket_git_util import BitBucketGitUtil
 
         git = BitBucketGitUtil(
             tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email
         )
     elif git_provider == "github":
-        from gitopscli.github_git_util import GithubGitUtil
 
         git = GithubGitUtil(tmp_dir, organisation, repository_name, username, password, git_user, git_email)
     else:

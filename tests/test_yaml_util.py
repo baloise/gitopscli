@@ -74,7 +74,7 @@ class YamlUtilTest(unittest.TestCase):
 # Kept comment
 applications:
   app1: # Lost comment
-  app2: # Kept comment
+  app2:
     key: value # Lost comment
 """
             )

@@ -6,7 +6,7 @@ from ruamel.yaml import YAML
 from gitopscli.yaml_util import merge_yaml_element
 
 
-def sync_apps(self, apps_git, root_git):
+def sync_apps(apps_git, root_git):
     apps_git.checkout("master")
     full_file_path = apps_git.get_full_file_path(".")
 

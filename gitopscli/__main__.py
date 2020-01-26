@@ -10,7 +10,7 @@ from .abstract_git_util import create_git
 from .yaml_util import yaml_load, update_yaml_file
 
 
-def sync_apps(args):
+def sync_apps_command(args):
     assert args.command == "sync-apps"
 
     apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
@@ -63,7 +63,7 @@ def main():
         deploy(**vars(args))
 
     if args.command == "sync-apps":
-        sync_apps(args)
+        sync_apps_command(args)
 
 
 def create_cli_parser():
