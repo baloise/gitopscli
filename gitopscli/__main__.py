@@ -4,14 +4,36 @@ import uuid
 import shutil
 import json
 import os
-from .bitbucket_git_util import BitBucketGitUtil
-from .github_git_util import GithubGitUtil
+
+from gitopscli.apps_synchronizer import AppsSynchronizer
+from .abstract_git_util import create_git
 from .yaml_util import yaml_load, update_yaml_file
+
+def sync_apps(args):
+    assert args.command == "sync-apps"
+
+    apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    os.makedirs(apps_tmp_dir)
+    root_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    os.makedirs(root_tmp_dir)
+
+    try:
+        apps_git = create_git(args.username, args.password, args.git_user, args.git_email, args.organisation, args.repository_name, args.git_provider,
+                              args.git_provider_url, apps_tmp_dir)
+        root_git = create_git(args.username, args.password, args.git_user, args.git_email, args.root_organisation, args.root_repository_name, args.git_provider,
+                              args.git_provider_url, root_tmp_dir)
+        apps_syncer = AppsSynchronizer()
+
+        apps_syncer.sync_apps(apps_git, root_git)
+    finally:
+        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
+        shutil.rmtree(root_tmp_dir, ignore_errors=True)
 
 
 def main():
     parser, subparsers = create_cli_parser()
     add_deploy_parser(subparsers)
+    add_sync_apps_parser(subparsers)
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -21,6 +43,9 @@ def main():
 
     if args.command == "deploy":
         deploy(**vars(args))
+
+    if args.command == "sync-apps":
+        sync_apps(args)
 
 
 def create_cli_parser():
@@ -39,12 +64,16 @@ def add_deploy_parser(subparsers):
         type=yaml_load,
         required=True,
     )
+
+    add_git_parser_args(deploy_p)
+
+
+def add_git_parser_args(deploy_p):
     deploy_p.add_argument("-b", "--branch", help="Branch to push the changes to", default="master")
     deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
     deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
     deploy_p.add_argument("-j", "--git-user", help="Git Username", default="GitOpsCLI")
     deploy_p.add_argument("-e", "--git-email", help="Git User Email", default="gitopscli@baloise.dev")
-
     deploy_p.add_argument(
         "-c",
         "--create-pr",
@@ -63,7 +92,7 @@ def add_deploy_parser(subparsers):
         const=True,
         default=False,
     )
-    deploy_p.add_argument("-o", "--organisation", help="Git organisation/projectKey", required=True)
+    deploy_p.add_argument("-o", "--organisation", help="Apps Git organisation/projectKey", required=True)
     deploy_p.add_argument(
         "-n", "--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True
     )
@@ -73,21 +102,30 @@ def add_deploy_parser(subparsers):
     )
 
 
+def add_sync_apps_parser(subparsers):
+    sync_apps_p = subparsers.add_parser("sync-apps",
+                                     help="Synchronize applications (= every directory) from apps config repository to apps root config")
+    add_git_parser_args(sync_apps_p)
+    sync_apps_p.add_argument("-i", "--root-organisation", help="Apps config repository organisation", required=True)
+    sync_apps_p.add_argument("-r", "--root-repository-name", help="Root config repository organisation", required=True)
+
+
+
 def deploy(
-    command,
-    file,
-    values,
-    branch,
-    username,
-    password,
-    git_user,
-    git_email,
-    create_pr,
-    auto_merge,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
+        command,
+        file,
+        values,
+        branch,
+        username,
+        password,
+        git_user,
+        git_email,
+        create_pr,
+        auto_merge,
+        organisation,
+        repository_name,
+        git_provider,
+        git_provider_url,
 ):
     assert command == "deploy"
 
@@ -95,21 +133,9 @@ def deploy(
     os.makedirs(tmp_dir)
 
     try:
-        if git_provider == "bitbucket-server":
-            if not git_provider_url:
-                print(f"Please provide --git-provider-url for bitbucket-server", file=sys.stderr)
-                sys.exit(1)
-            git = BitBucketGitUtil(
-                tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email
-            )
-        elif git_provider == "github":
-            git = GithubGitUtil(tmp_dir, organisation, repository_name, username, password)
-        else:
-            print(f"Git provider '{git_provider}' is not supported.", file=sys.stderr)
-            sys.exit(1)
-
+        git = create_git(username, password, git_user, git_email, organisation, repository_name, git_provider,
+                         git_provider_url, tmp_dir)
         git.checkout(branch)
-
         full_file_path = git.get_full_file_path(file)
         for key in values:
             value = values[key]

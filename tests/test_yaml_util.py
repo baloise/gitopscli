@@ -11,10 +11,10 @@ class YamlUtilTest(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp_dir = f"/tmp/gitopscli-test-{uuid.uuid4()}"
         os.makedirs(cls.tmp_dir)
-    #
-    # @classmethod
-    # def tearDownClass(cls):
-    #     shutil.rmtree(cls.tmp_dir, ignore_errors=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp_dir, ignore_errors=True)
 
     def test_yaml_load(self):
         self.assertEqual(yaml_load("{answer: '42'}"), {"answer": "42"})

@@ -2,10 +2,9 @@ import sys
 from github import Github, UnknownObjectException
 from .abstract_git_util import AbstractGitUtil
 
-
 class GithubGitUtil(AbstractGitUtil):
-    def __init__(self, tmp_dir, organisation, repository_name, username, password):
-        super().__init__(tmp_dir, username, password)
+    def __init__(self, tmp_dir, organisation, repository_name, username, password, git_user, git_email):
+        super().__init__(tmp_dir, username, password, git_user, git_email)
         self._organisation = organisation
         self._repository_name = repository_name
         self._github = Github(self._username, self._password)
