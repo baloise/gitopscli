@@ -45,7 +45,7 @@ def sync_apps(apps_git, root_git):
     pprint.pprint(all_other_apps)
     if selected_app_config is None:
         raise Exception("Could't find config file with repository " + apps_git.get_clone_url() + " in apps/ directory")
-    for app_key in apps.keys():
+    for app_key in apps:
         if app_key in all_other_apps:
             raise Exception("application: " + app_key + " already exists in a different repository")
 
