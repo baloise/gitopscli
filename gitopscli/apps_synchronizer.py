@@ -31,12 +31,13 @@ def sync_apps(apps_git, root_git):
     app_file_name = None
     selected_app_config = None
     for boot_entry in bootstrap["bootstrap"]:
-        app_file_name = "apps/" + boot_entry["name"] + ".yaml"
-        apps_config_file = root_git.get_full_file_path(app_file_name)
+        file = "apps/" + boot_entry["name"] + ".yaml"
+        apps_config_file = root_git.get_full_file_path(file)
         with open(apps_config_file, "r") as stream:
             app_config_content = yaml.load(stream)
             print(app_config_content["repository"])
             if app_config_content["repository"] == apps_git.get_clone_url():
+                app_file_name = file
                 selected_app_config = app_config_content
                 app_config_path = str(apps_config_file)
             else:
