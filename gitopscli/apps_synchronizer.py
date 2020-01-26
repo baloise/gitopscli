@@ -25,14 +25,12 @@ def sync_apps(apps_git, root_git):
     yaml = YAML()
     with open(bootstrap_values_file, "r") as stream:
         bootstrap = yaml.load(stream)
-    apps_configs = []
     for boot_entry in bootstrap["bootstrap"]:
         apps_config_file = root_git.get_full_file_path("apps/" + boot_entry["name"] + ".yaml")
         path_to_app_config = {}
         with open(apps_config_file, "r") as stream:
-            app_config = yaml.load(stream)
-            path_to_app_config[str(apps_config_file)] = app_config
-        apps_configs.append(app_config)
+            app_config_content = yaml.load(stream)
+            path_to_app_config[str(apps_config_file)] = app_config_content
     app_config_path = None
     selected_app_config = None
     for path, app_config in path_to_app_config.items():
@@ -40,8 +38,9 @@ def sync_apps(apps_git, root_git):
         if app_config["repository"] == apps_git.get_clone_url():
             selected_app_config = app_config
             app_config_path = path
+            break
     if selected_app_config is None:
-        raise Exception("Could't find config file with repository " + app_config["repository"] + " in apps/ directory")
+        raise Exception("Could't find config file with repository " + apps_git.get_clone_url() + " in apps/ directory")
 
     merge_yaml_element(app_config_path, "applications", apps, True)
 
