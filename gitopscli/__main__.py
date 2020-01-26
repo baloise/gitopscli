@@ -9,6 +9,7 @@ from gitopscli.apps_synchronizer import AppsSynchronizer
 from .abstract_git_util import create_git
 from .yaml_util import yaml_load, update_yaml_file
 
+
 def sync_apps(args):
     assert args.command == "sync-apps"
 
@@ -18,10 +19,28 @@ def sync_apps(args):
     os.makedirs(root_tmp_dir)
 
     try:
-        apps_git = create_git(args.username, args.password, args.git_user, args.git_email, args.organisation, args.repository_name, args.git_provider,
-                              args.git_provider_url, apps_tmp_dir)
-        root_git = create_git(args.username, args.password, args.git_user, args.git_email, args.root_organisation, args.root_repository_name, args.git_provider,
-                              args.git_provider_url, root_tmp_dir)
+        apps_git = create_git(
+            args.username,
+            args.password,
+            args.git_user,
+            args.git_email,
+            args.organisation,
+            args.repository_name,
+            args.git_provider,
+            args.git_provider_url,
+            apps_tmp_dir,
+        )
+        root_git = create_git(
+            args.username,
+            args.password,
+            args.git_user,
+            args.git_email,
+            args.root_organisation,
+            args.root_repository_name,
+            args.git_provider,
+            args.git_provider_url,
+            root_tmp_dir,
+        )
         apps_syncer = AppsSynchronizer()
 
         apps_syncer.sync_apps(apps_git, root_git)
@@ -103,29 +122,29 @@ def add_git_parser_args(deploy_p):
 
 
 def add_sync_apps_parser(subparsers):
-    sync_apps_p = subparsers.add_parser("sync-apps",
-                                     help="Synchronize applications (= every directory) from apps config repository to apps root config")
+    sync_apps_p = subparsers.add_parser(
+        "sync-apps", help="Synchronize applications (= every directory) from apps config repository to apps root config"
+    )
     add_git_parser_args(sync_apps_p)
     sync_apps_p.add_argument("-i", "--root-organisation", help="Apps config repository organisation", required=True)
     sync_apps_p.add_argument("-r", "--root-repository-name", help="Root config repository organisation", required=True)
 
 
-
 def deploy(
-        command,
-        file,
-        values,
-        branch,
-        username,
-        password,
-        git_user,
-        git_email,
-        create_pr,
-        auto_merge,
-        organisation,
-        repository_name,
-        git_provider,
-        git_provider_url,
+    command,
+    file,
+    values,
+    branch,
+    username,
+    password,
+    git_user,
+    git_email,
+    create_pr,
+    auto_merge,
+    organisation,
+    repository_name,
+    git_provider,
+    git_provider_url,
 ):
     assert command == "deploy"
 
@@ -133,8 +152,17 @@ def deploy(
     os.makedirs(tmp_dir)
 
     try:
-        git = create_git(username, password, git_user, git_email, organisation, repository_name, git_provider,
-                         git_provider_url, tmp_dir)
+        git = create_git(
+            username,
+            password,
+            git_user,
+            git_email,
+            organisation,
+            repository_name,
+            git_provider,
+            git_provider_url,
+            tmp_dir,
+        )
         git.checkout(branch)
         full_file_path = git.get_full_file_path(file)
         for key in values:

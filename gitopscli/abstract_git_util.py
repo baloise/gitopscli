@@ -5,18 +5,21 @@ from abc import ABC, abstractmethod
 from git import Repo
 
 
-def create_git(username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
-               tmp_dir):
+def create_git(
+    username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url, tmp_dir
+):
     if git_provider == "bitbucket-server":
         if not git_provider_url:
             print(f"Please provide --git-provider-url for bitbucket-server", file=sys.stderr)
             sys.exit(1)
         from gitopscli.bitbucket_git_util import BitBucketGitUtil
+
         git = BitBucketGitUtil(
             tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email
         )
     elif git_provider == "github":
         from gitopscli.github_git_util import GithubGitUtil
+
         git = GithubGitUtil(tmp_dir, organisation, repository_name, username, password, git_user, git_email)
     else:
         print(f"Git provider '{git_provider}' is not supported.", file=sys.stderr)

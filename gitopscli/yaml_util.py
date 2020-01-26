@@ -22,6 +22,7 @@ def update_yaml_file(file_path, key, value):
     with open(file_path, "w+") as stream:
         yaml.dump(content, stream)
 
+
 def merge_yaml_element(file_path, element_path, value, delete_missing_key=False):
     yaml = YAML()
     with open(file_path, "r") as stream:

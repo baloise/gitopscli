@@ -69,13 +69,15 @@ class YamlUtilTest(unittest.TestCase):
     def test_merge_yaml_element(self):
         test_file = f"{self.tmp_dir}/{uuid.uuid4()}.yml"
         with open(test_file, "w+") as stream:
-            stream.write("""\
+            stream.write(
+                """\
 # Kept comment
 applications:
   app1: # Lost comment
   app2: # Kept comment
     key: value # Lost comment
-""")
+"""
+            )
         value = {"app2": {"key2": "value"}, "app3": None}
         expected = """\
 # Kept comment
@@ -88,7 +90,7 @@ applications:
 
         merge_yaml_element(test_file, "applications", value, True)
 
-        with open(test_file, 'r') as stream:
+        with open(test_file, "r") as stream:
             actual = stream.read()
         self.assertEqual(expected, actual)
 
@@ -96,13 +98,15 @@ applications:
         test_file = f"{self.tmp_dir}/{uuid.uuid4()}.yml"
         print(test_file)
         with open(test_file, "w+") as stream:
-            stream.write("""\
+            stream.write(
+                """\
 applications:
   app1: # Lost comment
   app2: # Lost comment
     key: value # Lost comment
-""")
-        value = {"applications": { "app2": {"key2": "value"}, "app3": None }}
+"""
+            )
+        value = {"applications": {"app2": {"key2": "value"}, "app3": None}}
         expected = """\
 applications:
   app1:
@@ -113,6 +117,6 @@ applications:
 
         merge_yaml_element(test_file, ".", value, True)
 
-        with open(test_file, 'r') as stream:
+        with open(test_file, "r") as stream:
             actual = stream.read()
         self.assertEqual(expected, actual)

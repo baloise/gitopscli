@@ -7,12 +7,15 @@ from gitopscli.yaml_util import merge_yaml_element
 
 
 class AppsSynchronizer:
-
     def sync_apps(self, apps_git, root_git):
         apps_git.checkout("master")
         full_file_path = apps_git.get_full_file_path(".")
 
-        app_dirs = [ name for name in os.listdir(full_file_path) if os.path.isdir(os.path.join(full_file_path, name)) and not name.startswith(".")  ]
+        app_dirs = [
+            name
+            for name in os.listdir(full_file_path)
+            if os.path.isdir(os.path.join(full_file_path, name)) and not name.startswith(".")
+        ]
         apps = {}
         for app_dir in app_dirs:
             apps[app_dir] = {}
@@ -34,15 +37,16 @@ class AppsSynchronizer:
         app_config_path = None
         selected_app_config = None
         for path, app_config in path_to_app_config.items():
-            print( app_config["repository"] )
+            print(app_config["repository"])
             if app_config["repository"] == apps_git.get_clone_url():
                 selected_app_config = app_config
                 app_config_path = path
         if selected_app_config is None:
-            raise Exception("Could't find config file with repository " + app_config["repository"] + " in apps/ directory")
+            raise Exception(
+                "Could't find config file with repository " + app_config["repository"] + " in apps/ directory"
+            )
 
         merge_yaml_element(app_config_path, "applications", apps, True)
 
         root_git.commit("Updated applications in " + app_config_path)
         root_git.push("master")
-
