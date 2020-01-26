@@ -27,7 +27,6 @@ def merge_yaml_element(file_path, element_path, desired_value, delete_missing_ke
     yaml = YAML()
     with open(file_path, "r") as stream:
         yaml_file_content = yaml.load(stream)
-    pprint.pprint(yaml_file_content)
     work_path = yaml_file_content
 
     if element_path != ".":

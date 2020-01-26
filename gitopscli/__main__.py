@@ -6,7 +6,7 @@ import json
 import os
 
 from gitopscli.apps_synchronizer import sync_apps
-from .abstract_git_util import create_git
+from .create_git import create_git
 from .yaml_util import yaml_load, update_yaml_file
 
 
