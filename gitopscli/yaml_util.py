@@ -19,3 +19,29 @@ def update_yaml_file(file_path, key, value):
 
     with open(file_path, "w+") as stream:
         yaml.dump(content, stream)
+
+def merge_yaml_element(file_path, element_path, value, delete_missing_key=False):
+    yaml = YAML()
+
+    with open(file_path, "r") as stream:
+        yaml_file_content = yaml.load(stream)
+
+    work_path = yaml_file_content
+    if element_path != ".":
+        path_list = element_path.split(".")
+        for k in path_list:
+            work_path = work_path[k]
+
+    for k, v in value.items():
+        if k in work_path and work_path[k] is not None:
+            v = {**work_path[k], **v}
+        work_path[k] = v
+
+    if delete_missing_key:
+        current = work_path.copy().items()
+        for k, v in current:
+            if k not in value:
+                del work_path[k]
+
+    with open(file_path, "w+") as stream:
+        yaml.dump(yaml_file_content, stream)
