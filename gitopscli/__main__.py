@@ -5,7 +5,7 @@ import shutil
 import json
 import os
 
-from gitopscli.apps_synchronizer import AppsSynchronizer
+from gitopscli.apps_synchronizer import sync_apps
 from .abstract_git_util import create_git
 from .yaml_util import yaml_load, update_yaml_file
 
@@ -41,9 +41,8 @@ def sync_apps(args):
             args.git_provider_url,
             root_tmp_dir,
         )
-        apps_syncer = AppsSynchronizer()
 
-        apps_syncer.sync_apps(apps_git, root_git)
+        sync_apps(apps_git, root_git)
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
