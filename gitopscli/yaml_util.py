@@ -1,3 +1,5 @@
+import pprint
+
 from ruamel.yaml import YAML
 
 
@@ -22,19 +24,22 @@ def update_yaml_file(file_path, key, value):
 
 def merge_yaml_element(file_path, element_path, value, delete_missing_key=False):
     yaml = YAML()
-
     with open(file_path, "r") as stream:
         yaml_file_content = yaml.load(stream)
-
+    pprint.pprint(yaml_file_content)
     work_path = yaml_file_content
+
     if element_path != ".":
         path_list = element_path.split(".")
         for k in path_list:
+            if work_path[k] is None:
+                work_path[k] = {}
             work_path = work_path[k]
 
     for k, v in value.items():
-        if k in work_path and work_path[k] is not None:
-            v = {**work_path[k], **v}
+        if k in work_path:
+            if work_path[k] is not None:
+                v = {**work_path[k], **v}
         work_path[k] = v
 
     if delete_missing_key:

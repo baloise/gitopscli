@@ -42,7 +42,7 @@ class AbstractGitUtil(ABC):
         if self._username is not None and self._password is not None:
             credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
             git_options.append(f"--config credential.helper={credentials_file}")
-        repo = Repo.clone_from(
+        self._repo = Repo.clone_from(
             url=self.get_clone_url(), to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options
         )
         self._repo.create_head(branch).checkout()
