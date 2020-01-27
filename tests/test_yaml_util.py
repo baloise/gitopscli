@@ -79,9 +79,8 @@ class YamlUtilTest(unittest.TestCase):
             self.assertEqual(stream.readline(), "    y:\n")
             self.assertEqual(stream.readline(), "      z: foo_y_z\n")
             self.assertEqual(stream.readline(), "newlist:\n")
-            # TODO: These values should be intendet
-            self.assertEqual(stream.readline(), "- val1\n")
-            self.assertEqual(stream.readline(), "- val2\n")
+            self.assertEqual(stream.readline(), "  - val1\n")
+            self.assertEqual(stream.readline(), "  - val2\n")
             self.assertEqual(stream.readline(), "")
 
         update_yaml_file(test_file, "newlist", ["new_val1", "val2"])
@@ -97,7 +96,6 @@ class YamlUtilTest(unittest.TestCase):
             self.assertEqual(stream.readline(), "    y:\n")
             self.assertEqual(stream.readline(), "      z: foo_y_z\n")
             self.assertEqual(stream.readline(), "newlist:\n")
-            # TODO: These values should be intendet
-            self.assertEqual(stream.readline(), "- new_val1\n")
-            self.assertEqual(stream.readline(), "- val2\n")
+            self.assertEqual(stream.readline(), "  - new_val1\n")
+            self.assertEqual(stream.readline(), "  - val2\n")
             self.assertEqual(stream.readline(), "")
