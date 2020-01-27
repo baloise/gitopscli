@@ -17,5 +17,6 @@ def update_yaml_file(file_path, key, value):
         obj = obj[k]
     obj[keys[-1]] = value
 
+    yaml.indent(mapping=2, sequence=4, offset=2)
     with open(file_path, "w+") as stream:
         yaml.dump(content, stream)
