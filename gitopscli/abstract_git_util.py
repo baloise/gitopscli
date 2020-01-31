@@ -37,6 +37,10 @@ class AbstractGitUtil(ABC):
     def push(self, branch):
         self._repo.git.push("origin", branch)
 
+    def get_author_from_last_commit(self):
+        last_commit = list(self._repo.iter_commits())[0]
+        return self._repo.git.show("-s", "--format=%an <%ae>", last_commit.hexsha)
+
     @staticmethod
     def create_credentials_file(directory, username, password):
         file_path = f"{directory}/credentials.sh"
