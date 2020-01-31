@@ -54,6 +54,16 @@ class BitBucketGitUtil(AbstractGitUtil):
             self._organisation, self._repository_name, pull_request["id"], pull_request["version"]
         )
 
+    def add_pull_request_comment(self, pull_request, text):
+        pull_request_comment = self._bitbucket.add_pull_request_comment(
+            self._organisation, self._repository_name, pull_request["id"], pull_request["version"]
+        )
+        if "errors" in self, pull_request_comment:
+            for error in pull_request_comment["errors"]:
+                print(error["message"], file=sys.stderr)
+            sys.exit(1)
+        return pull_request_comment
+
     def delete_branch(self, branch):
         branches = self._bitbucket.get_branches(self._organisation, self._repository_name, filter=branch, limit=1)
         if not branches:
