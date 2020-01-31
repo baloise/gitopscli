@@ -1,11 +1,12 @@
 import argparse
-import sys
-import uuid
-import shutil
 import json
 import os
+import shutil
+import sys
+import uuid
+import logging
 
-from gitopscli.apps_synchronizer import sync_apps
+from gitopscli.apps_sync import sync_apps
 from .create_git import create_git
 from .yaml_util import yaml_load, update_yaml_file
 
@@ -49,6 +50,8 @@ def sync_apps_command(args):
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
+
     parser, subparsers = create_cli_parser()
     add_deploy_parser(subparsers)
     add_sync_apps_parser(subparsers)
