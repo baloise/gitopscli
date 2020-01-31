@@ -86,7 +86,7 @@ optional arguments:
                         https://bitbucket.example.tld)
 ```
 
-### gitopscli sync-apps
+### `gitopscli sync-apps`
 
 ```bash
 gitopscli sync-apps --git-provider-url https://bitbucket.baloise.dev \
