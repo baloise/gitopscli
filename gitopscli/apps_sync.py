@@ -20,26 +20,25 @@ def find_apps_config_from_repo(apps_git, root_git):
     yaml = YAML()
     # List for all entries in .applications from each config repository
     apps_from_other_repos = []
-    apps_config_file = None
-    app_file_name = None
-    selected_app_config = None
+    found_app_config_file = None
+    found_app_config_file_name = None
     app_file_entries = get_bootstrap_entries(root_git)
     for app_file in app_file_entries:
         app_file_name = "apps/" + app_file["name"] + ".yaml"
         logging.info("Analyzing %s", app_file_name)
-        apps_config_file = root_git.get_full_file_path(app_file_name)
-        with open(apps_config_file, "r") as stream:
+        app_config_file = root_git.get_full_file_path(app_file_name)
+        with open(app_config_file, "r") as stream:
             app_config_content = yaml.load(stream)
         if app_config_content["repository"] == apps_git.get_clone_url():
             logging.info("Found repository in %s", app_file_name)
-            selected_app_config = app_config_content
-            apps_config_file = str(apps_config_file)
+            found_app_config_file = app_config_file
+            found_app_config_file_name = app_file_name
         else:
             if "applications" in app_config_content and app_config_content["applications"] is not None:
                 apps_from_other_repos += app_config_content["applications"].keys()
-    if selected_app_config is None:
+    if found_app_config_file is None:
         raise Exception(f"Could't find config file with .repository={apps_git.get_clone_url()} in apps/ directory")
-    return apps_config_file, app_file_name, apps_from_other_repos
+    return found_app_config_file, found_app_config_file_name, apps_from_other_repos
 
 
 def commit_and_push(apps_git, root_git, app_file_name):
