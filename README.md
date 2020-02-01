@@ -9,11 +9,11 @@ Currently, we support both BitBucket Server and GitHub.
 
 ### Docker
 ```bash
-docker run --rm -it baloiseincubator/gitopscli deploy [options]
+$ docker run --rm -it baloiseincubator/gitopscli deploy [options]
 ```
 
 ## Usage
-```bash
+```
 $ gitopscli -h
 usage: gitopscli [-h] {deploy,sync-apps} ...
 
@@ -31,7 +31,7 @@ commands:
 
 ### `gitopscli deploy`
 ```bash
-gitopscli deploy --git-provider-url https://bitbucket.baloise.dev \
+$ gitopscli deploy --git-provider-url https://bitbucket.baloise.dev \
 --username $GIT_USERNAME \
 --password $GIT_PASSWORD \
 --git-user "GitOpsCLI" \
@@ -45,8 +45,8 @@ gitopscli deploy --git-provider-url https://bitbucket.baloise.dev \
 --auto-merge
 ```
 
-```bash
-gitopscli deploy -h
+```
+$ gitopscli deploy -h
 usage: gitopscli deploy [-h] -f FILE -v VALUES [-b BRANCH] [-u USERNAME]
                         [-p PASSWORD] [-j GIT_USER] [-e GIT_EMAIL]
                         [-c [CREATE_PR]] [-a [AUTO_MERGE]] -o ORGANISATION -n
@@ -89,7 +89,7 @@ optional arguments:
 ### `gitopscli sync-apps`
 
 ```bash
-gitopscli sync-apps --git-provider-url https://bitbucket.baloise.dev \
+$ gitopscli sync-apps --git-provider-url https://bitbucket.baloise.dev \
 --username "${USERNAME}" \
 --password "${PASSWORD}" \
 --git-user "GitOpsCLI" \
@@ -100,8 +100,8 @@ gitopscli sync-apps --git-provider-url https://bitbucket.baloise.dev \
 --root-repository-name "apps-root-config" 
 ```
 
-```bash
-gitopscli sync-apps -h
+```
+$ gitopscli sync-apps -h
 usage: gitopscli sync-apps [-h] [-b BRANCH] [-u USERNAME] [-p PASSWORD]
                            [-j GIT_USER] [-e GIT_EMAIL] [-c [CREATE_PR]]
                            [-a [AUTO_MERGE]] -o ORGANISATION -n
@@ -152,7 +152,7 @@ optional arguments:
 ### Installation (dev)
 
 ```bash
-make install
+$ make install
 ```
 
 ### General
