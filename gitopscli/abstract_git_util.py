@@ -68,7 +68,7 @@ class AbstractGitUtil(ABC):
         pass
 
     @abstractmethod
-    def add_pull_request_comment(self, pull_request, text):
+    def add_pull_request_comment(self, pr_id, text):
         pass
 
     @abstractmethod
