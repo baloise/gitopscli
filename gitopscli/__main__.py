@@ -165,7 +165,7 @@ def add_pr_comment_parser(subparsers):
     # TODO: We do not need all git args here
     add_git_parser_args(add_pr_comment_p)
     add_pr_comment_p.add_argument("-p", "--pr-id", help="the id of the pull request", required=True)
-    add_pr_comment_p.add_argument("-t", "--test", help="the text of the comment", required=True)
+    add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
 
 
 def deploy(
