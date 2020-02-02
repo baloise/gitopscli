@@ -31,8 +31,8 @@ class GithubGitUtil(AbstractGitUtil):
 
     def add_pull_request_comment(self, pr_id, text):
         repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
-        pr = repo.get_pull(pr_id)
-        pr_comment = pr.create_issue_comment(text)
+        pull_request = repo.get_pull(pr_id)
+        pr_comment = pull_request.create_issue_comment(text)
         return pr_comment
 
     def delete_branch(self, branch):
