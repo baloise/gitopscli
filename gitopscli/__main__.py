@@ -162,7 +162,7 @@ def add_sync_apps_parser(subparsers):
 def add_pr_comment_parser(subparsers):
     add_pr_comment_p = subparsers.add_parser("add-pr-comment", help="Create a comment on the pull request")
     add_git_parser_args(add_pr_comment_p)
-    add_pr_comment_p.add_argument("-i", "--pr-id", help="the id of the pull request", required=True)
+    add_pr_comment_p.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
     add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
 
 
