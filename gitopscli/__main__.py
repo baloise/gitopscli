@@ -51,7 +51,6 @@ def sync_apps_command(args):
 
 def pr_comment_command(args):
     assert args.command == "add-pr-comment"
-    # TODO: the whole git stuff is not needed - we only do api operations here
     apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
     os.makedirs(apps_tmp_dir)
     try:
@@ -162,7 +161,6 @@ def add_sync_apps_parser(subparsers):
 
 def add_pr_comment_parser(subparsers):
     add_pr_comment_p = subparsers.add_parser("add-pr-comment", help="Create a comment on the pull request")
-    # TODO: We do not need all git args here
     add_git_parser_args(add_pr_comment_p)
     add_pr_comment_p.add_argument("-p", "--pr-id", help="the id of the pull request", required=True)
     add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
