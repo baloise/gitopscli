@@ -72,6 +72,7 @@ def pr_comment_command(args):
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
 
+
 def main():
     logging.basicConfig(level=logging.INFO)
 
@@ -158,6 +159,7 @@ def add_sync_apps_parser(subparsers):
     sync_apps_p.add_argument("-i", "--root-organisation", help="Apps config repository organisation", required=True)
     sync_apps_p.add_argument("-r", "--root-repository-name", help="Root config repository organisation", required=True)
 
+
 def add_pr_comment_parser(subparsers):
     add_pr_comment_p = subparsers.add_parser(
         "add-pr-comment", help="Create a comment on the pull request"
@@ -166,7 +168,6 @@ def add_pr_comment_parser(subparsers):
     add_git_parser_args(add_pr_comment_p)
     add_pr_comment_p.add_argument("-p", "--pr-id", help="the id of the pull request", required=True)
     add_pr_comment_p.add_argument("-t", "--test", help="the text of the comment", required=True)
-
 
 
 def deploy(
