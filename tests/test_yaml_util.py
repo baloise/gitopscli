@@ -16,69 +16,87 @@ class YamlUtilTest(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp_dir, ignore_errors=True)
 
+    def _create_file(self, content):
+        path = f"{self.tmp_dir}/{uuid.uuid4()}"
+        with open(path, "w+") as stream:
+            stream.write(content)
+        return path
+
+    def _read_file(self, path):
+        with open(path, "r") as stream:
+            return stream.read()
+
     def test_yaml_load(self):
         self.assertEqual(yaml_load("{answer: '42'}"), {"answer": "42"})
         self.assertEqual(yaml_load("{answer: 42}"), {"answer": 42})
 
     def test_update_yaml_file(self):
-        test_file = f"{self.tmp_dir}/{uuid.uuid4()}.yml"
-        with open(test_file, "w+") as stream:
-            stream.write("a: # comment\n")
-            stream.write("# comment\n")
-            stream.write("  b:\n")
-            stream.write("    d: 1 # comment\n")
-            stream.write("    c: 2 # comment\n")
+        test_file = self._create_file(
+            """\
+a: # comment
+# comment
+  b:
+    d: 1 # comment
+    c: 2 # comment"""
+        )
 
         update_yaml_file(test_file, "a.b.c", "2")
 
-        with open(test_file, "r+") as stream:
-            self.assertEqual(stream.readline(), "a: # comment\n")
-            self.assertEqual(stream.readline(), "# comment\n")
-            self.assertEqual(stream.readline(), "  b:\n")
-            self.assertEqual(stream.readline(), "    d: 1 # comment\n")
-            self.assertEqual(stream.readline(), "    c: '2' # comment\n")
-            self.assertEqual(stream.readline(), "")
+        expected = """\
+a: # comment
+# comment
+  b:
+    d: 1 # comment
+    c: '2' # comment
+"""
+        actual = self._read_file(test_file)
+        self.assertEqual(expected, actual)
 
         update_yaml_file(test_file, "a.x", "foo")
 
-        with open(test_file, "r+") as stream:
-            self.assertEqual(stream.readline(), "a: # comment\n")
-            self.assertEqual(stream.readline(), "# comment\n")
-            self.assertEqual(stream.readline(), "  b:\n")
-            self.assertEqual(stream.readline(), "    d: 1 # comment\n")
-            self.assertEqual(stream.readline(), "    c: '2' # comment\n")
-            self.assertEqual(stream.readline(), "  x: foo\n")
-            self.assertEqual(stream.readline(), "")
+        expected = """\
+a: # comment
+# comment
+  b:
+    d: 1 # comment
+    c: '2' # comment
+  x: foo
+"""
+        actual = self._read_file(test_file)
+        self.assertEqual(expected, actual)
 
         update_yaml_file(test_file, "a.x.z", "foo_z")
         update_yaml_file(test_file, "a.x.y", "foo_y")
         update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
 
-        with open(test_file, "r+") as stream:
-            self.assertEqual(stream.readline(), "a: # comment\n")
-            self.assertEqual(stream.readline(), "# comment\n")
-            self.assertEqual(stream.readline(), "  b:\n")
-            self.assertEqual(stream.readline(), "    d: 1 # comment\n")
-            self.assertEqual(stream.readline(), "    c: '2' # comment\n")
-            self.assertEqual(stream.readline(), "  x:\n")
-            self.assertEqual(stream.readline(), "    z: foo_z\n")
-            self.assertEqual(stream.readline(), "    y:\n")
-            self.assertEqual(stream.readline(), "      z: foo_y_z\n")
-            self.assertEqual(stream.readline(), "")
+        expected = """\
+a: # comment
+# comment
+  b:
+    d: 1 # comment
+    c: '2' # comment
+  x:
+    z: foo_z
+    y:
+      z: foo_y_z
+"""
+        actual = self._read_file(test_file)
+        self.assertEqual(expected, actual)
 
     def test_merge_yaml_element(self):
-        test_file = f"{self.tmp_dir}/{uuid.uuid4()}.yml"
-        with open(test_file, "w+") as stream:
-            stream.write(
-                """\
+        test_file = self._create_file(
+            """\
 # Kept comment
 applications:
   app1: # Lost comment
   app2:
     key: value # Lost comment
 """
-            )
+        )
+
         value = {"app2": {"key2": "value"}, "app3": None}
+        merge_yaml_element(test_file, "applications", value, True)
+
         expected = """\
 # Kept comment
 applications:
@@ -87,26 +105,22 @@ applications:
     key2: value
   app3:
 """
-
-        merge_yaml_element(test_file, "applications", value, True)
-
-        with open(test_file, "r") as stream:
-            actual = stream.read()
+        actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
     def test_merge_yaml_element_root_dir(self):
-        test_file = f"{self.tmp_dir}/{uuid.uuid4()}.yml"
-        print(test_file)
-        with open(test_file, "w+") as stream:
-            stream.write(
-                """\
+        test_file = self._create_file(
+            """\
 applications:
   app1: # Lost comment
   app2: # Lost comment
     key: value # Lost comment
 """
-            )
+        )
+
         value = {"applications": {"app2": {"key2": "value"}, "app3": None}}
+        merge_yaml_element(test_file, ".", value, True)
+
         expected = """\
 applications:
   app1:
@@ -114,9 +128,5 @@ applications:
     key2: value
   app3:
 """
-
-        merge_yaml_element(test_file, ".", value, True)
-
-        with open(test_file, "r") as stream:
-            actual = stream.read()
+        actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
