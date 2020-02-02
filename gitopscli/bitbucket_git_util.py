@@ -54,9 +54,9 @@ class BitBucketGitUtil(AbstractGitUtil):
             self._organisation, self._repository_name, pull_request["id"], pull_request["version"]
         )
 
-    def add_pull_request_comment(self, pull_request, text):
+    def add_pull_request_comment(self, pr_id, text):
         pull_request_comment = self._bitbucket.add_pull_request_comment(
-            self._organisation, self._repository_name, pull_request["id"], text
+            self._organisation, self._repository_name, pr_id, text
         )
         if "errors" in pull_request_comment:
             for error in pull_request_comment["errors"]:
