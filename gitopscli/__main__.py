@@ -49,12 +49,36 @@ def sync_apps_command(args):
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
 
 
+def pr_comment_command(args):
+    assert args.command == "add-pr-comment"
+    apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    os.makedirs(apps_tmp_dir)
+    try:
+        apps_git = create_git(
+            args.username,
+            args.password,
+            args.git_user,
+            args.git_email,
+            args.organisation,
+            args.repository_name,
+            args.git_provider,
+            args.git_provider_url,
+            apps_tmp_dir,
+        )
+
+        apps_git.add_pull_request_comment(args.pr_id, args.text)
+
+    finally:
+        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
 
     parser, subparsers = create_cli_parser()
     add_deploy_parser(subparsers)
     add_sync_apps_parser(subparsers)
+    add_pr_comment_parser(subparsers)
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -67,6 +91,9 @@ def main():
 
     if args.command == "sync-apps":
         sync_apps_command(args)
+
+    if args.command == "add-pr-comment":
+        pr_comment_command(args)
 
 
 def create_cli_parser():
@@ -130,6 +157,13 @@ def add_sync_apps_parser(subparsers):
     add_git_parser_args(sync_apps_p)
     sync_apps_p.add_argument("-i", "--root-organisation", help="Apps config repository organisation", required=True)
     sync_apps_p.add_argument("-r", "--root-repository-name", help="Root config repository organisation", required=True)
+
+
+def add_pr_comment_parser(subparsers):
+    add_pr_comment_p = subparsers.add_parser("add-pr-comment", help="Create a comment on the pull request")
+    add_git_parser_args(add_pr_comment_p)
+    add_pr_comment_p.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
+    add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
 
 
 def deploy(
