@@ -164,7 +164,9 @@ def add_pr_comment_parser(subparsers):
     add_git_parser_args(add_pr_comment_p)
     add_pr_comment_p.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
     add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
-    add_pr_comment_p.add_argument("-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int)
+    add_pr_comment_p.add_argument(
+        "-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int
+    )
 
 
 def deploy(
