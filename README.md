@@ -15,18 +15,19 @@ $ docker run --rm -it baloiseincubator/gitopscli deploy [options]
 ## Usage
 ```
 $ gitopscli -h
-usage: gitopscli [-h] {deploy,sync-apps} ...
+usage: gitopscli [-h] {deploy,sync-apps,add-pr-comment} ...
 
 GitOps CLI
 
 optional arguments:
-  -h, --help          show this help message and exit
+  -h, --help            show this help message and exit
 
 commands:
-  {deploy,sync-apps}
-    deploy            Trigger a new deployment by changing YAML values
-    sync-apps         Synchronize applications (= every directory) from apps
-                      config repository to apps root config
+  {deploy,sync-apps,add-pr-comment}
+    deploy              Trigger a new deployment by changing YAML values
+    sync-apps           Synchronize applications (= every directory) from apps
+                        config repository to apps root config
+    add-pr-comment      Create a comment on the pull request
 ```
 
 ### `gitopscli deploy`
