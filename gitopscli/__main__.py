@@ -66,7 +66,7 @@ def pr_comment_command(args):
             apps_tmp_dir,
         )
 
-        apps_git.add_pull_request_comment(args.pr_id, args.text)
+        apps_git.add_pull_request_comment(args.pr_id, args.text, args.parent_id)
 
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
@@ -164,6 +164,7 @@ def add_pr_comment_parser(subparsers):
     add_git_parser_args(add_pr_comment_p)
     add_pr_comment_p.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
     add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
+    add_pr_comment_p.add_argument("-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int)
 
 
 def deploy(
