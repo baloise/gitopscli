@@ -11,7 +11,7 @@ env:
 
 script:
   - docker build -t $IMAGE_NAME:latest .
-  - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:$TRAVIS_TAG; fi
+  - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
   - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push $IMAGE_NAME:latest
   - echo $TRAVIS_TAG
