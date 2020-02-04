@@ -29,7 +29,7 @@ class GithubGitUtil(AbstractGitUtil):
     def merge_pull_request(self, pull_request):
         pull_request.merge()
 
-    def add_pull_request_comment(self, pr_id, text):
+    def add_pull_request_comment(self, pr_id, text, parent_id=None):
         repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
         pull_request = repo.get_pull(pr_id)
         pr_comment = pull_request.create_issue_comment(text)
