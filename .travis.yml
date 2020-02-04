@@ -9,8 +9,9 @@ env:
     - secure: "cyp11ZUB/GJ3o96oFZvMEZPW0rPzWnOHXcQTgQcQBz328+OUBgg/rY61BwRAjk57Kqjr9w7FWCJCjvzHLiTk/wVwsKo3pQw9nJPiyblFKAtGunJfA/rrwVqaDTvki9zWtQKqwteQ9gPpVG4RAsCVVYp0nCsCCfmBsw6iWnHSiQKwpw2g23PTG97xkioFcMNdetdt1+fqQC23fcEd7aktPlq0wRilSOZQRk87zF9tiRzTIL9Cl81guh0xC5FY4KG6egS82DAv0gANQO/aJr2vWpTZRPukL5GkFUpFfRFcH9nszz39R8OQ5B+SWJxbWSkbIN0k5IQyZyN7rWqQkk1p84JSMn3O4/0RSrAXDp93dcb1OxAYQq0o+upBZfcpKBFAAXy0xIHKu8uQe2BohREB2EVlfQIO1iXYnB2hUo7hUyHFQ2btjT1Qq8GdU1uudKmaueDC51WlHmcvBgAptQXD4ESagiL5vSCfw4S7gUevdrxrV+GLkUYGxqzd20CA0kWf05KBYX3JHh02sTwQm+x8cQWL4aHQ/vQN+zYRLh+TrgoOKoR50L5xK1Eyq3boTZ0R6wOcvKgA9ViWZ2ZDckB2FlM2Vpk4Zvmg5cBlgTwP96aQXh06TZgfvx26Ni9JaWb59iZSVSl1RWdeeIv5VZqLBX2MR5jy2rlccg8ws5DqWAQ="
     - IMAGE_NAME=baloiseincubator/gitopscli
 
-
 script:
   - docker build -t $IMAGE_NAME:latest .
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_ACCESS_TOKEN
+  - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
+  - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push $IMAGE_NAME:latest
+  - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
