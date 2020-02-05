@@ -27,6 +27,9 @@ class AbstractGitUtil(ABC):
         )
         self._repo.create_head(branch).checkout()
 
+    def new_branch(self, branch):
+        self._repo.create_head(branch).checkout()
+
     def commit(self, message):
         self._repo.git.add(u=True)
         self._repo.index.add(self._repo.untracked_files)
@@ -36,7 +39,7 @@ class AbstractGitUtil(ABC):
             self._repo.git.commit("-m", message)
 
     def push(self, branch):
-        self._repo.git.push("origin", branch)
+        self._repo.git.push("--set-upstream", "origin", branch)
 
     def get_author_from_last_commit(self):
         last_commit = self._repo.head.commit
