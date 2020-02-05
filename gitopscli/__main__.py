@@ -115,17 +115,36 @@ def create_preview_command(args):
             root_tmp_dir,
         )
         root_git.checkout(args.branch)
-        new_preview_ns = app_name + "-" + shortened_branch_hash + "-preview"
-        if not os.path.exists(root_git.get_full_file_path(new_preview_ns)):
+        new_preview_folder_name = app_name + "-" + shortened_branch_hash + "-preview"
+        preview_template_folder_name = "." + app_name + "-preview"
+        if not os.path.exists(root_git.get_full_file_path(new_preview_folder_name)):
             shutil.copytree(
-                root_git.get_full_file_path("." + app_name + "-preview"), root_git.get_full_file_path(new_preview_ns),
+                root_git.get_full_file_path(preview_template_folder_name),
+                root_git.get_full_file_path(new_preview_folder_name),
             )
+            chart_file_path = new_preview_folder_name + "/Chart.yaml"
+            if root_git.get_full_file_path(chart_file_path):
+                update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
+                if "routepaths" in gitops_config_content and gitops_config_content["routepaths"] is not None:
+                    route_host = gitops_config_content["routehost"].replace("previewplaceholder", shortened_branch_hash)
+                    for route_path in gitops_config_content["routepaths"]:
+                        yaml_replace_path = route_path["hostpath"]
+                        update_yaml_file(
+                            root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"),
+                            yaml_replace_path,
+                            route_host,
+                        )
+
+            root_git.commit(f"Initiated new preview env for branch {args.branch}'")
+
         new_image_tag = apps_git.get_last_commit_hash()
         if "imagepaths" in gitops_config_content and gitops_config_content["imagepaths"] is not None:
-            for image_path in gitops_config_content["imagepaths"]:
-                yaml_replace_path = image_path["yamlpath"]
+            for route_path in gitops_config_content["imagepaths"]:
+                yaml_replace_path = route_path["yamlpath"]
                 update_yaml_file(
-                    root_git.get_full_file_path(new_preview_ns + "/values.yaml"), yaml_replace_path, new_image_tag
+                    root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"),
+                    yaml_replace_path,
+                    new_image_tag,
                 )
                 root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
 
