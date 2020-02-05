@@ -29,6 +29,7 @@ class AbstractGitUtil(ABC):
 
     def commit(self, message):
         self._repo.git.add(u=True)
+        self._repo.index.add(self._repo.untracked_files)
         if self._repo.index.diff("HEAD"):
             self._repo.config_writer().set_value("user", "name", self._git_user).release()
             self._repo.config_writer().set_value("user", "email", self._git_email).release()
@@ -40,6 +41,9 @@ class AbstractGitUtil(ABC):
     def get_author_from_last_commit(self):
         last_commit = list(self._repo.iter_commits())[0]
         return self._repo.git.show("-s", "--format=%an <%ae>", last_commit.hexsha)
+
+    def get_last_commit_hash(self):
+        return list(self._repo.iter_commits())[0].hexsha
 
     @staticmethod
     def create_credentials_file(directory, username, password):

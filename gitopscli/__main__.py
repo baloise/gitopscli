@@ -5,6 +5,7 @@ import shutil
 import sys
 import uuid
 import logging
+import hashlib
 
 from gitopscli.apps_sync import sync_apps
 from .create_git import create_git
@@ -72,6 +73,84 @@ def pr_comment_command(args):
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
 
 
+def create_preview_command(args):
+    assert args.command == "create-preview"
+
+    apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    os.makedirs(apps_tmp_dir)
+    root_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    os.makedirs(root_tmp_dir)
+
+    try:
+        apps_git = create_git(
+            args.username,
+            args.password,
+            args.git_user,
+            args.git_email,
+            args.organisation,
+            args.repository_name,
+            args.git_provider,
+            args.git_provider_url,
+            apps_tmp_dir,
+        )
+
+        apps_git.checkout(args.branch)
+        shortened_branch_hash = str(int(hashlib.sha256(args.branch.encode("utf-8")).hexdigest(), 16) % 10 ** 8)
+        gitops_config_file = apps_git.get_full_file_path(".gitops.config.yaml")
+        with open(gitops_config_file, "r") as stream:
+            gitops_config_content = yaml_load(stream)
+        root_organisation = gitops_config_content["team-config-org"]
+        root_repository_name = gitops_config_content["team-config-repo"]
+        app_name = gitops_config_content["application-name"]
+
+        root_git = create_git(
+            args.username,
+            args.password,
+            args.git_user,
+            args.git_email,
+            root_organisation,
+            root_repository_name,
+            args.git_provider,
+            args.git_provider_url,
+            root_tmp_dir,
+        )
+        root_git.checkout(args.branch)
+        new_preview_ns = app_name + "-" + shortened_branch_hash + "-preview"
+        if not os.path.exists(root_git.get_full_file_path(new_preview_ns)):
+            shutil.copytree(
+                root_git.get_full_file_path("." + app_name + "-preview"), root_git.get_full_file_path(new_preview_ns),
+            )
+        new_image_tag = apps_git.get_last_commit_hash()
+        if "imagepaths" in gitops_config_content and gitops_config_content["imagepaths"] is not None:
+            for image_path in gitops_config_content["imagepaths"]:
+                yaml_replace_path = image_path["yamlpath"]
+                update_yaml_file(
+                    root_git.get_full_file_path(new_preview_ns + "/values.yaml"), yaml_replace_path, new_image_tag
+                )
+                root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
+
+        root_git.push(args.branch)
+
+    finally:
+        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
+        shutil.rmtree(root_tmp_dir, ignore_errors=True)
+
+    if args.create_pr and args.branch != "master":
+        title = "Updated preview environemnt for " + app_name
+        description = f"""
+This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
+"""
+        pull_request = root_git.create_pull_request(args.branch, "master", title, description)
+        print(f"Pull request created: {root_git.get_pull_request_url(pull_request)}")
+
+        if args.auto_merge:
+            root_git.merge_pull_request(pull_request)
+            print("Pull request merged")
+
+            root_git.delete_branch(args.branch)
+            print(f"Branch '{args.branch}' deleted")
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
 
@@ -79,6 +158,7 @@ def main():
     add_deploy_parser(subparsers)
     add_sync_apps_parser(subparsers)
     add_pr_comment_parser(subparsers)
+    add_create_preview_parser(subparsers)
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -94,6 +174,9 @@ def main():
 
     if args.command == "add-pr-comment":
         pr_comment_command(args)
+
+    if args.command == "create-preview":
+        create_preview_command(args)
 
 
 def create_cli_parser():
@@ -167,6 +250,11 @@ def add_pr_comment_parser(subparsers):
     add_pr_comment_p.add_argument(
         "-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int
     )
+
+
+def add_create_preview_parser(subparsers):
+    add_create_preview_p = subparsers.add_parser("create-preview", help="Create a preview environment")
+    add_git_parser_args(add_create_preview_p)
 
 
 def deploy(
