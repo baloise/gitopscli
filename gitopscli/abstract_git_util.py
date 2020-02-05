@@ -23,7 +23,7 @@ class AbstractGitUtil(ABC):
             credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
             git_options.append(f"--config credential.helper={credentials_file}")
         self._repo = Repo.clone_from(
-            url=self.get_clone_url(), to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options
+            url=self.get_clone_url(), to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options, b=branch
         )
         self._repo.create_head(branch).checkout()
 
@@ -39,11 +39,11 @@ class AbstractGitUtil(ABC):
         self._repo.git.push("origin", branch)
 
     def get_author_from_last_commit(self):
-        last_commit = list(self._repo.iter_commits())[0]
+        last_commit = self._repo.head.commit
         return self._repo.git.show("-s", "--format=%an <%ae>", last_commit.hexsha)
 
     def get_last_commit_hash(self):
-        return list(self._repo.iter_commits())[0].hexsha
+        return self._repo.head.commit.hexsha
 
     @staticmethod
     def create_credentials_file(directory, username, password):
