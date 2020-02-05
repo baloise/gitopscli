@@ -114,7 +114,7 @@ def create_preview_command(args):
             args.git_provider_url,
             root_tmp_dir,
         )
-        root_git.checkout(args.branch)
+        root_git.checkout("master")
         new_preview_folder_name = app_name + "-" + shortened_branch_hash + "-preview"
         preview_template_folder_name = ".preview-templates/" + app_name
         if not os.path.exists(root_git.get_full_file_path(new_preview_folder_name)):
@@ -309,7 +309,7 @@ def deploy(
             git_provider_url,
             tmp_dir,
         )
-        git.checkout(branch)
+        git.checkout("master")
         full_file_path = git.get_full_file_path(file)
         for key in values:
             value = values[key]
