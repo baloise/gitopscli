@@ -116,7 +116,7 @@ def create_preview_command(args):
         )
         root_git.checkout(args.branch)
         new_preview_folder_name = app_name + "-" + shortened_branch_hash + "-preview"
-        preview_template_folder_name = "." + app_name + "-preview"
+        preview_template_folder_name = ".preview-templates/" + app_name
         if not os.path.exists(root_git.get_full_file_path(new_preview_folder_name)):
             shutil.copytree(
                 root_git.get_full_file_path(preview_template_folder_name),
