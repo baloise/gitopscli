@@ -118,6 +118,7 @@ def create_preview_command(args):
         root_git.new_branch(args.branch)
         new_preview_folder_name = app_name + "-" + shortened_branch_hash + "-preview"
         preview_template_folder_name = ".preview-templates/" + app_name
+        route_host = None
         if not os.path.exists(root_git.get_full_file_path(new_preview_folder_name)):
             shutil.copytree(
                 root_git.get_full_file_path(preview_template_folder_name),
@@ -150,6 +151,10 @@ def create_preview_command(args):
                 root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
 
         root_git.push(args.branch)
+        pr_comment_text = f"""
+Preview created successfully. Access it [here]({route_host}).
+"""
+        apps_git.add_pull_request_comment(args.pr_id, pr_comment_text, args.parent_id)
 
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
@@ -275,6 +280,10 @@ def add_pr_comment_parser(subparsers):
 def add_create_preview_parser(subparsers):
     add_create_preview_p = subparsers.add_parser("create-preview", help="Create a preview environment")
     add_git_parser_args(add_create_preview_p)
+    add_create_preview_p.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
+    add_create_preview_p.add_argument(
+        "-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int
+    )
 
 
 def deploy(

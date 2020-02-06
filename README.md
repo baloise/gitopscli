@@ -210,6 +210,7 @@ $ gitopscli create-preview --git-provider-url https://bitbucket.baloise.dev \
 --repository-name "${repository}" \
 --branch "somebranchname" \
 --create-pr \
+--pr-id 27 \
 --auto-merge
 ```
 
@@ -248,6 +249,8 @@ optional arguments:
   -w GIT_PROVIDER_URL, --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
+  -i PR_ID, --pr-id PR_ID
+                        the id of the pull request
 ```
 
 
