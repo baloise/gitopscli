@@ -208,7 +208,7 @@ $ gitopscli create-preview --git-provider-url https://bitbucket.baloise.dev \
 --git-email "gitopscli@baloise.dev" \
 --organisation "${organisation}" \
 --repository-name "${repository}" \
---branch "somebranchname \
+--branch "somebranchname" \
 --create-pr \
 --auto-merge
 ```
