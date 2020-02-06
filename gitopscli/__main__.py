@@ -152,7 +152,7 @@ def create_preview_command(args):
 
         root_git.push(args.branch)
         pr_comment_text = f"""
-Preview created successfully. Access it [here]({route_host}).
+Preview created successfully. Access it [here](https://{route_host}).
 """
         apps_git.add_pull_request_comment(args.pr_id, pr_comment_text, args.parent_id)
 
