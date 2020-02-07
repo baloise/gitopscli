@@ -1,5 +1,7 @@
 import sys
+
 from atlassian import Bitbucket
+
 from .abstract_git_util import AbstractGitUtil
 
 

@@ -1,6 +1,7 @@
 import os
-from pathlib import Path
 from abc import ABC, abstractmethod
+from pathlib import Path
+
 from git import Repo
 
 
@@ -23,23 +24,30 @@ class AbstractGitUtil(ABC):
             credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
             git_options.append(f"--config credential.helper={credentials_file}")
         self._repo = Repo.clone_from(
-            url=self.get_clone_url(), to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options
+            url=self.get_clone_url(), to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options, b=branch
         )
+        self._repo.create_head(branch).checkout()
+
+    def new_branch(self, branch):
         self._repo.create_head(branch).checkout()
 
     def commit(self, message):
         self._repo.git.add(u=True)
+        self._repo.index.add(self._repo.untracked_files)
         if self._repo.index.diff("HEAD"):
             self._repo.config_writer().set_value("user", "name", self._git_user).release()
             self._repo.config_writer().set_value("user", "email", self._git_email).release()
             self._repo.git.commit("-m", message)
 
     def push(self, branch):
-        self._repo.git.push("origin", branch)
+        self._repo.git.push("--set-upstream", "origin", branch)
 
     def get_author_from_last_commit(self):
-        last_commit = list(self._repo.iter_commits())[0]
+        last_commit = self._repo.head.commit
         return self._repo.git.show("-s", "--format=%an <%ae>", last_commit.hexsha)
+
+    def get_last_commit_hash(self):
+        return self._repo.head.commit.hexsha
 
     @staticmethod
     def create_credentials_file(directory, username, password):
