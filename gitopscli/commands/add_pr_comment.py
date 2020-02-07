@@ -39,8 +39,12 @@ def pr_comment_command(
             apps_tmp_dir,
         )
 
-        logging.info("Creating PullRequest comment for pr with id %s and parentComment with id %s and content: %s", pr_id, text, parent_id)
+        logging.info(
+            "Creating PullRequest comment for pr with id %s and parentComment with id %s and content: %s",
+            pr_id,
+            text,
+            parent_id,
+        )
         apps_git.add_pull_request_comment(pr_id, text, parent_id)
-
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)

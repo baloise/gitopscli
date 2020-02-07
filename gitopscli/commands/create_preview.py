@@ -97,9 +97,7 @@ def create_preview_command(
                             yaml_replace_path,
                             route_host,
                         )
-
             root_git.commit(f"Initiated new preview env for branch {branch}'")
-
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
         for image_path in gitops_config.image_paths:
@@ -109,19 +107,21 @@ def create_preview_command(
                 root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
             )
             root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
-
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
 Preview created successfully. Access it [here](https://{route_host}).
 """
-        logging.info("Creating PullRequest comment for pr with id %s and parentComment with id %s and content: %s", pr_id, pr_comment_text, parent_id)
+        logging.info(
+            "Creating PullRequest comment for pr with id %s and parentComment with id %s and content: %s",
+            pr_id,
+            pr_comment_text,
+            parent_id,
+        )
         apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
-
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
-
     if create_pr and branch != "master":
         pull_request = __create_pullrequest(branch, gitops_config, root_git)
         if auto_merge:
