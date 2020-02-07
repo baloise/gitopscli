@@ -27,12 +27,8 @@ def create_preview_command(
 ):
     assert command == "create-preview"
 
-    apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    os.makedirs(apps_tmp_dir)
-    logging.info("Created directory %s", apps_tmp_dir)
-    root_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    os.makedirs(root_tmp_dir)
-    logging.info("Created directory %s", root_tmp_dir)
+    apps_tmp_dir = __create_tmp_dir()
+    root_tmp_dir = __create_tmp_dir()
 
     try:
         apps_git = create_git(
@@ -81,9 +77,9 @@ def create_preview_command(
             route_host = gitops_config.route_host.replace("previewplaceholder", shortened_branch_hash)
             logging.info("Created route host: %s", route_host)
         if not branch_preview_env_already_exist:
-            __create_new_preview_env(branch, gitops_config, new_preview_folder_name,
-                                                  preview_template_folder_name, root_git, route_host,
-                                                  shortened_branch_hash)
+            __create_new_preview_env(
+                branch, gitops_config, new_preview_folder_name, preview_template_folder_name, root_git, route_host,
+            )
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
         for image_path in gitops_config.image_paths:
@@ -114,11 +110,11 @@ Preview created successfully. Access it [here](https://{route_host}).
             __merge_pullrequest(branch, pull_request, root_git)
 
 
-def __create_new_preview_env(branch, gitops_config, new_preview_folder_name, preview_template_folder_name, root_git,
-                             route_host, shortened_branch_hash):
+def __create_new_preview_env(
+    branch, gitops_config, new_preview_folder_name, preview_template_folder_name, root_git, route_host,
+):
     shutil.copytree(
-        root_git.get_full_file_path(preview_template_folder_name),
-        root_git.get_full_file_path(new_preview_folder_name),
+        root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
     )
     chart_file_path = new_preview_folder_name + "/Chart.yaml"
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
@@ -152,3 +148,10 @@ def __merge_pullrequest(branch, pull_request, root_git):
     logging.info("Pull request merged")
     root_git.delete_branch(branch)
     logging.info("Branch '%s' deleted", branch)
+
+
+def __create_tmp_dir():
+    tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    os.makedirs(tmp_dir)
+    logging.info("Created directory %s", tmp_dir)
+    return tmp_dir
