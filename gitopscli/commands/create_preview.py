@@ -77,8 +77,11 @@ def create_preview_command(
         logging.info("New folder for preview: %s", new_preview_folder_name)
         branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
+        if gitops_config.route_paths:
+            route_host = gitops_config.route_host.replace("previewplaceholder", shortened_branch_hash)
+            logging.info("Created route host: %s", route_host)
         if not branch_preview_env_already_exist:
-            route_host = __create_new_preview_env(branch, gitops_config, new_preview_folder_name,
+            __create_new_preview_env(branch, gitops_config, new_preview_folder_name,
                                                   preview_template_folder_name, root_git, route_host,
                                                   shortened_branch_hash)
         new_image_tag = apps_git.get_last_commit_hash()
@@ -122,8 +125,6 @@ def __create_new_preview_env(branch, gitops_config, new_preview_folder_name, pre
     if root_git.get_full_file_path(chart_file_path):
         update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
         if gitops_config.route_paths:
-            route_host = gitops_config.route_host.replace("previewplaceholder", shortened_branch_hash)
-            logging.info("Created route host: %s", route_host)
             for route_path in gitops_config.route_paths:
                 yaml_replace_path = route_path["hostpath"]
                 logging.info("Replacing property %s with value: %s", yaml_replace_path, route_host)
