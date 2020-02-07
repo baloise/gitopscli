@@ -11,17 +11,17 @@ from gitopscli.yaml.yaml_util import merge_yaml_element
 
 
 def sync_apps_command(
-        command,
-        username,
-        password,
-        git_user,
-        git_email,
-        root_organisation,
-        root_repository_name,
-        organisation,
-        repository_name,
-        git_provider,
-        git_provider_url,
+    command,
+    username,
+    password,
+    git_user,
+    git_email,
+    root_organisation,
+    root_repository_name,
+    organisation,
+    repository_name,
+    git_provider,
+    git_provider_url,
 ):
     assert command == "sync-apps"
 

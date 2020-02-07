@@ -8,20 +8,20 @@ from gitopscli.yaml.yaml_util import update_yaml_file
 
 
 def deploy(
-        command,
-        file,
-        values,
-        branch,
-        username,
-        password,
-        git_user,
-        git_email,
-        create_pr,
-        auto_merge,
-        organisation,
-        repository_name,
-        git_provider,
-        git_provider_url,
+    command,
+    file,
+    values,
+    branch,
+    username,
+    password,
+    git_user,
+    git_email,
+    create_pr,
+    auto_merge,
+    organisation,
+    repository_name,
+    git_provider,
+    git_provider_url,
 ):
     assert command == "deploy"
 

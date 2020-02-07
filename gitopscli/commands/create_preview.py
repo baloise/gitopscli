@@ -9,20 +9,20 @@ from gitopscli.yaml.yaml_util import update_yaml_file
 
 
 def create_preview_command(
-        command,
-        pr_id,
-        parent_id,
-        branch,
-        username,
-        password,
-        git_user,
-        git_email,
-        create_pr,
-        auto_merge,
-        organisation,
-        repository_name,
-        git_provider,
-        git_provider_url,
+    command,
+    pr_id,
+    parent_id,
+    branch,
+    username,
+    password,
+    git_user,
+    git_email,
+    create_pr,
+    auto_merge,
+    organisation,
+    repository_name,
+    git_provider,
+    git_provider_url,
 ):
     assert command == "create-preview"
 

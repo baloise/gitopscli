@@ -6,18 +6,18 @@ from gitopscli.git.create_git import create_git
 
 
 def pr_comment_command(
-        command,
-        text,
-        username,
-        password,
-        git_user,
-        git_email,
-        parent_id,
-        pr_id,
-        organisation,
-        repository_name,
-        git_provider,
-        git_provider_url,
+    command,
+    text,
+    username,
+    password,
+    git_user,
+    git_email,
+    parent_id,
+    pr_id,
+    organisation,
+    repository_name,
+    git_provider,
+    git_provider_url,
 ):
     assert command == "add-pr-comment"
     apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
