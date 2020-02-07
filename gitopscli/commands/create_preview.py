@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import os
 import shutil
 import uuid
@@ -28,8 +29,10 @@ def create_preview_command(
 
     apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
     os.makedirs(apps_tmp_dir)
+    logging.info("Created directory %s", apps_tmp_dir)
     root_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
     os.makedirs(root_tmp_dir)
+    logging.info("Created directory %s", root_tmp_dir)
 
     try:
         apps_git = create_git(
@@ -45,8 +48,11 @@ def create_preview_command(
         )
 
         apps_git.checkout(branch)
+        logging.info("App repo %s checkout successfull", branch)
         shortened_branch_hash = hashlib.sha256(branch).hexdigest()[:8]
+        logging.info("Hashed branch %s to hash %s", branch, shortened_branch_hash)
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
+        logging.info("Read GitOpsConfig: %s", gitops_config)
 
         root_git = create_git(
             username,
@@ -60,22 +66,32 @@ def create_preview_command(
             root_tmp_dir,
         )
         root_git.checkout("master")
+        logging.info("Config repo master checkout successful")
         root_git.new_branch(branch)
-        new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
+        logging.info("Created branch %s in config repo", branch)
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
+        logging.info("Using the preview template folder: %s", preview_template_folder_name)
+        new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
+        logging.info("New folder for preview: %s", new_preview_folder_name)
         route_host = None
-        if not os.path.exists(root_git.get_full_file_path(new_preview_folder_name)):
+        logging.info("New folder for preview: %s", new_preview_folder_name)
+        branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
+        logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
+        if not branch_preview_env_already_exist:
             shutil.copytree(
                 root_git.get_full_file_path(preview_template_folder_name),
                 root_git.get_full_file_path(new_preview_folder_name),
             )
             chart_file_path = new_preview_folder_name + "/Chart.yaml"
+            logging.info("Looking for Chart.yaml at: %s", chart_file_path)
             if root_git.get_full_file_path(chart_file_path):
                 update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
                 if gitops_config.route_paths:
                     route_host = gitops_config.route_host.replace("previewplaceholder", shortened_branch_hash)
+                    logging.info("Created route host: %s", route_host)
                     for route_path in gitops_config.route_paths:
                         yaml_replace_path = route_path["hostpath"]
+                        logging.info("Replacing property %s with value: %s", yaml_replace_path, route_host)
                         update_yaml_file(
                             root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"),
                             yaml_replace_path,
@@ -85,17 +101,21 @@ def create_preview_command(
             root_git.commit(f"Initiated new preview env for branch {branch}'")
 
         new_image_tag = apps_git.get_last_commit_hash()
+        logging.info("Using image tag from last app repo commit: %s", new_image_tag)
         for image_path in gitops_config.image_paths:
             yaml_replace_path = image_path["yamlpath"]
+            logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
             update_yaml_file(
                 root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
             )
             root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
 
         root_git.push(branch)
+        logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
 Preview created successfully. Access it [here](https://{route_host}).
 """
+        logging.info("Creating PullRequest comment for pr with id %s and parentComment with id %s and content: %s", pr_id, pr_comment_text, parent_id)
         apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
 
     finally:
@@ -114,12 +134,12 @@ def __create_pullrequest(branch, gitops_config, root_git):
 This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
 """
     pull_request = root_git.create_pull_request(branch, "master", title, description)
-    print(f"Pull request created: {root_git.get_pull_request_url(pull_request)}")
+    logging.info("Pull request created: %s", {root_git.get_pull_request_url(pull_request)})
     return pull_request
 
 
 def __merge_pullrequest(branch, pull_request, root_git):
     root_git.merge_pull_request(pull_request)
-    print("Pull request merged")
+    logging.info("Pull request merged")
     root_git.delete_branch(branch)
-    print(f"Branch '{branch}' deleted")
+    logging.info("Branch '%s' deleted", branch)

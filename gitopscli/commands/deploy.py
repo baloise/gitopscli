@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import shutil
 import uuid
@@ -27,6 +28,7 @@ def deploy_command(
 
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
     os.makedirs(tmp_dir)
+    logging.info("Created directory %s", tmp_dir)
 
     try:
         git = create_git(
@@ -41,14 +43,18 @@ def deploy_command(
             tmp_dir,
         )
         git.checkout("master")
+        logging.info("Master checkout successful")
         git.new_branch(branch)
+        logging.info("Created branch %s", branch)
         full_file_path = git.get_full_file_path(file)
         for key in values:
             value = values[key]
             update_yaml_file(full_file_path, key, value)
+            logging.info("Updated yaml property %s to %s", key, value)
             git.commit(f"changed '{key}' to '{value}'")
 
         git.push(branch)
+        logging.info("Pushed branch %s", branch)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
@@ -63,11 +69,11 @@ Values changed:
 ```
 """
         pull_request = git.create_pull_request(branch, "master", title, description)
-        print(f"Pull request created: {git.get_pull_request_url(pull_request)}")
+        logging.info("Pull request created: %s", {git.get_pull_request_url(pull_request)})
 
         if auto_merge:
             git.merge_pull_request(pull_request)
-            print("Pull request merged")
+            logging.info("Pull request merged")
 
             git.delete_branch(branch)
-            print(f"Branch '{branch}' deleted")
+            logging.info("Branch '%s' deleted", branch)

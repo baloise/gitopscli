@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import uuid
@@ -20,8 +21,11 @@ def pr_comment_command(
     git_provider_url,
 ):
     assert command == "add-pr-comment"
+
     apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
     os.makedirs(apps_tmp_dir)
+    logging.info("Created directory %s", apps_tmp_dir)
+
     try:
         apps_git = create_git(
             username,
@@ -35,6 +39,7 @@ def pr_comment_command(
             apps_tmp_dir,
         )
 
+        logging.info("Creating PullRequest comment for pr with id %s and parentComment with id %s and content: %s", pr_id, text, parent_id)
         apps_git.add_pull_request_comment(pr_id, text, parent_id)
 
     finally:

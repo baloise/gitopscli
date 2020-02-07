@@ -27,8 +27,10 @@ def sync_apps_command(
 
     apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
     os.makedirs(apps_tmp_dir)
+    logging.info("Created directory %s", apps_tmp_dir)
     root_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
     os.makedirs(root_tmp_dir)
+    logging.info("Created directory %s", root_tmp_dir)
 
     try:
         apps_git = create_git(
