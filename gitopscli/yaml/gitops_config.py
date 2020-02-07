@@ -1,4 +1,4 @@
-from gitopscli.yaml.yaml_util import yaml_load
+from .yaml_util import yaml_load
 
 
 class GitOpsConfig:
