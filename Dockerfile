@@ -2,7 +2,8 @@ FROM python:3.7-slim-buster AS base
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends git \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && pip install --upgrade pip
 
 WORKDIR /opt/gitopscli
 
