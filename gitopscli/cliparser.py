@@ -3,7 +3,8 @@ import sys
 
 from gitopscli.yaml.yaml_util import yaml_load
 
-def createCli() :
+
+def createCli():
     parser, subparsers = __create_cli_parser()
     __add_deploy_parser(subparsers)
     __add_sync_apps_parser(subparsers)

@@ -1,11 +1,12 @@
+import hashlib
 import os
 import shutil
 import uuid
-import hashlib
 
-from gitopscli.yaml.gitops_config import GitOpsConfig
 from gitopscli.git.create_git import create_git
-from gitopscli.yaml.yaml_util import yaml_load, update_yaml_file
+from gitopscli.yaml.gitops_config import GitOpsConfig
+from gitopscli.yaml.yaml_util import update_yaml_file
+
 
 def create_preview_command(
         command,

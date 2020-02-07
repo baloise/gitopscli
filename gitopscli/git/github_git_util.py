@@ -1,5 +1,7 @@
 import sys
+
 from github import Github, UnknownObjectException
+
 from .abstract_git_util import AbstractGitUtil
 
 

@@ -5,7 +5,7 @@ from gitopscli.git.github_git_util import GithubGitUtil
 
 
 def create_git(
-    username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url, tmp_dir
+        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url, tmp_dir
 ):
     if git_provider == "bitbucket-server":
         if not git_provider_url:

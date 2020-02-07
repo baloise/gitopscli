@@ -1,10 +1,10 @@
 import logging
 
-from gitopscli.commands.sync_apps import sync_apps_command
-from gitopscli.commands.add_pr_comment import pr_comment_command
 from gitopscli.cliparser import createCli
-from gitopscli.commands.deploy import deploy
+from gitopscli.commands.add_pr_comment import pr_comment_command
 from gitopscli.commands.create_preview import create_preview_command
+from gitopscli.commands.deploy import deploy
+from gitopscli.commands.sync_apps import sync_apps_command
 
 
 def main():

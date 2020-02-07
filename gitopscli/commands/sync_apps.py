@@ -1,14 +1,14 @@
-from pprint import pformat
+import logging
 import os
 import shutil
 import uuid
-import logging
-
-from gitopscli.git.create_git import create_git
+from pprint import pformat
 
 from ruamel.yaml import YAML
 
+from gitopscli.git.create_git import create_git
 from gitopscli.yaml.yaml_util import merge_yaml_element
+
 
 def sync_apps_command(
         command,
@@ -58,6 +58,7 @@ def sync_apps_command(
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
+
 
 def __sync_apps(apps_git, root_git):
     repo_apps = __get_repo_apps(apps_git)
