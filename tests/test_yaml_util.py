@@ -40,7 +40,11 @@ a: # comment
     c: 2 # comment"""
         )
 
-        update_yaml_file(test_file, "a.b.c", "2")
+        updated = update_yaml_file(test_file, "a.b.c", "2")
+        self.assertTrue(updated)
+
+        updated = update_yaml_file(test_file, "a.b.c", "2")
+        self.assertFalse(updated)  # already updated
 
         expected = """\
 a: # comment
@@ -52,7 +56,8 @@ a: # comment
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
-        update_yaml_file(test_file, "a.x", "foo")
+        updated = update_yaml_file(test_file, "a.x", "foo")
+        self.assertTrue(updated)
 
         expected = """\
 a: # comment
@@ -65,9 +70,14 @@ a: # comment
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
-        update_yaml_file(test_file, "a.x.z", "foo_z")
-        update_yaml_file(test_file, "a.x.y", "foo_y")
-        update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
+        updated = update_yaml_file(test_file, "a.x.z", "foo_z")
+        self.assertTrue(updated)
+
+        updated = update_yaml_file(test_file, "a.x.y", "foo_y")
+        self.assertTrue(updated)
+
+        updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
+        self.assertTrue(updated)
 
         expected = """\
 a: # comment

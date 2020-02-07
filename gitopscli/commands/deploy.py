@@ -47,11 +47,19 @@ def deploy_command(
         git.new_branch(branch)
         logging.info("Created branch %s", branch)
         full_file_path = git.get_full_file_path(file)
+        updated_any_value = False
         for key in values:
             value = values[key]
-            update_yaml_file(full_file_path, key, value)
-            logging.info("Updated yaml property %s to %s", key, value)
-            git.commit(f"changed '{key}' to '{value}'")
+            if update_yaml_file(full_file_path, key, value):
+                logging.info("Updated yaml property %s to %s", key, value)
+                git.commit(f"changed '{key}' to '{value}'")
+                updated_any_value = True
+            else:
+                logging.info("Yaml property %s already up-to-date", key)
+
+        if not updated_any_value:
+            logging.info("All values already up-to-date. We're done here")
+            return
 
         git.push(branch)
         logging.info("Pushed branch %s", branch)

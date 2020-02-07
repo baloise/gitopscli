@@ -15,10 +15,13 @@ def update_yaml_file(file_path, key, value):
         if k not in obj or not isinstance(obj[k], dict):
             obj[k] = dict()
         obj = obj[k]
+    if keys[-1] in obj and obj[keys[-1]] == value:
+        return False  # nothing to update
     obj[keys[-1]] = value
 
     with open(file_path, "w+") as stream:
         yaml.dump(content, stream)
+    return True
 
 
 def merge_yaml_element(file_path, element_path, desired_value, delete_missing_key=False):
