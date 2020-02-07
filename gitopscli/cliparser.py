@@ -14,7 +14,6 @@ def create_cli():
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
-
     return parser.parse_args()
 
 
@@ -96,9 +95,7 @@ def __add_git_parser_args(deploy_p):
 
 def __add_create_prid_parser(subparsers):
     subparsers.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
-    subparsers.add_argument(
-        "-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int
-    )
+    subparsers.add_argument("-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int)
 
 
 def __str2bool(value):
