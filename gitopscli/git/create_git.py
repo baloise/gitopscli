@@ -1,7 +1,7 @@
 import sys
 
-from gitopscli.bitbucket_git_util import BitBucketGitUtil
-from gitopscli.github_git_util import GithubGitUtil
+from gitopscli.git.bitbucket_git_util import BitBucketGitUtil
+from gitopscli.git.github_git_util import GithubGitUtil
 
 
 def create_git(

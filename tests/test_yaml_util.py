@@ -3,7 +3,7 @@ import shutil
 import unittest
 import uuid
 
-from gitopscli.yaml_util import yaml_load, update_yaml_file, merge_yaml_element
+from gitopscli.yaml.yaml_util import yaml_load, update_yaml_file, merge_yaml_element
 
 
 class YamlUtilTest(unittest.TestCase):
