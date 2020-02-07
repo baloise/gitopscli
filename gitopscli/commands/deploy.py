@@ -50,15 +50,16 @@ def deploy_command(
         updated_any_value = False
         for key in values:
             value = values[key]
-            if update_yaml_file(full_file_path, key, value):
-                logging.info("Updated yaml property %s to %s", key, value)
-                git.commit(f"changed '{key}' to '{value}'")
-                updated_any_value = True
-            else:
+            if not update_yaml_file(full_file_path, key, value):
                 logging.info("Yaml property %s already up-to-date", key)
+                continue
+            logging.info("Updated yaml property %s to %s", key, value)
+            updated_any_value = True
+
+            git.commit(f"changed '{key}' to '{value}'")
 
         if not updated_any_value:
-            logging.info("All values already up-to-date. We're done here")
+            logging.info("All values already up-to-date. I'm done here")
             return
 
         git.push(branch)
