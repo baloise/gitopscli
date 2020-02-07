@@ -45,7 +45,7 @@ def create_preview_command(
         )
 
         apps_git.checkout(branch)
-        shortened_branch_hash = str(int(hashlib.sha256(branch.encode("utf-8")).hexdigest(), 16) % 10 ** 8)
+        shortened_branch_hash = hashlib.sha256(branch).hexdigest()[:8]
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
 
         root_git = create_git(
@@ -103,16 +103,23 @@ Preview created successfully. Access it [here](https://{route_host}).
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
 
     if create_pr and branch != "master":
-        title = "Updated preview environemnt for " + gitops_config.application_name
-        description = f"""
+        pull_request = __create_pullrequest(branch, gitops_config, root_git)
+        if auto_merge:
+            __merge_pullrequest(branch, pull_request, root_git)
+
+
+def __create_pullrequest(branch, gitops_config, root_git):
+    title = "Updated preview environemnt for " + gitops_config.application_name
+    description = f"""
 This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
 """
-        pull_request = root_git.create_pull_request(branch, "master", title, description)
-        print(f"Pull request created: {root_git.get_pull_request_url(pull_request)}")
+    pull_request = root_git.create_pull_request(branch, "master", title, description)
+    print(f"Pull request created: {root_git.get_pull_request_url(pull_request)}")
+    return pull_request
 
-        if auto_merge:
-            root_git.merge_pull_request(pull_request)
-            print("Pull request merged")
 
-            root_git.delete_branch(branch)
-            print(f"Branch '{branch}' deleted")
+def __merge_pullrequest(branch, pull_request, root_git):
+    root_git.merge_pull_request(pull_request)
+    print("Pull request merged")
+    root_git.delete_branch(branch)
+    print(f"Branch '{branch}' deleted")

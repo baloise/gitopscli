@@ -6,10 +6,10 @@ from gitopscli.yaml.yaml_util import yaml_load
 
 def create_cli():
     parser, subparsers = __create_cli_parser()
-    __add_deploy_parser(subparsers)
-    __add_sync_apps_parser(subparsers)
-    __add_pr_comment_parser(subparsers)
-    __add_create_preview_parser(subparsers)
+    __add_deploy_command_parser(subparsers)
+    __add_sync_apps_command_parser(subparsers)
+    __add_pr_comment_command_parser(subparsers)
+    __add_create_preview_command_parser(subparsers)
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -24,7 +24,7 @@ def __create_cli_parser():
     return parser, subparsers
 
 
-def __add_deploy_parser(subparsers):
+def __add_deploy_command_parser(subparsers):
     deploy_p = subparsers.add_parser("deploy", help="Trigger a new deployment by changing YAML values")
     deploy_p.add_argument("-f", "--file", help="YAML file path", required=True)
     deploy_p.add_argument(
@@ -36,6 +36,28 @@ def __add_deploy_parser(subparsers):
     )
 
     __add_git_parser_args(deploy_p)
+
+
+def __add_sync_apps_command_parser(subparsers):
+    sync_apps_p = subparsers.add_parser(
+        "sync-apps", help="Synchronize applications (= every directory) from apps config repository to apps root config"
+    )
+    __add_git_parser_args(sync_apps_p)
+    sync_apps_p.add_argument("-i", "--root-organisation", help="Apps config repository organisation", required=True)
+    sync_apps_p.add_argument("-r", "--root-repository-name", help="Root config repository organisation", required=True)
+
+
+def __add_pr_comment_command_parser(subparsers):
+    add_pr_comment_p = subparsers.add_parser("add-pr-comment", help="Create a comment on the pull request")
+    __add_git_parser_args(add_pr_comment_p)
+    __add_create_prid_parser(add_pr_comment_p)
+    add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
+
+
+def __add_create_preview_command_parser(subparsers):
+    add_create_preview_p = subparsers.add_parser("create-preview", help="Create a preview environment")
+    __add_git_parser_args(add_create_preview_p)
+    __add_create_prid_parser(add_create_preview_p)
 
 
 def __add_git_parser_args(deploy_p):
@@ -72,30 +94,9 @@ def __add_git_parser_args(deploy_p):
     )
 
 
-def __add_sync_apps_parser(subparsers):
-    sync_apps_p = subparsers.add_parser(
-        "sync-apps", help="Synchronize applications (= every directory) from apps config repository to apps root config"
-    )
-    __add_git_parser_args(sync_apps_p)
-    sync_apps_p.add_argument("-i", "--root-organisation", help="Apps config repository organisation", required=True)
-    sync_apps_p.add_argument("-r", "--root-repository-name", help="Root config repository organisation", required=True)
-
-
-def __add_pr_comment_parser(subparsers):
-    add_pr_comment_p = subparsers.add_parser("add-pr-comment", help="Create a comment on the pull request")
-    __add_git_parser_args(add_pr_comment_p)
-    add_pr_comment_p.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
-    add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
-    add_pr_comment_p.add_argument(
-        "-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int
-    )
-
-
-def __add_create_preview_parser(subparsers):
-    add_create_preview_p = subparsers.add_parser("create-preview", help="Create a preview environment")
-    __add_git_parser_args(add_create_preview_p)
-    add_create_preview_p.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
-    add_create_preview_p.add_argument(
+def __add_create_prid_parser(subparsers):
+    subparsers.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
+    subparsers.add_argument(
         "-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int
     )
 
