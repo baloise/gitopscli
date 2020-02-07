@@ -7,7 +7,7 @@ from gitopscli.git.create_git import create_git
 from gitopscli.yaml.yaml_util import update_yaml_file
 
 
-def deploy(
+def deploy_command(
     command,
     file,
     values,
