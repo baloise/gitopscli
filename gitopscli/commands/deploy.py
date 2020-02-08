@@ -1,11 +1,10 @@
-import json
 import logging
 import os
 import shutil
 import uuid
 
 from gitopscli.git.create_git import create_git
-from gitopscli.yaml.yaml_util import update_yaml_file
+from gitopscli.yaml.yaml_util import update_yaml_file, yaml_dump
 
 
 def deploy_command(
@@ -73,9 +72,8 @@ def deploy_command(
 This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
 Files changed: `{file}`
 Values changed:
-```json
-{json.dumps(values)}
-```
+```yaml
+{yaml_dump(values)}
 """
         pull_request = git.create_pull_request(branch, "master", title, description)
         logging.info("Pull request created: %s", {git.get_pull_request_url(pull_request)})

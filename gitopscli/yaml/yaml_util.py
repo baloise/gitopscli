@@ -5,6 +5,21 @@ def yaml_load(doc):
     return YAML().load(doc)
 
 
+def yaml_dump(data):
+    class FakeStream:
+        _byte_strings = []
+
+        def write(self, byte_string):
+            self._byte_strings.append(byte_string)
+
+        def get_string(self):
+            return b"".join(self._byte_strings).decode("utf-8").rstrip()
+
+    stream = FakeStream()
+    YAML().dump(data, stream)
+    return stream.get_string()
+
+
 def update_yaml_file(file_path, key, value):
     yaml = YAML()
     with open(file_path, "r") as stream:
