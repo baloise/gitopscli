@@ -2,10 +2,10 @@
 
 # deploy
 ```
-usage: gitopscli deploy [-h] -f FILE -v VALUES [-b BRANCH] [-u USERNAME]
-                        [-p PASSWORD] [-j GIT_USER] [-e GIT_EMAIL]
-                        [-c [CREATE_PR]] [-a [AUTO_MERGE]] -o ORGANISATION -n
-                        REPOSITORY_NAME [-s GIT_PROVIDER]
+usage: gitopscli deploy [-h] -f FILE -v VALUES [-g [SINGLE_COMMIT]]
+                        [-b BRANCH] [-u USERNAME] [-p PASSWORD] [-j GIT_USER]
+                        [-e GIT_EMAIL] [-c [CREATE_PR]] [-a [AUTO_MERGE]] -o
+                        ORGANISATION -n REPOSITORY_NAME [-s GIT_PROVIDER]
                         [-w GIT_PROVIDER_URL]
 
 optional arguments:
@@ -14,6 +14,8 @@ optional arguments:
   -v VALUES, --values VALUES
                         YAML/JSON object with the YAML path as key and the
                         desired value as value
+  -g [SINGLE_COMMIT], --single-commit [SINGLE_COMMIT]
+                        Create only single commit for all updates
   -b BRANCH, --branch BRANCH
                         Branch to push the changes to
   -u USERNAME, --username USERNAME
