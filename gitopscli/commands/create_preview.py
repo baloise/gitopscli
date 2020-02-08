@@ -84,24 +84,9 @@ def create_preview_command(
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
         for image_path in gitops_config.image_paths:
-            yaml_replace_path = image_path["yamlpath"]
-            logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
-            with open(root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), "r") as input_stream:
-                values_yaml = yaml_load(input_stream)
-                if values_yaml[yaml_replace_path] == new_image_tag:
-                    logging.info("The image tag %s has already been deployed. Doing nothing.", new_image_tag)
-                    pr_comment_text = f"""
-The version {new_image_tag} has already been deployed. Nothing to do here.
-"""
-                    logging.info(
-                        "Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text
-                    )
-                    apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
-                    sys.exit(0)
-            update_yaml_file(
-                root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
+            __replace_image_tag_value(
+                apps_git, image_path, new_image_tag, new_preview_folder_name, parent_id, pr_id, root_git
             )
-            root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
@@ -116,6 +101,29 @@ Preview created successfully. Access it here: https://{route_host}.
         pull_request = __create_pullrequest(branch, gitops_config, root_git)
         if auto_merge:
             __merge_pullrequest(branch, pull_request, root_git)
+
+
+def __replace_image_tag_value(apps_git, image_path, new_image_tag, new_preview_folder_name, parent_id, pr_id, root_git):
+    yaml_replace_path = image_path["yamlpath"]
+    logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
+    with open(root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), "r") as input_stream:
+        values_yaml = yaml_load(input_stream)
+        if values_yaml[yaml_replace_path] == new_image_tag:
+            __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
+            sys.exit(0)
+    update_yaml_file(
+        root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
+    )
+    root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
+
+
+def __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id):
+    logging.info("The image tag %s has already been deployed. Doing nothing.", new_image_tag)
+    pr_comment_text = f"""
+The version {new_image_tag} has already been deployed. Nothing to do here.
+"""
+    logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
+    apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
 
 
 def __create_new_preview_env(
