@@ -7,7 +7,7 @@ import uuid
 
 from gitopscli.git.create_git import create_git
 from gitopscli.yaml.gitops_config import GitOpsConfig
-from gitopscli.yaml.yaml_util import update_yaml_file, yaml_load
+from gitopscli.yaml.yaml_util import update_yaml_file
 
 
 def create_preview_command(
