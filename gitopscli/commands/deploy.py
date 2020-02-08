@@ -57,7 +57,7 @@ def deploy_command(
             updated_values[key] = value
 
             if not single_commit:
-                git.commit(f"changed '{key}' to '{value}'")
+                git.commit(f"changed '{key}' to '{value}' in {file}")
 
         if not updated_values:
             logging.info("All values already up-to-date. I'm done here")
@@ -66,7 +66,7 @@ def deploy_command(
         if single_commit:
             if len(updated_values) == 1:
                 key, value = list(updated_values.items())[0]
-                git.commit(f"changed '{key}' to '{value}'")
+                git.commit(f"changed '{key}' to '{value}' in {file}")
             else:
                 msg = f"updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in {file}"
                 msg += f"\n\n{yaml_dump(updated_values)}"
