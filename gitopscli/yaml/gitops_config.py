@@ -8,24 +8,20 @@ class GitOpsConfig:
 
     @property
     def application_name(self):
-        return self._data.get("application-name")
+        return self._data["deploymentConfig"]["applicationName"]
 
     @property
     def team_config_org(self):
-        return self._data.get("team-config-org")
+        return self._data["deploymentConfig"]["org"]
 
     @property
     def team_config_repo(self):
-        return self._data.get("team-config-repo")
+        return self._data["deploymentConfig"]["repository"]
 
     @property
     def route_host(self):
-        return self._data.get("routehost")
+        return self._data["previewConfig"]["route"]["host"]["template"]
 
     @property
-    def route_paths(self):
-        return self._data.get("routepaths", [])
-
-    @property
-    def image_paths(self):
-        return self._data.get("imagepaths", [])
+    def replacements(self):
+        return self._data["previewConfig"]["replace"]
