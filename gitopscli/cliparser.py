@@ -44,6 +44,7 @@ def __add_deploy_command_parser(subparsers):
     )
 
     __add_git_parser_args(deploy_p)
+    __add_branch_pr_parser_args(deploy_p)
 
 
 def __add_sync_apps_command_parser(subparsers):
@@ -65,15 +66,27 @@ def __add_pr_comment_command_parser(subparsers):
 def __add_create_preview_command_parser(subparsers):
     add_create_preview_p = subparsers.add_parser("create-preview", help="Create a preview environment")
     __add_git_parser_args(add_create_preview_p)
+    __add_branch_pr_parser_args(add_create_preview_p)
     __add_create_prid_parser(add_create_preview_p)
 
 
 def __add_git_parser_args(deploy_p):
-    deploy_p.add_argument("-b", "--branch", help="Branch to push the changes to", default="master")
     deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
     deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
     deploy_p.add_argument("-j", "--git-user", help="Git Username", default="GitOpsCLI")
     deploy_p.add_argument("-e", "--git-email", help="Git User Email", default="gitopscli@baloise.dev")
+    deploy_p.add_argument("-o", "--organisation", help="Apps Git organisation/projectKey", required=True)
+    deploy_p.add_argument(
+        "-n", "--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True
+    )
+    deploy_p.add_argument("-s", "--git-provider", help="Git server provider", default="bitbucket-server")
+    deploy_p.add_argument(
+        "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)"
+    )
+
+
+def __add_branch_pr_parser_args(deploy_p):
+    deploy_p.add_argument("-b", "--branch", help="Branch to push the changes to", default="master")
     deploy_p.add_argument(
         "-c",
         "--create-pr",
@@ -91,14 +104,6 @@ def __add_git_parser_args(deploy_p):
         nargs="?",
         const=True,
         default=False,
-    )
-    deploy_p.add_argument("-o", "--organisation", help="Apps Git organisation/projectKey", required=True)
-    deploy_p.add_argument(
-        "-n", "--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True
-    )
-    deploy_p.add_argument("-s", "--git-provider", help="Git server provider", default="bitbucket-server")
-    deploy_p.add_argument(
-        "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)"
     )
 
 

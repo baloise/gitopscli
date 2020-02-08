@@ -2,17 +2,14 @@
 
 # add-pr-comment
 ```
-usage: gitopscli add-pr-comment [-h] [-b BRANCH] [-u USERNAME] [-p PASSWORD]
-                                [-j GIT_USER] [-e GIT_EMAIL] [-c [CREATE_PR]]
-                                [-a [AUTO_MERGE]] -o ORGANISATION -n
-                                REPOSITORY_NAME [-s GIT_PROVIDER]
+usage: gitopscli add-pr-comment [-h] [-u USERNAME] [-p PASSWORD]
+                                [-j GIT_USER] [-e GIT_EMAIL]
+                                -o ORGANISATION -n REPOSITORY_NAME [-s GIT_PROVIDER]
                                 [-w GIT_PROVIDER_URL] -i PR_ID [-x PARENT_ID]
                                 -t TEXT
 
 optional arguments:
   -h, --help            show this help message and exit
-  -b BRANCH, --branch BRANCH
-                        Branch to push the changes to
   -u USERNAME, --username USERNAME
                         Git username if Basic Auth should be used
   -p PASSWORD, --password PASSWORD
@@ -21,12 +18,6 @@ optional arguments:
                         Git Username
   -e GIT_EMAIL, --git-email GIT_EMAIL
                         Git User Email
-  -c [CREATE_PR], --create-pr [CREATE_PR]
-                        Creates a Pull Request (only when --branch is not
-                        master/default branch)
-  -a [AUTO_MERGE], --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
   -o ORGANISATION, --organisation ORGANISATION
                         Apps Git organisation/projectKey
   -n REPOSITORY_NAME, --repository-name REPOSITORY_NAME
