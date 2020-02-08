@@ -70,23 +70,33 @@ def create_preview_command(
         logging.info("Using the preview template folder: %s", preview_template_folder_name)
         new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
         logging.info("New folder for preview: %s", new_preview_folder_name)
-        route_host = None
         logging.info("New folder for preview: %s", new_preview_folder_name)
         branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
-        if gitops_config.route_paths:
-            route_host = gitops_config.route_host.replace("previewplaceholder", shortened_branch_hash)
-            logging.info("Created route host: %s", route_host)
+        route_host = None
         if not branch_preview_env_already_exist:
-            __create_new_preview_env(
-                branch, gitops_config, new_preview_folder_name, preview_template_folder_name, root_git, route_host,
-            )
+            __create_new_preview_env(branch, new_preview_folder_name, preview_template_folder_name, root_git)
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
-        for image_path in gitops_config.image_paths:
-            __replace_image_tag_value(
-                apps_git, image_path, new_image_tag, new_preview_folder_name, parent_id, pr_id, root_git
+        value_replaced = False
+        for replacement in gitops_config.replacements:
+            replacement_value = None
+            if replacement.variable == "GIT_COMMIT":
+                replacement_value = new_image_tag
+            if replacement.variable == "ROUTE_HOST":
+                route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", shortened_branch_hash)
+                logging.info("Created route host: %s", route_host)
+                replacement_value = route_host
+            value_replaced = value_replaced | update_yaml_file(
+                root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"),
+                replacement.path,
+                replacement_value,
             )
+            logging.info("Replacing property %s with value: %s", replacement.path, replacement_value)
+        if not value_replaced:
+            __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
+            sys.exit(0)
+        root_git.commit(f"Upated preview environment for {gitops_config.application_name}.")
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
@@ -103,18 +113,6 @@ Preview created successfully. Access it here: https://{route_host}.
             __merge_pullrequest(branch, pull_request, root_git)
 
 
-def __replace_image_tag_value(apps_git, image_path, new_image_tag, new_preview_folder_name, parent_id, pr_id, root_git):
-    yaml_replace_path = image_path["yamlpath"]
-    logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
-    value_replaced = update_yaml_file(
-        root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
-    )
-    if not value_replaced:
-        __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
-        sys.exit(0)
-    root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
-
-
 def __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id):
     logging.info("The image tag %s has already been deployed. Doing nothing.", new_image_tag)
     pr_comment_text = f"""
@@ -125,7 +123,7 @@ The version {new_image_tag} has already been deployed. Nothing to do here.
 
 
 def __create_new_preview_env(
-    branch, gitops_config, new_preview_folder_name, preview_template_folder_name, root_git, route_host,
+    branch, new_preview_folder_name, preview_template_folder_name, root_git,
 ):
     shutil.copytree(
         root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
@@ -134,15 +132,7 @@ def __create_new_preview_env(
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
     if root_git.get_full_file_path(chart_file_path):
         update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
-    if gitops_config.route_paths:
-        for route_path in gitops_config.route_paths:
-            yaml_replace_path = route_path["hostpath"]
-            logging.info("Replacing property %s with value: %s", yaml_replace_path, route_host)
-            update_yaml_file(
-                root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, route_host,
-            )
     root_git.commit(f"Initiated new preview env for branch {branch}'")
-    return route_host
 
 
 def __create_pullrequest(branch, gitops_config, root_git):

@@ -56,3 +56,30 @@ gitopscli create-preview \
 --pr-id 4711 \
 --auto-merge
 ```
+
+## .gitops.config.yaml
+Make sure that your application repository contains a `.gitops.config.yaml` file.
+
+```yaml
+deploymentConfig:
+  # The organisation name of your deployment repo
+  org: DPL
+  # The repostiory name of your deployment repo
+  repository: incubator-non-prod
+  # The name of the application that is used in your deployment repo
+  applicationName: example
+
+previewConfig:
+  route:
+    host:
+      # your router host.
+      #{SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your feature branch name
+      template: example-{SHA256_8CHAR_BRANCH_HASH}.example.tld
+  replace:
+    # Paths that should be replaced
+    - path: image.tag
+      variable: GIT_COMMIT # this is the latest git hash of the PR branch
+    - path: route.host
+      variable: ROUTE_HOST # this is the resolved SHA256_8CHAR_BRANCH_HASH from above
+
+```
