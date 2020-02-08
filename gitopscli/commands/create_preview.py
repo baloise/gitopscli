@@ -72,7 +72,7 @@ def create_preview_command(
         logging.info("New folder for preview: %s", new_preview_folder_name)
         branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
-        for dirpath, dirnames, filenames in os.walk("."):
+        for dirpath, filenames in os.walk("."):
             for f in filenames:
                 logging.info(os.path.join(dirpath, f))
         if not branch_preview_env_already_exist:
