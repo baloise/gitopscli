@@ -44,9 +44,9 @@ def create_preview_command(
         )
 
         apps_git.checkout(branch)
-        logging.info("App repo %s checkout successfull", branch)
+        logging.info("App repo branch %s checkout successful", branch)
         shortened_branch_hash = hashlib.sha256(branch).hexdigest()[:8]
-        logging.info("Hashed branch %s to hash %s", branch, shortened_branch_hash)
+        logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         logging.info("Read GitOpsConfig: %s", gitops_config)
 
@@ -62,7 +62,7 @@ def create_preview_command(
             root_tmp_dir,
         )
         root_git.checkout("master")
-        logging.info("Config repo master checkout successful")
+        logging.info("Config repo branch master checkout successful")
         root_git.new_branch(branch)
         logging.info("Created branch %s in config repo", branch)
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name

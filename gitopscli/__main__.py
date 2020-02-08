@@ -11,7 +11,7 @@ from gitopscli.gitops_exception import GitOpsException
 
 def main():
     logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s", datefmt="%m-%d %H:%M"
+        level=logging.INFO, format="%(asctime)s %(levelname)-8s %(funcName)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
     args = create_cli()
 
