@@ -121,19 +121,19 @@ def __replace_value(
     value_replaced,
 ):
     replacement_value = None
-    logging.info("Replacment: %s", replacement)
-    if replacement.variable == "GIT_COMMIT":
+    logging.info("Replacement: %s", replacement)
+    if replacement["variable"] == "GIT_COMMIT":
         replacement_value = new_image_tag
-    elif replacement.variable == "ROUTE_HOST":
+    elif replacement["variable"] == "ROUTE_HOST":
         route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", shortened_branch_hash)
         logging.info("Created route host: %s", route_host)
         replacement_value = route_host
     else:
-        logging.info("Unknown replacement variable: %s", replacement.variable)
+        logging.info("Unknown replacement variable: %s", replacement["variable"])
     value_replaced = value_replaced | update_yaml_file(
-        root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement.path, replacement_value,
+        root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement["path"], replacement_value,
     )
-    logging.info("Replacing property %s with value: %s", replacement.path, replacement_value)
+    logging.info("Replacing property %s with value: %s", replacement["path"], replacement_value)
     return route_host, value_replaced
 
 
