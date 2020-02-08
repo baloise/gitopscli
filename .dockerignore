@@ -5,3 +5,5 @@
 !requirements-dev.txt
 !requirements.txt
 !setup.py
+
+**/__pycache__/
