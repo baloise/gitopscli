@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import shutil
+import sys
 import uuid
 
 from gitopscli.git.create_git import create_git
@@ -83,12 +84,9 @@ def create_preview_command(
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
         for image_path in gitops_config.image_paths:
-            yaml_replace_path = image_path["yamlpath"]
-            logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
-            update_yaml_file(
-                root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
+            __replace_image_tag_value(
+                apps_git, image_path, new_image_tag, new_preview_folder_name, parent_id, pr_id, root_git
             )
-            root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
@@ -105,6 +103,27 @@ Preview created successfully. Access it here: https://{route_host}.
             __merge_pullrequest(branch, pull_request, root_git)
 
 
+def __replace_image_tag_value(apps_git, image_path, new_image_tag, new_preview_folder_name, parent_id, pr_id, root_git):
+    yaml_replace_path = image_path["yamlpath"]
+    logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
+    value_replaced = update_yaml_file(
+        root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
+    )
+    if not value_replaced:
+        __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
+        sys.exit(0)
+    root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
+
+
+def __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id):
+    logging.info("The image tag %s has already been deployed. Doing nothing.", new_image_tag)
+    pr_comment_text = f"""
+The version {new_image_tag} has already been deployed. Nothing to do here.
+"""
+    logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
+    apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
+
+
 def __create_new_preview_env(
     branch, gitops_config, new_preview_folder_name, preview_template_folder_name, root_git, route_host,
 ):
@@ -115,15 +134,13 @@ def __create_new_preview_env(
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
     if root_git.get_full_file_path(chart_file_path):
         update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
-        if gitops_config.route_paths:
-            for route_path in gitops_config.route_paths:
-                yaml_replace_path = route_path["hostpath"]
-                logging.info("Replacing property %s with value: %s", yaml_replace_path, route_host)
-                update_yaml_file(
-                    root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"),
-                    yaml_replace_path,
-                    route_host,
-                )
+    if gitops_config.route_paths:
+        for route_path in gitops_config.route_paths:
+            yaml_replace_path = route_path["hostpath"]
+            logging.info("Replacing property %s with value: %s", yaml_replace_path, route_host)
+            update_yaml_file(
+                root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, route_host,
+            )
     root_git.commit(f"Initiated new preview env for branch {branch}'")
     return route_host
 
