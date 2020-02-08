@@ -73,26 +73,23 @@ def create_preview_command(
         logging.info("New folder for preview: %s", new_preview_folder_name)
         branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
-        route_host = None
         if not branch_preview_env_already_exist:
             __create_new_preview_env(branch, new_preview_folder_name, preview_template_folder_name, root_git)
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
+        route_host = None
         value_replaced = False
         for replacement in gitops_config.replacements:
-            replacement_value = None
-            if replacement.variable == "GIT_COMMIT":
-                replacement_value = new_image_tag
-            if replacement.variable == "ROUTE_HOST":
-                route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", shortened_branch_hash)
-                logging.info("Created route host: %s", route_host)
-                replacement_value = route_host
-            value_replaced = value_replaced | update_yaml_file(
-                root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"),
-                replacement.path,
-                replacement_value,
+            route_host, value_replaced = __replace_value(
+                gitops_config,
+                new_image_tag,
+                new_preview_folder_name,
+                replacement,
+                root_git,
+                route_host,
+                shortened_branch_hash,
+                value_replaced,
             )
-            logging.info("Replacing property %s with value: %s", replacement.path, replacement_value)
         if not value_replaced:
             __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
             sys.exit(0)
@@ -111,6 +108,30 @@ Preview created successfully. Access it here: https://{route_host}.
         pull_request = __create_pullrequest(branch, gitops_config, root_git)
         if auto_merge:
             __merge_pullrequest(branch, pull_request, root_git)
+
+
+def __replace_value(
+    gitops_config,
+    new_image_tag,
+    new_preview_folder_name,
+    replacement,
+    root_git,
+    route_host,
+    shortened_branch_hash,
+    value_replaced,
+):
+    replacement_value = None
+    if replacement.variable == "GIT_COMMIT":
+        replacement_value = new_image_tag
+    if replacement.variable == "ROUTE_HOST":
+        route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", shortened_branch_hash)
+        logging.info("Created route host: %s", route_host)
+        replacement_value = route_host
+    value_replaced = value_replaced | update_yaml_file(
+        root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement.path, replacement_value,
+    )
+    logging.info("Replacing property %s with value: %s", replacement.path, replacement_value)
+    return route_host, value_replaced
 
 
 def __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id):
