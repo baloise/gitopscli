@@ -2,11 +2,12 @@ import hashlib
 import logging
 import os
 import shutil
+import sys
 import uuid
 
 from gitopscli.git.create_git import create_git
 from gitopscli.yaml.gitops_config import GitOpsConfig
-from gitopscli.yaml.yaml_util import update_yaml_file
+from gitopscli.yaml.yaml_util import update_yaml_file, yaml_load
 
 
 def create_preview_command(
@@ -85,6 +86,18 @@ def create_preview_command(
         for image_path in gitops_config.image_paths:
             yaml_replace_path = image_path["yamlpath"]
             logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
+            with open(root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), "r") as input_stream:
+                values_yaml = yaml_load(input_stream)
+                if values_yaml[yaml_replace_path] == new_image_tag:
+                    logging.info("The image tag %s has already been deployed. Doing nothing.", new_image_tag)
+                    pr_comment_text = f"""
+The version {new_image_tag} has already been deployed. Nothing to do here.
+"""
+                    logging.info(
+                        "Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text
+                    )
+                    apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
+                    sys.exit(0)
             update_yaml_file(
                 root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
             )
@@ -115,15 +128,13 @@ def __create_new_preview_env(
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
     if root_git.get_full_file_path(chart_file_path):
         update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
-        if gitops_config.route_paths:
-            for route_path in gitops_config.route_paths:
-                yaml_replace_path = route_path["hostpath"]
-                logging.info("Replacing property %s with value: %s", yaml_replace_path, route_host)
-                update_yaml_file(
-                    root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"),
-                    yaml_replace_path,
-                    route_host,
-                )
+    if gitops_config.route_paths:
+        for route_path in gitops_config.route_paths:
+            yaml_replace_path = route_path["hostpath"]
+            logging.info("Replacing property %s with value: %s", yaml_replace_path, route_host)
+            update_yaml_file(
+                root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, route_host,
+            )
     root_git.commit(f"Initiated new preview env for branch {branch}'")
     return route_host
 
