@@ -45,7 +45,7 @@ def create_preview_command(
 
         apps_git.checkout(branch)
         logging.info("App repo branch %s checkout successful", branch)
-        shortened_branch_hash = hashlib.sha256(branch).hexdigest()[:8]
+        shortened_branch_hash = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
         logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         logging.info("Read GitOpsConfig: %s", gitops_config)
