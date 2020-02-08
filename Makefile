@@ -1,5 +1,5 @@
 format:
-	black -l 120 -t py37 gitopscli tests
+	black -l 120 -t py37 gitopscli tests setup.py
 
 lint:
 	pylint gitopscli

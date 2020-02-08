@@ -17,7 +17,7 @@ FROM deps-image AS test-image
 COPY requirements-dev.txt .
 RUN pip install -r requirements-dev.txt
 COPY . .
-RUN black --check -l 120 -t py37 gitopscli tests
+RUN black --check -l 120 -t py37 gitopscli tests setup.py
 RUN pylint gitopscli
 RUN python -m pytest -v
 
