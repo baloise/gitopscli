@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from gitopscli.cliparser import create_cli
 from gitopscli.commands.add_pr_comment import pr_comment_command
@@ -26,6 +27,7 @@ def main():
         command(**vars(args))
     except GitOpsException as ex:
         logging.error(ex)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
