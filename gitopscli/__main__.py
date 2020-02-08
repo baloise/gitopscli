@@ -10,8 +10,7 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
-
+    logging.basicConfig(level=logging.INFO, format="%(levelname)-2s %(funcName)s: %(message)s")
     args = create_cli()
 
     if args.command == "deploy":

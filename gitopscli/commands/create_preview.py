@@ -44,9 +44,9 @@ def create_preview_command(
         )
 
         apps_git.checkout(branch)
-        logging.info("App repo %s checkout successfull", branch)
+        logging.info("App repo branch %s checkout successful", branch)
         shortened_branch_hash = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
-        logging.info("Hashed branch %s to hash %s", branch, shortened_branch_hash)
+        logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         logging.info("Read GitOpsConfig: %s", gitops_config)
 
@@ -62,7 +62,7 @@ def create_preview_command(
             root_tmp_dir,
         )
         root_git.checkout("master")
-        logging.info("Config repo master checkout successful")
+        logging.info("Config repo branch master checkout successful")
         root_git.new_branch(branch)
         logging.info("Created branch %s in config repo", branch)
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
@@ -92,14 +92,9 @@ def create_preview_command(
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
-Preview created successfully. Access it [here](https://{route_host}).
+Preview created successfully. Access it here: https://{route_host}.
 """
-        logging.info(
-            "Creating PullRequest comment for pr with id %s and parentComment with id %s and content: %s",
-            pr_id,
-            pr_comment_text,
-            parent_id,
-        )
+        logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
         apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
