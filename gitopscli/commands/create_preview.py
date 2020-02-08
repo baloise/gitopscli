@@ -94,11 +94,7 @@ def create_preview_command(
         pr_comment_text = f"""
 Preview created successfully. Access it here: https://{route_host}.
 """
-        logging.info(
-            "Creating PullRequest comment for pr with id %s and content: %s",
-            pr_id,
-            pr_comment_text
-        )
+        logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
         apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
