@@ -1,0 +1,2 @@
+class GitOpsException(Exception):
+    pass
