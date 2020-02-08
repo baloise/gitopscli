@@ -3,7 +3,7 @@ import shutil
 import unittest
 import uuid
 
-from gitopscli.yaml.yaml_util import yaml_load, update_yaml_file, merge_yaml_element
+from gitopscli.yaml.yaml_util import yaml_load, yaml_dump, update_yaml_file, merge_yaml_element
 
 
 class YamlUtilTest(unittest.TestCase):
@@ -29,6 +29,19 @@ class YamlUtilTest(unittest.TestCase):
     def test_yaml_load(self):
         self.assertEqual(yaml_load("{answer: '42'}"), {"answer": "42"})
         self.assertEqual(yaml_load("{answer: 42}"), {"answer": 42})
+        self.assertEqual(yaml_load("answer: 42"), {"answer": 42})
+
+    def test_yaml_dump(self):
+        self.assertEqual(yaml_dump({"answer": "42"}), "answer: '42'")
+        self.assertEqual(yaml_dump({"answer": 42}), "answer: 42")
+        self.assertEqual(
+            yaml_dump({"answer": "42", "universe": ["and", "everything"]}),
+            """\
+answer: '42'
+universe:
+- and
+- everything""",
+        )
 
     def test_update_yaml_file(self):
         test_file = self._create_file(

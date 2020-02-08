@@ -33,6 +33,15 @@ def __add_deploy_command_parser(subparsers):
         type=yaml_load,
         required=True,
     )
+    deploy_p.add_argument(
+        "-g",
+        "--single-commit",
+        help="Create only single commit for all updates",
+        type=__str2bool,
+        nargs="?",
+        const=True,
+        default=False,
+    )
 
     __add_git_parser_args(deploy_p)
 
