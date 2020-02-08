@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+import sys
 import uuid
 
 from gitopscli.git.create_git import create_git
@@ -46,7 +47,12 @@ def deploy_command(
         logging.info("Master checkout successful")
         git.new_branch(branch)
         logging.info("Created branch %s", branch)
+
         full_file_path = git.get_full_file_path(file)
+        if not os.path.isfile(full_file_path):
+            logging.error("No such file: '%s'", file)
+            sys.exit(1)
+
         updated_values = {}
         for key in values:
             value = values[key]
