@@ -46,18 +46,18 @@ def deploy_command(
         git.new_branch(branch)
         logging.info("Created branch %s", branch)
         full_file_path = git.get_full_file_path(file)
-        updated_any_value = False
+        updated_values = {}
         for key in values:
             value = values[key]
             if not update_yaml_file(full_file_path, key, value):
                 logging.info("Yaml property %s already up-to-date", key)
                 continue
             logging.info("Updated yaml property %s to %s", key, value)
-            updated_any_value = True
+            updated_values[key] = value
 
             git.commit(f"changed '{key}' to '{value}'")
 
-        if not updated_any_value:
+        if not updated_values:
             logging.info("All values already up-to-date. I'm done here")
             return
 
@@ -73,7 +73,7 @@ This Pull Request is automatically created through [gitopscli](https://github.co
 Files changed: `{file}`
 Values changed:
 ```yaml
-{yaml_dump(values)}
+{yaml_dump(updated_values)}
 """
         pull_request = git.create_pull_request(branch, "master", title, description)
         logging.info("Pull request created: %s", {git.get_pull_request_url(pull_request)})
