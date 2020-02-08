@@ -16,7 +16,7 @@ class GitOpsConfig:
 
     @property
     def team_config_repo(self):
-        return self._data["deployment-config"]["repository"]
+        return self._data["deploymentConfig"]["repository"]
 
     @property
     def route_host(self):
