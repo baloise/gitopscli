@@ -97,7 +97,8 @@ def create_preview_command(
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
-Preview created successfully. Access it here: https://{route_host}.
+Preview created successfully. Access it here: 
+https://{route_host}.
 """
         logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
         apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
