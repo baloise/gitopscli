@@ -10,9 +10,9 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 def main():
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                        datefmt='%m-%d %H:%M')
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s", datefmt="%m-%d %H:%M"
+    )
     args = create_cli()
 
     if args.command == "deploy":
