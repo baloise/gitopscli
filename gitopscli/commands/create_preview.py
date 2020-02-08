@@ -70,8 +70,11 @@ def create_preview_command(
         logging.info("Using the preview template folder: %s", preview_template_folder_name)
         new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
         logging.info("New folder for preview: %s", new_preview_folder_name)
-        branch_preview_env_already_exist = os.path.isdir(root_git.get_full_file_path(new_preview_folder_name))
+        branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
+        for dirpath, dirnames, filenames in os.walk("."):
+            for f in filenames:
+                logging.info(os.path.join(dirpath, f))
         if not branch_preview_env_already_exist:
             __create_new_preview_env(branch, new_preview_folder_name, preview_template_folder_name, root_git)
         new_image_tag = apps_git.get_last_commit_hash()
