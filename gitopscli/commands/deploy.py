@@ -68,12 +68,11 @@ def deploy_command(
 
     if create_pr and branch != "master":
         title = f"Updated values in {file}"
-        description = f"""
-This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
-Files changed: `{file}`
-Values changed:
+        description = f"""\
+Updated values in `{file}`:
 ```yaml
 {yaml_dump(updated_values)}
+```
 """
         pull_request = git.create_pull_request(branch, "master", title, description)
         logging.info("Pull request created: %s", {git.get_pull_request_url(pull_request)})
