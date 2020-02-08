@@ -106,9 +106,10 @@ Preview created successfully. Access it here: https://{route_host}.
 def __replace_image_tag_value(apps_git, image_path, new_image_tag, new_preview_folder_name, parent_id, pr_id, root_git):
     yaml_replace_path = image_path["yamlpath"]
     logging.info("Replacing property %s with value: %s", yaml_replace_path, new_image_tag)
-    if update_yaml_file(
+    value_replaced = update_yaml_file(
         root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), yaml_replace_path, new_image_tag,
-    ):
+    )
+    if not value_replaced:
         __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
         sys.exit(0)
     root_git.commit(f"changed '{yaml_replace_path}' to '{new_image_tag}'")
