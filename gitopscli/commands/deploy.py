@@ -1,11 +1,11 @@
 import logging
 import os
 import shutil
-import sys
 import uuid
 
 from gitopscli.git.create_git import create_git
 from gitopscli.yaml.yaml_util import update_yaml_file, yaml_dump
+from gitopscli.gitops_exception import GitOpsException
 
 
 def deploy_command(
@@ -50,8 +50,7 @@ def deploy_command(
 
         full_file_path = git.get_full_file_path(file)
         if not os.path.isfile(full_file_path):
-            logging.error("No such file: '%s'", file)
-            sys.exit(1)
+            raise GitOpsException(f"No such file: {file}")
 
         updated_values = {}
         for key in values:

@@ -8,6 +8,7 @@ from ruamel.yaml import YAML
 
 from gitopscli.git.create_git import create_git
 from gitopscli.yaml.yaml_util import merge_yaml_element
+from gitopscli.gitops_exception import GitOpsException
 
 
 def sync_apps_command(
@@ -92,7 +93,9 @@ def __find_apps_config_from_repo(apps_git, root_git):
             if "applications" in app_config_content and app_config_content["applications"] is not None:
                 apps_from_other_repos += app_config_content["applications"].keys()
     if found_app_config_file is None:
-        raise Exception(f"Could't find config file with .repository={apps_git.get_clone_url()} in apps/ directory")
+        raise GitOpsException(
+            f"Could't find config file with .repository={apps_git.get_clone_url()} in apps/ directory"
+        )
     return found_app_config_file, found_app_config_file_name, apps_from_other_repos
 
 
@@ -134,4 +137,4 @@ def __get_application_directories(full_file_path):
 def __check_if_app_already_exists(apps_dirs, apps_from_other_repos):
     for app_key in apps_dirs:
         if app_key in apps_from_other_repos:
-            raise Exception("application: " + app_key + " already exists in a different repository")
+            raise GitOpsException(f"application: {app_key} already exists in a different repository")
