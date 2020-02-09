@@ -2,7 +2,7 @@
 
 # delete-preview
 ```
-usage: gitopscli create-preview [-h] [-b BRANCH] [-u USERNAME] [-p PASSWORD]
+usage: gitopscli delete-preview [-h] [-b BRANCH] [-u USERNAME] [-p PASSWORD]
                                 [-j GIT_USER] [-e GIT_EMAIL] [-c [CREATE_PR]]
                                 [-a [AUTO_MERGE]] -o ORGANISATION -n
                                 REPOSITORY_NAME [-s GIT_PROVIDER]
