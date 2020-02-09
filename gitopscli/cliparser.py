@@ -10,6 +10,7 @@ def create_cli():
     __add_sync_apps_command_parser(subparsers)
     __add_pr_comment_command_parser(subparsers)
     __add_create_preview_command_parser(subparsers)
+    __add_delete_preview_command_parser(subparsers)
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -68,6 +69,12 @@ def __add_create_preview_command_parser(subparsers):
     __add_git_parser_args(add_create_preview_p)
     __add_branch_pr_parser_args(add_create_preview_p)
     __add_create_prid_parser(add_create_preview_p)
+
+
+def __add_delete_preview_command_parser(subparsers):
+    add_delete_preview_p = subparsers.add_parser("delete-preview", help="Delete a preview environment")
+    __add_git_parser_args(add_delete_preview_p)
+    __add_branch_pr_parser_args(add_delete_preview_p)
 
 
 def __add_git_parser_args(deploy_p):
