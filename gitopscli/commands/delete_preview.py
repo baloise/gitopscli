@@ -72,7 +72,9 @@ def delete_preview_command(
         else:
             logging.info("There was no preview with name: %s", new_preview_folder_name)
             sys.exit(0)
-        root_git.commit(f"Deleted preview environment for {gitops_config.application_name} and branch {branch}.")
+        root_git.commit(
+            f"Deleted preview environment for application: {gitops_config.application_name} and branch: {branch}."
+        )
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
 
@@ -86,7 +88,7 @@ def delete_preview_command(
 
 
 def __create_pullrequest(branch, gitops_config, root_git):
-    title = "Updated preview environemnt for " + gitops_config.application_name
+    title = "Deleted preview environment for " + gitops_config.application_name
     description = f"""
 This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
 """

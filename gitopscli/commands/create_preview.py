@@ -73,7 +73,9 @@ def create_preview_command(
         branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
         if not branch_preview_env_already_exist:
-            __create_new_preview_env(branch, new_preview_folder_name, preview_template_folder_name, root_git)
+            __create_new_preview_env(
+                branch, new_preview_folder_name, preview_template_folder_name, root_git, gitops_config.application_name
+            )
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
         route_host = None
@@ -154,7 +156,7 @@ The version {new_image_tag} has already been deployed. Nothing to do here.
 
 
 def __create_new_preview_env(
-    branch, new_preview_folder_name, preview_template_folder_name, root_git,
+    branch, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
 ):
     shutil.copytree(
         root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
@@ -163,11 +165,11 @@ def __create_new_preview_env(
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
     if root_git.get_full_file_path(chart_file_path):
         update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
-    root_git.commit(f"Initiated new preview env for branch {branch}'")
+    root_git.commit(f"Create new preview env for application: {app_name} and branch: {branch}")
 
 
 def __create_pullrequest(branch, gitops_config, root_git):
-    title = "Updated preview environemnt for " + gitops_config.application_name
+    title = "Updated preview environment for " + gitops_config.application_name
     description = f"""
 This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
 """
