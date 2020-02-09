@@ -6,7 +6,7 @@ usage: gitopscli create-preview [-h] [-b BRANCH] [-u USERNAME] [-p PASSWORD]
                                 [-j GIT_USER] [-e GIT_EMAIL] [-c [CREATE_PR]]
                                 [-a [AUTO_MERGE]] -o ORGANISATION -n
                                 REPOSITORY_NAME [-s GIT_PROVIDER]
-                                [-w GIT_PROVIDER_URL] -i PR_ID [-x PARENT_ID]
+                                [-w GIT_PROVIDER_URL]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -35,10 +35,6 @@ optional arguments:
   -w GIT_PROVIDER_URL, --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  -i PR_ID, --pr-id PR_ID
-                        the id of the pull request
-  -x PARENT_ID, --parent-id PARENT_ID
-                        the id of the parent comment, in case of a reply
 ```
 
 ## Example
@@ -53,7 +49,6 @@ gitopscli delete-preview \
 --repository-name "my-app" \
 --branch "some-branch-name" \
 --create-pr \
---pr-id 4711 \
 --auto-merge
 ```
 
