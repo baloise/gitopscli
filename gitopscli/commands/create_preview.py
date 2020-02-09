@@ -92,16 +92,16 @@ def create_preview_command(
         if not value_replaced:
             __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
             sys.exit(0)
-        root_git.commit(f"Upated preview environment for {gitops_config.application_name}.")
+        root_git.commit(f"Upated preview environment for {gitops_config.application_name} and branch {branch}.")
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
         pr_comment_text = f"""
-New Preview Environment for {gitops_config.application_name} created successfully. Access it here: 
+New Preview Environment for {gitops_config.application_name} and branch {branch} created successfully. Access it here: 
 https://{route_host}
 """
         if branch_preview_env_already_exist:
             pr_comment_text = f"""
-Preview Environment for {gitops_config.application_name} updated successfully. Access it here: 
+Preview Environment for {gitops_config.application_name} and branch {branch} updated successfully. Access it here: 
 https://{route_host}
 """
         logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
