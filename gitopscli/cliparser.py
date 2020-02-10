@@ -78,8 +78,8 @@ def __add_delete_preview_command_parser(subparsers):
 
 
 def __add_git_parser_args(deploy_p):
-    deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
-    deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
+    deploy_p.add_argument("-u", "--username", help="Git username", required=True)
+    deploy_p.add_argument("-p", "--password", help="Git password or token", required=True)
     deploy_p.add_argument("-j", "--git-user", help="Git Username", default="GitOpsCLI")
     deploy_p.add_argument("-e", "--git-email", help="Git User Email", default="gitopscli@baloise.dev")
     deploy_p.add_argument("-o", "--organisation", help="Apps Git organisation/projectKey", required=True)
