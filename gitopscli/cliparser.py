@@ -86,7 +86,7 @@ def __add_git_parser_args(deploy_p):
     deploy_p.add_argument(
         "-n", "--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True
     )
-    deploy_p.add_argument("-s", "--git-provider", help="Git server provider", default="bitbucket-server")
+    deploy_p.add_argument("-s", "--git-provider", help="Git server provider")
     deploy_p.add_argument(
         "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)"
     )
