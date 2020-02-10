@@ -9,6 +9,7 @@ GitOps CLI is a command line utility to perform operations on GitOps managed inf
 ## Functionality
 - [add-pr-comment](doc/commands/add-pr-comment.md): Add a pull request comment
 - [create-preview](doc/commands/create-preview.md): Create a preview environment in the config repository for a pull request in an app repository.
+- [delete-preview](doc/commands/delete-preview.md): Delete a preview environment in the config repository.
 - [deploy](doc/commands/deploy.md): Update YAML values in config repository to e.g. deploy an application.
 - [sync-apps](doc/commands/sync-apps.md): Update root config repository with all apps from child config repository.
 
