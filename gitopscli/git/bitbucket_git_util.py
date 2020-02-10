@@ -1,4 +1,5 @@
 import sys
+import requests
 
 from atlassian import Bitbucket
 from gitopscli.gitops_exception import GitOpsException
@@ -16,7 +17,10 @@ class BitBucketGitUtil(AbstractGitUtil):
         self._bitbucket = Bitbucket(self._git_provider_url, self._username, self._password)
 
     def get_clone_url(self):
-        repo = self._bitbucket.get_repo(self._organisation, self._repository_name)
+        try:
+            repo = self._bitbucket.get_repo(self._organisation, self._repository_name)
+        except requests.exceptions.ConnectionError as ex:
+            raise GitOpsException(f"Error connecting to '{self._git_provider_url}''") from ex
         if "errors" in repo:
             for error in repo["errors"]:
                 exception = error["exceptionName"]
