@@ -25,10 +25,16 @@ def main():
     elif args.command == "delete-preview":
         command = delete_preview_command
 
+    verbose = args.verbose
+    del args.verbose
+
     try:
         command(**vars(args))
     except GitOpsException as ex:
-        logging.error(ex)
+        if verbose:
+            logging.exception(ex)
+        else:
+            logging.error(ex)
         sys.exit(1)
 
 
