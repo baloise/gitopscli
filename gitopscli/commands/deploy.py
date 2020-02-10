@@ -55,7 +55,11 @@ def deploy_command(
         updated_values = {}
         for key in values:
             value = values[key]
-            if not update_yaml_file(full_file_path, key, value):
+            try:
+                updated_value = update_yaml_file(full_file_path, key, value)
+            except KeyError as ex:
+                raise GitOpsException(f"Key '{key}' not found in {file}'") from ex
+            if not updated_value:
                 logging.info("Yaml property %s already up-to-date", key)
                 continue
             logging.info("Updated yaml property %s to %s", key, value)

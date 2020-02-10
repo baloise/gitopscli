@@ -20,7 +20,7 @@ def yaml_dump(data):
     return stream.get_string()
 
 
-def update_yaml_file(file_path, key, value):
+def update_yaml_file(file_path, key, value, create_new=False):
     yaml = YAML()
     with open(file_path, "r") as stream:
         content = yaml.load(stream)
@@ -28,10 +28,14 @@ def update_yaml_file(file_path, key, value):
     keys, obj = key.split("."), content
     for k in keys[:-1]:
         if k not in obj or not isinstance(obj[k], dict):
+            if not create_new:
+                raise KeyError(f"Key '{key}' not found in YAML!")
             obj[k] = dict()
         obj = obj[k]
     if keys[-1] in obj and obj[keys[-1]] == value:
         return False  # nothing to update
+    if not create_new and keys[-1] not in obj:
+        raise KeyError(f"Key '{key}' not found in YAML!")
     obj[keys[-1]] = value
 
     with open(file_path, "w+") as stream:
