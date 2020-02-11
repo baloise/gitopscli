@@ -1,10 +1,12 @@
+
 # GitOps CLI
 [![Build Status](https://travis-ci.org/baloise-incubator/gitopscli.svg?branch=master)](https://travis-ci.org/baloise-incubator/gitopscli) 
 [![Latest Release](https://img.shields.io/github/v/tag/baloise-incubator/gitopscli)](https://hub.docker.com/repository/docker/baloiseincubator/gitopscli/tags?page=1)
 [![Python: 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/baloise-incubator/gitopscli) 
 [![License: Apache License Version 2.0](https://img.shields.io/badge/license-Apache%20License%20Version%202.0-lightgrey.svg)](https://choosealicense.com/licenses/apache-2.0/) 
 
-GitOps CLI is a command line utility to perform operations on GitOps managed infrastructure repositories, including updates in YAML files.
+GitOps CLI is a command line interface (CLI) to perform operations on GitOps managed infrastructure repositories, including updates in YAML files.
 
 ## Functionality
 - [add-pr-comment](doc/commands/add-pr-comment.md): Add a pull request comment
@@ -17,7 +19,7 @@ GitOps CLI is a command line utility to perform operations on GitOps managed inf
 Currently, we support both BitBucket Server and GitHub.
 
 ## Usage
-You can install the Python based GitOps CLI locally on you system or simply run it in a docker container.
+You can install the Python based GitOps CLI locally on your system or simply run it in a docker container.
 
 ### Local (recommended for development)
 
