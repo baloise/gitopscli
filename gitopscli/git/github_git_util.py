@@ -1,6 +1,5 @@
-import sys
-
-from github import Github, UnknownObjectException
+from github import Github, UnknownObjectException, BadCredentialsException
+from gitopscli.gitops_exception import GitOpsException
 
 from .abstract_git_util import AbstractGitUtil
 
@@ -15,9 +14,10 @@ class GithubGitUtil(AbstractGitUtil):
     def get_clone_url(self):
         try:
             repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
-        except UnknownObjectException:
-            print(f"Repository '{self._organisation}/{self._repository_name}' does not exist.", file=sys.stderr)
-            sys.exit(1)
+        except BadCredentialsException as ex:
+            raise GitOpsException("Bad credentials") from ex
+        except UnknownObjectException as ex:
+            raise GitOpsException(f"Repository '{self._organisation}/{self._repository_name}' does not exist.") from ex
         return repo.clone_url
 
     def create_pull_request(self, from_branch, to_branch, title, description):

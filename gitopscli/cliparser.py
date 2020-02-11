@@ -83,15 +83,15 @@ def __add_delete_preview_command_parser(subparsers):
 
 
 def __add_git_parser_args(deploy_p):
-    deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
-    deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
+    deploy_p.add_argument("-u", "--username", help="Git username", required=True)
+    deploy_p.add_argument("-p", "--password", help="Git password or token", required=True)
     deploy_p.add_argument("-j", "--git-user", help="Git Username", default="GitOpsCLI")
     deploy_p.add_argument("-e", "--git-email", help="Git User Email", default="gitopscli@baloise.dev")
     deploy_p.add_argument("-o", "--organisation", help="Apps Git organisation/projectKey", required=True)
     deploy_p.add_argument(
         "-n", "--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True
     )
-    deploy_p.add_argument("-s", "--git-provider", help="Git server provider", default="bitbucket-server")
+    deploy_p.add_argument("-s", "--git-provider", help="Git server provider")
     deploy_p.add_argument(
         "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)"
     )

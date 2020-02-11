@@ -2,18 +2,17 @@
 
 # sync-apps
 ```
-usage: gitopscli sync-apps [-h] [-u USERNAME] [-p PASSWORD]
-                           [-j GIT_USER] [-e GIT_EMAIL]
-                           -o ORGANISATION -n REPOSITORY_NAME [-s GIT_PROVIDER]
-                           [-w GIT_PROVIDER_URL] -i ROOT_ORGANISATION -r
-                           ROOT_REPOSITORY_NAME
+usage: gitopscli sync-apps [-h] -u USERNAME -p PASSWORD [-j GIT_USER]
+                           [-e GIT_EMAIL] -o ORGANISATION -n REPOSITORY_NAME
+                           [-s GIT_PROVIDER] [-w GIT_PROVIDER_URL] -i
+                           ROOT_ORGANISATION -r ROOT_REPOSITORY_NAME
 
 optional arguments:
   -h, --help            show this help message and exit
   -u USERNAME, --username USERNAME
-                        Git username if Basic Auth should be used
+                        Git username
   -p PASSWORD, --password PASSWORD
-                        Git password if Basic Auth should be used
+                        Git password or token
   -j GIT_USER, --git-user GIT_USER
                         Git Username
   -e GIT_EMAIL, --git-email GIT_EMAIL

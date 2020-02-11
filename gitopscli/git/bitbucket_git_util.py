@@ -1,7 +1,8 @@
 import sys
+import requests
 
 from atlassian import Bitbucket
-
+from gitopscli.gitops_exception import GitOpsException
 from .abstract_git_util import AbstractGitUtil
 
 
@@ -16,13 +17,22 @@ class BitBucketGitUtil(AbstractGitUtil):
         self._bitbucket = Bitbucket(self._git_provider_url, self._username, self._password)
 
     def get_clone_url(self):
-        repo = self._bitbucket.get_repo(self._organisation, self._repository_name)
+        try:
+            repo = self._bitbucket.get_repo(self._organisation, self._repository_name)
+        except requests.exceptions.ConnectionError as ex:
+            raise GitOpsException(f"Error connecting to '{self._git_provider_url}''") from ex
+        if "errors" in repo:
+            for error in repo["errors"]:
+                exception = error["exceptionName"]
+                if exception == "com.atlassian.bitbucket.auth.IncorrectPasswordAuthenticationException":
+                    raise GitOpsException("Bad credentials")
+                if exception == "com.atlassian.bitbucket.project.NoSuchProjectException":
+                    raise GitOpsException(f"Organisation '{self._organisation}' does not exist")
+                if exception == "com.atlassian.bitbucket.repository.NoSuchRepositoryException":
+                    raise GitOpsException(f"Repository '{self._organisation}/{self._repository_name}' does not exist")
+                raise GitOpsException(error["message"])
         if "links" not in repo:
-            print(
-                f"Repository '{self._repository_name}' or organisation '{self._organisation}' does not exist.",
-                file=sys.stderr,
-            )
-            sys.exit(1)
+            raise GitOpsException(f"Repository '{self._organisation}/{self._repository_name}' does not exist")
         for clone_link in repo["links"]["clone"]:
             if clone_link["name"] == "http":
                 repo_url = clone_link["href"]
