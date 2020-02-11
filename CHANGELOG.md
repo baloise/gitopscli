@@ -12,3 +12,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `--verbose` arg
 - Improved git error handling
 - Improved yaml update error handling
+### Removed
+- arg shortcuts (except -v verbose and -h help)
