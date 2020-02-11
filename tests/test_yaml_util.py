@@ -2,6 +2,7 @@ import os
 import shutil
 import unittest
 import uuid
+import pytest
 
 from gitopscli.yaml.yaml_util import yaml_load, yaml_dump, update_yaml_file, merge_yaml_element
 
@@ -69,7 +70,9 @@ a: # comment
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
-        updated = update_yaml_file(test_file, "a.x", "foo")
+        with pytest.raises(KeyError):
+            updated = update_yaml_file(test_file, "a.x", "foo")
+        updated = update_yaml_file(test_file, "a.x", "foo", create_new=True)
         self.assertTrue(updated)
 
         expected = """\
@@ -83,13 +86,19 @@ a: # comment
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
-        updated = update_yaml_file(test_file, "a.x.z", "foo_z")
+        with pytest.raises(KeyError):
+            updated = update_yaml_file(test_file, "a.x.z", "foo_z")
+        updated = update_yaml_file(test_file, "a.x.z", "foo_z", create_new=True)
         self.assertTrue(updated)
 
-        updated = update_yaml_file(test_file, "a.x.y", "foo_y")
+        with pytest.raises(KeyError):
+            updated = update_yaml_file(test_file, "a.x.y", "foo_y")
+        updated = update_yaml_file(test_file, "a.x.y", "foo_y", create_new=True)
         self.assertTrue(updated)
 
-        updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
+        with pytest.raises(KeyError):
+            updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
+        updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z", create_new=True)
         self.assertTrue(updated)
 
         expected = """\

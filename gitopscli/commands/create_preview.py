@@ -8,6 +8,7 @@ import uuid
 from gitopscli.git.create_git import create_git
 from gitopscli.yaml.gitops_config import GitOpsConfig
 from gitopscli.yaml.yaml_util import update_yaml_file
+from gitopscli.gitops_exception import GitOpsException
 
 
 def create_preview_command(
@@ -129,7 +130,7 @@ def __replace_value(
 ):
     replacement_value = None
     logging.info("Replacement: %s", replacement)
-    replacement_path_ = replacement["path"]
+    replacement_path = replacement["path"]
     replacement_variable = replacement["variable"]
     if replacement_variable == "GIT_COMMIT":
         replacement_value = new_image_tag
@@ -139,10 +140,13 @@ def __replace_value(
         replacement_value = route_host
     else:
         logging.info("Unknown replacement variable: %s", replacement_variable)
-    value_replaced = value_replaced | update_yaml_file(
-        root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement_path_, replacement_value,
-    )
-    logging.info("Replacing property %s with value: %s", replacement_path_, replacement_value)
+    try:
+        value_replaced = value_replaced | update_yaml_file(
+            root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement_path, replacement_value,
+        )
+    except KeyError as ex:
+        raise GitOpsException(f"Key '{replacement_path}' not found in '{new_preview_folder_name}/values.yaml'") from ex
+    logging.info("Replacing property %s with value: %s", replacement_path, replacement_value)
     return route_host, value_replaced
 
 
@@ -164,7 +168,10 @@ def __create_new_preview_env(
     chart_file_path = new_preview_folder_name + "/Chart.yaml"
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
     if root_git.get_full_file_path(chart_file_path):
-        update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
+        try:
+            update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
+        except KeyError as ex:
+            raise GitOpsException(f"Key 'name' not found in '{chart_file_path}'") from ex
     root_git.commit(f"Create new preview env for application: {app_name} and branch: {branch}")
 
 
