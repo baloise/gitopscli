@@ -9,3 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - New command `delete-preview`
 - Added initial Changelog.md
+- Added `--verbose` arg
+- Improved git error handling
+- Improved yaml update error handling
