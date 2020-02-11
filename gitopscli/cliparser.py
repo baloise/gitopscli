@@ -26,16 +26,14 @@ def __create_cli_parser():
 
 def __add_deploy_command_parser(subparsers):
     deploy_p = subparsers.add_parser("deploy", help="Trigger a new deployment by changing YAML values")
-    deploy_p.add_argument("-f", "--file", help="YAML file path", required=True)
+    deploy_p.add_argument("--file", help="YAML file path", required=True)
     deploy_p.add_argument(
-        "-v",
         "--values",
         help="YAML/JSON object with the YAML path as key and the desired value as value",
         type=yaml_load,
         required=True,
     )
     deploy_p.add_argument(
-        "-g",
         "--single-commit",
         help="Create only single commit for all updates",
         type=__str2bool,
@@ -55,8 +53,8 @@ def __add_sync_apps_command_parser(subparsers):
     )
     __add_git_parser_args(sync_apps_p)
     __add_verbose_parser(sync_apps_p)
-    sync_apps_p.add_argument("-i", "--root-organisation", help="Apps config repository organisation", required=True)
-    sync_apps_p.add_argument("-r", "--root-repository-name", help="Root config repository organisation", required=True)
+    sync_apps_p.add_argument("--root-organisation", help="Apps config repository organisation", required=True)
+    sync_apps_p.add_argument("--root-repository-name", help="Root config repository organisation", required=True)
 
 
 def __add_pr_comment_command_parser(subparsers):
@@ -64,7 +62,7 @@ def __add_pr_comment_command_parser(subparsers):
     __add_git_parser_args(add_pr_comment_p)
     __add_create_prid_parser(add_pr_comment_p)
     __add_verbose_parser(add_pr_comment_p)
-    add_pr_comment_p.add_argument("-t", "--text", help="the text of the comment", required=True)
+    add_pr_comment_p.add_argument("--text", help="the text of the comment", required=True)
 
 
 def __add_create_preview_command_parser(subparsers):
@@ -83,24 +81,19 @@ def __add_delete_preview_command_parser(subparsers):
 
 
 def __add_git_parser_args(deploy_p):
-    deploy_p.add_argument("-u", "--username", help="Git username if Basic Auth should be used")
-    deploy_p.add_argument("-p", "--password", help="Git password if Basic Auth should be used")
-    deploy_p.add_argument("-j", "--git-user", help="Git Username", default="GitOpsCLI")
-    deploy_p.add_argument("-e", "--git-email", help="Git User Email", default="gitopscli@baloise.dev")
-    deploy_p.add_argument("-o", "--organisation", help="Apps Git organisation/projectKey", required=True)
-    deploy_p.add_argument(
-        "-n", "--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True
-    )
-    deploy_p.add_argument("-s", "--git-provider", help="Git server provider", default="bitbucket-server")
-    deploy_p.add_argument(
-        "-w", "--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)"
-    )
+    deploy_p.add_argument("--username", help="Git username if Basic Auth should be used")
+    deploy_p.add_argument("--password", help="Git password if Basic Auth should be used")
+    deploy_p.add_argument("--git-user", help="Git Username", default="GitOpsCLI")
+    deploy_p.add_argument("--git-email", help="Git User Email", default="gitopscli@baloise.dev")
+    deploy_p.add_argument("--organisation", help="Apps Git organisation/projectKey", required=True)
+    deploy_p.add_argument("--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True)
+    deploy_p.add_argument("--git-provider", help="Git server provider", default="bitbucket-server")
+    deploy_p.add_argument("--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)")
 
 
 def __add_branch_pr_parser_args(deploy_p):
-    deploy_p.add_argument("-b", "--branch", help="Branch to push the changes to", default="master")
+    deploy_p.add_argument("--branch", help="Branch to push the changes to", default="master")
     deploy_p.add_argument(
-        "-c",
         "--create-pr",
         help="Creates a Pull Request (only when --branch is not master/default branch)",
         type=__str2bool,
@@ -109,7 +102,6 @@ def __add_branch_pr_parser_args(deploy_p):
         default=False,
     )
     deploy_p.add_argument(
-        "-a",
         "--auto-merge",
         help="Automatically merge the created PR (only valid with --create-pr)",
         type=__str2bool,
@@ -120,13 +112,13 @@ def __add_branch_pr_parser_args(deploy_p):
 
 
 def __add_create_prid_parser(subparsers):
-    subparsers.add_argument("-i", "--pr-id", help="the id of the pull request", type=int, required=True)
-    subparsers.add_argument("-x", "--parent-id", help="the id of the parent comment, in case of a reply", type=int)
+    subparsers.add_argument("--pr-id", help="the id of the pull request", type=int, required=True)
+    subparsers.add_argument("--parent-id", help="the id of the parent comment, in case of a reply", type=int)
 
 
 def __add_verbose_parser(subparsers):
     subparsers.add_argument(
-        "--verbose", help="Verbose exception logging", type=__str2bool, nargs="?", const=True, default=False,
+        "-v", "--verbose", help="Verbose exception logging", type=__str2bool, nargs="?", const=True, default=False,
     )
 
 
