@@ -42,9 +42,7 @@ def delete_preview_command(
         )
 
         apps_git.checkout(branch)
-        logging.info("App repo branch %s checkout successful", branch)
-        shortened_branch_hash = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
-        logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
+        logging.info("App repo branch master checkout successful")
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         logging.info("Read GitOpsConfig: %s", gitops_config)
 
@@ -63,14 +61,16 @@ def delete_preview_command(
         logging.info("Config repo branch master checkout successful")
         root_git.new_branch(branch)
         logging.info("Created branch %s in config repo", branch)
-        new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
-        logging.info("New folder for preview: %s", new_preview_folder_name)
-        branch_preview_env_exists = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
+        shortened_branch_hash = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
+        logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
+        preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
+        logging.info("Preview folder name: %s", preview_folder_name)
+        branch_preview_env_exists = os.path.exists(root_git.get_full_file_path(preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_exists)
         if branch_preview_env_exists:
-            shutil.rmtree(root_git.get_full_file_path(new_preview_folder_name), ignore_errors=True)
+            shutil.rmtree(root_git.get_full_file_path(preview_folder_name), ignore_errors=True)
         else:
-            logging.info("There was no preview with name: %s", new_preview_folder_name)
+            logging.info("There was no preview with name: %s", preview_folder_name)
             sys.exit(0)
         root_git.commit(
             f"Deleted preview environment for application: {gitops_config.application_name} and branch: {branch}."
