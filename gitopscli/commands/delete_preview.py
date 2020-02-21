@@ -41,7 +41,7 @@ def delete_preview_command(
             apps_tmp_dir,
         )
 
-        apps_git.checkout(branch)
+        apps_git.checkout("master")
         logging.info("App repo branch master checkout successful")
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         logging.info("Read GitOpsConfig: %s", gitops_config)
