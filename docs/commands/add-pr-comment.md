@@ -1,5 +1,3 @@
-[GitOps CLI](../../README.md) » add-pr-comment
-
 # add-pr-comment
 ```
 usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD

@@ -1,5 +1,3 @@
-[GitOps CLI](../../README.md) » deploy
-
 # deploy
 ```
 usage: gitopscli deploy [-h] --file FILE --values VALUES
@@ -62,5 +60,5 @@ gitopscli deploy \
 ```
 
 ## Screenshots
-![Example PR Overview](/doc/screenshots/example_pr_overview.png?raw=true "Example of a created PR")
-![Example PR Diff](/doc/screenshots/example_pr_diff.png?raw=true "Example of a PR yaml file diff")
+![Example PR Overview](../assets/images/screenshots/example_pr_overview.png?raw=true "Example of a created PR")
+![Example PR Diff](../assets/images/screenshots/example_pr_diff.png?raw=true "Example of a PR yaml file diff")

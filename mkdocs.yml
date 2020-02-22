@@ -1,0 +1,52 @@
+# Project information
+site_name: 'GitOps CLI'
+site_description: 'A command line interface to perform operations on GitOps managed infrastructure repositories.'
+#site_url: todo
+
+# Repository
+repo_name: 'baloise-incubator/gitopscli'
+repo_url: 'https://github.com/baloise-incubator/gitopscli'
+
+# Copyright
+#copyright: 'Copyright &copy; 2020 todo'
+
+# Navigation
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - CLI Commands:
+    - add-pr-comment: commands/add-pr-comment.md
+    - create-preview: commands/create-preview.md
+    - delete-preview: commands/delete-preview.md
+    - deploy: commands/deploy.md
+    - sync-apps: commands/sync-apps.md
+  - Changelog: changelog.md
+  - Contributing: contributing.md
+  - License: license.md
+
+# Configuration
+theme:
+  name: 'material'
+  language: 'en'
+  palette:
+    primary: 'indigo'
+    accent: 'indigo'
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+  feature:
+    tabs: true
+  logo: 'assets/images/logo-white.svg'
+  favicon: 'assets/images/favicon.ico'
+
+extra_css:
+  - 'stylesheets/extra.css'
+
+# Extensions
+markdown_extensions:
+  - markdown.extensions.attr_list
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true

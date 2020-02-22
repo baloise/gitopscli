@@ -1,5 +1,3 @@
-[GitOps CLI](../../README.md) » sync-apps
-
 # sync-apps
 ```
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD

@@ -18,4 +18,10 @@ uninstall:
 build:
 	docker build -t gitopscli:latest .
 
-.PHONY: format install uninstall build lint test
+docs:
+	mkdocs gh-deploy
+
+serve_docs:
+	mkdocs serve
+
+.PHONY: format lint test install uninstall build docs serve_docs
