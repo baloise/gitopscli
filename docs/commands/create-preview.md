@@ -1,5 +1,3 @@
-[GitOps CLI](../../README.md) » create-preview
-
 # create-preview
 ```
 usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD

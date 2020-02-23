@@ -1,5 +1,3 @@
-[GitOps CLI](../../README.md) » delete-preview
-
 # delete-preview
 ```
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
