@@ -1,7 +1,7 @@
 # Project information
 site_name: 'GitOps CLI'
 site_description: 'A command line interface to perform operations on GitOps managed infrastructure repositories.'
-#site_url: todo
+site_url: 'https://baloise-incubator.github.io/gitopscli/'
 
 # Repository
 repo_name: 'baloise-incubator/gitopscli'
