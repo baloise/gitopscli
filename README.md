@@ -5,7 +5,7 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/baloise-incubator/gitopscli) 
 [![License: Apache License Version 2.0](https://img.shields.io/badge/license-Apache%20License%20Version%202.0-lightgrey.svg)](https://choosealicense.com/licenses/apache-2.0/) 
 
-# GitOps CLI
+# GitOps CLI ![Stability: Experimental](https://img.shields.io/badge/stability-experimental-orange)
 
 GitOps CLI is a command line interface (CLI) to perform operations on GitOps managed infrastructure repositories, including updates in YAML files.
 
