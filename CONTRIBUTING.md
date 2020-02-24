@@ -14,7 +14,7 @@ If you need help, please reach out to us by opening an issue.
 ## Report a bug 
 Reporting bugs is one of the best ways to contribute. Before creating a bug report, please check that an [issue](https://github.com/baloise-incubator/gitopscli/issues) reporting the same problem does not already exist. If there is such an issue, you may add your information as a comment.
 
-To report a new bug you should open an issue that summarizes the bug and set the label to ![bug](https://img.shields.io/badge/-bug-d73a4a)".
+To report a new bug you should open an issue that summarizes the bug and set the label to ![bug](https://img.shields.io/badge/-bug-d73a4a).
 
 If you want to provide a fix along with your bug report: That is great! In this case please send us a pull request as described in section [Contribute code](#contribute-code).
 
