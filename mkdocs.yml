@@ -7,9 +7,6 @@ site_url: 'https://baloise-incubator.github.io/gitopscli/'
 repo_name: 'baloise-incubator/gitopscli'
 repo_url: 'https://github.com/baloise-incubator/gitopscli'
 
-# Copyright
-#copyright: 'Copyright &copy; 2020 todo'
-
 # Navigation
 nav:
   - Home: index.md
@@ -39,6 +36,7 @@ theme:
   logo: 'assets/images/logo-white.svg'
   favicon: 'assets/images/favicon.ico'
 
+# Custom CSS
 extra_css:
   - 'stylesheets/extra.css'
 
