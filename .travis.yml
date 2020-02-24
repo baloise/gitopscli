@@ -1,6 +1,3 @@
-language: minimal
-python: 3.6
-
 env:
   global:
     # DOCKER_USERNAME
@@ -12,6 +9,7 @@ env:
 jobs:
   include:
     - name: docker
+      language: shell
       script:
         - docker build -t $IMAGE_NAME:latest .
         - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -19,6 +17,8 @@ jobs:
         - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
         - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
     - name: doc
+      language: python
+      python: 3.6
       install: pip install -r requirements-dev.txt
       #if: branch = master
       script:
