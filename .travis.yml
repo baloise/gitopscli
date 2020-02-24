@@ -1,3 +1,6 @@
+os: linux
+language: shell
+
 env:
   global:
     # DOCKER_USERNAME
@@ -28,8 +31,8 @@ jobs:
         provider: pages
         local_dir: site
         target_branch: gh-pages-test
-        github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+        token: $GITHUB_TOKEN
         keep_history: true
-        cleanup: false
+        skip_cleanup: true
         on:
           branch: feat/travis-stages
