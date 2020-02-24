@@ -18,7 +18,7 @@ jobs:
       script:
         - docker build -t $IMAGE_NAME:latest .
         - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - if [ "$TRAVIS_BRANCH" == "master" ]; then docker push $IMAGE_NAME:latest; fi
+        - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then docker push $IMAGE_NAME:latest; fi
         - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
         - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
     - name: doc
