@@ -22,7 +22,7 @@ jobs:
         - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
         - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
     - name: doc
-      #if: branch = master
+      if: branch = master
       language: python
       python: 3.6
       install: pip install -r requirements-dev.txt
@@ -30,9 +30,6 @@ jobs:
       deploy:
         provider: pages
         local_dir: site
-        target_branch: gh-pages-test
         token: $GITHUB_TOKEN
         keep_history: true
         skip_cleanup: true
-        on:
-          branch: feat/travis-stages
