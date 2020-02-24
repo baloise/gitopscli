@@ -19,9 +19,6 @@ build:
 	docker build -t gitopscli:latest .
 
 docs:
-	mkdocs gh-deploy
-
-serve_docs:
 	mkdocs serve
 
-.PHONY: format lint test install uninstall build docs serve_docs
+.PHONY: format lint test install uninstall build docs
