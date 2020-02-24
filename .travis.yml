@@ -1,5 +1,5 @@
-services:
-  - docker
+os: linux
+language: shell
 
 env:
   global:
@@ -7,11 +7,29 @@ env:
     - secure: "mW+7G47eUTjiJrl9DdP8fScdis5cHqp5gfwgvRmhrjOx3xKP606Yi3tBPc/N6s+iJHwvllLl/jkzUo5vOnBYxC+1w1DKQX+AsaYtASM+wFinusyct69v5vZIqw9z5FoSQxK43fQkJqmGiJpm0IWm7NapDTiuXmJHp7kaeGPVZdvbsDNGF1ke9EPEdLdu61jNme3XAiLas7Dtk0w//3rcXbqIDDOgosu/TC7uEYzgL3kVygONFGOcdXxK50M0871YFln9ol/XSgyIja7F7lTqzih2E/4BQKvgSZ3HAYFc6ejDGXqZ38suOU8X23rsgIfWURB+4FsR3IEFOIKcoSH9oHk/alo7arvvomaFHDtYSy+a+w2uEUiqVgOCiI6DXa90Rb1ADVi3CUGAsyUccLyrcNhDbLJjGVMt5NiHZZCm5dmWEUSr+L7F77LbkH345IzCUtZXy1gVwENSMxNFAzpkuZwwTYTD0tv7lZ8prC2nX/4VSKDA6DvsLiQXe9pqbEr8rtOwdQ0QA/NRQYlXhfE+mQEmAiWJnxUvlbXyO6BCr8WsuvJAFG53fZ0VU7rBoNvmLZNFcuzQDFnj0KYpQ3AmB8n9VyY4x5G1ZWGsdmwlMJVddpT1qgSzweu21O0bI70Oj7Ii8e2JjOwvamXm8JjtLh4Ya1iWIRTt3zvhylPegEA="
     # DOCKER_ACCESS_TOKEN
     - secure: "cyp11ZUB/GJ3o96oFZvMEZPW0rPzWnOHXcQTgQcQBz328+OUBgg/rY61BwRAjk57Kqjr9w7FWCJCjvzHLiTk/wVwsKo3pQw9nJPiyblFKAtGunJfA/rrwVqaDTvki9zWtQKqwteQ9gPpVG4RAsCVVYp0nCsCCfmBsw6iWnHSiQKwpw2g23PTG97xkioFcMNdetdt1+fqQC23fcEd7aktPlq0wRilSOZQRk87zF9tiRzTIL9Cl81guh0xC5FY4KG6egS82DAv0gANQO/aJr2vWpTZRPukL5GkFUpFfRFcH9nszz39R8OQ5B+SWJxbWSkbIN0k5IQyZyN7rWqQkk1p84JSMn3O4/0RSrAXDp93dcb1OxAYQq0o+upBZfcpKBFAAXy0xIHKu8uQe2BohREB2EVlfQIO1iXYnB2hUo7hUyHFQ2btjT1Qq8GdU1uudKmaueDC51WlHmcvBgAptQXD4ESagiL5vSCfw4S7gUevdrxrV+GLkUYGxqzd20CA0kWf05KBYX3JHh02sTwQm+x8cQWL4aHQ/vQN+zYRLh+TrgoOKoR50L5xK1Eyq3boTZ0R6wOcvKgA9ViWZ2ZDckB2FlM2Vpk4Zvmg5cBlgTwP96aQXh06TZgfvx26Ni9JaWb59iZSVSl1RWdeeIv5VZqLBX2MR5jy2rlccg8ws5DqWAQ="
+    # GITHUB_TOKEN
+    - secure: "MGMSLhzZuFGVbCGR+EcyC0SODyccmJlKG9vjbSUl9Lxs7Hxm1C9vpcn6eP5LhZtsX3Qsarc52TzM93bwWJWS3Wc1nzNzB/p32MtvD3lECAMps8592PAhmYhNl0Dn2WauNlD/kCDtYO42IZ5jRu74jnOvbqvqJDUasposPGx7MIC2NxFHHEZzuPf4TVf7lpjWYcI08yNTBLqeykAZqdYMXH+tzuHp2DagyP4Ay6LxnqfTdYD980FbWf1ObgfpXAMpzhFC0RP18J5MURF/lKaX/9kal9NGex51UHaFZXiyVNqIMF1Wkw1jRoN95duKGI1F5onnx8bqFoHA/4g5PqUXHBDZfZPq0kZxj3qBCttxOY+M5b0VRm8fAAO2Jh/ly8newk1KElV3Uxy7YHhnEY4OEWQLq2nbHYCFH2qVHXuJovzqn1/3waAdDKpg0SkaW9N9Kud+SZtKkXk5NE97Rt8S+4v2hD+9vZvus33FPBFzZgNN7iRLFAAqMTVnauYVoiQos2XsuEyol2swJeMjZYhUM9m3N05K65uAfj3TWdHMAMw5LQrS8pWnKkQ/xhGEyx3vLih8P14YSeFDIFDD69SKX5pBUmQ1TAReaK8atElUTPcOKzHrGjNggVBxlPdK9bDLIE2CWOaIqYm+m9LbytfjllZT4FzFCBAchE4eShaBLYM="
     - IMAGE_NAME=baloiseincubator/gitopscli
 
-script:
-  - docker build -t $IMAGE_NAME:latest .
-  - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
-  - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push $IMAGE_NAME:latest
-  - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
+jobs:
+  include:
+    - name: docker
+      language: shell
+      script:
+        - docker build -t $IMAGE_NAME:latest .
+        - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then docker push $IMAGE_NAME:latest; fi
+        - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
+        - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
+    - name: doc
+      if: branch = master
+      language: python
+      python: 3.6
+      install: pip install -r requirements-dev.txt
+      script: mkdocs build
+      deploy:
+        provider: pages
+        local_dir: site
+        token: $GITHUB_TOKEN
+        keep_history: true
+        skip_cleanup: true
