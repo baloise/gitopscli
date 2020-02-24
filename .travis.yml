@@ -26,5 +26,7 @@ jobs:
         - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
         - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
     - stage: doc
+      on:
+        branch: master
       script:
         - mkdocs build
