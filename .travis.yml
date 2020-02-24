@@ -18,11 +18,13 @@ install:
   - pip install -r requirements-dev.txt
 jobs:
   include:
-    - stage: build
-      script: docker build -t $IMAGE_NAME:latest .
-    - stage: push
+    - stage: docker
       script:
+        - docker build -t $IMAGE_NAME:latest .
         - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker push $IMAGE_NAME:latest
         - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
         - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
+    - stage: doc
+      script:
+        - mkdocs build
