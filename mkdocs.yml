@@ -10,6 +10,7 @@ repo_url: 'https://github.com/baloise-incubator/gitopscli'
 # Navigation
 nav:
   - Home: index.md
+  - Setup: setup.md
   - Getting started: getting-started.md
   - CLI Commands:
     - add-pr-comment: commands/add-pr-comment.md

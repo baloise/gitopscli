@@ -1,2 +1,2 @@
 tasks:
-  - init: make install && gitopscli --help
+  - init: make init && gitopscli --help
