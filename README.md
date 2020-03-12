@@ -23,9 +23,9 @@ docker run --rm -it baloiseincubator/gitopscli --help
 
 ## Features
 - Update YAML values in config repository to e.g. deploy an application.
-- Add a pull request comments.
+- Add pull request comments.
 - Create and delete preview environments in the config repository for a pull request in an app repository.
-- Update root config repository with all apps from child config repository.
+- Update root config repository with all apps from child config repositories.
 
 For detailed installation and usage instructions, visit [https://baloise-incubator.github.io/gitopscli/](https://baloise-incubator.github.io/gitopscli/).
 
