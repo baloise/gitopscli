@@ -1,4 +1,22 @@
 # add-pr-comment
+
+The `add-pr-comment` command adds a comment to a pull request. You can also reply to an existing comment by providing the `--parent-id`.
+
+## Example
+```bash
+gitopscli add-pr-comment \
+  --git-provider-url https://bitbucket.baloise.dev \
+  --username $GIT_USERNAME \
+  --password $GIT_PASSWORD \
+  --git-user "GitOps CLI" \
+  --git-email "gitopscli@baloise.dev" \
+  --organisation "my-team" \
+  --repository-name "my-app" \
+  --pr-id 4711 \
+  --text "this is a comment" 
+```
+
+## Usage
 ```
 usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
@@ -30,18 +48,4 @@ optional arguments:
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
   --text TEXT           the text of the comment
-```
-
-## Example
-```bash
-gitopscli add-pr-comment \
---git-provider-url https://bitbucket.baloise.dev \
---username $GIT_USERNAME \
---password $GIT_PASSWORD \
---git-user "GitOpsCLI" \
---git-email "gitopscli@baloise.dev" \
---organisation "my-team" \
---repository-name "my-app" \
---pr-id 4711 \
---text "this is a comment" 
 ```
