@@ -3,7 +3,7 @@
 [![Latest Release](https://img.shields.io/github/v/tag/baloise-incubator/gitopscli)](https://hub.docker.com/repository/docker/baloiseincubator/gitopscli/tags?page=1)
 [![Python: 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) 
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/baloise-incubator/gitopscli) 
-[![License: Apache License Version 2.0](https://img.shields.io/badge/license-Apache%20License%20Version%202.0-lightgrey.svg)](https://choosealicense.com/licenses/apache-2.0/) 
+[![License: GNU GPLv3](https://img.shields.io/badge/license-GNU%20GPLv3-lightgrey.svg)](https://choosealicense.com/licenses/gpl-3.0/) 
 
 # GitOps CLI ![Stability: Experimental](https://img.shields.io/badge/stability-experimental-orange)
 
@@ -33,4 +33,4 @@ For detailed installation and usage instructions, visit [https://baloise-incubat
 Currently, we support both BitBucket Server and GitHub.
 
 ## License
-[Apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
+[GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
