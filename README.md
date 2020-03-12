@@ -16,7 +16,7 @@ The official GitOps CLI Docker image comes with all dependencies pre-installed a
 ```bash
 docker pull baloiseincubator/gitopscli
 ```
-Start the CLI and the print help page with:
+Start the CLI and the print the help page with:
 ```bash
 docker run --rm -it baloiseincubator/gitopscli --help
 ```
