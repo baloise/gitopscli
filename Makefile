@@ -1,3 +1,7 @@
+init:
+	pip3 install --editable .
+	pip3 install -r requirements-dev.txt
+
 format:
 	black -l 120 -t py37 gitopscli tests setup.py
 
@@ -7,18 +11,10 @@ lint:
 test:
 	python3 -m pytest -v -s
 
-install:
-	pip3 install -r requirements.txt
-	pip3 install -r requirements-dev.txt
-	pip3 install --editable .
-
-uninstall:
-	pip3 uninstall gitopscli
-
-build:
+image:
 	docker build -t gitopscli:latest .
 
 docs:
 	mkdocs serve
 
-.PHONY: format lint test install uninstall build docs
+.PHONY: init format lint test image docs
