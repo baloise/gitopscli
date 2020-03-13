@@ -36,7 +36,10 @@ class GithubGitUtil(AbstractGitUtil):
 
     def delete_branch(self, branch):
         repo = self.__get_repo()
-        git_ref = repo.get_git_ref(f"heads/{branch}")
+        try:
+            git_ref = repo.get_git_ref(f"heads/{branch}")
+        except UnknownObjectException as ex:
+            raise GitOpsException(f"Branch '{branch}' does not exist.") from ex
         git_ref.delete()
 
     def __get_repo(self):
