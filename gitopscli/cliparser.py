@@ -59,7 +59,7 @@ def __add_sync_apps_command_parser(subparsers):
 
 def __add_pr_comment_command_parser(subparsers):
     add_pr_comment_p = subparsers.add_parser("add-pr-comment", help="Create a comment on the pull request")
-    __add_git_parser_args(add_pr_comment_p)
+    __add_git_parser_args(add_pr_comment_p, api_only=True)
     __add_create_prid_parser(add_pr_comment_p)
     __add_verbose_parser(add_pr_comment_p)
     add_pr_comment_p.add_argument("--text", help="the text of the comment", required=True)
@@ -80,11 +80,12 @@ def __add_delete_preview_command_parser(subparsers):
     __add_verbose_parser(add_delete_preview_p)
 
 
-def __add_git_parser_args(deploy_p):
+def __add_git_parser_args(deploy_p, api_only=False):
     deploy_p.add_argument("--username", help="Git username", required=True)
     deploy_p.add_argument("--password", help="Git password or token", required=True)
-    deploy_p.add_argument("--git-user", help="Git Username", default="GitOpsCLI")
-    deploy_p.add_argument("--git-email", help="Git User Email", default="gitopscli@baloise.dev")
+    if not api_only:
+        deploy_p.add_argument("--git-user", help="Git Username", default="GitOpsCLI")
+        deploy_p.add_argument("--git-email", help="Git User Email", default="gitopscli@baloise.dev")
     deploy_p.add_argument("--organisation", help="Apps Git organisation/projectKey", required=True)
     deploy_p.add_argument("--repository-name", help="Git repository name (not the URL, e.g. my-repo)", required=True)
     deploy_p.add_argument("--git-provider", help="Git server provider")
