@@ -12,16 +12,10 @@ class GithubGitUtil(AbstractGitUtil):
         self._github = Github(self._username, self._password)
 
     def get_clone_url(self):
-        try:
-            repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
-        except BadCredentialsException as ex:
-            raise GitOpsException("Bad credentials") from ex
-        except UnknownObjectException as ex:
-            raise GitOpsException(f"Repository '{self._organisation}/{self._repository_name}' does not exist.") from ex
-        return repo.clone_url
+        return self.__get_repo().clone_url
 
     def create_pull_request(self, from_branch, to_branch, title, description):
-        repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
+        repo = self.__get_repo()
         pull_request = repo.create_pull(title=title, body=description, head=from_branch, base=to_branch)
         return pull_request
 
@@ -32,12 +26,23 @@ class GithubGitUtil(AbstractGitUtil):
         pull_request.merge()
 
     def add_pull_request_comment(self, pr_id, text, parent_id=None):
-        repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
-        pull_request = repo.get_pull(pr_id)
+        repo = self.__get_repo()
+        try:
+            pull_request = repo.get_pull(pr_id)
+        except UnknownObjectException as ex:
+            raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist.") from ex
         pr_comment = pull_request.create_issue_comment(text)
         return pr_comment
 
     def delete_branch(self, branch):
-        repo = self._github.get_repo(f"{self._organisation}/{self._repository_name}")
+        repo = self.__get_repo()
         git_ref = repo.get_git_ref(f"heads/{branch}")
         git_ref.delete()
+
+    def __get_repo(self):
+        try:
+            return self._github.get_repo(f"{self._organisation}/{self._repository_name}")
+        except BadCredentialsException as ex:
+            raise GitOpsException("Bad credentials") from ex
+        except UnknownObjectException as ex:
+            raise GitOpsException(f"Repository '{self._organisation}/{self._repository_name}' does not exist.") from ex
