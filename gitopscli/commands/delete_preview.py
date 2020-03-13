@@ -2,11 +2,11 @@ import hashlib
 import logging
 import os
 import shutil
-import sys
 import uuid
 
 from gitopscli.git.create_git import create_git
 from gitopscli.yaml.gitops_config import GitOpsConfig
+from gitopscli.gitops_exception import GitOpsException
 
 
 def delete_preview_command(
@@ -70,8 +70,7 @@ def delete_preview_command(
         if branch_preview_env_exists:
             shutil.rmtree(root_git.get_full_file_path(preview_folder_name), ignore_errors=True)
         else:
-            logging.info("There was no preview with name: %s", preview_folder_name)
-            sys.exit(0)
+            raise GitOpsException(f"There was no preview with name: {preview_folder_name}")
         root_git.commit(
             f"Deleted preview environment for application: {gitops_config.application_name} and branch: {branch}."
         )
