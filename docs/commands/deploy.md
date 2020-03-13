@@ -64,7 +64,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 
 ### Create Pull Request
 
-In some cases you might want to create a pull request for your updates. You can achieve this by adding `--create-pr` to the command. The pull request can be left open of merged directly with `--auto-merge`.
+In some cases you might want to create a pull request for your updates. You can achieve this by adding `--create-pr` to the command. The pull request can be left open or merged directly with `--auto-merge`.
 
 !!! info "We recommend creating a random branch name for automatically created pull requests to prevent collisions."
 
