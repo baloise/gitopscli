@@ -75,7 +75,7 @@ def __update_values(git, file, values, single_commit):
         try:
             updated_value = update_yaml_file(full_file_path, key, value)
         except KeyError as ex:
-            raise GitOpsException(f"Key '{key}' not found in {file}'") from ex
+            raise GitOpsException(f"Key '{key}' not found in {file}") from ex
         if not updated_value:
             logging.info("Yaml property %s already up-to-date", key)
             continue

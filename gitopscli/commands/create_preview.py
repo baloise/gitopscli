@@ -2,7 +2,6 @@ import hashlib
 import logging
 import os
 import shutil
-import sys
 import uuid
 
 from gitopscli.git.create_git import create_git
@@ -94,7 +93,7 @@ def create_preview_command(
             )
         if not value_replaced:
             __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
-            sys.exit(0)
+            return
         root_git.commit(f"Upated preview environment for {gitops_config.application_name} and branch {branch}.")
         root_git.push(branch)
         logging.info("Pushed branch %s", branch)
