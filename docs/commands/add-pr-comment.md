@@ -8,8 +8,6 @@ gitopscli add-pr-comment \
   --git-provider-url https://bitbucket.baloise.dev \
   --username $GIT_USERNAME \
   --password $GIT_PASSWORD \
-  --git-user "GitOps CLI" \
-  --git-email "gitopscli@baloise.dev" \
   --organisation "my-team" \
   --repository-name "my-app" \
   --pr-id 4711 \
@@ -19,7 +17,6 @@ gitopscli add-pr-comment \
 ## Usage
 ```
 usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
-                                [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL] --pr-id
@@ -30,9 +27,6 @@ optional arguments:
   -h, --help            show this help message and exit
   --username USERNAME   Git username
   --password PASSWORD   Git password or token
-  --git-user GIT_USER   Git Username
-  --git-email GIT_EMAIL
-                        Git User Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
