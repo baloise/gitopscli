@@ -1,8 +1,9 @@
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
+from git import Repo, GitError
 
-from git import Repo
+from gitopscli.gitops_exception import GitOpsException
 
 
 class AbstractGitUtil(ABC):
@@ -20,27 +21,43 @@ class AbstractGitUtil(ABC):
 
     def checkout(self, branch):
         git_options = []
-        if self._username is not None and self._password is not None:
-            credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
-            git_options.append(f"--config credential.helper={credentials_file}")
-        self._repo = Repo.clone_from(
-            url=self.get_clone_url(), to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options, b=branch
-        )
-        self._repo.create_head(branch).checkout()
+        url = self.get_clone_url()
+        try:
+            if self._username is not None and self._password is not None:
+                credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
+                git_options.append(f"--config credential.helper={credentials_file}")
+            self._repo = Repo.clone_from(
+                url=url, to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options, b=branch
+            )
+        except GitError as ex:
+            raise GitOpsException(f"Error cloning '{url}'") from ex
+        try:
+            self._repo.create_head(branch).checkout()
+        except GitError as ex:
+            raise GitOpsException(f"Error checking out branch '{branch}'") from ex
 
     def new_branch(self, branch):
-        self._repo.create_head(branch).checkout()
+        try:
+            self._repo.create_head(branch).checkout()
+        except GitError as ex:
+            raise GitOpsException(f"Error creating new branch '{branch}'.") from ex
 
     def commit(self, message):
-        self._repo.git.add(u=True)
-        self._repo.index.add(self._repo.untracked_files)
-        if self._repo.index.diff("HEAD"):
-            self._repo.config_writer().set_value("user", "name", self._git_user).release()
-            self._repo.config_writer().set_value("user", "email", self._git_email).release()
-            self._repo.git.commit("-m", message)
+        try:
+            self._repo.git.add(u=True)
+            self._repo.index.add(self._repo.untracked_files)
+            if self._repo.index.diff("HEAD"):
+                self._repo.config_writer().set_value("user", "name", self._git_user).release()
+                self._repo.config_writer().set_value("user", "email", self._git_email).release()
+                self._repo.git.commit("-m", message)
+        except GitError as ex:
+            raise GitOpsException(f"Error creating commit.") from ex
 
     def push(self, branch):
-        self._repo.git.push("--set-upstream", "origin", branch)
+        try:
+            self._repo.git.push("--set-upstream", "origin", branch)
+        except GitError as ex:
+            raise GitOpsException(f"Error pushing branch '{branch}' to origin.") from ex
 
     def get_author_from_last_commit(self):
         last_commit = self._repo.head.commit
