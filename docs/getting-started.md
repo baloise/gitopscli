@@ -22,4 +22,4 @@ commands:
     delete-preview      Delete a preview environment
 ```
 
-A detailed description of the individual commands including some examples can be found in the [CLI Commands](/commands/add-pr-comment/) section.
+A detailed description of the individual commands including some examples can be found in the [CLI Commands](/gitopscli/commands/add-pr-comment/) section.
