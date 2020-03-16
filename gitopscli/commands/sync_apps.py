@@ -2,7 +2,6 @@ import logging
 import os
 import shutil
 import uuid
-from pprint import pformat
 
 from ruamel.yaml import YAML
 
@@ -65,9 +64,11 @@ def sync_apps_command(
 
 def __sync_apps(apps_git, root_git):
     repo_apps = __get_repo_apps(apps_git)
+    logging.info("Found %s app(s) in %s: %s", len(repo_apps), apps_git.get_clone_url(), ", ".join(repo_apps))
+
     apps_config_file, app_file_name, apps_from_other_repos = __find_apps_config_from_repo(apps_git, root_git)
     __check_if_app_already_exists(repo_apps, apps_from_other_repos)
-    merge_yaml_element(apps_config_file, "applications", repo_apps, True)
+    merge_yaml_element(apps_config_file, "applications", dict.fromkeys(repo_apps, {}), True)
     __commit_and_push(apps_git, root_git, app_file_name)
 
 
@@ -106,32 +107,21 @@ def __commit_and_push(apps_git, root_git, app_file_name):
 
 
 def __get_bootstrap_entries(root_git):
-    yaml = YAML()
     root_git.checkout("master")
     bootstrap_values_file = root_git.get_full_file_path("bootstrap/values.yaml")
     with open(bootstrap_values_file, "r") as stream:
-        bootstrap = yaml.load(stream)
+        bootstrap = YAML().load(stream)
     return bootstrap["bootstrap"]
 
 
 def __get_repo_apps(apps_git):
     apps_git.checkout("master")
     repo_dir = apps_git.get_full_file_path(".")
-    apps_dirs = __get_application_directories(repo_dir)
-    logging.info("Apps in %s\n%s", apps_git.get_clone_url(), pformat(apps_dirs))
-    return apps_dirs
-
-
-def __get_application_directories(full_file_path):
-    app_dirs = [
+    return {
         name
-        for name in os.listdir(full_file_path)
-        if os.path.isdir(os.path.join(full_file_path, name)) and not name.startswith(".")
-    ]
-    apps = {}
-    for app_dir in app_dirs:
-        apps[app_dir] = {}
-    return apps
+        for name in os.listdir(repo_dir)
+        if os.path.isdir(os.path.join(repo_dir, name)) and not name.startswith(".")
+    }
 
 
 def __check_if_app_already_exists(apps_dirs, apps_from_other_repos):
