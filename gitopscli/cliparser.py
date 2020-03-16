@@ -53,8 +53,8 @@ def __add_sync_apps_command_parser(subparsers):
     )
     __add_git_parser_args(sync_apps_p)
     __add_verbose_parser(sync_apps_p)
-    sync_apps_p.add_argument("--root-organisation", help="Apps config repository organisation", required=True)
-    sync_apps_p.add_argument("--root-repository-name", help="Root config repository organisation", required=True)
+    sync_apps_p.add_argument("--root-organisation", help="Root config repository organisation", required=True)
+    sync_apps_p.add_argument("--root-repository-name", help="Root config repository name", required=True)
 
 
 def __add_pr_comment_command_parser(subparsers):

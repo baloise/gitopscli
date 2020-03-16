@@ -1,4 +1,68 @@
 # sync-apps
+
+The `sync-apps` command can be used to keep a *root config repository* in sync with several *app config repositories*. You can use this command if your config repositories are structured in the following (opinionated) way:
+
+## Repository Structure
+
+### App Config Repositories
+
+You have `1..n` config repositories for the deployment configurations of your applications (e.g. one per team). Every *app config repository* can contain `0..n` directories (e.g. containing [Helm](https://helm.sh/) charts). Directories starting with a dot will be ignored. Example:
+
+```
+team-1-app-config-repo/
+├── .this-will-be-ignored
+├── app-xy-production
+├── app-xy-staging
+└── app-xy-test
+```
+
+### Root Config Repository
+
+The *root config repository* acts as a single entrypoint for your GitOps continous delivery tool (e.g. [Argo CD](https://argoproj.github.io/argo-cd/)). Here you define all applications in your cluster and link to the *app config repositories* with their deployment configurations. It is structured in the following way:
+
+```
+root-config-repo/
+├── apps
+│   ├── team-a.yaml
+│   └── team-b.yaml
+└── bootstrap
+    └── values.yaml
+```
+
+**bootstrap/values.yaml**
+```yaml
+bootstrap:
+  - name: team-a # <- every entry links to a YAML file in the `apps/` directory
+  - name: team-b
+```
+
+**apps/team-a.yaml**
+```yaml
+repository: https://github.com/company-deployments/team-1-app-config-repo.git # link to your apps root repository
+
+# The applications that are synced by the `sync-app` command:
+applications:
+  app-xy-production: # <- every entry corresponds to a directory in the apps root repository
+  app-xy-staging:
+  app-xy-test:
+```
+
+## Example
+
+```bash
+gitopscli sync-apps \
+  --git-provider-url github \
+  --username $GIT_USERNAME \
+  --password $GIT_PASSWORD \
+  --git-user "GitOps CLI" \
+  --git-email "gitopscli@baloise.dev" \
+  --organisation "company-deployments" \
+  --repository-name "team-1-app-config-repo" \
+  --root-organisation "company-deployments" \
+  --root-repository-name "root-config-repo"
+```
+
+## Usage
 ```
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-user GIT_USER] [--git-email GIT_EMAIL]
@@ -28,20 +92,7 @@ optional arguments:
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
   --root-organisation ROOT_ORGANISATION
-                        Apps config repository organisation
-  --root-repository-name ROOT_REPOSITORY_NAME
                         Root config repository organisation
-```
-
-## Example
-```bash
-gitopscli sync-apps --git-provider-url https://bitbucket.baloise.dev \
---username $GIT_USERNAME \
---password $GIT_PASSWORD \
---git-user "GitOpsCLI" \
---git-email "gitopscli@baloise.dev" \
---organisation "my-team" \
---repository-name "my-app" \
---root-organisation "deployment" \
---root-repository-name "apps-root-config" 
+  --root-repository-name ROOT_REPOSITORY_NAME
+                        Root config repository name
 ```
