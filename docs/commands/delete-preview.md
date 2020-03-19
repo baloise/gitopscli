@@ -1,4 +1,24 @@
 # delete-preview
+
+The `delete-preview` command can be used to delete a preview previously created with the [`create-preview` command](/gitopscli/commands/create-preview/). Please refer to `create-preview` documentation for the needed configuration files.
+
+## Example
+
+```bash
+gitopscli delete-preview \
+  --git-provider-url https://bitbucket.baloise.dev \
+  --username $GIT_USERNAME \
+  --password $GIT_PASSWORD \
+  --git-user "GitOps CLI" \
+  --git-email "gitopscli@baloise.dev" \
+  --organisation "my-team" \
+  --repository-name "app-xy" \
+  --branch "my-pr-branch" \
+  --create-pr \
+  --auto-merge
+```
+
+## Usage
 ```
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
@@ -33,46 +53,4 @@ optional arguments:
                         --create-pr)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
-```
-
-## Example
-```bash
-gitopscli delete-preview \
---git-provider-url https://bitbucket.baloise.dev \
---username $GIT_USERNAME \
---password $GIT_PASSWORD \
---git-user "GitOpsCLI" \
---git-email "gitopscli@baloise.dev" \
---organisation "my-team" \
---repository-name "my-app" \
---branch "some-branch-name" \
---create-pr \
---auto-merge
-```
-
-## .gitops.config.yaml
-Make sure that your application repository contains a `.gitops.config.yaml` file.
-
-```yaml
-deploymentConfig:
-  # The organisation name of your deployment repo
-  org: DPL
-  # The repostiory name of your deployment repo
-  repository: incubator-non-prod
-  # The name of the application that is used in your deployment repo
-  applicationName: example
-
-previewConfig:
-  route:
-    host:
-      # your router host.
-      #{SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your feature branch name
-      template: example-{SHA256_8CHAR_BRANCH_HASH}.example.tld
-  replace:
-    # Paths that should be replaced
-    - path: image.tag
-      variable: GIT_COMMIT # this is the latest git hash of the PR branch
-    - path: route.host
-      variable: ROUTE_HOST # this is the resolved SHA256_8CHAR_BRANCH_HASH from above
-
 ```
