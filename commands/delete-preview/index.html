@@ -388,8 +388,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gitopsconfigyaml" class="md-nav__link">
-    .gitops.config.yaml
+  <a href="#usage" class="md-nav__link">
+    Usage
   </a>
   
 </li>
@@ -498,8 +498,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gitopsconfigyaml" class="md-nav__link">
-    .gitops.config.yaml
+  <a href="#usage" class="md-nav__link">
+    Usage
   </a>
   
 </li>
@@ -524,6 +524,23 @@
                 
                 
                 <h1 id="delete-preview">delete-preview<a class="headerlink" href="#delete-preview" title="Permanent link">&para;</a></h1>
+<p>The <code>delete-preview</code> command can be used to delete a preview previously created with the <a href="/gitopscli/commands/create-preview/"><code>create-preview</code> command</a>. Please refer to <code>create-preview</code> documentation for the needed configuration files.</p>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code>gitopscli delete-preview <span class="se">\</span>
+  --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
+  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
+  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
+  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
+  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
+  --organisation <span class="s2">&quot;my-team&quot;</span> <span class="se">\</span>
+  --repository-name <span class="s2">&quot;app-xy&quot;</span> <span class="se">\</span>
+  --branch <span class="s2">&quot;my-pr-branch&quot;</span> <span class="se">\</span>
+  --create-pr <span class="se">\</span>
+  --auto-merge
+</code></pre></div>
+
+
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span><code>usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
@@ -557,46 +574,6 @@ optional arguments:
                         --create-pr)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
-</code></pre></div>
-
-
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>gitopscli delete-preview <span class="se">\</span>
---git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
---username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
---password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
---git-user <span class="s2">&quot;GitOpsCLI&quot;</span> <span class="se">\</span>
---git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
---organisation <span class="s2">&quot;my-team&quot;</span> <span class="se">\</span>
---repository-name <span class="s2">&quot;my-app&quot;</span> <span class="se">\</span>
---branch <span class="s2">&quot;some-branch-name&quot;</span> <span class="se">\</span>
---create-pr <span class="se">\</span>
---auto-merge
-</code></pre></div>
-
-
-<h2 id="gitopsconfigyaml">.gitops.config.yaml<a class="headerlink" href="#gitopsconfigyaml" title="Permanent link">&para;</a></h2>
-<p>Make sure that your application repository contains a <code>.gitops.config.yaml</code> file.</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">deploymentConfig</span><span class="p">:</span>
-  <span class="c1"># The organisation name of your deployment repo</span>
-  <span class="nt">org</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DPL</span>
-  <span class="c1"># The repostiory name of your deployment repo</span>
-  <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">incubator-non-prod</span>
-  <span class="c1"># The name of the application that is used in your deployment repo</span>
-  <span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">example</span>
-
-<span class="nt">previewConfig</span><span class="p">:</span>
-  <span class="nt">route</span><span class="p">:</span>
-    <span class="nt">host</span><span class="p">:</span>
-      <span class="c1"># your router host.</span>
-      <span class="c1">#{SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your feature branch name</span>
-      <span class="nt">template</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">example-{SHA256_8CHAR_BRANCH_HASH}.example.tld</span>
-  <span class="nt">replace</span><span class="p">:</span>
-    <span class="c1"># Paths that should be replaced</span>
-    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">image.tag</span>
-      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span> <span class="c1"># this is the latest git hash of the PR branch</span>
-    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
-      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span> <span class="c1"># this is the resolved SHA256_8CHAR_BRANCH_HASH from above</span>
 </code></pre></div>
                 
                   
