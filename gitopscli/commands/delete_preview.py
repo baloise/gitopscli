@@ -59,8 +59,11 @@ def delete_preview_command(
         )
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
-        root_git.new_branch(branch)
-        logging.info("Created branch %s in config repo", branch)
+
+        config_branch = f"gitopscli-delete-preview-{str(uuid.uuid4())[:8]}" if create_pr else "master"
+
+        root_git.new_branch(config_branch)
+        logging.info("Created branch %s in config repo", config_branch)
         shortened_branch_hash = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
         logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
         preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
@@ -74,16 +77,16 @@ def delete_preview_command(
         root_git.commit(
             f"Deleted preview environment for application: {gitops_config.application_name} and branch: {branch}."
         )
-        root_git.push(branch)
-        logging.info("Pushed branch %s", branch)
+        root_git.push(config_branch)
+        logging.info("Pushed branch %s", config_branch)
 
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
-    if create_pr and branch != "master":
-        pull_request = __create_pullrequest(branch, gitops_config, root_git)
+    if create_pr:
+        pull_request = __create_pullrequest(config_branch, gitops_config, root_git)
         if auto_merge:
-            __merge_pullrequest(branch, pull_request, root_git)
+            __merge_pullrequest(config_branch, pull_request, root_git)
 
 
 def __create_pullrequest(branch, gitops_config, root_git):

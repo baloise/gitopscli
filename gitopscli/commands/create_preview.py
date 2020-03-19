@@ -14,7 +14,6 @@ def create_preview_command(
     command,
     pr_id,
     parent_id,
-    branch,
     username,
     password,
     git_user,
@@ -44,10 +43,12 @@ def create_preview_command(
             apps_tmp_dir,
         )
 
-        apps_git.checkout(branch)
-        logging.info("App repo branch %s checkout successful", branch)
-        shortened_branch_hash = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
-        logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
+        pr_branch = apps_git.get_pull_request_branch(pr_id)
+
+        apps_git.checkout(pr_branch)
+        logging.info("App repo PR branch %s checkout successful", pr_branch)
+        shortened_branch_hash = hashlib.sha256(pr_branch.encode("utf-8")).hexdigest()[:8]
+        logging.info("Hashed branch %s to hash: %s", pr_branch, shortened_branch_hash)
         gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         logging.info("Read GitOpsConfig: %s", gitops_config)
 
@@ -64,8 +65,12 @@ def create_preview_command(
         )
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
-        root_git.new_branch(branch)
-        logging.info("Created branch %s in config repo", branch)
+
+        config_branch = f"gitopscli-create-preview-{str(uuid.uuid4())[:8]}" if create_pr else "master"
+        if create_pr:
+            root_git.new_branch(config_branch)
+            logging.info("Created branch %s in config repo", config_branch)
+
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
         logging.info("Using the preview template folder: %s", preview_template_folder_name)
         new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
@@ -74,7 +79,11 @@ def create_preview_command(
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
         if not branch_preview_env_already_exist:
             __create_new_preview_env(
-                branch, new_preview_folder_name, preview_template_folder_name, root_git, gitops_config.application_name
+                config_branch,
+                new_preview_folder_name,
+                preview_template_folder_name,
+                root_git,
+                gitops_config.application_name,
             )
         new_image_tag = apps_git.get_last_commit_hash()
         logging.info("Using image tag from last app repo commit: %s", new_image_tag)
@@ -94,16 +103,16 @@ def create_preview_command(
         if not value_replaced:
             __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
             return
-        root_git.commit(f"Upated preview environment for {gitops_config.application_name} and branch {branch}.")
-        root_git.push(branch)
-        logging.info("Pushed branch %s", branch)
+        root_git.commit(f"Upated preview environment for {gitops_config.application_name} and branch {pr_branch}.")
+        root_git.push(config_branch)
+        logging.info("Pushed branch %s", config_branch)
         pr_comment_text = f"""
-New Preview Environment for {gitops_config.application_name} and branch {branch} created successfully. Access it here: 
+New Preview Environment for {gitops_config.application_name} and branch {pr_branch} created successfully. Access it here: 
 https://{route_host}
 """
         if branch_preview_env_already_exist:
             pr_comment_text = f"""
-Preview Environment for {gitops_config.application_name} and branch {branch} updated successfully. Access it here: 
+Preview Environment for {gitops_config.application_name} and branch {pr_branch} updated successfully. Access it here: 
 https://{route_host}
 """
         logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
@@ -111,10 +120,10 @@ https://{route_host}
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
-    if create_pr and branch != "master":
-        pull_request = __create_pullrequest(branch, gitops_config, root_git)
+    if create_pr:
+        pull_request = __create_pullrequest(config_branch, gitops_config, root_git)
         if auto_merge:
-            __merge_pullrequest(branch, pull_request, root_git)
+            __merge_pullrequest(config_branch, pull_request, root_git)
 
 
 def __replace_value(

@@ -80,3 +80,9 @@ class BitBucketGitUtil(AbstractGitUtil):
         )
         if result and "errors" in result:
             raise GitOpsException(result["errors"][0]["message"])
+
+    def get_pull_request_branch(self, pr_id):
+        pull_request = self._bitbucket.get_pullrequest(self._organisation, self._repository_name, pr_id)
+        if "errors" in pull_request:
+            raise GitOpsException(pull_request["errors"][0]["message"])
+        return pull_request["fromRef"]["displayId"]

@@ -12,7 +12,6 @@ def deploy_command(
     command,
     file,
     values,
-    branch,
     username,
     password,
     git_user,
@@ -46,22 +45,24 @@ def deploy_command(
         git.checkout("master")
         logging.info("Master checkout successful")
 
-        if branch != "master":
-            git.new_branch(branch)
-            logging.info("Created branch %s", branch)
+        config_branch = f"gitopscli-deploy-{str(uuid.uuid4())[:8]}" if create_pr else "master"
+
+        if create_pr:
+            git.new_branch(config_branch)
+            logging.info("Created branch %s", config_branch)
 
         updated_values = __update_values(git, file, values, single_commit)
         if not updated_values:
             logging.info("All values already up-to-date. I'm done here")
             return
 
-        git.push(branch)
-        logging.info("Pushed branch %s", branch)
+        git.push(config_branch)
+        logging.info("Pushed branch %s", config_branch)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
-    if create_pr and branch != "master":
-        __create_pr(git, branch, file, updated_values, auto_merge)
+    if create_pr:
+        __create_pr(git, config_branch, file, updated_values, auto_merge)
 
 
 def __update_values(git, file, values, single_commit):

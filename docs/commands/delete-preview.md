@@ -24,8 +24,8 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL]
-                                [--branch BRANCH] [--create-pr [CREATE_PR]]
+                                [--git-provider-url GIT_PROVIDER_URL] --branch
+                                BRANCH [--create-pr [CREATE_PR]]
                                 [--auto-merge [AUTO_MERGE]] [-v [VERBOSE]]
 
 optional arguments:
@@ -44,10 +44,9 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --branch BRANCH       Branch to push the changes to
+  --branch BRANCH       The branch for which the preview was created for
   --create-pr [CREATE_PR]
-                        Creates a Pull Request (only when --branch is not
-                        master/default branch)
+                        Creates a Pull Request
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with
                         --create-pr)

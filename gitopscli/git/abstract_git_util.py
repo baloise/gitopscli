@@ -99,3 +99,7 @@ class AbstractGitUtil(ABC):
     @abstractmethod
     def delete_branch(self, branch):
         pass
+
+    @abstractmethod
+    def get_pull_request_branch(self, pr_id):
+        pass
