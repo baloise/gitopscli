@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2020-03-20
+
 ### Added
 - Added `--verbose` arg to print stack traces in case of errors
 - Automatic git provider detection. If `--git-provider-url` contains "github" or "bitbucket" the `--git-provider` arg is not needed anymore. Until now, `bitbucket` was used as default if `--git-provider` was missing.
