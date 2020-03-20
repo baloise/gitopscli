@@ -422,6 +422,19 @@
     [Unreleased]
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    Added
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -433,7 +446,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     Added
   </a>
   
@@ -467,7 +480,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_1" class="md-nav__link">
+  <a href="#added_2" class="md-nav__link">
     Added
   </a>
   
@@ -538,6 +551,19 @@
     [Unreleased]
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    Added
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -549,7 +575,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     Added
   </a>
   
@@ -583,7 +609,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_1" class="md-nav__link">
+  <a href="#added_2" class="md-nav__link">
     Added
   </a>
   
@@ -617,8 +643,12 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased">[Unreleased]<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
-<h2 id="300-2020-03-20">[3.0.0] - 2020-03-20<a class="headerlink" href="#300-2020-03-20" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Improved error handling while reading <code>gitops.config.yaml</code></li>
+</ul>
+<h2 id="300-2020-03-20">[3.0.0] - 2020-03-20<a class="headerlink" href="#300-2020-03-20" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added <code>--verbose</code> arg to print stack traces in case of errors</li>
 <li>Automatic git provider detection. If <code>--git-provider-url</code> contains "github" or "bitbucket" the <code>--git-provider</code> arg is not needed anymore. Until now, <code>bitbucket</code> was used as default if <code>--git-provider</code> was missing.</li>
@@ -638,7 +668,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <li>The <code>--branch</code> arg was removed for commands <code>deploy</code> and <code>create-preview</code>. For <code>create-preview</code> the app repo branch is detected via the <code>--pr_id</code>. All changes in the config repo are pushed to <code>master</code> by default, or to a randomly created branch name if <code>--create_pr</code> is given.</li>
 </ul>
 <h2 id="210-2020-02-09">[2.1.0] - 2020-02-09<a class="headerlink" href="#210-2020-02-09" title="Permanent link">&para;</a></h2>
-<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>New command <code>delete-preview</code></li>
 <li>Added initial Changelog.md</li>
