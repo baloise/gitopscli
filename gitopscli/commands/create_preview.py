@@ -49,8 +49,11 @@ def create_preview_command(
         logging.info("App repo PR branch %s checkout successful", pr_branch)
         shortened_branch_hash = hashlib.sha256(pr_branch.encode("utf-8")).hexdigest()[:8]
         logging.info("Hashed branch %s to hash: %s", pr_branch, shortened_branch_hash)
-        gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
-        logging.info("Read GitOpsConfig: %s", gitops_config)
+        try:
+            gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
+        except FileNotFoundError as ex:
+            raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
+        logging.info("Read .gitops.config.yaml: %s", gitops_config)
 
         root_git = create_git(
             username,
