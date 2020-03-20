@@ -77,10 +77,14 @@ def create_preview_command(
             logging.info("Created branch %s in config repo", config_branch)
 
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
-        logging.info("Using the preview template folder: %s", preview_template_folder_name)
+        if os.path.isdir(root_git.get_full_file_path(preview_template_folder_name)):
+            logging.info("Using the preview template folder: %s", preview_template_folder_name)
+        else:
+            raise GitOpsException(f"The preview template folder does not exist: {preview_template_folder_name}")
+
         new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
         logging.info("New folder for preview: %s", new_preview_folder_name)
-        branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
+        branch_preview_env_already_exist = os.path.isdir(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
         if not branch_preview_env_already_exist:
             __create_new_preview_env(
