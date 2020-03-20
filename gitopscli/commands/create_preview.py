@@ -9,6 +9,8 @@ from gitopscli.yaml.gitops_config import GitOpsConfig
 from gitopscli.yaml.yaml_util import update_yaml_file
 from gitopscli.gitops_exception import GitOpsException
 
+# pylint: disable=too-many-statements
+
 
 def create_preview_command(
     command,
