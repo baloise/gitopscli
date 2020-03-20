@@ -9,6 +9,8 @@ from gitopscli.yaml.gitops_config import GitOpsConfig
 from gitopscli.yaml.yaml_util import update_yaml_file
 from gitopscli.gitops_exception import GitOpsException
 
+# pylint: disable=too-many-statements
+
 
 def create_preview_command(
     command,
@@ -49,8 +51,11 @@ def create_preview_command(
         logging.info("App repo PR branch %s checkout successful", pr_branch)
         shortened_branch_hash = hashlib.sha256(pr_branch.encode("utf-8")).hexdigest()[:8]
         logging.info("Hashed branch %s to hash: %s", pr_branch, shortened_branch_hash)
-        gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
-        logging.info("Read GitOpsConfig: %s", gitops_config)
+        try:
+            gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
+        except FileNotFoundError as ex:
+            raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
+        logging.info("Read .gitops.config.yaml: %s", gitops_config)
 
         root_git = create_git(
             username,
@@ -72,10 +77,14 @@ def create_preview_command(
             logging.info("Created branch %s in config repo", config_branch)
 
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
-        logging.info("Using the preview template folder: %s", preview_template_folder_name)
+        if os.path.isdir(root_git.get_full_file_path(preview_template_folder_name)):
+            logging.info("Using the preview template folder: %s", preview_template_folder_name)
+        else:
+            raise GitOpsException(f"The preview template folder does not exist: {preview_template_folder_name}")
+
         new_preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
         logging.info("New folder for preview: %s", new_preview_folder_name)
-        branch_preview_env_already_exist = os.path.exists(root_git.get_full_file_path(new_preview_folder_name))
+        branch_preview_env_already_exist = os.path.isdir(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
         if not branch_preview_env_already_exist:
             __create_new_preview_env(
