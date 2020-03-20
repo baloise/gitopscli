@@ -70,12 +70,9 @@ gitopscli create-preview \
   --organisation "my-team" \
   --repository-name "app-xy" \
   --pr-id 4711 \
-  --branch "my-pr-branch" \
   --create-pr \
   --auto-merge
 ```
-
-!!! warning "The `--branch` parameter is currently used to locate the PR branch in the *app repository* as well as to create the change branch in the *deployment config repository*. This may lead to branch collisions in the config repository. Hence, the current behavior may be subject to change in the near future. [(Issue #40)](https://github.com/baloise-incubator/gitopscli/issues/40)"
 
 ## Usage
 ```
@@ -84,7 +81,7 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                [--branch BRANCH] [--create-pr [CREATE_PR]]
+                                [--create-pr [CREATE_PR]]
                                 [--auto-merge [AUTO_MERGE]] --pr-id PR_ID
                                 [--parent-id PARENT_ID] [-v [VERBOSE]]
 
@@ -104,10 +101,8 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --branch BRANCH       Branch to push the changes to
   --create-pr [CREATE_PR]
-                        Creates a Pull Request (only when --branch is not
-                        master/default branch)
+                        Creates a Pull Request
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with
                         --create-pr)

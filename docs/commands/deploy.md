@@ -27,8 +27,7 @@ gitopscli deploy \
   --organisation "deployment" \
   --repository-name "incubator-non-prod" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0}" \
-  --branch "master"
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0}"
 ```
 
 ### Number Of Commits
@@ -66,8 +65,6 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 
 In some cases you might want to create a pull request for your updates. You can achieve this by adding `--create-pr` to the command. The pull request can be left open or merged directly with `--auto-merge`.
 
-!!! info "We recommend creating a random branch name for automatically created pull requests to prevent collisions."
-
 ```bash
 gitopscli deploy \
   --git-provider-url https://bitbucket.baloise.dev \
@@ -79,7 +76,6 @@ gitopscli deploy \
   --repository-name "incubator-non-prod" \
   --file "example/values.yaml" \
   --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0}" \
-  --branch deploy-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 5 | head -n 1) \
   --create-pr \
   --auto-merge
 ```
@@ -98,8 +94,8 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         --repository-name REPOSITORY_NAME
                         [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
-                        [--branch BRANCH] [--create-pr [CREATE_PR]]
-                        [--auto-merge [AUTO_MERGE]] [-v [VERBOSE]]
+                        [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
+                        [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -122,10 +118,8 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --branch BRANCH       Branch to push the changes to
   --create-pr [CREATE_PR]
-                        Creates a Pull Request (only when --branch is not
-                        master/default branch)
+                        Creates a Pull Request
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with
                         --create-pr)

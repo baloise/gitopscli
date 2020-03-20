@@ -76,6 +76,9 @@ def __add_create_preview_command_parser(subparsers):
 def __add_delete_preview_command_parser(subparsers):
     add_delete_preview_p = subparsers.add_parser("delete-preview", help="Delete a preview environment")
     __add_git_parser_args(add_delete_preview_p)
+    add_delete_preview_p.add_argument(
+        "--branch", help="The branch for which the preview was created for", required=True
+    )
     __add_branch_pr_parser_args(add_delete_preview_p)
     __add_verbose_parser(add_delete_preview_p)
 
@@ -93,14 +96,8 @@ def __add_git_parser_args(deploy_p, api_only=False):
 
 
 def __add_branch_pr_parser_args(deploy_p):
-    deploy_p.add_argument("--branch", help="Branch to push the changes to", default="master")
     deploy_p.add_argument(
-        "--create-pr",
-        help="Creates a Pull Request (only when --branch is not master/default branch)",
-        type=__str2bool,
-        nargs="?",
-        const=True,
-        default=False,
+        "--create-pr", help="Creates a Pull Request", type=__str2bool, nargs="?", const=True, default=False,
     )
     deploy_p.add_argument(
         "--auto-merge",

@@ -26,11 +26,7 @@ class GithubGitUtil(AbstractGitUtil):
         pull_request.merge()
 
     def add_pull_request_comment(self, pr_id, text, parent_id=None):
-        repo = self.__get_repo()
-        try:
-            pull_request = repo.get_pull(pr_id)
-        except UnknownObjectException as ex:
-            raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist.") from ex
+        pull_request = self.__get_pull_request(pr_id)
         pr_comment = pull_request.create_issue_comment(text)
         return pr_comment
 
@@ -41,6 +37,17 @@ class GithubGitUtil(AbstractGitUtil):
         except UnknownObjectException as ex:
             raise GitOpsException(f"Branch '{branch}' does not exist.") from ex
         git_ref.delete()
+
+    def get_pull_request_branch(self, pr_id):
+        pull_request = self.__get_pull_request(pr_id)
+        return pull_request.head.ref
+
+    def __get_pull_request(self, pr_id):
+        repo = self.__get_repo()
+        try:
+            return repo.get_pull(pr_id)
+        except UnknownObjectException as ex:
+            raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist.") from ex
 
     def __get_repo(self):
         try:
