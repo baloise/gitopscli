@@ -1,9 +1,9 @@
-import shutil
+from os import path, makedirs
 import unittest
 import uuid
-import pytest
-from os import path, makedirs
+from pathlib import Path
 from git import Repo
+import pytest
 
 from gitopscli.git.abstract_git_util import AbstractGitUtil
 from gitopscli.gitops_exception import GitOpsException
@@ -112,14 +112,20 @@ echo password=PASS
         testee.set_clone_url("invalid_url")
         with pytest.raises(GitOpsException) as ex:
             testee.checkout("master")
-        self.assertEqual(f"Error cloning 'invalid_url'", str(ex.value))
+        self.assertEqual("Error cloning 'invalid_url'", str(ex.value))
 
     def test_checkout_unknown_branch(self):
         testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
         testee.set_clone_url(self.origin.working_dir)
         with pytest.raises(GitOpsException) as ex:
             testee.checkout("foo")
-        self.assertEqual(f"Error checking out branch 'foo'", str(ex.value))
+        self.assertEqual("Error checking out branch 'foo'", str(ex.value))
+
+    def test_get_full_file_path(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+        self.assertEqual(Path(f"{self.tmp_dir}/repo/foo.bar"), testee.get_full_file_path("foo.bar"))
 
     def test_new_branch(self):
         testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
@@ -128,5 +134,85 @@ echo password=PASS
 
         testee.new_branch("foo")
 
-        branches = [str(x) for x in Repo(f"{self.tmp_dir}/repo").branches]
+        repo = Repo(f"{self.tmp_dir}/repo")
+        branches = [str(b) for b in repo.branches]
         self.assertIn("foo", branches)
+
+    def test_commit(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user="john doe", git_email="john@doe.com")
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        with open(f"{self.tmp_dir}/repo/foo.md", "w") as foo:
+            foo.write("new file")
+        with open(f"{self.tmp_dir}/repo/README.md", "w") as readme:
+            readme.write("new content")
+        testee.commit("new commit")
+
+        repo = Repo(f"{self.tmp_dir}/repo")
+        commits = list(repo.iter_commits("master"))
+        self.assertEqual(2, len(commits))
+        self.assertEqual("new commit\n", commits[0].message)
+        self.assertEqual("john doe", commits[0].author.name)
+        self.assertEqual("john@doe.com", commits[0].author.email)
+        self.assertIn("foo.md", commits[0].stats.files)
+        self.assertIn("README.md", commits[0].stats.files)
+
+    def test_commit_nothing_to_commit(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        testee.commit("empty commit")
+
+        repo = Repo(f"{self.tmp_dir}/repo")
+        commits = list(repo.iter_commits("master"))
+        self.assertEqual(1, len(commits))
+        self.assertEqual("initial commit\n", commits[0].message)
+
+    def test_push(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        with open(f"{self.tmp_dir}/repo/foo.md", "w") as readme:
+            readme.write("new file")
+        util_repo = Repo(f"{self.tmp_dir}/repo")
+        util_repo.git.add("--all")
+        util_repo.git.commit("-m", "new commit")
+
+        testee.push("master")
+
+        commits = list(self.origin.iter_commits("master"))
+        self.assertEqual(2, len(commits))
+        self.assertEqual("new commit\n", commits[0].message)
+
+    def test_push_no_changes(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        testee.push("master")
+
+    def test_push_unknown_branch(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        with pytest.raises(GitOpsException) as ex:
+            testee.push("unknown")
+        self.assertEqual("Error pushing branch 'unknown' to origin.", str(ex.value))
+
+    def test_get_author_from_last_commit(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        self.assertEqual("unit tester <unit@tester.com>", testee.get_author_from_last_commit())
+
+    def test_get_last_commit_hash(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("xyz")
+
+        self.assertEqual(self.origin.head.commit.hexsha, testee.get_last_commit_hash())

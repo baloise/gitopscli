@@ -42,8 +42,7 @@ class AbstractGitUtil(ABC):
 
     def commit(self, message):
         try:
-            self._repo.git.add(u=True)
-            self._repo.index.add(self._repo.untracked_files)
+            self._repo.git.add("--all")
             if self._repo.index.diff("HEAD"):
                 self._repo.config_writer().set_value("user", "name", self._git_user).release()
                 self._repo.config_writer().set_value("user", "email", self._git_email).release()
