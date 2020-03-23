@@ -36,7 +36,7 @@ class AbstractGitUtil(ABC):
 
     def new_branch(self, branch):
         try:
-            self._repo.create_head(branch).checkout()
+            self._repo.git.checkout("-b", branch)
         except GitError as ex:
             raise GitOpsException(f"Error creating new branch '{branch}'.") from ex
 

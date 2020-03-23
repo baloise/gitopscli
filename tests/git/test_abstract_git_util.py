@@ -138,6 +138,15 @@ echo password=PASS
         branches = [str(b) for b in repo.branches]
         self.assertIn("foo", branches)
 
+    def test_new_branch_name_collision(self):
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        with pytest.raises(GitOpsException) as ex:
+            testee.new_branch("xyz")
+        self.assertEqual("Error creating new branch 'xyz'.", str(ex.value))
+
     def test_commit(self):
         testee = GitUtil(self.tmp_dir, username=None, password=None, git_user="john doe", git_email="john@doe.com")
         testee.set_clone_url(self.origin.working_dir)
