@@ -26,13 +26,11 @@ class AbstractGitUtil(ABC):
             if self._username is not None and self._password is not None:
                 credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
                 git_options.append(f"--config credential.helper={credentials_file}")
-            self._repo = Repo.clone_from(
-                url=url, to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options, b=branch
-            )
+            self._repo = Repo.clone_from(url=url, to_path=f"{self._tmp_dir}/repo", multi_options=git_options)
         except GitError as ex:
             raise GitOpsException(f"Error cloning '{url}'") from ex
         try:
-            self._repo.create_head(branch).checkout()
+            self._repo.git.checkout(branch)
         except GitError as ex:
             raise GitOpsException(f"Error checking out branch '{branch}'") from ex
 
