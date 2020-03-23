@@ -4,7 +4,7 @@ import sys
 from gitopscli.yaml.yaml_util import yaml_load
 
 
-def create_cli():
+def create_cli(args):
     parser, subparsers = __create_cli_parser()
     __add_deploy_command_parser(subparsers)
     __add_sync_apps_command_parser(subparsers)
@@ -12,14 +12,15 @@ def create_cli():
     __add_create_preview_command_parser(subparsers)
     __add_delete_preview_command_parser(subparsers)
 
-    if len(sys.argv) == 1:
+    if len(args) == 0:
         parser.print_help(sys.stderr)
-        sys.exit(1)
-    return parser.parse_args()
+        sys.exit(2)
+
+    return parser.parse_args(args)
 
 
 def __create_cli_parser():
-    parser = argparse.ArgumentParser(description="GitOps CLI")
+    parser = argparse.ArgumentParser(prog="gitopscli", description="GitOps CLI")
     subparsers = parser.add_subparsers(title="commands", dest="command")
     return parser, subparsers
 
