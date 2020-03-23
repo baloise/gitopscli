@@ -57,7 +57,7 @@ class AbstractGitUtilTest(unittest.TestCase):
     def _create_origin():
         repo_dir = AbstractGitUtilTest._create_tmp_dir()
 
-        repo = Repo().init(repo_dir)
+        repo = Repo.init(repo_dir)
         repo.config_writer().set_value("user", "name", "unit tester").release()
         repo.config_writer().set_value("user", "email", "unit@tester.com").release()
 
@@ -179,6 +179,7 @@ echo password=PASS
             readme.write("new file")
         util_repo = Repo(f"{self.tmp_dir}/repo")
         util_repo.git.add("--all")
+        util_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
         util_repo.git.commit("-m", "new commit")
 
         testee.push("master")
