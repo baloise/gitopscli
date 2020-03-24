@@ -26,26 +26,23 @@ class AbstractGitUtil(ABC):
             if self._username is not None and self._password is not None:
                 credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
                 git_options.append(f"--config credential.helper={credentials_file}")
-            self._repo = Repo.clone_from(
-                url=url, to_path=f"{self._tmp_dir}/{branch}", multi_options=git_options, b=branch
-            )
+            self._repo = Repo.clone_from(url=url, to_path=f"{self._tmp_dir}/repo", multi_options=git_options)
         except GitError as ex:
             raise GitOpsException(f"Error cloning '{url}'") from ex
         try:
-            self._repo.create_head(branch).checkout()
+            self._repo.git.checkout(branch)
         except GitError as ex:
             raise GitOpsException(f"Error checking out branch '{branch}'") from ex
 
     def new_branch(self, branch):
         try:
-            self._repo.create_head(branch).checkout()
+            self._repo.git.checkout("-b", branch)
         except GitError as ex:
             raise GitOpsException(f"Error creating new branch '{branch}'.") from ex
 
     def commit(self, message):
         try:
-            self._repo.git.add(u=True)
-            self._repo.index.add(self._repo.untracked_files)
+            self._repo.git.add("--all")
             if self._repo.index.diff("HEAD"):
                 self._repo.config_writer().set_value("user", "name", self._git_user).release()
                 self._repo.config_writer().set_value("user", "email", self._git_email).release()
