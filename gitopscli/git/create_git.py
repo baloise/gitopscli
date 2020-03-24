@@ -14,17 +14,32 @@ def create_git(
         elif "github" in git_provider_url:
             git_provider = "github"
         else:
-            raise GitOpsException("Please provide --git-provider-url")
+            raise GitOpsException("Please provide --git-provider")
         logging.info("Inferred git provider '%s' from url '%s'", git_provider, git_provider_url)
 
     if git_provider == "bitbucket-server":
         if not git_provider_url:
             raise GitOpsException("Please provide --git-provider-url for bitbucket-server")
         git = BitBucketGitUtil(
-            tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email
+            tmp_dir=tmp_dir,
+            git_provider_url=git_provider_url,
+            organisation=organisation,
+            repository_name=repository_name,
+            username=username,
+            password=password,
+            git_user=git_user,
+            git_email=git_email,
         )
     elif git_provider == "github":
-        git = GithubGitUtil(tmp_dir, organisation, repository_name, username, password, git_user, git_email)
+        git = GithubGitUtil(
+            tmp_dir=tmp_dir,
+            organisation=organisation,
+            repository_name=repository_name,
+            username=username,
+            password=password,
+            git_user=git_user,
+            git_email=git_email,
+        )
     else:
         raise GitOpsException(f"Git provider '{git_provider}' is not supported.")
 
