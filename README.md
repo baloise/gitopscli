@@ -1,6 +1,6 @@
 
 [![Build Status](https://travis-ci.org/baloise/gitopscli.svg?branch=master)](https://travis-ci.org/baloise/gitopscli) 
-[![Latest Release](https://img.shields.io/github/v/tag/baloise/gitopscli)](https://hub.docker.com/repository/docker/baloiseincubator/gitopscli/tags?page=1)
+[![Latest Release](https://img.shields.io/github/v/tag/baloise/gitopscli)](https://hub.docker.com/repository/docker/baloise/gitopscli/tags?page=1)
 [![Python: 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) 
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/baloise/gitopscli) 
 [![License: Apache License Version 2.0](https://img.shields.io/badge/license-Apache%20License%20Version%202.0-lightgrey.svg)](https://choosealicense.com/licenses/apache-2.0/) 
@@ -14,11 +14,11 @@ GitOps CLI is a command line interface (CLI) to perform operations on GitOps man
 ## Quick Start
 The official GitOps CLI Docker image comes with all dependencies pre-installed and ready-to-use. Pull it with:
 ```bash
-docker pull baloiseincubator/gitopscli
+docker pull baloise/gitopscli
 ```
 Start the CLI and the print the help page with:
 ```bash
-docker run --rm -it baloiseincubator/gitopscli --help
+docker run --rm -it baloise/gitopscli --help
 ```
 
 ## Features
