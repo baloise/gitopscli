@@ -6,11 +6,11 @@ Currently there are two different ways to setup and use the GitOps CLI.
 
 The official GitOps CLI Docker image comes with all dependencies pre-installed and ready-to-use. Pull it with:
 ```bash
-docker pull baloise/gitopscli
+docker pull baloiseincubator/gitopscli
 ```
 Start the CLI and the print the help page with:
 ```bash
-docker run --rm -it baloise/gitopscli --help
+docker run --rm -it baloiseincubator/gitopscli --help
 ```
 
 ## From Source
