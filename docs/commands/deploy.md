@@ -3,7 +3,7 @@
 The `deploy` command can be used to deploy applications by updating the image tags in the YAML files of a config repository. Of course, you can also use it to update any YAML values in a git repository. However, only _one_ YAML can be changed at a time.
 
 ## Example
-Let's assume you have a repository `deployment/incubator-non-prod` which contains your deployment configuration in the form of YAML files (e.g. [Helm](https://helm.sh/) charts). To deploy a new version of your application you need to update some values in `example/values.yaml`.
+Let's assume you have a repository `deployment/myapp-non-prod` which contains your deployment configuration in the form of YAML files (e.g. [Helm](https://helm.sh/) charts). To deploy a new version of your application you need to update some values in `example/values.yaml`.
 
 ```yaml
 # Example Helm values.yaml
@@ -25,7 +25,7 @@ gitopscli deploy \
   --git-user "GitOps CLI" \
   --git-email "gitopscli@baloise.dev" \
   --organisation "deployment" \
-  --repository-name "incubator-non-prod" \
+  --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
   --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0}"
 ```
@@ -73,7 +73,7 @@ gitopscli deploy \
   --git-user "GitOps CLI" \
   --git-email "gitopscli@baloise.dev" \
   --organisation "deployment" \
-  --repository-name "incubator-non-prod" \
+  --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
   --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0}" \
   --create-pr \

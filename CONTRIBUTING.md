@@ -12,19 +12,19 @@ Below are a few guidelines we would like you to follow.
 If you need help, please reach out to us by opening an issue.
 
 ## Report a bug 
-Reporting bugs is one of the best ways to contribute. Before creating a bug report, please check that an [issue](https://github.com/baloise-incubator/gitopscli/issues) reporting the same problem does not already exist. If there is such an issue, you may add your information as a comment.
+Reporting bugs is one of the best ways to contribute. Before creating a bug report, please check that an [issue](https://github.com/baloise/gitopscli/issues) reporting the same problem does not already exist. If there is such an issue, you may add your information as a comment.
 
 To report a new bug you should open an issue that summarizes the bug and set the label to ![bug](https://img.shields.io/badge/-bug-d73a4a).
 
 If you want to provide a fix along with your bug report: That is great! In this case please send us a pull request as described in section [Contribute code](#contribute-code).
 
 ## Suggest a feature
-To request a new feature you should open an [issue](https://github.com/baloise-incubator/gitopscli/issues/new) and summarize the desired functionality and its use case. Set the issue label to ![enhancement](https://img.shields.io/badge/-enhancement-52d13e).  
+To request a new feature you should open an [issue](https://github.com/baloise/gitopscli/issues/new) and summarize the desired functionality and its use case. Set the issue label to ![enhancement](https://img.shields.io/badge/-enhancement-52d13e).  
 
 ## Contribute code
 This is an outline of what the workflow for code contributions looks like
 
-- Check the list of open [issues](https://github.com/baloise-incubator/gitopscli/issues). Either assign an existing issue to yourself, or 
+- Check the list of open [issues](https://github.com/baloise/gitopscli/issues). Either assign an existing issue to yourself, or 
 create a new one that you would like work on and discuss your ideas and use cases. 
 
 It is always best to discuss your plans beforehand, to ensure that your contribution is in line with our goals.
@@ -39,7 +39,7 @@ It is always best to discuss your plans beforehand, to ensure that your contribu
 - As you push your changes, update the pull request with new information and tasks as you complete them
 - Project maintainers might comment on your work as you progress
 - When you are done, remove the ![work in progress](https://img.shields.io/badge/-work%20in%20progress-fc9979) label and ping the maintainers for a review
-- Your pull request must receive a :thumbsup: from two [MAINTAINERS](https://github.com/baloise-incubator/gitopscli/blob/master/docs/CODEOWNERS)
+- Your pull request must receive a :thumbsup: from two [MAINTAINERS](https://github.com/baloise/gitopscli/blob/master/docs/CODEOWNERS)
 
 Thanks for your contributions!
 

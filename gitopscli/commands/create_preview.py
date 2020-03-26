@@ -195,7 +195,7 @@ def __create_new_preview_env(
 def __create_pullrequest(branch, gitops_config, root_git):
     title = "Updated preview environment for " + gitops_config.application_name
     description = f"""
-This Pull Request is automatically created through [gitopscli](https://github.com/baloise-incubator/gitopscli).
+This Pull Request is automatically created through [gitopscli](https://github.com/baloise/gitopscli).
 """
     pull_request = root_git.create_pull_request(branch, "master", title, description)
     logging.info("Pull request created: %s", {root_git.get_pull_request_url(pull_request)})
