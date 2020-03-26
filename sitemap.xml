@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/setup/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/setup/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/getting-started/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/getting-started/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/commands/add-pr-comment/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/commands/add-pr-comment/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/commands/create-preview/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/commands/create-preview/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/commands/delete-preview/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/commands/delete-preview/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/commands/deploy/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/commands/deploy/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/commands/sync-apps/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/commands/sync-apps/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/changelog/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/changelog/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/contributing/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/contributing/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://baloise-incubator.github.io/gitopscli/license/</loc>
-     <lastmod>2020-03-25</lastmod>
+     <loc>https://baloise.github.io/gitopscli/license/</loc>
+     <lastmod>2020-03-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

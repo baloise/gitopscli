@@ -13,7 +13,7 @@
         <meta name="description" content="A command line interface to perform operations on GitOps managed infrastructure repositories.">
       
       
-        <link rel="canonical" href="https://baloise-incubator.github.io/gitopscli/commands/deploy/">
+        <link rel="canonical" href="https://baloise.github.io/gitopscli/commands/deploy/">
       
       
       
@@ -100,7 +100,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="https://baloise-incubator.github.io/gitopscli/" title="GitOps CLI" aria-label="GitOps CLI" class="md-header-nav__button md-logo">
+        <a href="https://baloise.github.io/gitopscli/" title="GitOps CLI" aria-label="GitOps CLI" class="md-header-nav__button md-logo">
           
             <img alt="logo" src="../../assets/images/logo-white.svg" width="24" height="24">
           
@@ -159,7 +159,7 @@
 
   
 
-<a href="https://github.com/baloise-incubator/gitopscli/" title="Go to repository" class="md-source" data-md-source="github">
+<a href="https://github.com/baloise/gitopscli/" title="Go to repository" class="md-source" data-md-source="github">
   
     <div class="md-source__icon">
       <svg viewBox="0 0 24 24" width="24" height="24">
@@ -168,7 +168,7 @@
     </div>
   
   <div class="md-source__repository">
-    baloise-incubator/gitopscli
+    baloise/gitopscli
   </div>
 </a>
           </div>
@@ -237,7 +237,7 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="https://baloise-incubator.github.io/gitopscli/" title="GitOps CLI" class="md-nav__button md-logo">
+    <a href="https://baloise.github.io/gitopscli/" title="GitOps CLI" class="md-nav__button md-logo">
       
         <img alt="logo" src="../../assets/images/logo-white.svg" width="48" height="48">
       
@@ -251,7 +251,7 @@
 
   
 
-<a href="https://github.com/baloise-incubator/gitopscli/" title="Go to repository" class="md-source" data-md-source="github">
+<a href="https://github.com/baloise/gitopscli/" title="Go to repository" class="md-source" data-md-source="github">
   
     <div class="md-source__icon">
       <svg viewBox="0 0 24 24" width="24" height="24">
@@ -260,7 +260,7 @@
     </div>
   
   <div class="md-source__repository">
-    baloise-incubator/gitopscli
+    baloise/gitopscli
   </div>
 </a>
     </div>
@@ -560,13 +560,13 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/baloise-incubator/gitopscli/edit/master/docs/commands/deploy.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/baloise/gitopscli/edit/master/docs/commands/deploy.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
                 <h1 id="deploy">deploy<a class="headerlink" href="#deploy" title="Permanent link">&para;</a></h1>
 <p>The <code>deploy</code> command can be used to deploy applications by updating the image tags in the YAML files of a config repository. Of course, you can also use it to update any YAML values in a git repository. However, only <em>one</em> YAML can be changed at a time.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>Let's assume you have a repository <code>deployment/incubator-non-prod</code> which contains your deployment configuration in the form of YAML files (e.g. <a href="https://helm.sh/">Helm</a> charts). To deploy a new version of your application you need to update some values in <code>example/values.yaml</code>.</p>
+<p>Let's assume you have a repository <code>deployment/myapp-non-prod</code> which contains your deployment configuration in the form of YAML files (e.g. <a href="https://helm.sh/">Helm</a> charts). To deploy a new version of your application you need to update some values in <code>example/values.yaml</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># Example Helm values.yaml</span>
 <span class="nt">frontend</span><span class="p">:</span>
   <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-app/frontend</span>
@@ -585,7 +585,7 @@
   --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
   --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
   --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;incubator-non-prod&quot;</span> <span class="se">\</span>
+  --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
   --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
   --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0}&quot;</span>
 </code></pre></div>
@@ -628,7 +628,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
   --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
   --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
   --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;incubator-non-prod&quot;</span> <span class="se">\</span>
+  --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
   --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
   --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0}&quot;</span> <span class="se">\</span>
   --create-pr <span class="se">\</span>
