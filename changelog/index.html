@@ -422,12 +422,26 @@
     [Unreleased]
   </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#301-2020-04-09" class="md-nav__link">
+    [3.0.1] - 2020-04-09
+  </a>
+  
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     Added
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
   </a>
   
 </li>
@@ -453,7 +467,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -551,12 +565,26 @@
     [Unreleased]
   </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#301-2020-04-09" class="md-nav__link">
+    [3.0.1] - 2020-04-09
+  </a>
+  
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     Added
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
   </a>
   
 </li>
@@ -582,7 +610,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -643,9 +671,14 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased">[Unreleased]<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="301-2020-04-09">[3.0.1] - 2020-04-09<a class="headerlink" href="#301-2020-04-09" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Improved error handling while reading <code>gitops.config.yaml</code></li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Fixed bug in <code>sync-apps</code> that always added a <code>test-app</code></li>
 </ul>
 <h2 id="300-2020-03-20">[3.0.0] - 2020-03-20<a class="headerlink" href="#300-2020-03-20" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
@@ -654,7 +687,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <li>Automatic git provider detection. If <code>--git-provider-url</code> contains "github" or "bitbucket" the <code>--git-provider</code> arg is not needed anymore. Until now, <code>bitbucket</code> was used as default if <code>--git-provider</code> was missing.</li>
 <li>Improved error handling and log outputs</li>
 </ul>
-<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Throw an error if a key is not found in the YAML file for <code>deploy</code> and <code>create-preview</code> commands. Until now, the missing key was silently added.</li>
 <li><code>--username</code> and <code>--pasword</code> are always required</li>
