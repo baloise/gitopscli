@@ -5,8 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [3.0.1] - 2020-04-09
+
 ### Added
 - Improved error handling while reading `gitops.config.yaml`
+
+### Changed
+- Fixed bug in `sync-apps` that always added a `test-app`
 
 ## [3.0.0] - 2020-03-20
 
