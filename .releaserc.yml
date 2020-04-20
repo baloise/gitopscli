@@ -1,0 +1,22 @@
+branch: master
+preset: conventionalcommits # https://www.conventionalcommits.org/
+tagFormat: "v${version}"
+plugins:
+- "@semantic-release/commit-analyzer"
+- "@semantic-release/release-notes-generator"
+- - "@google/semantic-release-replace-plugin"
+  - replacements:
+    - files: [ "setup.py "]
+      from: "version=\"dev\""
+      to: "version=\"${nextRelease.version}\""
+      countMatches: true
+      results:
+        - file: "setup.py"
+          hasChanged: true
+          numMatches: 1
+          numReplacements: 1
+- - "@semantic-release/exec"
+  - prepareCmd: "docker build -t baloise/gitopscli ."
+- - "semantic-release-docker"
+  - name: "baloise/gitopscli"
+- "@semantic-release/github"

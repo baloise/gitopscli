@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="gitopscli",
-    version="3.0.0",
+    version="dev",
     packages=find_packages(),
     entry_points={"console_scripts": ["gitopscli = gitopscli.__main__:main"]},
     setup_requires=["wheel"],
