@@ -18,6 +18,7 @@ nav:
     - delete-preview: commands/delete-preview.md
     - deploy: commands/deploy.md
     - sync-apps: commands/sync-apps.md
+    - version: commands/version.md
   - Changelog: changelog.md
   - Contributing: contributing.md
   - License: license.md

@@ -2,11 +2,14 @@ import logging
 import sys
 
 from gitopscli.cliparser import create_cli
-from gitopscli.commands.add_pr_comment import pr_comment_command
-from gitopscli.commands.create_preview import create_preview_command
-from gitopscli.commands.delete_preview import delete_preview_command
-from gitopscli.commands.deploy import deploy_command
-from gitopscli.commands.sync_apps import sync_apps_command
+from gitopscli.commands import (
+    pr_comment_command,
+    create_preview_command,
+    delete_preview_command,
+    deploy_command,
+    sync_apps_command,
+    version_command,
+)
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -24,9 +27,14 @@ def main():
         command = create_preview_command
     elif args.command == "delete-preview":
         command = delete_preview_command
+    elif args.command == "version":
+        command = version_command
 
-    verbose = args.verbose
-    del args.verbose
+    if "verbose" in args:
+        verbose = args.verbose
+        del args.verbose
+    else:
+        verbose = False
 
     try:
         command(**vars(args))
