@@ -11,6 +11,7 @@ def create_cli(args):
     __add_pr_comment_command_parser(subparsers)
     __add_create_preview_command_parser(subparsers)
     __add_delete_preview_command_parser(subparsers)
+    __add_version_command_parser(subparsers)
 
     if len(args) == 0:
         parser.print_help(sys.stderr)
@@ -82,6 +83,10 @@ def __add_delete_preview_command_parser(subparsers):
     )
     __add_branch_pr_parser_args(add_delete_preview_p)
     __add_verbose_parser(add_delete_preview_p)
+
+
+def __add_version_command_parser(subparsers):
+    subparsers.add_parser("version", help="Show the GitOps CLI version information")
 
 
 def __add_git_parser_args(deploy_p, api_only=False):
