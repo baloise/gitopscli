@@ -8,7 +8,7 @@ from gitopscli.cliparser import create_cli
 
 EXPECTED_GITOPSCLI_HELP = """\
 usage: gitopscli [-h]
-                 {deploy,sync-apps,add-pr-comment,create-preview,delete-preview}
+                 {deploy,sync-apps,add-pr-comment,create-preview,delete-preview,version}
                  ...
 
 GitOps CLI
@@ -17,13 +17,14 @@ optional arguments:
   -h, --help            show this help message and exit
 
 commands:
-  {deploy,sync-apps,add-pr-comment,create-preview,delete-preview}
+  {deploy,sync-apps,add-pr-comment,create-preview,delete-preview,version}
     deploy              Trigger a new deployment by changing YAML values
     sync-apps           Synchronize applications (= every directory) from apps
                         config repository to apps root config
     add-pr-comment      Create a comment on the pull request
     create-preview      Create a preview environment
     delete-preview      Delete a preview environment
+    version             Show the GitOps CLI version information
 """
 
 EXPECTED_ADD_PR_COMMENT_NO_ARGS_ERROR = """\
@@ -259,6 +260,13 @@ optional arguments:
                         Root config repository organisation
   --root-repository-name ROOT_REPOSITORY_NAME
                         Root config repository name
+"""
+
+EXPECTED_VERSION_HELP = """\
+usage: gitopscli version [-h]
+
+optional arguments:
+  -h, --help  show this help message and exit
 """
 
 
@@ -795,3 +803,13 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(cli.git_provider, "GIT_PROVIDER")
         self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
         self.assertTrue(cli.verbose)
+
+    def test_version_args(self):
+        cli = create_cli(["version"])
+        self.assertEqual(cli.command, "version")
+
+    def test_version_help(self):
+        exit_code, stdout, stderr = self._capture_create_cli(["version", "--help"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(EXPECTED_VERSION_HELP, stdout)
+        self.assertEqual("", stderr)
