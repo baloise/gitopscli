@@ -613,7 +613,7 @@ create a new one that you would like work on and discuss your ideas and use case
 <li>Create a topic branch from where you want to base your work. This is usually master.</li>
 <li>Open a new pull request, label it <img alt="work in progress" src="https://img.shields.io/badge/-work%20in%20progress-fc9979" /> and outline what you will be contributing</li>
 <li>Make commits of logical units.</li>
-<li>Make sure you sign-off on your commits <code>git commit -s -m "adding X to change Y"</code> </li>
+<li>Make sure you sign-off on your commits <code>git commit -s -m "feat(xyz): added feature xyz"</code></li>
 <li>Write good commit messages (see below).</li>
 <li>Push your changes to a topic branch in your fork of the repository.</li>
 <li>As you push your changes, update the pull request with new information and tasks as you complete them</li>
@@ -623,11 +623,11 @@ create a new one that you would like work on and discuss your ideas and use case
 </ul>
 <p>Thanks for your contributions!</p>
 <h3 id="commit-messages">Commit messages<a class="headerlink" href="#commit-messages" title="Permanent link">&para;</a></h3>
-<p>Your commit messages ideally can answer two questions: what changed and why. The subject line should feature the <em>what</em> and the body of the commit should describe the <em>why</em>.  </p>
+<p>We are using the (Conventional Commits)[https://www.conventionalcommits.org/en/v1.0.0/#summary] convention for our commit messages. This convention dovetails with (SemVer)[https://semver.org/], by describing the features, fixes, and breaking changes made in commit messages.</p>
 <p>When creating a pull request, its description should reference the corresponding issue id.</p>
 <h3 id="sign-your-work-developer-certificate-of-origin">Sign your work / Developer certificate of origin<a class="headerlink" href="#sign-your-work-developer-certificate-of-origin" title="Permanent link">&para;</a></h3>
 <p>All contributions (including pull requests) must agree to the Developer Certificate of Origin (DCO) version 1.1. This is exactly the same one created and used by the Linux kernel developers and posted on <a href="http://developercertificate.org/">http://developercertificate.org/</a>. This is a developer's certification that he or she has the right to submit the patch for inclusion into the project. Simply submitting a contribution implies this agreement, however, please include a <code>Signed-off-by</code> tag in every patch (this tag is a conventional way to confirm that you agree to the DCO) - you can automate this with a <a href="https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working">Git hook</a></p>
-<div class="codehilite"><pre><span></span><code>git commit -s -m &quot;adding X to change Y&quot;
+<div class="codehilite"><pre><span></span><code>git commit -s -m &quot;feat(xyz): added feature xyz&quot;
 </code></pre></div>
 
 
