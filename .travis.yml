@@ -1,35 +1,54 @@
 os: linux
+dist: xenial
 language: shell
 
 env:
   global:
     # DOCKER_USERNAME
     - secure: "Ecq9r+yXVc9gVdn1e4sDS/yegMKOyN3F6f4jxNSNl1pEkBZayVOvl6seh58sK+QzaIOLlrMYNlOzmWIKaekRuskYLJNYMUh67RJB24knOMSbA0hD3WPO8GbFY1Y/Xe1Gk5zKlLqFKe9OoCbM0ItGIXL2DrFPWl94F1YoZim2h7q6lFEo9NHvYSjreGMcqJujQKoN5/UkO76C3TEKNFXbyxev18nHwXQvqC2axbZONYEQuzYC7dDDAHRMxQ25t2qcWh19f/ssl0qR7VYheBY72Pypvl131+qIxaMl+r/7UeKHnhrM2/ineyo8VPfxhHwar31ldu0YyC0KtSYEMERASsKmJNyaP9d3mo6Vciws/8fGaU0FqlwfRPOhaa/ixMS43qJ4NS9vSogteQJVIIC4B9mHmFvzShDK5aDML+KJ0ehQnayS/30AywS80iSkSWdbkKPAdr+djVhUbey+LAWPVdmJOnIiBET4eSFqJ37dXmcKrhUcfrthL2SftkTGZ4Fm4gHPNYWXIej9N6kTwHlYzRkuJN3PNTLsqp9YE6dUYIUZEu0qkyX2IBljdOxLK5UTKzdkD+j8kLFEP2kN1ELbhP4qEBJj17swycTP9wR4RB+FfjsdeTXonaEOGq8z2CctnczJe87TJ1/GuRj5l/VXiK2ph25El/Axhg5Kv3lHxJw="
-    # DOCKER_ACCESS_TOKEN
-    - secure: "DAsUarnF1UfdkkQ8ozi6AcHzbTUtbSO38FTZQLyHE2Wq6UxW6yOyRyOL48KnArL6HslEwIs6Sqf9FS0XBDc4/RwAFReBiGoUpq7MKGZeghmssLkimPY5eeq7VVti6II4rowKcY54EXMT8tKJo6Enlm/D98vIUVsCPhBzgsjyeM6GMIHln/ECjVVWew0ngnIyCjFz6eVVYT9eGkCzsIwMW3aTTqgQ/Y+t+fdI/4qoIx2C8kkZJ5byclRp2Ass1YSoHk1exW2keHftUYJcQj6HlavGVJeUIzkyI1L0trlfssPyaSSH6q2jC4u9lHfWK/Eru03o54yMUbl4Rl+iyjXk2Q6pPw4vMp9dp11uDokmc3ukC5bfMJP/T1O/7RKSAgvwc876nGW3oBaiyzHWn1Fj6Z+rLVDeygfVso4J36atcu4oCmgKKoAXfT0NSvOKECnGofcBsbYrcjURgpoCukFgsL5JadeeWjY3u7+BgxMt22cRr+jp1zUO7YwhUq7biUjTghvWo/JYmnaEXZYaejlgrowsPHZziYJINsu0sPAPw6VOZDKkXuawyw/TA7x5U4JLwbwdeJZNPF6S6zNS3IfArRD/3fJOkcr5MVQSNOQ9NUgmKNtSnpCsrOYVIkuomyOfisGv8jDiGctdFbl6uPsJ32Dvh9EgvYDXMtKEbNdvcT4="
+    # DOCKER_PASSWORD
+    - secure: "gnQCC722E9vE6HEL6LwSS6tHdbKkhNX0gPwbVMYZWkfQiVBic9543j6Tdu6BWZbtPzTvdfQmOLoojK/srTpBpr3zdUTCwDlm8hoO6PtiYbaUMwaI/9mUI2s+Td3MKCzKLkQWOWY6+aiMooVXFZXRiHOrQaiXnKtnQnZcrEMe0il8z/71j1Tm1FofZXdPf94ycjCRW/gi1aRTkl3m5VufOsV9D3fo4/OSF4cjS8UXYyjAPWIbk5cyro/UtTAwjXnOroXFrQ2AQGlrII09ipPc/AczJd2KTRRHcAb2yME4PE9hGI67U2kRIVPuZKdt/pHhyibjgJV1UZocQ53sExhF0pnu8vUOIbM9pUf+qYJF/7aRtrLHPek3+JGYcmclJK2ZSPqAHtbh51H3Hkiq/OFw7zK+I36RcILH7imcapbVb391sLF6Q0bTRo2yeQA3GODQ5B3HUEBaDgMjDzqObEpyGyGk16UL2k5+zvZTS4mBxs5wJ+tl/cAYHBdyRG6wC7g2gAnsat3yJbdpUeaWz1PNUXRh0oIQnYXk9zfG7EeIEvFdvQL9kA7d1fLS4ojshvwv0Wsg7oqin/d8kyE+8qBXkVLdC/iGIdgXiNPcZc9VY9cCSJiEUy/s0F3xeGIDOVnuxuBMEb33O+r6HBSZejkAqUVnJvOebSy279jZJ36nuTw="
     # GITHUB_TOKEN
     - secure: "MGMSLhzZuFGVbCGR+EcyC0SODyccmJlKG9vjbSUl9Lxs7Hxm1C9vpcn6eP5LhZtsX3Qsarc52TzM93bwWJWS3Wc1nzNzB/p32MtvD3lECAMps8592PAhmYhNl0Dn2WauNlD/kCDtYO42IZ5jRu74jnOvbqvqJDUasposPGx7MIC2NxFHHEZzuPf4TVf7lpjWYcI08yNTBLqeykAZqdYMXH+tzuHp2DagyP4Ay6LxnqfTdYD980FbWf1ObgfpXAMpzhFC0RP18J5MURF/lKaX/9kal9NGex51UHaFZXiyVNqIMF1Wkw1jRoN95duKGI1F5onnx8bqFoHA/4g5PqUXHBDZfZPq0kZxj3qBCttxOY+M5b0VRm8fAAO2Jh/ly8newk1KElV3Uxy7YHhnEY4OEWQLq2nbHYCFH2qVHXuJovzqn1/3waAdDKpg0SkaW9N9Kud+SZtKkXk5NE97Rt8S+4v2hD+9vZvus33FPBFzZgNN7iRLFAAqMTVnauYVoiQos2XsuEyol2swJeMjZYhUM9m3N05K65uAfj3TWdHMAMw5LQrS8pWnKkQ/xhGEyx3vLih8P14YSeFDIFDD69SKX5pBUmQ1TAReaK8atElUTPcOKzHrGjNggVBxlPdK9bDLIE2CWOaIqYm+m9LbytfjllZT4FzFCBAchE4eShaBLYM="
-    - IMAGE_NAME=baloise/gitopscli
 
 jobs:
   include:
-    - name: docker
+    - stage: test
       language: shell
-      script:
-        - docker build -t $IMAGE_NAME:latest .
-        - echo "$DOCKER_ACCESS_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then docker push $IMAGE_NAME:latest; fi
-        - if [ -n "$TRAVIS_TAG" ]; then docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG; fi
-        - if [ -n "$TRAVIS_TAG" ]; then docker push $IMAGE_NAME:$TRAVIS_TAG; fi
-    - name: doc
-      if: branch = master
+      services: docker
+      script: docker build .
+    - stage: doc
       language: python
       python: 3.6
       install: pip install -r requirements-dev.txt
       script: mkdocs build
       deploy:
         provider: pages
+        strategy: git
         local_dir: site
         token: $GITHUB_TOKEN
         keep_history: true
         skip_cleanup: true
+        on:
+          branch: master
+    - stage: release
+      language: node_js
+      node_js: lts/*
+      services: docker
+      install:
+        - npm install semantic-release
+                      semantic-release-docker
+                      @semantic-release/exec
+                      @google/semantic-release-replace-plugin
+                      conventional-changelog-conventionalcommits
+      script: npx semantic-release
+
+stages:
+  - name: test
+  - name: doc
+  - name: release
+    if: branch = master AND type = push
+
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/

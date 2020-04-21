@@ -33,7 +33,7 @@ It is always best to discuss your plans beforehand, to ensure that your contribu
 - Create a topic branch from where you want to base your work. This is usually master.
 - Open a new pull request, label it ![work in progress](https://img.shields.io/badge/-work%20in%20progress-fc9979) and outline what you will be contributing
 - Make commits of logical units.
-- Make sure you sign-off on your commits `git commit -s -m "adding X to change Y"` 
+- Make sure you sign-off on your commits `git commit -s -m "feat(xyz): added feature xyz"`
 - Write good commit messages (see below).
 - Push your changes to a topic branch in your fork of the repository.
 - As you push your changes, update the pull request with new information and tasks as you complete them
@@ -44,7 +44,7 @@ It is always best to discuss your plans beforehand, to ensure that your contribu
 Thanks for your contributions!
 
 ### Commit messages
-Your commit messages ideally can answer two questions: what changed and why. The subject line should feature the *what* and the body of the commit should describe the *why*.  
+We are using the (Conventional Commits)[https://www.conventionalcommits.org/en/v1.0.0/#summary] convention for our commit messages. This convention dovetails with (SemVer)[https://semver.org/], by describing the features, fixes, and breaking changes made in commit messages.
 
 When creating a pull request, its description should reference the corresponding issue id.
 
@@ -52,7 +52,7 @@ When creating a pull request, its description should reference the corresponding
 All contributions (including pull requests) must agree to the Developer Certificate of Origin (DCO) version 1.1. This is exactly the same one created and used by the Linux kernel developers and posted on [http://developercertificate.org/](http://developercertificate.org/). This is a developer's certification that he or she has the right to submit the patch for inclusion into the project. Simply submitting a contribution implies this agreement, however, please include a `Signed-off-by` tag in every patch (this tag is a conventional way to confirm that you agree to the DCO) - you can automate this with a [Git hook](https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working)
 
 ```
-git commit -s -m "adding X to change Y"
+git commit -s -m "feat(xyz): added feature xyz"
 ```
 
 **Have fun, and happy hacking!**
