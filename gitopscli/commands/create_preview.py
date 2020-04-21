@@ -88,7 +88,7 @@ def create_preview_command(
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
         if not branch_preview_env_already_exist:
             __create_new_preview_env(
-                config_branch,
+                pr_branch,
                 new_preview_folder_name,
                 preview_template_folder_name,
                 root_git,
@@ -112,16 +112,16 @@ def create_preview_command(
         if not value_replaced:
             __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id)
             return
-        root_git.commit(f"Upated preview environment for {gitops_config.application_name} and branch {pr_branch}.")
+        root_git.commit(f"Update preview environment for '{gitops_config.application_name}' and branch '{pr_branch}'.")
         root_git.push(config_branch)
         logging.info("Pushed branch %s", config_branch)
         pr_comment_text = f"""
-New Preview Environment for {gitops_config.application_name} and branch {pr_branch} created successfully. Access it here: 
+New preview environment for `{gitops_config.application_name}` and branch `{pr_branch}` created successfully. Access it here:
 https://{route_host}
 """
         if branch_preview_env_already_exist:
             pr_comment_text = f"""
-Preview Environment for {gitops_config.application_name} and branch {pr_branch} updated successfully. Access it here: 
+Preview environment for `{gitops_config.application_name}` and branch `{pr_branch}` updated successfully. Access it here:
 https://{route_host}
 """
         logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
@@ -170,14 +170,14 @@ def __replace_value(
 def __no_deployment_needed(apps_git, new_image_tag, parent_id, pr_id):
     logging.info("The image tag %s has already been deployed. Doing nothing.", new_image_tag)
     pr_comment_text = f"""
-The version {new_image_tag} has already been deployed. Nothing to do here.
+The version `{new_image_tag}` has already been deployed. Nothing to do here.
 """
     logging.info("Creating PullRequest comment for pr with id %s and content: %s", pr_id, pr_comment_text)
     apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
 
 
 def __create_new_preview_env(
-    branch, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
+    pr_branch, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
 ):
     shutil.copytree(
         root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
@@ -189,7 +189,7 @@ def __create_new_preview_env(
             update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
         except KeyError as ex:
             raise GitOpsException(f"Key 'name' not found in '{chart_file_path}'") from ex
-    root_git.commit(f"Create new preview env for application: {app_name} and branch: {branch}")
+    root_git.commit(f"Create new preview environment for '{app_name}' and branch '{pr_branch}'.")
 
 
 def __create_pullrequest(branch, gitops_config, root_git):
