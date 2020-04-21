@@ -7,7 +7,7 @@ plugins:
 - - "@google/semantic-release-replace-plugin"
   - replacements:
     - files: [ "setup.py "]
-      from: "version=\"dev\""
+      from: "version=\"UNRELEASED\""
       to: "version=\"${nextRelease.version}\""
       countMatches: true
       results:
