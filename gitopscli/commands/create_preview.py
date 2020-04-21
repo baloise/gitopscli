@@ -88,7 +88,7 @@ def create_preview_command(
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
         if not branch_preview_env_already_exist:
             __create_new_preview_env(
-                config_branch,
+                pr_branch,
                 new_preview_folder_name,
                 preview_template_folder_name,
                 root_git,
@@ -177,7 +177,7 @@ The version {new_image_tag} has already been deployed. Nothing to do here.
 
 
 def __create_new_preview_env(
-    branch, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
+    pr_branch, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
 ):
     shutil.copytree(
         root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
@@ -189,7 +189,7 @@ def __create_new_preview_env(
             update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
         except KeyError as ex:
             raise GitOpsException(f"Key 'name' not found in '{chart_file_path}'") from ex
-    root_git.commit(f"Create new preview env for application: {app_name} and branch: {branch}")
+    root_git.commit(f"Create new preview env for application: {app_name} and branch: {pr_branch}")
 
 
 def __create_pullrequest(branch, gitops_config, root_git):
