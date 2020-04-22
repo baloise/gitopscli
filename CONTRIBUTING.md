@@ -44,7 +44,7 @@ It is always best to discuss your plans beforehand, to ensure that your contribu
 Thanks for your contributions!
 
 ### Commit messages
-We are using the (Conventional Commits)[https://www.conventionalcommits.org/en/v1.0.0/#summary] convention for our commit messages. This convention dovetails with (SemVer)[https://semver.org/], by describing the features, fixes, and breaking changes made in commit messages.
+We are using the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) convention for our commit messages. This convention dovetails with [SemVer](https://semver.org/), by describing the features, fixes, and breaking changes made in commit messages.
 
 When creating a pull request, its description should reference the corresponding issue id.
 
