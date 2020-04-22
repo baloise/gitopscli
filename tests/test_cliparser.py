@@ -1,3 +1,4 @@
+import os
 import sys
 import unittest
 from contextlib import contextmanager
@@ -274,11 +275,15 @@ optional arguments:
 def captured_output():
     new_out, new_err = StringIO(), StringIO()
     old_out, old_err = sys.stdout, sys.stderr
+    old_environ = dict(os.environ)
+    os.environ["COLUMNS"] = "80"
     try:
         sys.stdout, sys.stderr = new_out, new_err
         yield sys.stdout, sys.stderr
     finally:
         sys.stdout, sys.stderr = old_out, old_err
+        os.environ.clear()
+        os.environ.update(old_environ)
 
 
 class CliParserTest(unittest.TestCase):
