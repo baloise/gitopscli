@@ -83,7 +83,7 @@ def __sync_apps(apps_git, root_git):
     __check_if_app_already_exists(repo_apps, apps_from_other_repos)
 
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
-    merge_yaml_element(apps_config_file, "applications", dict.fromkeys(repo_apps, {}), True)
+    merge_yaml_element(apps_config_file, "applications", {repo_app: {} for repo_app in repo_apps}, True)
     __commit_and_push(apps_git, root_git, apps_config_file_name)
 
 
