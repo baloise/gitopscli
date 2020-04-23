@@ -1,6 +1,6 @@
 
 [![Build Status](https://travis-ci.org/baloise/gitopscli.svg?branch=master)](https://travis-ci.org/baloise/gitopscli) 
-[![Latest Release](https://img.shields.io/github/v/tag/baloise/gitopscli)](https://hub.docker.com/repository/docker/baloise/gitopscli/tags?page=1)
+[![Latest Release](https://img.shields.io/github/v/tag/baloise/gitopscli)](https://hub.docker.com/r/baloise/gitopscli/tags)
 [![Python: 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) 
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/baloise/gitopscli) 
 [![License: Apache License Version 2.0](https://img.shields.io/badge/license-Apache%20License%20Version%202.0-lightgrey.svg)](https://choosealicense.com/licenses/apache-2.0/) 
