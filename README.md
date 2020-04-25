@@ -1,9 +1,10 @@
-
 [![Build Status](https://travis-ci.org/baloise/gitopscli.svg?branch=master)](https://travis-ci.org/baloise/gitopscli) 
-[![Latest Release](https://img.shields.io/github/v/tag/baloise/gitopscli)](https://hub.docker.com/r/baloise/gitopscli/tags)
-[![Python: 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/baloise/gitopscli) 
-[![License: Apache License Version 2.0](https://img.shields.io/badge/license-Apache%20License%20Version%202.0-lightgrey.svg)](https://choosealicense.com/licenses/apache-2.0/) 
+[![Latest Release)](https://img.shields.io/github/v/release/baloise/gitopscli)](https://github.com/baloise/gitopscli/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/baloise/gitopscli)](https://hub.docker.com/r/baloise/gitopscli/tags)
+[![Python: 3.7](https://img.shields.io/badge/python-3.7-yellow.svg)](https://www.python.org/downloads/release/python-370/)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![Gitpod](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/baloise/gitopscli) 
+[![License](https://img.shields.io/github/license/baloise/gitopscli?color=lightgrey)](https://github.com/baloise/gitopscli/blob/master/LICENSE)
 
 # GitOps CLI
 
