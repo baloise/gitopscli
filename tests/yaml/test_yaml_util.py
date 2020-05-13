@@ -72,48 +72,6 @@ a: # comment
 
         with pytest.raises(KeyError):
             updated = update_yaml_file(test_file, "a.x", "foo")
-        updated = update_yaml_file(test_file, "a.x", "foo", create_new=True)
-        self.assertTrue(updated)
-
-        expected = """\
-a: # comment
-# comment
-  b:
-    d: 1 # comment
-    c: '2' # comment
-  x: foo
-"""
-        actual = self._read_file(test_file)
-        self.assertEqual(expected, actual)
-
-        with pytest.raises(KeyError):
-            updated = update_yaml_file(test_file, "a.x.z", "foo_z")
-        updated = update_yaml_file(test_file, "a.x.z", "foo_z", create_new=True)
-        self.assertTrue(updated)
-
-        with pytest.raises(KeyError):
-            updated = update_yaml_file(test_file, "a.x.y", "foo_y")
-        updated = update_yaml_file(test_file, "a.x.y", "foo_y", create_new=True)
-        self.assertTrue(updated)
-
-        with pytest.raises(KeyError):
-            updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
-        updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z", create_new=True)
-        self.assertTrue(updated)
-
-        expected = """\
-a: # comment
-# comment
-  b:
-    d: 1 # comment
-    c: '2' # comment
-  x:
-    z: foo_z
-    y:
-      z: foo_y_z
-"""
-        actual = self._read_file(test_file)
-        self.assertEqual(expected, actual)
 
     def test_merge_yaml_element(self):
         test_file = self._create_file(
