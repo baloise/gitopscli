@@ -1,4 +1,7 @@
+import re
 from ruamel.yaml import YAML
+
+INDEX_PATTERN = re.compile(r"\[(\d+)\]")
 
 
 def yaml_load(doc):
@@ -25,16 +28,27 @@ def update_yaml_file(file_path, key, value):
     with open(file_path, "r") as stream:
         content = yaml.load(stream)
 
-    keys, obj = key.split("."), content
-    for k in keys[:-1]:
-        if k not in obj or not isinstance(obj[k], dict):
-            raise KeyError(f"Key '{key}' not found in YAML!")
-        obj = obj[k]
-    if keys[-1] in obj and obj[keys[-1]] == value:
-        return False  # nothing to update
-    if keys[-1] not in obj:
-        raise KeyError(f"Key '{key}' not found in YAML!")
-    obj[keys[-1]] = value
+    keys, item = key.split("."), content
+    leaf_idx = len(keys) - 1
+    current_key_segments = []
+    current_key = ""
+    for i, k in enumerate(keys):
+        current_key_segments.append(k)
+        current_key = ".".join(current_key_segments)
+        is_array = INDEX_PATTERN.match(k)
+        if is_array:
+            k = int(is_array.group(1))
+            if not isinstance(item, list) or k >= len(item):
+                raise KeyError(f"Key '{current_key}' not found in YAML!")
+        else:
+            if not isinstance(item, dict) or k not in item:
+                raise KeyError(f"Key '{current_key}' not found in YAML!")
+        if i == leaf_idx:
+            if item[k] == value:
+                return False  # nothing to update
+            item[k] = value
+            break
+        item = item[k]
 
     with open(file_path, "w+") as stream:
         yaml.dump(content, stream)

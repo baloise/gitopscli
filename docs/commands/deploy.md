@@ -13,6 +13,9 @@ frontend:
 backend:
   repository: my-app/backend
   tag: 1.0.0 # <- and this one
+  env:
+  - name: TEST
+    value: foo # <- and even one in a list
 ```
 
 With the following command GitOps CLI will update both values to `1.1.0` on the `master` branch.
@@ -27,7 +30,7 @@ gitopscli deploy \
   --organisation "deployment" \
   --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0}"
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}"
 ```
 
 ### Number Of Commits
@@ -35,6 +38,12 @@ gitopscli deploy \
 Note that by default GitOps CLI will create a separate commit for every value change:
 
 ```
+commit 0dcaa136b4c5249576bb1f40b942bff6ac718144
+Author: GitOpsCLI <gitopscli@baloise.dev>
+Date:   Thu Mar 12 15:30:32 2020 +0100
+
+    changed 'backend.env.[0].value' to 'bar' in example/values.yaml
+
 commit d98913ad8fecf571d5f8c3635f8070b05c43a9ca
 Author: GitOpsCLI <gitopscli@baloise.dev>
 Date:   Thu Mar 12 15:30:32 2020 +0100
@@ -59,6 +68,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 
     frontend.tag: '1.1.0'
     backend.tag: '1.1.0'
+    backend.env.[0].value: 'bar'
 ```
 
 ### Create Pull Request
@@ -75,7 +85,7 @@ gitopscli deploy \
   --organisation "deployment" \
   --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0}" \
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}" \
   --create-pr \
   --auto-merge
 ```
