@@ -1,7 +1,7 @@
 import re
 from ruamel.yaml import YAML
 
-INDEX_PATTERN = re.compile(r"\[(\d+)\]")
+ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
 
 
 def yaml_load(doc):
@@ -28,31 +28,29 @@ def update_yaml_file(file_path, key, value):
     with open(file_path, "r") as stream:
         content = yaml.load(stream)
 
-    keys, item = key.split("."), content
-    leaf_idx = len(keys) - 1
+    key_segments = key.split(".")
     current_key_segments = []
-    current_key = ""
-    for i, k in enumerate(keys):
-        current_key_segments.append(k)
+    parent_item = content
+    for current_key_segment in key_segments:
+        current_key_segments.append(current_key_segment)
         current_key = ".".join(current_key_segments)
-        is_array = INDEX_PATTERN.match(k)
+        is_array = ARRAY_KEY_SEGMENT_PATTERN.match(current_key_segment)
         if is_array:
-            k = int(is_array.group(1))
-            if not isinstance(item, list) or k >= len(item):
+            current_key_segment = int(is_array.group(1))
+            if not isinstance(parent_item, list) or current_key_segment >= len(parent_item):
                 raise KeyError(f"Key '{current_key}' not found in YAML!")
         else:
-            if not isinstance(item, dict) or k not in item:
+            if not isinstance(parent_item, dict) or current_key_segment not in parent_item:
                 raise KeyError(f"Key '{current_key}' not found in YAML!")
-        if i == leaf_idx:
-            if item[k] == value:
+        if current_key == key:
+            if parent_item[current_key_segment] == value:
                 return False  # nothing to update
-            item[k] = value
-            break
-        item = item[k]
-
-    with open(file_path, "w+") as stream:
-        yaml.dump(content, stream)
-    return True
+            parent_item[current_key_segment] = value
+            with open(file_path, "w+") as stream:
+                yaml.dump(content, stream)
+            return True
+        parent_item = parent_item[current_key_segment]
+    raise KeyError(f"Empty key!")
 
 
 def merge_yaml_element(file_path, element_path, desired_value, delete_missing_key=False):
