@@ -586,6 +586,9 @@
 <span class="nt">backend</span><span class="p">:</span>
   <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-app/backend</span>
   <span class="nt">tag</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0.0</span> <span class="c1"># &lt;- and this one</span>
+  <span class="nt">env</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">TEST</span>
+    <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span> <span class="c1"># &lt;- and even one in a list</span>
 </code></pre></div>
 
 
@@ -599,13 +602,19 @@
   --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
   --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
   --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0}&quot;</span>
+  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}&quot;</span>
 </code></pre></div>
 
 
 <h3 id="number-of-commits">Number Of Commits<a class="headerlink" href="#number-of-commits" title="Permanent link">&para;</a></h3>
 <p>Note that by default GitOps CLI will create a separate commit for every value change:</p>
-<div class="codehilite"><pre><span></span><code>commit d98913ad8fecf571d5f8c3635f8070b05c43a9ca
+<div class="codehilite"><pre><span></span><code>commit 0dcaa136b4c5249576bb1f40b942bff6ac718144
+Author: GitOpsCLI &lt;gitopscli@baloise.dev&gt;
+Date:   Thu Mar 12 15:30:32 2020 +0100
+
+    changed &#39;backend.env.[0].value&#39; to &#39;bar&#39; in example/values.yaml
+
+commit d98913ad8fecf571d5f8c3635f8070b05c43a9ca
 Author: GitOpsCLI &lt;gitopscli@baloise.dev&gt;
 Date:   Thu Mar 12 15:30:32 2020 +0100
 
@@ -628,6 +637,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 
     frontend.tag: &#39;1.1.0&#39;
     backend.tag: &#39;1.1.0&#39;
+    backend.env.[0].value: &#39;bar&#39;
 </code></pre></div>
 
 
@@ -642,7 +652,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
   --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
   --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
   --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0}&quot;</span> <span class="se">\</span>
+  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}&quot;</span> <span class="se">\</span>
   --create-pr <span class="se">\</span>
   --auto-merge
 </code></pre></div>
