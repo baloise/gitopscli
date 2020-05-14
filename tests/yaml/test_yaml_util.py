@@ -47,71 +47,70 @@ universe:
     def test_update_yaml_file(self):
         test_file = self._create_file(
             """\
-a: # comment
-# comment
+a: # comment 1
+# comment 2
   b:
-    d: 1 # comment
-    c: 2 # comment"""
+    d: 1 # comment 3
+    c: 2 # comment 4
+  e:
+  - f: 3 # comment 5
+    g: 4 # comment 6
+  - [hello, world] # comment 7
+  - foo: # comment 8
+      bar # comment 9"""
         )
 
-        updated = update_yaml_file(test_file, "a.b.c", "2")
-        self.assertTrue(updated)
+        self.assertTrue(update_yaml_file(test_file, "a.b.c", "2"))
+        self.assertFalse(update_yaml_file(test_file, "a.b.c", "2"))  # already updated
 
-        updated = update_yaml_file(test_file, "a.b.c", "2")
-        self.assertFalse(updated)  # already updated
+        self.assertTrue(update_yaml_file(test_file, "a.e.[0].g", 42))
+        self.assertFalse(update_yaml_file(test_file, "a.e.[0].g", 42))  # already updated
+
+        self.assertTrue(update_yaml_file(test_file, "a.e.[1].[1]", "tester"))
+        self.assertFalse(update_yaml_file(test_file, "a.e.[1].[1]", "tester"))  # already updated
+
+        self.assertTrue(update_yaml_file(test_file, "a.e.[2]", "replaced object"))
+        self.assertFalse(update_yaml_file(test_file, "a.e.[2]", "replaced object"))  # already updated
 
         expected = """\
-a: # comment
-# comment
+a: # comment 1
+# comment 2
   b:
-    d: 1 # comment
-    c: '2' # comment
+    d: 1 # comment 3
+    c: '2' # comment 4
+  e:
+  - f: 3 # comment 5
+    g: 42 # comment 6
+  - [hello, tester] # comment 7
+  - replaced object
 """
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
-        with pytest.raises(KeyError):
-            updated = update_yaml_file(test_file, "a.x", "foo")
-        updated = update_yaml_file(test_file, "a.x", "foo", create_new=True)
-        self.assertTrue(updated)
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "x.y", "foo")
+        self.assertEqual("\"Key 'x' not found in YAML!\"", str(ex.value))
 
-        expected = """\
-a: # comment
-# comment
-  b:
-    d: 1 # comment
-    c: '2' # comment
-  x: foo
-"""
-        actual = self._read_file(test_file)
-        self.assertEqual(expected, actual)
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "[42].y", "foo")
+        self.assertEqual("\"Key '[42]' not found in YAML!\"", str(ex.value))
 
-        with pytest.raises(KeyError):
-            updated = update_yaml_file(test_file, "a.x.z", "foo_z")
-        updated = update_yaml_file(test_file, "a.x.z", "foo_z", create_new=True)
-        self.assertTrue(updated)
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "a.x", "foo")
+        self.assertEqual("\"Key 'a.x' not found in YAML!\"", str(ex.value))
 
-        with pytest.raises(KeyError):
-            updated = update_yaml_file(test_file, "a.x.y", "foo_y")
-        updated = update_yaml_file(test_file, "a.x.y", "foo_y", create_new=True)
-        self.assertTrue(updated)
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "a.[42]", "foo")
+        self.assertEqual("\"Key 'a.[42]' not found in YAML!\"", str(ex.value))
 
-        with pytest.raises(KeyError):
-            updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z")
-        updated = update_yaml_file(test_file, "a.x.y.z", "foo_y_z", create_new=True)
-        self.assertTrue(updated)
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "a.e.[3]", "foo")
+        self.assertEqual("\"Key 'a.e.[3]' not found in YAML!\"", str(ex.value))
 
-        expected = """\
-a: # comment
-# comment
-  b:
-    d: 1 # comment
-    c: '2' # comment
-  x:
-    z: foo_z
-    y:
-      z: foo_y_z
-"""
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "a.e.[2].[2]", "foo")
+        self.assertEqual("\"Key 'a.e.[2].[2]' not found in YAML!\"", str(ex.value))
+
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 

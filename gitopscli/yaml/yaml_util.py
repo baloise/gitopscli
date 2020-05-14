@@ -1,4 +1,7 @@
+import re
 from ruamel.yaml import YAML
+
+ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
 
 
 def yaml_load(doc):
@@ -20,27 +23,34 @@ def yaml_dump(data):
     return stream.get_string()
 
 
-def update_yaml_file(file_path, key, value, create_new=False):
+def update_yaml_file(file_path, key, value):
     yaml = YAML()
     with open(file_path, "r") as stream:
         content = yaml.load(stream)
 
-    keys, obj = key.split("."), content
-    for k in keys[:-1]:
-        if k not in obj or not isinstance(obj[k], dict):
-            if not create_new:
-                raise KeyError(f"Key '{key}' not found in YAML!")
-            obj[k] = dict()
-        obj = obj[k]
-    if keys[-1] in obj and obj[keys[-1]] == value:
-        return False  # nothing to update
-    if not create_new and keys[-1] not in obj:
-        raise KeyError(f"Key '{key}' not found in YAML!")
-    obj[keys[-1]] = value
-
-    with open(file_path, "w+") as stream:
-        yaml.dump(content, stream)
-    return True
+    key_segments = key.split(".")
+    current_key_segments = []
+    parent_item = content
+    for current_key_segment in key_segments:
+        current_key_segments.append(current_key_segment)
+        current_key = ".".join(current_key_segments)
+        is_array = ARRAY_KEY_SEGMENT_PATTERN.match(current_key_segment)
+        if is_array:
+            current_key_segment = int(is_array.group(1))
+            if not isinstance(parent_item, list) or current_key_segment >= len(parent_item):
+                raise KeyError(f"Key '{current_key}' not found in YAML!")
+        else:
+            if not isinstance(parent_item, dict) or current_key_segment not in parent_item:
+                raise KeyError(f"Key '{current_key}' not found in YAML!")
+        if current_key == key:
+            if parent_item[current_key_segment] == value:
+                return False  # nothing to update
+            parent_item[current_key_segment] = value
+            with open(file_path, "w+") as stream:
+                yaml.dump(content, stream)
+            return True
+        parent_item = parent_item[current_key_segment]
+    raise KeyError(f"Empty key!")
 
 
 def merge_yaml_element(file_path, element_path, desired_value, delete_missing_key=False):
