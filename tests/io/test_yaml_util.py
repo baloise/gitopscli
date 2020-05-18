@@ -4,7 +4,7 @@ import unittest
 import uuid
 import pytest
 
-from gitopscli.yaml.yaml_util import yaml_load, yaml_dump, update_yaml_file, merge_yaml_element
+from gitopscli.io.yaml_util import yaml_load, yaml_dump, update_yaml_file, merge_yaml_element
 
 
 class YamlUtilTest(unittest.TestCase):

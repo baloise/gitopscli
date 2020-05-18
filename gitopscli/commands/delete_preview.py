@@ -1,11 +1,12 @@
 import hashlib
 import logging
 import os
-import shutil
 import uuid
+import shutil
 
 from gitopscli.git.create_git import create_git
-from gitopscli.yaml.gitops_config import GitOpsConfig
+from gitopscli.io.gitops_config import GitOpsConfig
+from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -25,8 +26,8 @@ def delete_preview_command(
 ):
     assert command == "delete-preview"
 
-    apps_tmp_dir = __create_tmp_dir()
-    root_tmp_dir = __create_tmp_dir()
+    apps_tmp_dir = create_tmp_dir()
+    root_tmp_dir = create_tmp_dir()
 
     try:
         apps_git = create_git(
@@ -79,8 +80,8 @@ def delete_preview_command(
         logging.info("Pushed branch %s", config_branch)
 
     finally:
-        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
-        shutil.rmtree(root_tmp_dir, ignore_errors=True)
+        delete_tmp_dir(apps_tmp_dir)
+        delete_tmp_dir(root_tmp_dir)
     if create_pr:
         pull_request = __create_pullrequest(config_branch, gitops_config, root_git)
         if auto_merge:
@@ -102,10 +103,3 @@ def __merge_pullrequest(branch, pull_request, root_git):
     logging.info("Pull request merged")
     root_git.delete_branch(branch)
     logging.info("Branch '%s' deleted", branch)
-
-
-def __create_tmp_dir():
-    tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    os.makedirs(tmp_dir)
-    logging.info("Created directory %s", tmp_dir)
-    return tmp_dir

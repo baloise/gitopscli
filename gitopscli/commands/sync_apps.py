@@ -1,12 +1,11 @@
 import logging
 import os
-import shutil
-import uuid
 
 from ruamel.yaml import YAML
 
 from gitopscli.git.create_git import create_git
-from gitopscli.yaml.yaml_util import merge_yaml_element
+from gitopscli.io.yaml_util import merge_yaml_element
+from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -25,12 +24,8 @@ def sync_apps_command(
 ):
     assert command == "sync-apps"
 
-    apps_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    os.makedirs(apps_tmp_dir)
-    logging.info("Created directory %s", apps_tmp_dir)
-    root_tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    os.makedirs(root_tmp_dir)
-    logging.info("Created directory %s", root_tmp_dir)
+    apps_tmp_dir = create_tmp_dir()
+    root_tmp_dir = create_tmp_dir()
 
     try:
         apps_git = create_git(
@@ -58,8 +53,8 @@ def sync_apps_command(
 
         __sync_apps(apps_git, root_git)
     finally:
-        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
-        shutil.rmtree(root_tmp_dir, ignore_errors=True)
+        delete_tmp_dir(apps_tmp_dir)
+        delete_tmp_dir(root_tmp_dir)
 
 
 def __sync_apps(apps_git, root_git):
