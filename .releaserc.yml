@@ -16,7 +16,10 @@ plugins:
           numMatches: 1
           numReplacements: 1
 - - "@semantic-release/exec"
-  - prepareCmd: "docker build -t baloise/gitopscli ."
-- - "semantic-release-docker"
-  - name: "baloise/gitopscli"
+  - verifyConditionsCmd: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    prepareCmd: docker build -t $DOCKER_IMAGE:latest .
+    publishCmd: |
+      docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:${nextRelease.version}
+      docker push $DOCKER_IMAGE:latest
+      docker push $DOCKER_IMAGE:${nextRelease.version}
 - "@semantic-release/github"
