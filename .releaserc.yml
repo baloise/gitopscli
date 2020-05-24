@@ -17,9 +17,19 @@ plugins:
           numReplacements: 1
 - - "@semantic-release/exec"
   - verifyConditionsCmd: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    verifyReleaseCmd: |
+      MAJOR_MINOR_PATCH=${/^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)}
+      if [ -z $MAJOR_MINOR_PATCH ]; then echo "Only SemVer versions with version core (major.minor.patch) supported!"; exit 1; fi
     prepareCmd: docker build -t $DOCKER_IMAGE:latest .
     publishCmd: |
-      docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:${nextRelease.version}
+      MAJOR_MINOR_PATCH=${/^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)[0]}
+      MAJOR_MINOR=${      /^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)[1]}
+      MAJOR=${            /^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)[2]}
+      docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:$MAJOR_MINOR_PATCH
+      docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:$MAJOR_MINOR
+      docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:$MAJOR
       docker push $DOCKER_IMAGE:latest
-      docker push $DOCKER_IMAGE:${nextRelease.version}
+      docker push $DOCKER_IMAGE:$MAJOR_MINOR_PATCH
+      docker push $DOCKER_IMAGE:$MAJOR_MINOR
+      docker push $DOCKER_IMAGE:$MAJOR
 - "@semantic-release/github"
