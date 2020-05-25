@@ -60,10 +60,13 @@ def delete_preview_command(
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
 
-        config_branch = f"gitopscli-delete-preview-{str(uuid.uuid4())[:8]}" if create_pr else "master"
+        if create_pr:
+            config_branch = f"gitopscli-delete-preview-{str(uuid.uuid4())[:8]}"
+            root_git.new_branch(config_branch)
+            logging.info("Created branch %s in config repo", config_branch)
+        else:
+            config_branch = "master"
 
-        root_git.new_branch(config_branch)
-        logging.info("Created branch %s in config repo", config_branch)
         shortened_branch_hash = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
         logging.info("Hashed branch %s to hash: %s", branch, shortened_branch_hash)
         preview_folder_name = gitops_config.application_name + "-" + shortened_branch_hash + "-preview"
