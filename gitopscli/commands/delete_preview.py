@@ -43,7 +43,10 @@ def delete_preview_command(
 
         apps_git.checkout("master")
         logging.info("App repo branch master checkout successful")
-        gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
+        try:
+            gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
+        except FileNotFoundError as ex:
+            raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
         logging.info("Read GitOpsConfig: %s", gitops_config)
 
         root_git = create_git(
