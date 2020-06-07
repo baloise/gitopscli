@@ -1,10 +1,10 @@
 import logging
 import os
-import shutil
 import uuid
 
 from gitopscli.git.create_git import create_git
-from gitopscli.yaml.yaml_util import update_yaml_file, yaml_dump
+from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
+from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -26,9 +26,7 @@ def deploy_command(
 ):
     assert command == "deploy"
 
-    tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    os.makedirs(tmp_dir)
-    logging.info("Created directory %s", tmp_dir)
+    tmp_dir = create_tmp_dir()
 
     try:
         git = create_git(
@@ -59,7 +57,7 @@ def deploy_command(
         git.push(config_branch)
         logging.info("Pushed branch %s", config_branch)
     finally:
-        shutil.rmtree(tmp_dir, ignore_errors=True)
+        delete_tmp_dir(tmp_dir)
 
     if create_pr:
         __create_pr(git, config_branch, file, updated_values, auto_merge)

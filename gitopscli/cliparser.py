@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from gitopscli.yaml.yaml_util import yaml_load
+from gitopscli.io.yaml_util import yaml_load
 
 
 def create_cli(args):

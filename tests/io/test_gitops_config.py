@@ -4,7 +4,7 @@ import unittest
 import uuid
 import pytest
 
-from gitopscli.yaml.gitops_config import GitOpsConfig
+from gitopscli.io.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 
 
