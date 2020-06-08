@@ -9,7 +9,7 @@ lint:
 	pylint gitopscli
 
 test:
-	python3 -m pytest -v -s
+	python3 -m pytest -vv -s
 
 image:
 	docker build -t gitopscli:latest .
