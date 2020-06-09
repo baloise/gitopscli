@@ -105,7 +105,7 @@ Updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in `
 ```
 """
     pull_request = git.create_pull_request(branch, "master", title, description)
-    logging.info("Pull request created: %s", {git.get_pull_request_url(pull_request)})
+    logging.info("Pull request created: %s", git.get_pull_request_url(pull_request))
 
     if auto_merge:
         git.merge_pull_request(pull_request)
