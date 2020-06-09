@@ -20,14 +20,13 @@ class DeployCommandTest(unittest.TestCase):
         self.delete_tmp_dir_mock = add_patch("gitopscli.commands.deploy.delete_tmp_dir")
         self.logging_mock = add_patch("gitopscli.commands.deploy.logging")
         self.uuid_mock = add_patch("gitopscli.commands.deploy.uuid")
-
+        self.create_git_mock = add_patch("gitopscli.commands.deploy.create_git")
         self.git_util_mock = MagicMock()
-        create_git_mock = add_patch("gitopscli.commands.deploy.create_git")
-        create_git_mock.return_value = self.git_util_mock
 
         # Attach all mocks to a single mock manager
         self.mock_manager = Mock()
         self.mock_manager.attach_mock(self.create_tmp_dir_mock, "create_tmp_dir")
+        self.mock_manager.attach_mock(self.create_git_mock, "create_git")
         self.mock_manager.attach_mock(self.git_util_mock, "git_util")
         self.mock_manager.attach_mock(self.delete_tmp_dir_mock, "delete_tmp_dir")
         self.mock_manager.attach_mock(self.update_yaml_file_mock, "update_yaml_file")
@@ -35,6 +34,7 @@ class DeployCommandTest(unittest.TestCase):
         self.mock_manager.attach_mock(self.logging_mock, "logging")
 
         # Define some common default return values
+        self.create_git_mock.return_value = self.git_util_mock
         self.create_tmp_dir_mock.return_value = "/tmp/created-tmp-dir"
         self.git_util_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
         self.git_util_mock.create_pull_request.return_value = "<dummy-pr-object>"
@@ -63,6 +63,9 @@ class DeployCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -98,6 +101,9 @@ class DeployCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.new_branch("gitopscli-deploy-b973b5bb"),
@@ -143,6 +149,9 @@ class DeployCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.new_branch("gitopscli-deploy-b973b5bb"),
@@ -192,6 +201,9 @@ class DeployCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -231,6 +243,9 @@ class DeployCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
             call.git_util.checkout("master"),
             call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]
@@ -259,6 +274,9 @@ class DeployCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -288,6 +306,9 @@ class DeployCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
