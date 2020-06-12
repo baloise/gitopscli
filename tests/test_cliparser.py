@@ -9,7 +9,7 @@ from gitopscli.cliparser import create_cli
 
 EXPECTED_GITOPSCLI_HELP = """\
 usage: gitopscli [-h]
-                 {deploy,sync-apps,add-pr-comment,create-preview,delete-preview,version}
+                 {deploy,sync-apps,add-pr-comment,create-preview,create-pr-preview,delete-preview,delete-pr-preview,version}
                  ...
 
 GitOps CLI
@@ -18,13 +18,15 @@ optional arguments:
   -h, --help            show this help message and exit
 
 commands:
-  {deploy,sync-apps,add-pr-comment,create-preview,delete-preview,version}
+  {deploy,sync-apps,add-pr-comment,create-preview,create-pr-preview,delete-preview,delete-pr-preview,version}
     deploy              Trigger a new deployment by changing YAML values
     sync-apps           Synchronize applications (= every directory) from apps
                         config repository to apps root config
     add-pr-comment      Create a comment on the pull request
     create-preview      Create a preview environment
+    create-pr-preview   Create a preview environment
     delete-preview      Delete a preview environment
+    delete-pr-preview   Delete a pr preview environment
     version             Show the GitOps CLI version information
 """
 
@@ -73,10 +75,21 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] --pr-id PR_ID
-                                [--parent-id PARENT_ID] [-v [VERBOSE]]
-gitopscli create-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id
+                                --git-hash GIT_HASH --preview-id PREVIEW_ID
+                                [-v [VERBOSE]]
+gitopscli create-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --git-hash, --preview-id
+"""
+EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR = """\
+usage: gitopscli create-pr-preview [-h] --username USERNAME --password
+                                   PASSWORD [--git-user GIT_USER]
+                                   [--git-email GIT_EMAIL] --organisation
+                                   ORGANISATION --repository-name
+                                   REPOSITORY_NAME
+                                   [--git-provider GIT_PROVIDER]
+                                   [--git-provider-url GIT_PROVIDER_URL]
+                                   --pr-id PR_ID [--parent-id PARENT_ID]
+                                   [-v [VERBOSE]]
+gitopscli create-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id
 """
 
 EXPECTED_CREATE_PREVIEW_HELP = """\
@@ -85,9 +98,8 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] --pr-id PR_ID
-                                [--parent-id PARENT_ID] [-v [VERBOSE]]
+                                --git-hash GIT_HASH --preview-id PREVIEW_ID
+                                [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -105,11 +117,53 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --create-pr [CREATE_PR]
-                        Creates a Pull Request
-  --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
+  --git-hash GIT_HASH   the git hash which should be deployed
+  --preview-id PREVIEW_ID
+                        the id of folder in the config repo which will be
+                        created
+  -v [VERBOSE], --verbose [VERBOSE]
+                        Verbose exception logging
+"""
+
+EXPECTED_CREATE_PR_PREVIEW_HELP = """\
+usage: gitopscli create-pr-preview [-h] --username USERNAME --password
+                                   PASSWORD [--git-user GIT_USER]
+                                   [--git-email GIT_EMAIL] --organisation
+                                   ORGANISATION --repository-name
+                                   REPOSITORY_NAME
+                                   [--git-provider GIT_PROVIDER]
+                                   [--git-provider-url GIT_PROVIDER_URL]
+                                   --pr-id PR_ID [--parent-id PARENT_ID]
+                                   [-v [VERBOSE]]
+gitopscli create-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id
+gitpod /workspace/gitopscli $ export COLUMNS=80
+gitpod /workspace/gitopscli $ gitopscli create-pr-preview -h
+usage: gitopscli create-pr-preview [-h] --username USERNAME --password
+                                   PASSWORD [--git-user GIT_USER]
+                                   [--git-email GIT_EMAIL] --organisation
+                                   ORGANISATION --repository-name
+                                   REPOSITORY_NAME
+                                   [--git-provider GIT_PROVIDER]
+                                   [--git-provider-url GIT_PROVIDER_URL]
+                                   --pr-id PR_ID [--parent-id PARENT_ID]
+                                   [-v [VERBOSE]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --username USERNAME   Git username
+  --password PASSWORD   Git password or token
+  --git-user GIT_USER   Git Username
+  --git-email GIT_EMAIL
+                        Git User Email
+  --organisation ORGANISATION
+                        Apps Git organisation/projectKey
+  --repository-name REPOSITORY_NAME
+                        Git repository name (not the URL, e.g. my-repo)
+  --git-provider GIT_PROVIDER
+                        Git server provider
+  --git-provider-url GIT_PROVIDER_URL
+                        Git provider base API URL (e.g.
+                        https://bitbucket.example.tld)
   --pr-id PR_ID         the id of the pull request
   --parent-id PARENT_ID
                         the id of the parent comment, in case of a reply
@@ -122,10 +176,21 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL] --branch
-                                BRANCH [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] [-v [VERBOSE]]
-gitopscli delete-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --branch
+                                [--git-provider-url GIT_PROVIDER_URL]
+                                --preview-id PREVIEW_ID [-v [VERBOSE]]
+gitopscli delete-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --preview-id
+"""
+
+EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR = """\
+usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
+                                   PASSWORD [--git-user GIT_USER]
+                                   [--git-email GIT_EMAIL] --organisation
+                                   ORGANISATION --repository-name
+                                   REPOSITORY_NAME
+                                   [--git-provider GIT_PROVIDER]
+                                   [--git-provider-url GIT_PROVIDER_URL]
+                                   --branch BRANCH [-v [VERBOSE]]
+gitopscli delete-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --branch
 """
 
 EXPECTED_DELETE_PREVIEW_HELP = """\
@@ -133,9 +198,40 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL] --branch
-                                BRANCH [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] [-v [VERBOSE]]
+                                [--git-provider-url GIT_PROVIDER_URL]
+                                --preview-id PREVIEW_ID [-v [VERBOSE]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --username USERNAME   Git username
+  --password PASSWORD   Git password or token
+  --git-user GIT_USER   Git Username
+  --git-email GIT_EMAIL
+                        Git User Email
+  --organisation ORGANISATION
+                        Apps Git organisation/projectKey
+  --repository-name REPOSITORY_NAME
+                        Git repository name (not the URL, e.g. my-repo)
+  --git-provider GIT_PROVIDER
+                        Git server provider
+  --git-provider-url GIT_PROVIDER_URL
+                        Git provider base API URL (e.g.
+                        https://bitbucket.example.tld)
+  --preview-id PREVIEW_ID
+                        The preview-id for which the preview was created for
+  -v [VERBOSE], --verbose [VERBOSE]
+                        Verbose exception logging
+"""
+
+EXPECTED_DELETE_PR_PREVIEW_HELP = """\
+usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
+                                   PASSWORD [--git-user GIT_USER]
+                                   [--git-email GIT_EMAIL] --organisation
+                                   ORGANISATION --repository-name
+                                   REPOSITORY_NAME
+                                   [--git-provider GIT_PROVIDER]
+                                   [--git-provider-url GIT_PROVIDER_URL]
+                                   --branch BRANCH [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -154,11 +250,6 @@ optional arguments:
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
   --branch BRANCH       The branch for which the preview was created for
-  --create-pr [CREATE_PR]
-                        Creates a Pull Request
-  --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
@@ -437,8 +528,10 @@ class CliParserTest(unittest.TestCase):
                 "ORG",
                 "--repository-name",
                 "REPO",
-                "--pr-id",
-                "4711",
+                "--git-hash",
+                "c0784a34e834117e1489973327ff4ff3c2582b94",
+                "--preview-id",
+                "abc123",
             ]
         )
         self.assertEqual(cli.command, "create-preview")
@@ -449,13 +542,11 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(cli.git_email, "GIT_EMAIL")
         self.assertEqual(cli.organisation, "ORG")
         self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.pr_id, 4711)
+        self.assertEqual(cli.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
+        self.assertEqual(cli.preview_id, "abc123")
 
         self.assertIsNone(cli.git_provider)
         self.assertIsNone(cli.git_provider_url)
-        self.assertIsNone(cli.parent_id)
-        self.assertFalse(cli.create_pr)
-        self.assertFalse(cli.auto_merge)
         self.assertFalse(cli.verbose)
 
     def test_create_preview_all_args(self):
@@ -478,18 +569,109 @@ class CliParserTest(unittest.TestCase):
                 "ORG",
                 "--repository-name",
                 "REPO",
-                "--pr-id",
-                "4711",
-                "--parent-id",
-                "42",
-                "--create-pr",
-                "yEs",
-                "--auto-merge",
-                "1",
+                "--git-hash",
+                "c0784a34e834117e1489973327ff4ff3c2582b94",
+                "--preview-id",
+                "abc123",
                 "-v",
             ]
         )
         self.assertEqual(cli.command, "create-preview")
+
+        self.assertEqual(cli.username, "USER")
+        self.assertEqual(cli.password, "PASS")
+        self.assertEqual(cli.git_user, "GIT_USER")
+        self.assertEqual(cli.git_email, "GIT_EMAIL")
+        self.assertEqual(cli.organisation, "ORG")
+        self.assertEqual(cli.repository_name, "REPO")
+        self.assertEqual(cli.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
+        self.assertEqual(cli.preview_id, "abc123")
+
+        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
+        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(cli.verbose)
+
+    def test_create_pr_preview_no_args(self):
+        exit_code, stdout, stderr = self._capture_create_cli(["create-pr-preview"])
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
+
+    def test_create_pr_preview_help(self):
+        exit_code, stdout, stderr = self._capture_create_cli(["create-preview", "--help"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
+        self.assertEqual("", stderr)
+
+    def test_create_pr_preview_help_shortcut(self):
+        exit_code, stdout, stderr = self._capture_create_cli(["create-preview", "--help"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
+        self.assertEqual("", stderr)
+
+    def test_create_pr_preview_required_args(self):
+        cli = create_cli(
+            [
+                "create-pr-preview",
+                "--username",
+                "USER",
+                "--password",
+                "PASS",
+                "--git-user",
+                "GIT_USER",
+                "--git-email",
+                "GIT_EMAIL",
+                "--organisation",
+                "ORG",
+                "--repository-name",
+                "REPO",
+                "--pr-id",
+                "4711",
+            ]
+        )
+        self.assertEqual(cli.command, "create-pr-preview")
+
+        self.assertEqual(cli.username, "USER")
+        self.assertEqual(cli.password, "PASS")
+        self.assertEqual(cli.git_user, "GIT_USER")
+        self.assertEqual(cli.git_email, "GIT_EMAIL")
+        self.assertEqual(cli.organisation, "ORG")
+        self.assertEqual(cli.repository_name, "REPO")
+        self.assertEqual(cli.pr_id, 4711)
+
+        self.assertIsNone(cli.git_provider)
+        self.assertIsNone(cli.git_provider_url)
+        self.assertIsNone(cli.parent_id)
+        self.assertFalse(cli.verbose)
+
+    def test_create_pr_preview_all_args(self):
+        cli = create_cli(
+            [
+                "create-pr-preview",
+                "--username",
+                "USER",
+                "--password",
+                "PASS",
+                "--git-user",
+                "GIT_USER",
+                "--git-email",
+                "GIT_EMAIL",
+                "--git-provider",
+                "GIT_PROVIDER",
+                "--git-provider-url",
+                "GIT_PROVIDER_URL",
+                "--organisation",
+                "ORG",
+                "--repository-name",
+                "REPO",
+                "--pr-id",
+                "4711",
+                "--parent-id",
+                "42",
+                "-v",
+            ]
+        )
+        self.assertEqual(cli.command, "create-pr-preview")
 
         self.assertEqual(cli.username, "USER")
         self.assertEqual(cli.password, "PASS")
@@ -502,8 +684,6 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(cli.git_provider, "GIT_PROVIDER")
         self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.create_pr)
-        self.assertTrue(cli.auto_merge)
         self.assertTrue(cli.verbose)
 
     def test_delete_preview_no_args(self):
@@ -540,8 +720,8 @@ class CliParserTest(unittest.TestCase):
                 "ORG",
                 "--repository-name",
                 "REPO",
-                "--branch",
-                "BRANCH",
+                "--preview-id",
+                "abc123",
             ]
         )
         self.assertEqual(cli.command, "delete-preview")
@@ -552,12 +732,10 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(cli.git_email, "GIT_EMAIL")
         self.assertEqual(cli.organisation, "ORG")
         self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.branch, "BRANCH")
+        self.assertEqual(cli.preview_id, "abc123")
 
         self.assertIsNone(cli.git_provider)
         self.assertIsNone(cli.git_provider_url)
-        self.assertFalse(cli.create_pr)
-        self.assertFalse(cli.auto_merge)
         self.assertFalse(cli.verbose)
 
     def test_delete_preview_all_args(self):
@@ -580,12 +758,8 @@ class CliParserTest(unittest.TestCase):
                 "ORG",
                 "--repository-name",
                 "REPO",
-                "--branch",
-                "BRANCH",
-                "--create-pr",
-                "tRue",
-                "--auto-merge",
-                "y",
+                "--preview-id",
+                "abc123",
                 "-v",
                 "n",
             ]
@@ -598,12 +772,102 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(cli.git_email, "GIT_EMAIL")
         self.assertEqual(cli.organisation, "ORG")
         self.assertEqual(cli.repository_name, "REPO")
+        self.assertEqual(cli.preview_id, "abc123")
+
+        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
+        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertFalse(cli.verbose)
+
+    def test_delete_pr_preview_no_args(self):
+        exit_code, stdout, stderr = self._capture_create_cli(["delete-pr-preview"])
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
+
+    def test_delete_pr_preview_help(self):
+        exit_code, stdout, stderr = self._capture_create_cli(["delete-pr-preview", "--help"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
+        self.assertEqual("", stderr)
+
+    def test_delete_pr_preview_help_shortcut(self):
+        exit_code, stdout, stderr = self._capture_create_cli(["delete-pr-preview", "--help"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
+        self.assertEqual("", stderr)
+
+    def test_delete_pr_preview_required_args(self):
+        cli = create_cli(
+            [
+                "delete-pr-preview",
+                "--username",
+                "USER",
+                "--password",
+                "PASS",
+                "--git-user",
+                "GIT_USER",
+                "--git-email",
+                "GIT_EMAIL",
+                "--organisation",
+                "ORG",
+                "--repository-name",
+                "REPO",
+                "--branch",
+                "BRANCH",
+            ]
+        )
+        self.assertEqual(cli.command, "delete-pr-preview")
+
+        self.assertEqual(cli.username, "USER")
+        self.assertEqual(cli.password, "PASS")
+        self.assertEqual(cli.git_user, "GIT_USER")
+        self.assertEqual(cli.git_email, "GIT_EMAIL")
+        self.assertEqual(cli.organisation, "ORG")
+        self.assertEqual(cli.repository_name, "REPO")
+        self.assertEqual(cli.branch, "BRANCH")
+
+        self.assertIsNone(cli.git_provider)
+        self.assertIsNone(cli.git_provider_url)
+        self.assertFalse(cli.verbose)
+
+    def test_delete_pr_preview_all_args(self):
+        cli = create_cli(
+            [
+                "delete-pr-preview",
+                "--username",
+                "USER",
+                "--password",
+                "PASS",
+                "--git-user",
+                "GIT_USER",
+                "--git-email",
+                "GIT_EMAIL",
+                "--git-provider",
+                "GIT_PROVIDER",
+                "--git-provider-url",
+                "GIT_PROVIDER_URL",
+                "--organisation",
+                "ORG",
+                "--repository-name",
+                "REPO",
+                "--branch",
+                "BRANCH",
+                "-v",
+                "n",
+            ]
+        )
+        self.assertEqual(cli.command, "delete-pr-preview")
+
+        self.assertEqual(cli.username, "USER")
+        self.assertEqual(cli.password, "PASS")
+        self.assertEqual(cli.git_user, "GIT_USER")
+        self.assertEqual(cli.git_email, "GIT_EMAIL")
+        self.assertEqual(cli.organisation, "ORG")
+        self.assertEqual(cli.repository_name, "REPO")
         self.assertEqual(cli.branch, "BRANCH")
 
         self.assertEqual(cli.git_provider, "GIT_PROVIDER")
         self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.create_pr)
-        self.assertTrue(cli.auto_merge)
         self.assertFalse(cli.verbose)
 
     def test_deploy_no_args(self):

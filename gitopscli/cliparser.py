@@ -70,7 +70,7 @@ def __add_pr_comment_command_parser(subparsers):
 
 
 def __add_create_preview_command_parser(subparsers):
-    add_create_preview_common_p = subparsers.add_parser("create-preview-common", help="Create a preview environment")
+    add_create_preview_common_p = subparsers.add_parser("create-preview", help="Create a preview environment")
     __add_git_parser_args(add_create_preview_common_p)
     __add_create_githash_previewid_parser(add_create_preview_common_p)
     __add_verbose_parser(add_create_preview_common_p)
@@ -131,7 +131,10 @@ def __add_branch_pr_parser_args(deploy_p):
 
 def __add_create_githash_previewid_parser(subparsers):
     subparsers.add_argument("--git-hash", help="the git hash which should be deployed", type=str, required=True)
-    subparsers.add_argument("--preview-id", help="the id of folder in the config repo which will be created", type=str, required=True)
+    subparsers.add_argument(
+        "--preview-id",
+        help="the id of folder in the config repo which will be created", type=str, required=True
+    )
 
 def __add_create_prid_parser(subparsers):
     subparsers.add_argument("--pr-id", help="the id of the pull request", type=int, required=True)

@@ -5,10 +5,6 @@ import shutil
 import uuid
 
 from gitopscli.git.create_git import create_git
-from gitopscli.yaml.gitops_config import GitOpsConfig
-from gitopscli.yaml.yaml_util import update_yaml_file
-from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.create_preview import create_preview_command
 from gitopscli.commands.create_preview import create_preview_command
 
 # pylint: disable=too-many-statements
@@ -52,7 +48,6 @@ def create_pr_preview_command(
         preview_id = hashlib.sha256(pr_branch.encode("utf-8")).hexdigest()[:8]
         git_hash = apps_git.get_last_commit_hash()
         create_preview_command(
-            command,
             username,
             password,
             git_user,
@@ -63,16 +58,16 @@ def create_pr_preview_command(
             git_provider_url,
             git_hash,
             preview_id,
-            deploymentReplaced(parent_id, pr_id),
-            deploymentExist(parent_id, pr_id, pr_branch),
-            deploymentNew(parent_id, pr_id, pr_branch)
+            deployment_replaced(parent_id, pr_id),
+            deployment_exist(parent_id, pr_id, pr_branch),
+            deployment_new(parent_id, pr_id, pr_branch)
         )
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)
         shutil.rmtree(root_tmp_dir, ignore_errors=True)
 
 
-def deploymentReplaced(parent_id, pr_id):
+def deployment_replaced(parent_id, pr_id):
     def inner_func(apps_git, new_image_tag):
         logging.info("The image tag %s has already been deployed. Doing nothing.", new_image_tag)
         pr_comment_text = f"""
@@ -83,7 +78,7 @@ def deploymentReplaced(parent_id, pr_id):
 
     return inner_func
 
-def deploymentNew(parent_id, pr_id, pr_branch):
+def deployment_new(parent_id, pr_id, pr_branch):
     def inner_func(apps_git, gitops_config, route_host):
         pr_comment_text = f"""
         New preview environment for `{gitops_config.application_name}` and branch `{pr_branch}` created successfully. Access it here:
@@ -94,7 +89,7 @@ def deploymentNew(parent_id, pr_id, pr_branch):
 
     return inner_func
 
-def deploymentExist(parent_id, pr_id, pr_branch):
+def deployment_exist(parent_id, pr_id, pr_branch):
     def inner_func(apps_git, gitops_config, route_host):
         pr_comment_text = f"""
         Preview environment for `{gitops_config.application_name}` and branch `{pr_branch}` updated successfully. Access it here:

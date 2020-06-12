@@ -1,4 +1,3 @@
-import hashlib
 import logging
 import os
 import uuid
@@ -69,7 +68,9 @@ def delete_preview_command(
             shutil.rmtree(root_git.get_full_file_path(preview_folder_name), ignore_errors=True)
         else:
             raise GitOpsException(f"There was no preview with name: {preview_folder_name}")
-        root_git.commit(f"Delete preview environment for '{gitops_config.application_name}' and preview id '{preview_id}'.")
+        root_git.commit(
+            f"Delete preview environment for '{gitops_config.application_name}' and preview id '{preview_id}'."
+        )
         root_git.push(config_branch)
         logging.info("Pushed branch %s", config_branch)
 
