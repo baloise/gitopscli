@@ -14,19 +14,19 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 def create_preview_command(
-        username,
-        password,
-        git_user,
-        git_email,
-        organisation,
-        repository_name,
-        git_provider,
-        git_provider_url,
-        git_hash,
-        preview_id,
-        deployment_replaced_callback=None,
-        deployment_exists_callback=None,
-        deployment_new_callback=None,
+    username,
+    password,
+    git_user,
+    git_email,
+    organisation,
+    repository_name,
+    git_provider,
+    git_provider_url,
+    git_hash,
+    preview_id,
+    deployment_replaced_callback=None,
+    deployment_exists_callback=None,
+    deployment_new_callback=None,
 ):
     apps_tmp_dir = create_tmp_dir()
     root_tmp_dir = create_tmp_dir()
@@ -122,14 +122,14 @@ def create_preview_command(
 
 
 def __replace_value(
-        gitops_config,
-        new_image_tag,
-        new_preview_folder_name,
-        replacement,
-        root_git,
-        route_host,
-        shortened_branch_hash,
-        value_replaced,
+    gitops_config,
+    new_image_tag,
+    new_preview_folder_name,
+    replacement,
+    root_git,
+    route_host,
+    shortened_branch_hash,
+    value_replaced,
 ):
     replacement_value = None
     logging.info("Replacement: %s", replacement)
@@ -154,7 +154,7 @@ def __replace_value(
 
 
 def __create_new_preview_env(
-        git_hash, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
+    git_hash, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
 ):
     shutil.copytree(
         root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
