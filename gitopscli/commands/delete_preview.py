@@ -79,10 +79,3 @@ def delete_preview_command(
     finally:
         delete_tmp_dir(apps_tmp_dir)
         delete_tmp_dir(root_tmp_dir)
-
-
-def __create_tmp_dir():
-    tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-    os.makedirs(tmp_dir)
-    logging.info("Created directory %s", tmp_dir)
-    return tmp_dir

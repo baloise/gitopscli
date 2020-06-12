@@ -24,7 +24,7 @@ def create_preview_command(
     git_provider_url,
     git_hash,
     preview_id,
-    deployment_replaced_callback=None,
+    deployment_already_up_to_date_callback=None,
     deployment_exists_callback=None,
     deployment_new_callback=None,
 ):
@@ -86,14 +86,13 @@ def create_preview_command(
                 root_git,
                 gitops_config.application_name,
             )
-        new_image_tag = apps_git.get_last_commit_hash()
-        logging.info("Using image tag from last app repo commit: %s", new_image_tag)
+        logging.info("Using image tag from last app repo commit: %s", git_hash)
         route_host = None
         value_replaced = False
         for replacement in gitops_config.replacements:
             route_host, value_replaced = __replace_value(
                 gitops_config,
-                new_image_tag,
+                git_hash,
                 new_preview_folder_name,
                 replacement,
                 root_git,
@@ -102,8 +101,8 @@ def create_preview_command(
                 value_replaced,
             )
         if not value_replaced:
-            if deployment_replaced_callback:
-                deployment_replaced_callback(apps_git, new_image_tag)
+            if deployment_already_up_to_date_callback:
+                deployment_already_up_to_date_callback(apps_git, git_hash)
             return
 
         if branch_preview_env_already_exist:
