@@ -1,14 +1,12 @@
 import hashlib
 import logging
 import os
-import uuid
 import shutil
 
 from gitopscli.git.create_git import create_git
+from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io.gitops_config import GitOpsConfig
 from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
-from gitopscli.gitops_exception import GitOpsException
-
 
 def delete_preview_command(
     command,
