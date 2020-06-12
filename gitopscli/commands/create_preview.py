@@ -97,7 +97,7 @@ def create_preview_command(
                 replacement,
                 root_git,
                 route_host,
-                preview_id,
+                hashed_preview_id,
                 value_replaced,
             )
         if not value_replaced:
