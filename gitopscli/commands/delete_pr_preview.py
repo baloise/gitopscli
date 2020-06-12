@@ -1,18 +1,18 @@
 import hashlib
 import logging
 import os
-import uuid
 import shutil
+import uuid
 
+from gitopscli.commands import delete_preview_command
 from gitopscli.git.create_git import create_git
-from gitopscli.io.gitops_config import GitOpsConfig
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
+from gitopscli.yaml.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 
 
-def delete_preview_command(
+def delete_pr_preview_command(
     command,
-    git_hash,
+    branch,
     username,
     password,
     git_user,
@@ -21,12 +21,11 @@ def delete_preview_command(
     repository_name,
     git_provider,
     git_provider_url,
-    preview_id
 ):
-    assert command == "delete-preview"
+    assert command == "delete-pr-preview"
 
-    apps_tmp_dir = create_tmp_dir()
-    root_tmp_dir = create_tmp_dir()
+    apps_tmp_dir = __create_tmp_dir()
+    root_tmp_dir = __create_tmp_dir()
 
     try:
         apps_git = create_git(
@@ -41,8 +40,10 @@ def delete_preview_command(
             apps_tmp_dir,
         )
 
-        apps_git.checkout("master")
-        logging.info("App repo branch master checkout successful")
+        apps_git.checkout(branch)
+        git_hash = apps_git.get_last_commit_hash()
+        preview_id = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
+        logging.info("App repo branch %s checkout successful", branch)
         try:
             gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         except FileNotFoundError as ex:
@@ -62,18 +63,20 @@ def delete_preview_command(
         )
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
-        config_branch = "master"
-        preview_folder_name = gitops_config.application_name + "-" + preview_id + "-preview"
-        logging.info("Preview folder name: %s", preview_folder_name)
-        branch_preview_env_exists = os.path.exists(root_git.get_full_file_path(preview_folder_name))
-        logging.info("Is preview env already existing for branch? %s", branch_preview_env_exists)
-        if branch_preview_env_exists:
-            shutil.rmtree(root_git.get_full_file_path(preview_folder_name), ignore_errors=True)
-        else:
-            raise GitOpsException(f"There was no preview with name: {preview_folder_name}")
-        root_git.commit(f"Delete preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.")
-        root_git.push(config_branch)
-        logging.info("Pushed branch %s", config_branch)
+
+        delete_preview_command(
+            command,
+            git_hash,
+            username,
+            password,
+            git_user,
+            git_email,
+            organisation,
+            repository_name,
+            git_provider,
+            git_provider_url,
+            preview_id
+        )
 
     finally:
         shutil.rmtree(apps_tmp_dir, ignore_errors=True)

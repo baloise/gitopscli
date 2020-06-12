@@ -11,6 +11,7 @@ from gitopscli.commands import (
     deploy_command,
     sync_apps_command,
     version_command,
+    delete_pr_preview_command,
 )
 from gitopscli.gitops_exception import GitOpsException
 
@@ -31,6 +32,8 @@ def main():
         command = create_pr_preview_command
     elif args.command == "create-preview":
         command = create_preview_command
+    elif args.command == "delete-pr-preview":
+        command = delete_pr_preview_command
     elif args.command == "delete-preview":
         command = delete_preview_command
     elif args.command == "version":
