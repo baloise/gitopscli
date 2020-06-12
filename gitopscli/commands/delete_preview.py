@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 import uuid
@@ -60,7 +61,8 @@ def delete_preview_command(
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
         config_branch = "master"
-        preview_folder_name = gitops_config.application_name + "-" + preview_id + "-preview"
+        hashed_preview_id = hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
+        preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
         logging.info("Preview folder name: %s", preview_folder_name)
         branch_preview_env_exists = os.path.exists(root_git.get_full_file_path(preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_exists)

@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 import shutil
@@ -8,25 +9,25 @@ from gitopscli.io.yaml_util import update_yaml_file
 from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
+
 # pylint: disable=too-many-statements
 
 
 def create_preview_command(
-    username,
-    password,
-    git_user,
-    git_email,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
-    git_hash,
-    preview_id,
-    deployment_replaced=None,
-    deployment_exists=None,
-    deployment_new=None,
+        username,
+        password,
+        git_user,
+        git_email,
+        organisation,
+        repository_name,
+        git_provider,
+        git_provider_url,
+        git_hash,
+        preview_id,
+        deployment_replaced_callback=None,
+        deployment_exists_callback=None,
+        deployment_new_callback=None,
 ):
-
     apps_tmp_dir = create_tmp_dir()
     root_tmp_dir = create_tmp_dir()
 
@@ -72,7 +73,8 @@ def create_preview_command(
         else:
             raise GitOpsException(f"The preview template folder does not exist: {preview_template_folder_name}")
 
-        new_preview_folder_name = gitops_config.application_name + "-" + preview_id + "-preview"
+        hashed_preview_id = hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
+        new_preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
         logging.info("New folder for preview: %s", new_preview_folder_name)
         branch_preview_env_already_exist = os.path.isdir(root_git.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
@@ -100,16 +102,16 @@ def create_preview_command(
                 value_replaced,
             )
         if not value_replaced:
-            if deployment_replaced:
-                deployment_replaced(apps_git, new_image_tag)
+            if deployment_replaced_callback:
+                deployment_replaced_callback(apps_git, new_image_tag)
             return
 
         if branch_preview_env_already_exist:
-            if deployment_exists:
-                deployment_exists(apps_git, gitops_config, route_host)
+            if deployment_exists_callback:
+                deployment_exists_callback(apps_git, gitops_config, route_host)
         else:
-            if deployment_new:
-                deployment_new(apps_git, gitops_config, route_host)
+            if deployment_new_callback:
+                deployment_new_callback(apps_git, gitops_config, route_host)
 
         root_git.commit(f"Update preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.")
         root_git.push(config_branch)
@@ -120,14 +122,14 @@ def create_preview_command(
 
 
 def __replace_value(
-    gitops_config,
-    new_image_tag,
-    new_preview_folder_name,
-    replacement,
-    root_git,
-    route_host,
-    shortened_branch_hash,
-    value_replaced,
+        gitops_config,
+        new_image_tag,
+        new_preview_folder_name,
+        replacement,
+        root_git,
+        route_host,
+        shortened_branch_hash,
+        value_replaced,
 ):
     replacement_value = None
     logging.info("Replacement: %s", replacement)
@@ -152,7 +154,7 @@ def __replace_value(
 
 
 def __create_new_preview_env(
-    git_hash, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
+        git_hash, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
 ):
     shutil.copytree(
         root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
