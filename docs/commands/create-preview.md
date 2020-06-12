@@ -100,7 +100,7 @@ optional arguments:
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
   --git-hash GIT_HASH         the git hash of the app repo which should be deployed
-  --preview-id PREVIEW_ID         the id of the created preview environment folder in the config repo
+  --preview-id PREVIEW_ID         the id of the created preview environment
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```
