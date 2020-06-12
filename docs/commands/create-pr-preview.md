@@ -1,6 +1,6 @@
-# create-preview-common
+# create-preview
 
-The `create-preview-common` command can be used to create a preview environment in your *deployment config repository* for a pull request in you *app repository*. You can later easily delete this preview with the [`delete-preview` command](/gitopscli/commands/delete-preview/).
+The `create-pr-preview` command can be used to create a preview environment in your *deployment config repository* for a pull request of your *app repository*. You can later easily delete this preview with the [`delete-preview` command](/gitopscli/commands/delete-preview/).
 
 You need to provide some additional configuration files in your repositories for this command to work. 
 
@@ -61,7 +61,7 @@ previewConfig:
 ## Example
 
 ```bash
-gitopscli create-preview-common \
+gitopscli create-preview \
   --git-provider-url https://bitbucket.baloise.dev \
   --username $GIT_USERNAME \
   --password $GIT_PASSWORD \
@@ -76,13 +76,12 @@ gitopscli create-preview-common \
 
 ## Usage
 ```
-usage: gitopscli create-preview-common [-h] --username USERNAME --password PASSWORD
+usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] --pr-id PR_ID
+                                --pr-id PR_ID
                                 [--parent-id PARENT_ID] [-v [VERBOSE]]
 
 optional arguments:
@@ -101,11 +100,6 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --create-pr [CREATE_PR]
-                        Creates a Pull Request
-  --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
   --pr-id PR_ID         the id of the pull request
   --parent-id PARENT_ID
                         the id of the parent comment, in case of a reply

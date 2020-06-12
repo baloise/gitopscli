@@ -4,7 +4,6 @@ import sys
 from gitopscli.cliparser import create_cli
 from gitopscli.commands import (
     pr_comment_command,
-    create_preview_common_command,
     create_pr_preview_command,
     create_preview_command,
     delete_preview_command,
@@ -26,8 +25,6 @@ def main():
         command = sync_apps_command
     elif args.command == "add-pr-comment":
         command = pr_comment_command
-    elif args.command == "create-preview-common":
-        command = create_preview_common_command
     elif args.command == "create-pr-preview":
         command = create_pr_preview_command
     elif args.command == "create-preview":

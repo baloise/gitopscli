@@ -1,6 +1,6 @@
 # create-preview
 
-The `create-preview` command can be used to create a preview environment in your *deployment config repository* for a pull request in you *app repository*. You can later easily delete this preview with the [`delete-preview` command](/gitopscli/commands/delete-preview/).
+The `create-preview` command can be used to create a preview environment in your *deployment config repository* for a commit hash of your *app repository*. You can later easily delete this preview with the [`delete-preview` command](/gitopscli/commands/delete-preview/).
 
 You need to provide some additional configuration files in your repositories for this command to work. 
 
@@ -69,9 +69,8 @@ gitopscli create-preview \
   --git-email "gitopscli@baloise.dev" \
   --organisation "my-team" \
   --repository-name "app-xy" \
-  --pr-id 4711 \
-  --create-pr \
-  --auto-merge
+  --git-hash "c0784a34e834117e1489973327ff4ff3c2582b94" \
+  --preview-id "test-preview-id" \
 ```
 
 ## Usage
@@ -81,9 +80,8 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] --pr-id PR_ID
-                                [--parent-id PARENT_ID] [-v [VERBOSE]]
+                                --preview-id PREVIEW_ID
+                                [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -101,14 +99,8 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --create-pr [CREATE_PR]
-                        Creates a Pull Request
-  --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
-  --pr-id PR_ID         the id of the pull request
-  --parent-id PARENT_ID
-                        the id of the parent comment, in case of a reply
+  --git-hash GIT_HASH         the git hash of the app repo which should be deployed
+  --preview-id PREVIEW_ID         the id of the created preview environment folder in the config repo
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```

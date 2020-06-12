@@ -1,6 +1,6 @@
 # delete-preview
 
-The `delete-preview` command can be used to delete a preview previously created with the [`create-preview` command](/gitopscli/commands/create-preview/). Please refer to `create-preview` documentation for the needed configuration files.
+The `delete-pr-preview` command can be used to delete a preview previously created with the [`create-pr-preview` command](/gitopscli/commands/create-pr-preview/). Please refer to `create-pr-preview` documentation for the needed configuration files.
 
 ## Example
 
@@ -13,7 +13,7 @@ gitopscli delete-preview \
   --git-email "gitopscli@baloise.dev" \
   --organisation "my-team" \
   --repository-name "app-xy" \
-  --preview-id "test123" \
+  --branch "my-pr-branch" \
 ```
 
 ## Usage
@@ -22,8 +22,8 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL] --preview-id
-                                PREVIEW_ID
+                                [--git-provider-url GIT_PROVIDER_URL] --branch
+                                BRANCH
                                 [-v [VERBOSE]]
 
 optional arguments:
@@ -42,7 +42,7 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --preview-id PREVIEW_ID   The preview id for which the preview was created for
+  --branch BRANCH       The branch for which the preview was created for
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```

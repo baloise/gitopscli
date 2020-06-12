@@ -75,7 +75,7 @@ class AbstractGitUtil(ABC):
 
     @abstractmethod
     def get_clone_url(self):
-        pass
+        return f"https://{self._username}:{self._password}@github.com/{self.__get_repo().full_name}"
 
     @abstractmethod
     def create_pull_request(self, from_branch, to_branch, title, description):

@@ -41,7 +41,6 @@ def delete_pr_preview_command(
         )
 
         apps_git.checkout(branch)
-        git_hash = apps_git.get_last_commit_hash()
         preview_id = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
         logging.info("App repo branch %s checkout successful", branch)
         try:
@@ -66,7 +65,6 @@ def delete_pr_preview_command(
 
         delete_preview_command(
             command,
-            git_hash,
             username,
             password,
             git_user,

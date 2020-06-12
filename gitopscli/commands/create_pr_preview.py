@@ -9,7 +9,7 @@ from gitopscli.yaml.gitops_config import GitOpsConfig
 from gitopscli.yaml.yaml_util import update_yaml_file
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.create_preview import create_preview_command
-from gitopscli.commands.create_preview_common import create_preview_common_command
+from gitopscli.commands.create_preview import create_preview_command
 
 # pylint: disable=too-many-statements
 
@@ -51,7 +51,7 @@ def create_pr_preview_command(
         logging.info("App repo PR branch %s checkout successful", pr_branch)
         preview_id = hashlib.sha256(pr_branch.encode("utf-8")).hexdigest()[:8]
         git_hash = apps_git.get_last_commit_hash()
-        create_preview_common_command(
+        create_preview_command(
             command,
             username,
             password,
