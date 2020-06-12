@@ -1,11 +1,11 @@
-# delete-preview
+# delete-pr-preview
 
 The `delete-pr-preview` command can be used to delete a preview previously created with the [`create-pr-preview` command](/gitopscli/commands/create-pr-preview/). Please refer to `create-pr-preview` documentation for the needed configuration files.
 
 ## Example
 
 ```bash
-gitopscli delete-preview \
+gitopscli delete-pr-preview \
   --git-provider-url https://bitbucket.baloise.dev \
   --username $GIT_USERNAME \
   --password $GIT_PASSWORD \
@@ -18,7 +18,7 @@ gitopscli delete-preview \
 
 ## Usage
 ```
-usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
+usage: gitopscli delete-pr-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]

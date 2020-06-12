@@ -1,6 +1,6 @@
-# create-preview
+# create-pr-preview
 
-The `create-pr-preview` command can be used to create a preview environment in your *deployment config repository* for a pull request of your *app repository*. You can later easily delete this preview with the [`delete-preview` command](/gitopscli/commands/delete-preview/).
+The `create-pr-preview` command can be used to create a preview environment in your *deployment config repository* for a pull request of your *app repository*. You can later easily delete this preview with the [`delete-pr-preview` command](/gitopscli/commands/delete-pr-preview/).
 
 You need to provide some additional configuration files in your repositories for this command to work. 
 
@@ -9,7 +9,7 @@ You need to provide some additional configuration files in your repositories for
 
 Your *deployment config repository* needs to contain a `.preview-templates` folder with the deployment configuration templates for every application you want to use this command for.
 
-For example you have to provide `.preview-templates/app-xy` for your app `app-xy`. The `create-preview` command simply copies this directory to the root of the repository. Only image tag and route host will be replaced in the preview version of the deployment.
+For example you have to provide `.preview-templates/app-xy` for your app `app-xy`. The `create-pr-preview` command simply copies this directory to the root of the repository. Only image tag and route host will be replaced in the preview version of the deployment.
 
 ```
 deployment-config-repo/
@@ -61,7 +61,7 @@ previewConfig:
 ## Example
 
 ```bash
-gitopscli create-preview \
+gitopscli create-pr-preview \
   --git-provider-url https://bitbucket.baloise.dev \
   --username $GIT_USERNAME \
   --password $GIT_PASSWORD \
