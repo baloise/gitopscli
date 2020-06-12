@@ -24,7 +24,7 @@ def create_preview_command(
     preview_id,
     deployment_replaced=None,
     deployment_exists=None,
-    deployment_new=None
+    deployment_new=None,
 ):
 
     apps_tmp_dir = create_tmp_dir()
@@ -117,6 +117,7 @@ def create_preview_command(
     finally:
         delete_tmp_dir(apps_tmp_dir)
         delete_tmp_dir(root_tmp_dir)
+
 
 def __replace_value(
     gitops_config,

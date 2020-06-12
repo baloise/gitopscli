@@ -60,7 +60,7 @@ def create_pr_preview_command(
             preview_id,
             deployment_replaced(parent_id, pr_id),
             deployment_exist(parent_id, pr_id, pr_branch),
-            deployment_new(parent_id, pr_id, pr_branch)
+            deployment_new(parent_id, pr_id, pr_branch),
         )
     finally:
         delete_tmp_dir(apps_tmp_dir)
@@ -78,6 +78,7 @@ def deployment_replaced(parent_id, pr_id):
 
     return inner_func
 
+
 def deployment_new(parent_id, pr_id, pr_branch):
     def inner_func(apps_git, gitops_config, route_host):
         pr_comment_text = f"""
@@ -89,6 +90,7 @@ def deployment_new(parent_id, pr_id, pr_branch):
 
     return inner_func
 
+
 def deployment_exist(parent_id, pr_id, pr_branch):
     def inner_func(apps_git, gitops_config, route_host):
         pr_comment_text = f"""
@@ -99,6 +101,7 @@ def deployment_exist(parent_id, pr_id, pr_branch):
         apps_git.add_pull_request_comment(pr_id, pr_comment_text, parent_id)
 
     return inner_func
+
 
 def __create_pullrequest(branch, gitops_config, root_git):
     title = "Updated preview environment for " + gitops_config.application_name

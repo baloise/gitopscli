@@ -91,6 +91,7 @@ def __add_delete_preview_command_parser(subparsers):
     )
     __add_verbose_parser(add_delete_preview_p)
 
+
 def __add_delete_pr_preview_command_parser(subparsers):
     add_delete_preview_p = subparsers.add_parser("delete-pr-preview", help="Delete a pr preview environment")
     __add_git_parser_args(add_delete_preview_p)
@@ -129,12 +130,13 @@ def __add_branch_pr_parser_args(deploy_p):
         default=False,
     )
 
+
 def __add_create_githash_previewid_parser(subparsers):
     subparsers.add_argument("--git-hash", help="the git hash which should be deployed", type=str, required=True)
     subparsers.add_argument(
-        "--preview-id",
-        help="the id of folder in the config repo which will be created", type=str, required=True
+        "--preview-id", help="the id of folder in the config repo which will be created", type=str, required=True
     )
+
 
 def __add_create_prid_parser(subparsers):
     subparsers.add_argument("--pr-id", help="the id of the pull request", type=int, required=True)

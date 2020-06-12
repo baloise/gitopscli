@@ -73,12 +73,13 @@ def delete_pr_preview_command(
             repository_name,
             git_provider,
             git_provider_url,
-            preview_id
+            preview_id,
         )
 
     finally:
         delete_tmp_dir(apps_tmp_dir)
         delete_tmp_dir(root_tmp_dir)
+
 
 def __create_tmp_dir():
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
