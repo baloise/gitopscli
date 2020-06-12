@@ -15,6 +15,7 @@ nav:
   - CLI Commands:
     - add-pr-comment: commands/add-pr-comment.md
     - create-preview: commands/create-preview.md
+    - create-preview-common: commands/create-preview-common.md
     - delete-preview: commands/delete-preview.md
     - deploy: commands/deploy.md
     - sync-apps: commands/sync-apps.md
