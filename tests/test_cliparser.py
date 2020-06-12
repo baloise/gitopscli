@@ -135,18 +135,6 @@ usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    [--git-provider-url GIT_PROVIDER_URL]
                                    --pr-id PR_ID [--parent-id PARENT_ID]
                                    [-v [VERBOSE]]
-gitopscli create-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id
-gitpod /workspace/gitopscli $ export COLUMNS=80
-gitpod /workspace/gitopscli $ gitopscli create-pr-preview -h
-usage: gitopscli create-pr-preview [-h] --username USERNAME --password
-                                   PASSWORD [--git-user GIT_USER]
-                                   [--git-email GIT_EMAIL] --organisation
-                                   ORGANISATION --repository-name
-                                   REPOSITORY_NAME
-                                   [--git-provider GIT_PROVIDER]
-                                   [--git-provider-url GIT_PROVIDER_URL]
-                                   --pr-id PR_ID [--parent-id PARENT_ID]
-                                   [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -598,13 +586,13 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_create_pr_preview_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_create_cli(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_pr_preview_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_create_cli(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
