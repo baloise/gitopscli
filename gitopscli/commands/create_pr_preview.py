@@ -1,11 +1,11 @@
 import hashlib
 import logging
 import os
-import shutil
 import uuid
 
-from gitopscli.git.create_git import create_git
 from gitopscli.commands.create_preview import create_preview_command
+from gitopscli.git.create_git import create_git
+from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 
 # pylint: disable=too-many-statements
 
@@ -25,8 +25,8 @@ def create_pr_preview_command(
 ):
     assert command == "create-pr-preview"
 
-    apps_tmp_dir = __create_tmp_dir()
-    root_tmp_dir = __create_tmp_dir()
+    apps_tmp_dir = create_tmp_dir()
+    root_tmp_dir = create_tmp_dir()
 
     try:
         apps_git = create_git(
@@ -63,8 +63,8 @@ def create_pr_preview_command(
             deployment_new(parent_id, pr_id, pr_branch)
         )
     finally:
-        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
-        shutil.rmtree(root_tmp_dir, ignore_errors=True)
+        delete_tmp_dir(apps_tmp_dir)
+        delete_tmp_dir(root_tmp_dir)
 
 
 def deployment_replaced(parent_id, pr_id):

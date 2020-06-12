@@ -1,13 +1,13 @@
 import hashlib
 import logging
 import os
-import shutil
 import uuid
 
 from gitopscli.commands import delete_preview_command
 from gitopscli.git.create_git import create_git
-from gitopscli.yaml.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io.gitops_config import GitOpsConfig
+from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 
 
 def delete_pr_preview_command(
@@ -24,8 +24,8 @@ def delete_pr_preview_command(
 ):
     assert command == "delete-pr-preview"
 
-    apps_tmp_dir = __create_tmp_dir()
-    root_tmp_dir = __create_tmp_dir()
+    apps_tmp_dir = create_tmp_dir()
+    root_tmp_dir = create_tmp_dir()
 
     try:
         apps_git = create_git(
@@ -77,8 +77,8 @@ def delete_pr_preview_command(
         )
 
     finally:
-        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
-        shutil.rmtree(root_tmp_dir, ignore_errors=True)
+        delete_tmp_dir(apps_tmp_dir)
+        delete_tmp_dir(root_tmp_dir)
 
 def __create_tmp_dir():
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"

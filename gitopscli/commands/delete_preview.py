@@ -75,8 +75,8 @@ def delete_preview_command(
         logging.info("Pushed branch %s", config_branch)
 
     finally:
-        shutil.rmtree(apps_tmp_dir, ignore_errors=True)
-        shutil.rmtree(root_tmp_dir, ignore_errors=True)
+        delete_tmp_dir(apps_tmp_dir)
+        delete_tmp_dir(root_tmp_dir)
 
 def __create_tmp_dir():
     tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"

@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-import uuid
 
 from gitopscli.git.create_git import create_git
 from gitopscli.io.gitops_config import GitOpsConfig
