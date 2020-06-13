@@ -10,9 +10,6 @@ from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
 
-# pylint: disable=too-many-statements
-
-
 def create_preview_command(
     username,
     password,
@@ -66,7 +63,6 @@ def create_preview_command(
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
 
-        config_branch = f"master"
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
         if os.path.isdir(root_git.get_full_file_path(preview_template_folder_name)):
             logging.info("Using the preview template folder: %s", preview_template_folder_name)
@@ -76,9 +72,9 @@ def create_preview_command(
         hashed_preview_id = hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
         new_preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
         logging.info("New folder for preview: %s", new_preview_folder_name)
-        branch_preview_env_already_exist = os.path.isdir(root_git.get_full_file_path(new_preview_folder_name))
-        logging.info("Is preview env already existing for branch? %s", branch_preview_env_already_exist)
-        if not branch_preview_env_already_exist:
+        preview_env_already_exist = os.path.isdir(root_git.get_full_file_path(new_preview_folder_name))
+        logging.info("Is preview env already existing? %s", preview_env_already_exist)
+        if not preview_env_already_exist:
             __create_new_preview_env(
                 git_hash,
                 new_preview_folder_name,
@@ -86,7 +82,7 @@ def create_preview_command(
                 root_git,
                 gitops_config.application_name,
             )
-        logging.info("Using image tag from last app repo commit: %s", git_hash)
+        logging.info("Using image tag from git hash: %s", git_hash)
         route_host = None
         value_replaced = False
         for replacement in gitops_config.replacements:
@@ -101,20 +97,21 @@ def create_preview_command(
                 value_replaced,
             )
         if not value_replaced:
+            logging.info("The image tag %s has already been deployed. Doing nothing.", git_hash)
             if deployment_already_up_to_date_callback:
                 deployment_already_up_to_date_callback(apps_git, git_hash)
             return
 
-        if branch_preview_env_already_exist:
+        root_git.commit(f"Update preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.")
+        root_git.push("master")
+        logging.info("Pushed branch master")
+
+        if preview_env_already_exist:
             if deployment_exists_callback:
                 deployment_exists_callback(apps_git, gitops_config, route_host)
         else:
             if deployment_new_callback:
                 deployment_new_callback(apps_git, gitops_config, route_host)
-
-        root_git.commit(f"Update preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.")
-        root_git.push(config_branch)
-        logging.info("Pushed branch %s", config_branch)
     finally:
         delete_tmp_dir(apps_tmp_dir)
         delete_tmp_dir(root_tmp_dir)
@@ -127,7 +124,7 @@ def __replace_value(
     replacement,
     root_git,
     route_host,
-    shortened_branch_hash,
+    hashed_preview_id,
     value_replaced,
 ):
     replacement_value = None
@@ -137,7 +134,7 @@ def __replace_value(
     if replacement_variable == "GIT_COMMIT":
         replacement_value = new_image_tag
     elif replacement_variable == "ROUTE_HOST":
-        route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", shortened_branch_hash)
+        route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
         logging.info("Created route host: %s", route_host)
         replacement_value = route_host
     else:
