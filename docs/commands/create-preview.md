@@ -48,12 +48,12 @@ previewConfig:
   route:
     host:
       # Your router host
-      # {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your feature branch name
+      # {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your preview_id
       template: app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld
   replace:
     # Paths that should be replaced in the `values.yaml`
     - path: image.tag
-      variable: GIT_COMMIT # this is the latest git hash of the pull request branch
+      variable: GIT_COMMIT # this is the git hash of your app repo
     - path: route.host
       variable: ROUTE_HOST # this is the resolved host.template from above
 ```
