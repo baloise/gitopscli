@@ -1,2 +1,2 @@
 tasks:
-  - init: make init && gitopscli --help
+  - init: make init && export COLUMNS=80 && gitopscli --help

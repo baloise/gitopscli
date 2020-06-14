@@ -1,6 +1,6 @@
-# create-preview
+# create-pr-preview
 
-The `create-preview` command can be used to create a preview environment in your *deployment config repository* for a commit hash of your *app repository*. You can later easily delete this preview with the [`delete-preview` command](/gitopscli/commands/delete-preview/).
+The `create-pr-preview` command can be used to create a preview environment in your *deployment config repository* for a pull request of your *app repository*. You can later easily delete this preview with the [`delete-pr-preview` command](/gitopscli/commands/delete-pr-preview/).
 
 You need to provide some additional configuration files in your repositories for this command to work. 
 
@@ -9,7 +9,7 @@ You need to provide some additional configuration files in your repositories for
 
 Your *deployment config repository* needs to contain a `.preview-templates` folder with the deployment configuration templates for every application you want to use this command for.
 
-For example you have to provide `.preview-templates/app-xy` for your app `app-xy`. The `create-preview` command simply copies this directory to the root of the repository. Only image tag and route host will be replaced in the preview version of the deployment.
+For example you have to provide `.preview-templates/app-xy` for your app `app-xy`. The `create-pr-preview` command simply copies this directory to the root of the repository. Only image tag and route host will be replaced in the preview version of the deployment.
 
 ```
 deployment-config-repo/
@@ -48,12 +48,12 @@ previewConfig:
   route:
     host:
       # Your router host
-      # {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your preview_id
+      # {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your feature branch name
       template: app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld
   replace:
     # Paths that should be replaced in the `values.yaml`
     - path: image.tag
-      variable: GIT_COMMIT # this is the git hash of your app repo
+      variable: GIT_COMMIT # this is the latest git hash of the pull request branch
     - path: route.host
       variable: ROUTE_HOST # this is the resolved host.template from above
 ```
@@ -61,7 +61,7 @@ previewConfig:
 ## Example
 
 ```bash
-gitopscli create-preview \
+gitopscli create-pr-preview \
   --git-provider-url https://bitbucket.baloise.dev \
   --username $GIT_USERNAME \
   --password $GIT_PASSWORD \
@@ -69,19 +69,20 @@ gitopscli create-preview \
   --git-email "gitopscli@baloise.dev" \
   --organisation "my-team" \
   --repository-name "app-xy" \
-  --git-hash "c0784a34e834117e1489973327ff4ff3c2582b94" \
-  --preview-id "test-preview-id" \
+  --pr-id 4711 \
+  --create-pr \
+  --auto-merge
 ```
 
 ## Usage
 ```
-usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
+usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                --preview-id PREVIEW_ID
-                                [-v [VERBOSE]]
+                                --pr-id PR_ID
+                                [--parent-id PARENT_ID] [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -99,8 +100,9 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --git-hash GIT_HASH         the git hash of the app repo which should be deployed
-  --preview-id PREVIEW_ID         the id of the created preview environment
+  --pr-id PR_ID         the id of the pull request
+  --parent-id PARENT_ID
+                        the id of the parent comment, in case of a reply
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```

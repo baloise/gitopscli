@@ -4,11 +4,13 @@ import sys
 from gitopscli.cliparser import create_cli
 from gitopscli.commands import (
     pr_comment_command,
+    create_pr_preview_command,
     create_preview_command,
     delete_preview_command,
     deploy_command,
     sync_apps_command,
     version_command,
+    delete_pr_preview_command,
 )
 from gitopscli.gitops_exception import GitOpsException
 
@@ -17,18 +19,7 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(levelname)-2s %(funcName)s: %(message)s")
     args = create_cli(sys.argv[1:])
 
-    if args.command == "deploy":
-        command = deploy_command
-    elif args.command == "sync-apps":
-        command = sync_apps_command
-    elif args.command == "add-pr-comment":
-        command = pr_comment_command
-    elif args.command == "create-preview":
-        command = create_preview_command
-    elif args.command == "delete-preview":
-        command = delete_preview_command
-    elif args.command == "version":
-        command = version_command
+    command = get_command(args.command)
 
     if "verbose" in args:
         verbose = args.verbose
@@ -48,3 +39,24 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def get_command(command):
+    command_func = None
+    if command == "deploy":
+        command_func = deploy_command
+    elif command == "sync-apps":
+        command_func = sync_apps_command
+    elif command == "add-pr-comment":
+        command_func = pr_comment_command
+    elif command == "create-pr-preview":
+        command_func = create_pr_preview_command
+    elif command == "create-preview":
+        command_func = create_preview_command
+    elif command == "delete-pr-preview":
+        command_func = delete_pr_preview_command
+    elif command == "delete-preview":
+        command_func = delete_preview_command
+    elif command == "version":
+        command_func = version_command
+    return command_func
