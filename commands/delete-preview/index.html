@@ -352,6 +352,18 @@
           
           
 
+
+  <li class="md-nav__item">
+    <a href="../create-pr-preview/" title="create-pr-preview" class="md-nav__link">
+      create-pr-preview
+    </a>
+  </li>
+
+        
+          
+          
+          
+
   
 
 
@@ -402,6 +414,18 @@
   
 </nav>
     
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../delete-pr-preview/" title="delete-pr-preview" class="md-nav__link">
+      delete-pr-preview
+    </a>
   </li>
 
         
@@ -546,9 +570,7 @@
   --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
   --organisation <span class="s2">&quot;my-team&quot;</span> <span class="se">\</span>
   --repository-name <span class="s2">&quot;app-xy&quot;</span> <span class="se">\</span>
-  --branch <span class="s2">&quot;my-pr-branch&quot;</span> <span class="se">\</span>
-  --create-pr <span class="se">\</span>
-  --auto-merge
+  --preview-id <span class="s2">&quot;test123&quot;</span> <span class="se">\</span>
 </code></pre></div>
 
 
@@ -557,9 +579,9 @@
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL] --branch
-                                BRANCH [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] [-v [VERBOSE]]
+                                [--git-provider-url GIT_PROVIDER_URL] --preview-id
+                                PREVIEW_ID
+                                [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -577,12 +599,7 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --branch BRANCH       The branch for which the preview was created for
-  --create-pr [CREATE_PR]
-                        Creates a Pull Request
-  --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
+  --preview-id PREVIEW_ID   The preview id for which the preview was created for
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 </code></pre></div>
@@ -607,7 +624,7 @@ optional arguments:
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../create-preview/" title="create-preview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../create-pr-preview/" title="create-pr-preview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -616,19 +633,19 @@ optional arguments:
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                create-preview
+                create-pr-preview
               </span>
             </div>
           </a>
         
         
-          <a href="../deploy/" title="deploy" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../delete-pr-preview/" title="delete-pr-preview" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                deploy
+                delete-pr-preview
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

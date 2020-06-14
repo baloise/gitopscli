@@ -426,8 +426,32 @@
 
 
   <li class="md-nav__item">
+    <a href="../create-pr-preview/" title="create-pr-preview" class="md-nav__link">
+      create-pr-preview
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../delete-preview/" title="delete-preview" class="md-nav__link">
       delete-preview
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../delete-pr-preview/" title="delete-pr-preview" class="md-nav__link">
+      delete-pr-preview
     </a>
   </li>
 
@@ -590,7 +614,7 @@
                 
                 
                 <h1 id="create-preview">create-preview<a class="headerlink" href="#create-preview" title="Permanent link">&para;</a></h1>
-<p>The <code>create-preview</code> command can be used to create a preview environment in your <em>deployment config repository</em> for a pull request in you <em>app repository</em>. You can later easily delete this preview with the <a href="/gitopscli/commands/delete-preview/"><code>delete-preview</code> command</a>.</p>
+<p>The <code>create-preview</code> command can be used to create a preview environment in your <em>deployment config repository</em> for a commit hash of your <em>app repository</em>. You can later easily delete this preview with the <a href="/gitopscli/commands/delete-preview/"><code>delete-preview</code> command</a>.</p>
 <p>You need to provide some additional configuration files in your repositories for this command to work. </p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <h3 id="preview-templates">Preview Templates<a class="headerlink" href="#preview-templates" title="Permanent link">&para;</a></h3>
@@ -632,12 +656,12 @@
   <span class="nt">route</span><span class="p">:</span>
     <span class="nt">host</span><span class="p">:</span>
       <span class="c1"># Your router host</span>
-      <span class="c1"># {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your feature branch name</span>
+      <span class="c1"># {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your preview_id</span>
       <span class="nt">template</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld</span>
   <span class="nt">replace</span><span class="p">:</span>
     <span class="c1"># Paths that should be replaced in the `values.yaml`</span>
     <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">image.tag</span>
-      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span> <span class="c1"># this is the latest git hash of the pull request branch</span>
+      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span> <span class="c1"># this is the git hash of your app repo</span>
     <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
       <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span> <span class="c1"># this is the resolved host.template from above</span>
 </code></pre></div>
@@ -652,9 +676,8 @@
   --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
   --organisation <span class="s2">&quot;my-team&quot;</span> <span class="se">\</span>
   --repository-name <span class="s2">&quot;app-xy&quot;</span> <span class="se">\</span>
-  --pr-id <span class="m">4711</span> <span class="se">\</span>
-  --create-pr <span class="se">\</span>
-  --auto-merge
+  --git-hash <span class="s2">&quot;c0784a34e834117e1489973327ff4ff3c2582b94&quot;</span> <span class="se">\</span>
+  --preview-id <span class="s2">&quot;test-preview-id&quot;</span> <span class="se">\</span>
 </code></pre></div>
 
 
@@ -664,9 +687,8 @@
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                [--create-pr [CREATE_PR]]
-                                [--auto-merge [AUTO_MERGE]] --pr-id PR_ID
-                                [--parent-id PARENT_ID] [-v [VERBOSE]]
+                                --preview-id PREVIEW_ID
+                                [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -684,14 +706,8 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --create-pr [CREATE_PR]
-                        Creates a Pull Request
-  --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
-  --pr-id PR_ID         the id of the pull request
-  --parent-id PARENT_ID
-                        the id of the parent comment, in case of a reply
+  --git-hash GIT_HASH         the git hash of the app repo which should be deployed
+  --preview-id PREVIEW_ID         the id of the created preview environment
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 </code></pre></div>
@@ -731,13 +747,13 @@ optional arguments:
           </a>
         
         
-          <a href="../delete-preview/" title="delete-preview" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../create-pr-preview/" title="create-pr-preview" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                delete-preview
+                create-pr-preview
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
