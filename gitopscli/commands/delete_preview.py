@@ -22,6 +22,8 @@ def delete_preview_command(
     preview_id,
 ):
 
+    assert command is not None
+
     apps_tmp_dir = create_tmp_dir()
     root_tmp_dir = create_tmp_dir()
 
