@@ -11,6 +11,7 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 def create_preview_command(
+    command,
     username,
     password,
     git_user,
