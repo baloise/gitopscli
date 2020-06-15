@@ -26,6 +26,9 @@ def create_preview_command(
     deployment_exists_callback=None,
     deployment_new_callback=None,
 ):
+
+    assert command is not None
+
     apps_tmp_dir = create_tmp_dir()
     root_tmp_dir = create_tmp_dir()
 
