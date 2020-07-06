@@ -41,6 +41,7 @@ def create_pr_preview_command(
         logging.info("App repo PR branch %s checkout successful", pr_branch)
         git_hash = apps_git.get_last_commit_hash()
         create_preview_command(
+            command,
             username,
             password,
             git_user,
