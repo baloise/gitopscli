@@ -1,4 +1,3 @@
-import hashlib
 import logging
 import os
 import uuid
@@ -41,7 +40,6 @@ def delete_pr_preview_command(
         )
 
         apps_git.checkout(branch)
-        preview_id = hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
         logging.info("App repo branch %s checkout successful", branch)
         try:
             gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
@@ -73,7 +71,7 @@ def delete_pr_preview_command(
             repository_name,
             git_provider,
             git_provider_url,
-            preview_id,
+            branch,
         )
 
     finally:
