@@ -229,11 +229,12 @@ class DeployCommandTest(unittest.TestCase):
             git_email="GIT_EMAIL",
             create_pr=False,
             auto_merge=False,
-            commit_message="testcommit",
+            single_commit=False,
             organisation="ORGA",
             repository_name="REPO",
             git_provider="github",
             git_provider_url=None,
+            commit_message="testcommit",
         )
 
         assert self.mock_manager.mock_calls == [

@@ -50,7 +50,7 @@ def deploy_command(
             git.new_branch(config_branch)
             logging.info("Created branch %s", config_branch)
 
-        updated_values = __update_values(git, file, values, single_commit)
+        updated_values = __update_values(git, file, values, single_commit, commit_message)
         if not updated_values:
             logging.info("All values already up-to-date. I'm done here")
             return

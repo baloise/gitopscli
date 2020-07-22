@@ -46,11 +46,7 @@ def __add_deploy_command_parser(subparsers):
         default=False,
     )
     deploy_p.add_argument(
-        "--commit-message",
-        help="Specify exact commit message of deployment commit",
-        type=str,
-        required=False,
-        default=None,
+        "--commit-message", help="Specify exact commit message of deployment commit", type=str, default=None,
     )
 
     __add_git_parser_args(deploy_p)
