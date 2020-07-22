@@ -218,6 +218,43 @@ class DeployCommandTest(unittest.TestCase):
             call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]
 
+    def test_commit_message_happy_flow(self):
+        deploy_command(
+            command="deploy",
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            commit_message="testcommit",
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider="github",
+            git_provider_url=None,
+        )
+
+        assert self.mock_manager.mock_calls == [
+            call.create_tmp_dir(),
+            call.create_git(
+                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
+            ),
+            call.git_util.checkout("master"),
+            call.logging.info("Master checkout successful"),
+            call.git_util.get_full_file_path("test/file.yml"),
+            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
+            call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
+            call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
+            call.git_util.commit("testcommit"),
+            call.git_util.push("master"),
+            call.logging.info("Pushed branch %s", "master"),
+            call.delete_tmp_dir("/tmp/created-tmp-dir"),
+        ]
+
     def test_checkout_error(self):
         checkout_exception = GitOpsException("dummy checkout error")
         self.git_util_mock.checkout.side_effect = checkout_exception
