@@ -244,7 +244,8 @@ optional arguments:
 
 EXPECTED_DEPLOY_NO_ARGS_ERROR = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
-                        [--single-commit [SINGLE_COMMIT]] --username USERNAME
+                        [--single-commit [SINGLE_COMMIT]]
+                        [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
                         [--git-email GIT_EMAIL] --organisation ORGANISATION
                         --repository-name REPOSITORY_NAME
@@ -257,7 +258,8 @@ gitopscli deploy: error: the following arguments are required: --file, --values,
 
 EXPECTED_DEPLOY_HELP = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
-                        [--single-commit [SINGLE_COMMIT]] --username USERNAME
+                        [--single-commit [SINGLE_COMMIT]]
+                        [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
                         [--git-email GIT_EMAIL] --organisation ORGANISATION
                         --repository-name REPOSITORY_NAME
@@ -273,6 +275,8 @@ optional arguments:
                         desired value as value
   --single-commit [SINGLE_COMMIT]
                         Create only single commit for all updates
+  --commit-message COMMIT_MESSAGE
+                        Specify exact commit message of deployment commit
   --username USERNAME   Git username
   --password PASSWORD   Git password or token
   --git-user GIT_USER   Git Username

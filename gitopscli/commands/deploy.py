@@ -23,6 +23,7 @@ def deploy_command(
     repository_name,
     git_provider,
     git_provider_url,
+    commit_message=None,
 ):
     assert command == "deploy"
 
@@ -49,7 +50,7 @@ def deploy_command(
             git.new_branch(config_branch)
             logging.info("Created branch %s", config_branch)
 
-        updated_values = __update_values(git, file, values, single_commit)
+        updated_values = __update_values(git, file, values, single_commit, commit_message)
         if not updated_values:
             logging.info("All values already up-to-date. I'm done here")
             return
@@ -63,7 +64,7 @@ def deploy_command(
         __create_pr(git, config_branch, file, updated_values, auto_merge)
 
 
-def __update_values(git, file, values, single_commit):
+def __update_values(git, file, values, single_commit, commit_message):
     full_file_path = git.get_full_file_path(file)
     if not os.path.isfile(full_file_path):
         raise GitOpsException(f"No such file: {file}")
@@ -81,10 +82,10 @@ def __update_values(git, file, values, single_commit):
         logging.info("Updated yaml property %s to %s", key, value)
         updated_values[key] = value
 
-        if not single_commit:
+        if not single_commit and commit_message is None:
             git.commit(f"changed '{key}' to '{value}' in {file}")
 
-    if updated_values and single_commit:
+    if updated_values and single_commit and commit_message is None:
         if len(updated_values) == 1:
             key, value = list(updated_values.items())[0]
             git.commit(f"changed '{key}' to '{value}' in {file}")
@@ -92,6 +93,9 @@ def __update_values(git, file, values, single_commit):
             msg = f"updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in {file}"
             msg += f"\n\n{yaml_dump(updated_values)}"
             git.commit(msg)
+
+    if updated_values and commit_message is not None:
+        git.commit(commit_message)
 
     return updated_values
 
