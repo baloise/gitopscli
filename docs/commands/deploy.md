@@ -91,6 +91,8 @@ gitopscli deploy \
   --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}"
 ```
 
+This will end up in one single commit with your specified commit-message.
+
 ### Create Pull Request
 
 In some cases you might want to create a pull request for your updates. You can achieve this by adding `--create-pr` to the command. The pull request can be left open or merged directly with `--auto-merge`.

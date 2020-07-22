@@ -94,7 +94,7 @@ def __update_values(git, file, values, single_commit, commit_message):
             msg += f"\n\n{yaml_dump(updated_values)}"
             git.commit(msg)
 
-    if commit_message is not None:
+    if updated_values and commit_message is not None:
         git.commit(commit_message)
 
     return updated_values
