@@ -39,8 +39,9 @@ def delete_pr_preview_command(
             apps_tmp_dir,
         )
 
-        apps_git.checkout(branch)
-        logging.info("App repo branch %s checkout successful", branch)
+        app_master_branch_name = "master"
+        apps_git.checkout(app_master_branch_name)
+        logging.info("App repo branch %s checkout successful", app_master_branch_name)
         try:
             gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
         except FileNotFoundError as ex:
