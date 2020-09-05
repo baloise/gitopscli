@@ -217,7 +217,7 @@ echo password=PASS
     def test_push_commit_hook_error_reason_is_shown(self):
         repo_dir = self.origin.working_dir
         with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:
-            pre_receive_hook.write("echo >&2 \"we reject this push\"; exit 1")
+            pre_receive_hook.write('echo >&2 "we reject this push"; exit 1')
         chmod(f"{repo_dir}/.git/hooks/pre-receive", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
 
         testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
