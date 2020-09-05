@@ -54,7 +54,7 @@ class AbstractGitUtil(ABC):
         try:
             self._repo.git.push("--set-upstream", "origin", branch)
         except GitCommandError as ex:
-            raise GitOpsException(f"Error pushing branch '{branch}' to origin: {ex}") from ex
+            raise GitOpsException(f"Error pushing branch '{branch}' to origin: {ex.stderr}") from ex
         except GitError as ex:
             raise GitOpsException(f"Error pushing branch '{branch}' to origin.") from ex
 
