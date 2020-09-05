@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from git import Repo, GitError
+from git import Repo, GitError, GitCommandError
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -53,6 +53,8 @@ class AbstractGitUtil(ABC):
     def push(self, branch):
         try:
             self._repo.git.push("--set-upstream", "origin", branch)
+        except GitCommandError as ex:
+            raise GitOpsException(f"Error pushing branch '{branch}' to origin: {ex}") from ex
         except GitError as ex:
             raise GitOpsException(f"Error pushing branch '{branch}' to origin.") from ex
 

@@ -1,4 +1,5 @@
-from os import path, makedirs
+from os import path, makedirs, chmod
+import stat
 import unittest
 import uuid
 from pathlib import Path
@@ -211,7 +212,28 @@ echo password=PASS
 
         with pytest.raises(GitOpsException) as ex:
             testee.push("unknown")
-        self.assertEqual("Error pushing branch 'unknown' to origin.", str(ex.value))
+        assert str(ex.value).startswith("Error pushing branch 'unknown' to origin")
+
+    def test_push_commit_hook_error_reason_is_shown(self):
+        repo_dir = self.origin.working_dir
+        with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:
+            pre_receive_hook.write("echo >&2 \"we reject this push\"; exit 1")
+        chmod(f"{repo_dir}/.git/hooks/pre-receive", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+
+        testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
+        testee.set_clone_url(self.origin.working_dir)
+        testee.checkout("master")
+
+        with open(f"{self.tmp_dir}/repo/foo.md", "w") as readme:
+            readme.write("new file")
+        util_repo = Repo(f"{self.tmp_dir}/repo")
+        util_repo.git.add("--all")
+        util_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+        util_repo.git.commit("-m", "new commit")
+
+        with pytest.raises(GitOpsException) as ex:
+            testee.push("master")
+        assert "pre-receive" in str(ex.value) and "we reject this push" in str(ex.value)
 
     def test_get_author_from_last_commit(self):
         testee = GitUtil(self.tmp_dir, username=None, password=None, git_user=None, git_email=None)
