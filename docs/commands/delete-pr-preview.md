@@ -18,13 +18,16 @@ gitopscli delete-pr-preview \
 
 ## Usage
 ```
-usage: gitopscli delete-pr-preview [-h] --username USERNAME --password PASSWORD
-                                [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                                --organisation ORGANISATION --repository-name
-                                REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL] --branch
-                                BRANCH
-                                [-v [VERBOSE]]
+usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
+                                   PASSWORD [--git-user GIT_USER]
+                                   [--git-email GIT_EMAIL] --organisation
+                                   ORGANISATION --repository-name
+                                   REPOSITORY_NAME
+                                   [--git-provider GIT_PROVIDER]
+                                   [--git-provider-url GIT_PROVIDER_URL]
+                                   --branch BRANCH
+                                   [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
+                                   [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -43,6 +46,8 @@ optional arguments:
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
   --branch BRANCH       The branch for which the preview was created for
+  --expect-preview-exists [EXPECT_PREVIEW_EXISTS]
+                        Fail if preview does not exist
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```
