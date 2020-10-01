@@ -92,6 +92,7 @@ def __add_delete_preview_command_parser(subparsers):
     add_delete_preview_p.add_argument(
         "--preview-id", help="The preview-id for which the preview was created for", required=True
     )
+    __add_expect_preview_exists_parser(add_delete_preview_p)
     __add_verbose_parser(add_delete_preview_p)
 
 
@@ -101,6 +102,7 @@ def __add_delete_pr_preview_command_parser(subparsers):
     add_delete_preview_p.add_argument(
         "--branch", help="The branch for which the preview was created for", required=True
     )
+    __add_expect_preview_exists_parser(add_delete_preview_p)
     __add_verbose_parser(add_delete_preview_p)
 
 
@@ -144,6 +146,17 @@ def __add_create_githash_previewid_parser(subparsers):
 def __add_create_prid_parser(subparsers):
     subparsers.add_argument("--pr-id", help="the id of the pull request", type=int, required=True)
     subparsers.add_argument("--parent-id", help="the id of the parent comment, in case of a reply", type=int)
+
+
+def __add_expect_preview_exists_parser(subparsers):
+    subparsers.add_argument(
+        "--expect-preview-exists",
+        help="Fail if preview does not exist",
+        type=__str2bool,
+        nargs="?",
+        const=True,
+        default=False,
+    )
 
 
 def __add_verbose_parser(subparsers):

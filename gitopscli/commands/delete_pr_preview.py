@@ -20,6 +20,7 @@ def delete_pr_preview_command(
     repository_name,
     git_provider,
     git_provider_url,
+    expect_preview_exists,
 ):
     assert command == "delete-pr-preview"
 
@@ -73,6 +74,7 @@ def delete_pr_preview_command(
             git_provider,
             git_provider_url,
             branch,
+            expect_preview_exists,
         )
 
     finally:
