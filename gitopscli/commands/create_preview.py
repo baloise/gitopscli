@@ -80,12 +80,9 @@ def create_preview_command(
         logging.info("Is preview env already existing? %s", preview_env_already_exist)
         if not preview_env_already_exist:
             __create_new_preview_env(
-                git_hash,
-                new_preview_folder_name,
-                preview_template_folder_name,
-                root_git,
-                gitops_config.application_name,
+                new_preview_folder_name, preview_template_folder_name, root_git,
             )
+
         logging.info("Using image tag from git hash: %s", git_hash)
         route_host = None
         value_replaced = False
@@ -106,7 +103,10 @@ def create_preview_command(
                 deployment_already_up_to_date_callback(apps_git, git_hash)
             return
 
-        root_git.commit(f"Update preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.")
+        commit_msg_verb = "Update" if preview_env_already_exist else "Create new"
+        root_git.commit(
+            f"{commit_msg_verb} preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'."
+        )
         root_git.push("master")
         logging.info("Pushed branch master")
 
@@ -154,7 +154,7 @@ def __replace_value(
 
 
 def __create_new_preview_env(
-    git_hash, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
+    new_preview_folder_name, preview_template_folder_name, root_git,
 ):
     shutil.copytree(
         root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
@@ -166,4 +166,3 @@ def __create_new_preview_env(
             update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
         except KeyError as ex:
             raise GitOpsException(f"Key 'name' not found in '{chart_file_path}'") from ex
-    root_git.commit(f"Create new preview environment for '{app_name}' and git hash '{git_hash}'.")
