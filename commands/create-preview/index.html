@@ -633,7 +633,6 @@
     └── some-more-config-files-or-folders
 </code></pre></div>
 
-
 <div class="admonition info">
 <p class="admonition-title">Currently you have to specify image tag and route host in a <code>values.yaml</code> file. We are working on making this configurable in the future.</p>
 </div>
@@ -644,7 +643,7 @@
 <li>locate the preview template for your app</li>
 <li>replace image tag and route host in the template</li>
 </ol>
-<div class="codehilite"><pre><span></span><code><span class="nt">deploymentConfig</span><span class="p">:</span>
+<div class="yaml codehilite"><pre><span></span><code><span class="nt">deploymentConfig</span><span class="p">:</span>
   <span class="c1"># The organisation name of your deployment repo</span>
   <span class="nt">org</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
   <span class="c1"># The repostiory name of your deployment repo</span>
@@ -666,9 +665,8 @@
       <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span> <span class="c1"># this is the resolved host.template from above</span>
 </code></pre></div>
 
-
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>gitopscli create-preview <span class="se">\</span>
+<div class="bash codehilite"><pre><span></span><code>gitopscli create-preview <span class="se">\</span>
   --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
   --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
   --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
@@ -679,7 +677,6 @@
   --git-hash <span class="s2">&quot;c0784a34e834117e1489973327ff4ff3c2582b94&quot;</span> <span class="se">\</span>
   --preview-id <span class="s2">&quot;test-preview-id&quot;</span> <span class="se">\</span>
 </code></pre></div>
-
 
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span><code>usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
