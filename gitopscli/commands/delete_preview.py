@@ -3,7 +3,7 @@ import logging
 import os
 import shutil
 
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io.gitops_config import GitOpsConfig
 

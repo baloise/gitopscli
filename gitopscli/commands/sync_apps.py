@@ -3,7 +3,7 @@ import os
 
 from ruamel.yaml import YAML
 
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git
 from gitopscli.io.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
 

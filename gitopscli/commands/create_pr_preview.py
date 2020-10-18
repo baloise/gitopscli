@@ -1,7 +1,7 @@
 import logging
 
 from gitopscli.commands.create_preview import create_preview_command
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git
 
 
 def create_pr_preview_command(

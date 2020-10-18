@@ -3,7 +3,7 @@ import os
 import uuid
 
 from gitopscli.commands import delete_preview_command
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io.gitops_config import GitOpsConfig
 

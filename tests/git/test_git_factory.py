@@ -1,17 +1,13 @@
-from os import path, makedirs
 import unittest
 from unittest.mock import patch, MagicMock
-import uuid
-from pathlib import Path
-from git import Repo
 import pytest
 
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git
 
 
 class CreateGitTest(unittest.TestCase):
-    @patch("gitopscli.git.create_git.GithubGitUtil")
+    @patch("gitopscli.git.git_factory.GithubGitUtil")
     def test_github(self, mock_github_git_util_constructor):
         mock_github_git_util = MagicMock()
         mock_github_git_util_constructor.return_value = mock_github_git_util
@@ -37,7 +33,7 @@ class CreateGitTest(unittest.TestCase):
             repository_name="REPO",
         )
 
-    @patch("gitopscli.git.create_git.GithubGitUtil")
+    @patch("gitopscli.git.git_factory.GithubGitUtil")
     def test_github_via_git_provider_url(self, mock_github_git_util_constructor):
         mock_github_git_util = MagicMock()
         mock_github_git_util_constructor.return_value = mock_github_git_util
@@ -63,7 +59,7 @@ class CreateGitTest(unittest.TestCase):
             repository_name="REPO",
         )
 
-    @patch("gitopscli.git.create_git.BitBucketGitUtil")
+    @patch("gitopscli.git.git_factory.BitBucketGitUtil")
     def test_bitbucket_server(self, mock_bitbucket_git_util_constructor):
         mock_bitbucket_git_util = MagicMock()
         mock_bitbucket_git_util_constructor.return_value = mock_bitbucket_git_util
@@ -104,7 +100,7 @@ class CreateGitTest(unittest.TestCase):
             )
         self.assertEqual("Please provide --git-provider-url for bitbucket-server", str(ex.value))
 
-    @patch("gitopscli.git.create_git.BitBucketGitUtil")
+    @patch("gitopscli.git.git_factory.BitBucketGitUtil")
     def test_bitbucket_server_via_git_provider_url(self, mock_bitbucket_git_util_constructor):
         mock_bitbucket_git_util = MagicMock()
         mock_bitbucket_git_util_constructor.return_value = mock_bitbucket_git_util

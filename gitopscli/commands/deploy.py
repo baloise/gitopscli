@@ -2,7 +2,7 @@ import logging
 import os
 import uuid
 
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
 from gitopscli.gitops_exception import GitOpsException
 

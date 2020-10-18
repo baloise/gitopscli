@@ -1,6 +1,6 @@
 import logging
 
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git
 
 
 def pr_comment_command(
