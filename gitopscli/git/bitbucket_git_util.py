@@ -7,10 +7,8 @@ from .abstract_git_util import AbstractGitUtil
 
 
 class BitBucketGitUtil(AbstractGitUtil):
-    def __init__(
-        self, tmp_dir, git_provider_url, organisation, repository_name, username, password, git_user, git_email
-    ):
-        super().__init__(tmp_dir, username, password, git_user, git_email)
+    def __init__(self, git_provider_url, organisation, repository_name, username, password, git_user, git_email):
+        super().__init__(username, password, git_user, git_email)
         self._git_provider_url = git_provider_url
         self._organisation = organisation
         self._repository_name = repository_name

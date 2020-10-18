@@ -5,9 +5,7 @@ from gitopscli.git.github_git_util import GithubGitUtil
 from gitopscli.gitops_exception import GitOpsException
 
 
-def create_git(
-    username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url, tmp_dir
-):
+def create_git(username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url):
     if not git_provider:
         if "bitbucket" in git_provider_url:
             git_provider = "bitbucket-server"
@@ -21,7 +19,6 @@ def create_git(
         if not git_provider_url:
             raise GitOpsException("Please provide --git-provider-url for bitbucket-server")
         git = BitBucketGitUtil(
-            tmp_dir=tmp_dir,
             git_provider_url=git_provider_url,
             organisation=organisation,
             repository_name=repository_name,
@@ -32,7 +29,6 @@ def create_git(
         )
     elif git_provider == "github":
         git = GithubGitUtil(
-            tmp_dir=tmp_dir,
             organisation=organisation,
             repository_name=repository_name,
             username=username,

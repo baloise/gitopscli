@@ -6,7 +6,6 @@ import shutil
 from gitopscli.git.create_git import create_git
 from gitopscli.io.gitops_config import GitOpsConfig
 from gitopscli.io.yaml_util import update_yaml_file
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -29,22 +28,9 @@ def create_preview_command(
 
     assert command is not None
 
-    apps_tmp_dir = create_tmp_dir()
-    root_tmp_dir = create_tmp_dir()
-
-    try:
-        apps_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            organisation,
-            repository_name,
-            git_provider,
-            git_provider_url,
-            apps_tmp_dir,
-        )
-
+    with create_git(
+        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
+    ) as apps_git:
         apps_git.checkout(git_hash)
         logging.info("App repo git hash %s checkout successful", git_hash)
         try:
@@ -53,17 +39,16 @@ def create_preview_command(
             raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
         logging.info("Read .gitops.config.yaml: %s", gitops_config)
 
-        root_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            gitops_config.team_config_org,
-            gitops_config.team_config_repo,
-            git_provider,
-            git_provider_url,
-            root_tmp_dir,
-        )
+    with create_git(
+        username,
+        password,
+        git_user,
+        git_email,
+        gitops_config.team_config_org,
+        gitops_config.team_config_repo,
+        git_provider,
+        git_provider_url,
+    ) as root_git:
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
 
@@ -116,9 +101,6 @@ def create_preview_command(
         else:
             if deployment_new_callback:
                 deployment_new_callback(apps_git, gitops_config, route_host)
-    finally:
-        delete_tmp_dir(apps_tmp_dir)
-        delete_tmp_dir(root_tmp_dir)
 
 
 def __replace_value(
