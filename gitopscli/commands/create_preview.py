@@ -21,11 +21,11 @@ def create_preview_command(
     git_provider_url,
     git_hash,
     preview_id,
-    deployment_already_up_to_date_callback=None,
-    deployment_exists_callback=None,
-    deployment_new_callback=None,
+    deployment_already_up_to_date_callback=lambda: None,
+    deployment_exists_callback=lambda: None,
+    deployment_new_callback=lambda: None,
 ):
-    assert command is not None
+    assert command == "create-preview"
 
     git_config = GitConfig(
         username=username,
@@ -43,10 +43,9 @@ def create_preview_command(
         logging.info("Config repo branch master checkout successful")
 
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
-        if os.path.isdir(root_git.get_full_file_path(preview_template_folder_name)):
-            logging.info("Using the preview template folder: %s", preview_template_folder_name)
-        else:
+        if not os.path.isdir(root_git.get_full_file_path(preview_template_folder_name)):
             raise GitOpsException(f"The preview template folder does not exist: {preview_template_folder_name}")
+        logging.info("Using the preview template folder: %s", preview_template_folder_name)
 
         hashed_preview_id = hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
         new_preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
@@ -74,8 +73,7 @@ def create_preview_command(
             )
         if not value_replaced:
             logging.info("The image tag %s has already been deployed. Doing nothing.", git_hash)
-            if deployment_already_up_to_date_callback:
-                deployment_already_up_to_date_callback(git_hash)
+            deployment_already_up_to_date_callback(route_host)
             return
 
         commit_msg_verb = "Update" if preview_env_already_exist else "Create new"
@@ -86,11 +84,9 @@ def create_preview_command(
         logging.info("Pushed branch master")
 
         if preview_env_already_exist:
-            if deployment_exists_callback:
-                deployment_exists_callback(gitops_config, route_host)
+            deployment_exists_callback(route_host)
         else:
-            if deployment_new_callback:
-                deployment_new_callback(gitops_config, route_host)
+            deployment_new_callback(route_host)
 
 
 def __replace_value(
