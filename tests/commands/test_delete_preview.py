@@ -2,6 +2,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
+from gitopscli.git import GitConfig
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.delete_preview import delete_preview_command
 
@@ -17,12 +18,9 @@ class DeletePreviewCommandTest(unittest.TestCase):
         self.os_path_exists_mock = add_patch("gitopscli.commands.delete_preview.os.path.exists")
         self.shutil_rmtree_mock = add_patch("gitopscli.commands.delete_preview.shutil.rmtree")
         self.logging_mock = add_patch("gitopscli.commands.delete_preview.logging")
+        self.load_gitops_config_mock = add_patch("gitopscli.commands.delete_preview.load_gitops_config")
         self.create_git_mock = add_patch("gitopscli.commands.delete_preview.create_git")
         self.git_util_mock = MagicMock()
-        self.gitops_config_mock = add_patch("gitopscli.commands.delete_preview.GitOpsConfig")
-        self.gitops_config_team_config_org_mock = add_patch(
-            "gitopscli.commands.delete_preview.GitOpsConfig.team_config_org"
-        )
 
         # Attach all mocks to a single mock manager
         self.mock_manager = Mock()
@@ -31,8 +29,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
         self.mock_manager.attach_mock(self.os_path_exists_mock, "os.path.exists")
         self.mock_manager.attach_mock(self.shutil_rmtree_mock, "shutil.rmtree")
         self.mock_manager.attach_mock(self.logging_mock, "logging")
-        self.mock_manager.attach_mock(self.gitops_config_mock, "GitOpsConfig")
-        self.mock_manager.attach_mock(self.gitops_config_team_config_org_mock, "GitOpsConfig.team_config_org")
+        self.mock_manager.attach_mock(self.load_gitops_config_mock, "load_gitops_config")
 
         self.create_git_mock.return_value = self.git_util_mock
         self.git_util_mock.__enter__.return_value = self.git_util_mock
@@ -40,7 +37,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
         self.git_util_mock.create_pull_request.return_value = "<dummy-pr-object>"
         self.git_util_mock.get_pull_request_url.side_effect = lambda x: f"<url of {x}>"
         self.os_path_exists_mock.return_value = True
-        self.gitops_config_mock.return_value = SimpleNamespace(
+        self.load_gitops_config_mock.return_value = SimpleNamespace(
             team_config_org="TEAM_CONFIG_ORG", team_config_repo="TEAM_CONFIG_REPO", application_name="APP"
         )
 
@@ -58,17 +55,17 @@ class DeletePreviewCommandTest(unittest.TestCase):
             preview_id="PREVIEW_ID",
             expect_preview_exists=False,
         )
-
+        expected_git_config = GitConfig(
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            git_provider="github",
+            git_provider_url=None,
+        )
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None,),
-            call.git_util.checkout("master"),
-            call.logging.info("App repo '%s/%s' branch 'master' checkout successful", "ORGA", "REPO"),
-            call.git_util.get_full_file_path(".gitops.config.yaml"),
-            call.GitOpsConfig("/tmp/created-tmp-dir/.gitops.config.yaml"),
-            call.logging.info("Read .gitops.config.yaml"),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO", "github", None,
-            ),
+            call.load_gitops_config(expected_git_config, "ORGA", "REPO"),
+            call.create_git(expected_git_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.git_util.checkout("master"),
             call.logging.info(
                 "Config repo '%s/%s' branch 'master' checkout successful", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"
@@ -98,17 +95,17 @@ class DeletePreviewCommandTest(unittest.TestCase):
             preview_id="PREVIEW_ID",
             expect_preview_exists=False,
         )
-
+        expected_git_config = GitConfig(
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            git_provider="github",
+            git_provider_url=None,
+        )
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None,),
-            call.git_util.checkout("master"),
-            call.logging.info("App repo '%s/%s' branch 'master' checkout successful", "ORGA", "REPO"),
-            call.git_util.get_full_file_path(".gitops.config.yaml"),
-            call.GitOpsConfig("/tmp/created-tmp-dir/.gitops.config.yaml"),
-            call.logging.info("Read .gitops.config.yaml"),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO", "github", None,
-            ),
+            call.load_gitops_config(expected_git_config, "ORGA", "REPO"),
+            call.create_git(expected_git_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.git_util.checkout("master"),
             call.logging.info(
                 "Config repo '%s/%s' branch 'master' checkout successful", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"
@@ -140,16 +137,17 @@ class DeletePreviewCommandTest(unittest.TestCase):
             )
         self.assertEqual(str(ex.value), "There was no preview with name: APP-685912d3-preview")
 
+        expected_git_config = GitConfig(
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            git_provider="github",
+            git_provider_url=None,
+        )
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None,),
-            call.git_util.checkout("master"),
-            call.logging.info("App repo '%s/%s' branch 'master' checkout successful", "ORGA", "REPO"),
-            call.git_util.get_full_file_path(".gitops.config.yaml"),
-            call.GitOpsConfig("/tmp/created-tmp-dir/.gitops.config.yaml"),
-            call.logging.info("Read .gitops.config.yaml"),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO", "github", None,
-            ),
+            call.load_gitops_config(expected_git_config, "ORGA", "REPO"),
+            call.create_git(expected_git_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.git_util.checkout("master"),
             call.logging.info(
                 "Config repo '%s/%s' branch 'master' checkout successful", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"
@@ -160,7 +158,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
         ]
 
     def test_missing_gitops_config_yaml_error(self):
-        self.gitops_config_mock.side_effect = FileNotFoundError()
+        self.load_gitops_config_mock.side_effect = GitOpsException()
 
         with pytest.raises(GitOpsException) as ex:
             delete_preview_command(
@@ -176,12 +174,14 @@ class DeletePreviewCommandTest(unittest.TestCase):
                 preview_id="PREVIEW_ID",
                 expect_preview_exists=True,  # we expect an existing preview
             )
-        self.assertEqual(str(ex.value), "Couldn't find .gitops.config.yaml")
-
+        expected_git_config = GitConfig(
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            git_provider="github",
+            git_provider_url=None,
+        )
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None,),
-            call.git_util.checkout("master"),
-            call.logging.info("App repo '%s/%s' branch 'master' checkout successful", "ORGA", "REPO"),
-            call.git_util.get_full_file_path(".gitops.config.yaml"),
-            call.GitOpsConfig("/tmp/created-tmp-dir/.gitops.config.yaml"),
+            call.load_gitops_config(expected_git_config, "ORGA", "REPO"),
         ]

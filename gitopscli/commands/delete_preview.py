@@ -3,9 +3,10 @@ import logging
 import os
 import shutil
 
-from gitopscli.git import create_git
+from gitopscli.git import create_git, GitConfig
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.io.gitops_config import GitOpsConfig
+
+from .common import load_gitops_config
 
 
 def delete_preview_command(
@@ -23,27 +24,18 @@ def delete_preview_command(
 ):
     assert command is not None
 
-    with create_git(
-        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
-    ) as apps_git:
-        apps_git.checkout("master")
-        logging.info("App repo '%s/%s' branch 'master' checkout successful", organisation, repository_name)
-        try:
-            gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
-        except FileNotFoundError as ex:
-            raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
-        logging.info("Read .gitops.config.yaml")
+    git_config = GitConfig(
+        username=username,
+        password=password,
+        git_user=git_user,
+        git_email=git_email,
+        git_provider=git_provider,
+        git_provider_url=git_provider_url,
+    )
 
-    with create_git(
-        username,
-        password,
-        git_user,
-        git_email,
-        gitops_config.team_config_org,
-        gitops_config.team_config_repo,
-        git_provider,
-        git_provider_url,
-    ) as root_git:
+    gitops_config = load_gitops_config(git_config, organisation, repository_name)
+
+    with create_git(git_config, gitops_config.team_config_org, gitops_config.team_config_repo) as root_git:
         root_git.checkout("master")
         logging.info(
             "Config repo '%s/%s' branch 'master' checkout successful",

@@ -3,9 +3,8 @@ import os
 import uuid
 
 from gitopscli.commands import delete_preview_command
-from gitopscli.git import create_git
-from gitopscli.gitops_exception import GitOpsException
-from gitopscli.io.gitops_config import GitOpsConfig
+from gitopscli.git import create_git, GitConfig
+from .common import load_gitops_config
 
 
 def delete_pr_preview_command(
@@ -23,29 +22,18 @@ def delete_pr_preview_command(
 ):
     assert command == "delete-pr-preview"
 
-    with create_git(
-        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
-    ) as apps_git:
+    git_config = GitConfig(
+        username=username,
+        password=password,
+        git_user=git_user,
+        git_email=git_email,
+        git_provider=git_provider,
+        git_provider_url=git_provider_url,
+    )
 
-        app_master_branch_name = "master"
-        apps_git.checkout(app_master_branch_name)
-        logging.info("App repo branch %s checkout successful", app_master_branch_name)
-        try:
-            gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
-        except FileNotFoundError as ex:
-            raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
-        logging.info("Read GitOpsConfig: %s", gitops_config)
+    gitops_config = load_gitops_config(git_config, organisation, repository_name)
 
-    with create_git(
-        username,
-        password,
-        git_user,
-        git_email,
-        gitops_config.team_config_org,
-        gitops_config.team_config_repo,
-        git_provider,
-        git_provider_url,
-    ) as root_git:
+    with create_git(git_config, gitops_config.team_config_org, gitops_config.team_config_repo) as root_git:
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
 

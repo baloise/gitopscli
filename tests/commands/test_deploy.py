@@ -4,9 +4,19 @@ from unittest.mock import patch, MagicMock, Mock, call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.deploy import deploy_command
+from gitopscli.git import GitConfig
 
 
 class DeployCommandTest(unittest.TestCase):
+    _expected_github_config = GitConfig(
+        username="USERNAME",
+        password="PASSWORD",
+        git_user="GIT_USER",
+        git_email="GIT_EMAIL",
+        git_provider="github",
+        git_provider_url=None,
+    )
+
     def setUp(self):
         def add_patch(target):
             patcher = patch(target)
@@ -58,7 +68,7 @@ class DeployCommandTest(unittest.TestCase):
         )
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -92,7 +102,7 @@ class DeployCommandTest(unittest.TestCase):
         )
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.new_branch("gitopscli-deploy-b973b5bb"),
@@ -136,7 +146,7 @@ class DeployCommandTest(unittest.TestCase):
         )
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.new_branch("gitopscli-deploy-b973b5bb"),
@@ -184,7 +194,7 @@ class DeployCommandTest(unittest.TestCase):
         )
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -218,7 +228,7 @@ class DeployCommandTest(unittest.TestCase):
         )
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -256,7 +266,7 @@ class DeployCommandTest(unittest.TestCase):
         self.assertEqual(ex.value, checkout_exception)
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
         ]
 
@@ -283,7 +293,7 @@ class DeployCommandTest(unittest.TestCase):
         self.assertEqual(str(ex.value), "No such file: test/file.yml")
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -311,7 +321,7 @@ class DeployCommandTest(unittest.TestCase):
         )
 
         assert self.mock_manager.method_calls == [
-            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
+            call.create_git(self._expected_github_config, "ORGA", "REPO"),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),

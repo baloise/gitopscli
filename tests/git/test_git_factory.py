@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.git import create_git
+from gitopscli.git import create_git, GitConfig
 
 
 class CreateGitTest(unittest.TestCase):
@@ -13,14 +13,16 @@ class CreateGitTest(unittest.TestCase):
         mock_github_git_util_constructor.return_value = mock_github_git_util
 
         git = create_git(
-            username="USER",
-            password="PASS",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
+            git_config=GitConfig(
+                username="USER",
+                password="PASS",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                git_provider="github",
+                git_provider_url=None,
+            ),
             organisation="ORG",
             repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
         )
 
         self.assertEqual(git, mock_github_git_util)
@@ -39,14 +41,16 @@ class CreateGitTest(unittest.TestCase):
         mock_github_git_util_constructor.return_value = mock_github_git_util
 
         git = create_git(
-            username="USER",
-            password="PASS",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
+            git_config=GitConfig(
+                username="USER",
+                password="PASS",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                git_provider=None,
+                git_provider_url="www.github.com",
+            ),
             organisation="ORG",
             repository_name="REPO",
-            git_provider=None,
-            git_provider_url="www.github.com",
         )
 
         self.assertEqual(git, mock_github_git_util)
@@ -65,14 +69,16 @@ class CreateGitTest(unittest.TestCase):
         mock_bitbucket_git_util_constructor.return_value = mock_bitbucket_git_util
 
         git = create_git(
-            username="USER",
-            password="PASS",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
+            git_config=GitConfig(
+                username="USER",
+                password="PASS",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                git_provider="bitbucket-server",
+                git_provider_url="GIT_PROVIDER_URL",
+            ),
             organisation="ORG",
             repository_name="REPO",
-            git_provider="bitbucket-server",
-            git_provider_url="GIT_PROVIDER_URL",
         )
 
         self.assertEqual(git, mock_bitbucket_git_util)
@@ -89,16 +95,18 @@ class CreateGitTest(unittest.TestCase):
     def test_bitbucket_server_missing_git_provider_url(self):
         with pytest.raises(GitOpsException) as ex:
             create_git(
-                username="USER",
-                password="PASS",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
+                git_config=GitConfig(
+                    username="USER",
+                    password="PASS",
+                    git_user="GIT_USER",
+                    git_email="GIT_EMAIL",
+                    git_provider="bitbucket-server",
+                    git_provider_url=None,  # <- missing
+                ),
                 organisation="ORG",
                 repository_name="REPO",
-                git_provider="bitbucket-server",
-                git_provider_url=None,  # <- missing
             )
-        self.assertEqual("Please provide --git-provider-url for bitbucket-server", str(ex.value))
+        self.assertEqual("Please provide url for bitbucket-server.", str(ex.value))
 
     @patch("gitopscli.git.git_factory.BitBucketGitUtil")
     def test_bitbucket_server_via_git_provider_url(self, mock_bitbucket_git_util_constructor):
@@ -106,14 +114,16 @@ class CreateGitTest(unittest.TestCase):
         mock_bitbucket_git_util_constructor.return_value = mock_bitbucket_git_util
 
         git = create_git(
-            username="USER",
-            password="PASS",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
+            git_config=GitConfig(
+                username="USER",
+                password="PASS",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                git_provider=None,
+                git_provider_url="bitbucket.baloise.dev",
+            ),
             organisation="ORG",
             repository_name="REPO",
-            git_provider=None,
-            git_provider_url="bitbucket.baloise.dev",
         )
 
         self.assertEqual(git, mock_bitbucket_git_util)
@@ -130,27 +140,33 @@ class CreateGitTest(unittest.TestCase):
     def test_unknown_git_provider(self):
         with pytest.raises(GitOpsException) as ex:
             create_git(
-                username="USER",
-                password="PASS",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
+                git_config=GitConfig(
+                    username="USER",
+                    password="PASS",
+                    git_user="GIT_USER",
+                    git_email="GIT_EMAIL",
+                    git_provider="unknown",  # <- unknown
+                    git_provider_url="GIT_PROVIDER_URL",
+                ),
                 organisation="ORG",
                 repository_name="REPO",
-                git_provider="unknown",  # <- unknown
-                git_provider_url="GIT_PROVIDER_URL",
             )
         self.assertEqual("Git provider 'unknown' is not supported.", str(ex.value))
 
     def test_cannot_infer_git_provider_from_url(self):
         with pytest.raises(GitOpsException) as ex:
             create_git(
-                username="USER",
-                password="PASS",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
+                git_config=GitConfig(
+                    username="USER",
+                    password="PASS",
+                    git_user="GIT_USER",
+                    git_email="GIT_EMAIL",
+                    git_provider=None,
+                    git_provider_url="some.unknown-url.com",
+                ),
                 organisation="ORG",
                 repository_name="REPO",
-                git_provider=None,
-                git_provider_url="some.unknown-url.com",
             )
-        self.assertEqual("Please provide --git-provider", str(ex.value))
+        self.assertEqual(
+            "Unknown git provider url: 'some.unknown-url.com'. Please specify git provider.", str(ex.value)
+        )
