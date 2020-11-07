@@ -617,7 +617,7 @@
 <p>The <code>deploy</code> command can be used to deploy applications by updating the image tags in the YAML files of a config repository. Of course, you can also use it to update any YAML values in a git repository. However, only <em>one</em> YAML can be changed at a time.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
 <p>Let's assume you have a repository <code>deployment/myapp-non-prod</code> which contains your deployment configuration in the form of YAML files (e.g. <a href="https://helm.sh/">Helm</a> charts). To deploy a new version of your application you need to update some values in <code>example/values.yaml</code>.</p>
-<div class="yaml codehilite"><pre><span></span><code><span class="c1"># Example Helm values.yaml</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Example Helm values.yaml</span>
 <span class="nt">frontend</span><span class="p">:</span>
   <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-app/frontend</span>
   <span class="nt">tag</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0.0</span> <span class="c1"># &lt;- you want to change this value</span>
@@ -630,7 +630,7 @@
 </code></pre></div>
 
 <p>With the following command GitOps CLI will update both values to <code>1.1.0</code> on the <code>master</code> branch.</p>
-<div class="bash codehilite"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
+<div class="codehilite"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
   --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
   --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
   --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
@@ -678,7 +678,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 <h3 id="specific-commit-message">Specific Commit Message<a class="headerlink" href="#specific-commit-message" title="Permanent link">&para;</a></h3>
 <p>If you want to specify the commit message of the deployment then you can use the following param:</p>
 <p><code>--commit-message</code></p>
-<div class="bash codehilite"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
+<div class="codehilite"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
   --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
   --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
   --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
@@ -694,7 +694,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 <p>This will end up in one single commit with your specified commit-message.</p>
 <h3 id="create-pull-request">Create Pull Request<a class="headerlink" href="#create-pull-request" title="Permanent link">&para;</a></h3>
 <p>In some cases you might want to create a pull request for your updates. You can achieve this by adding <code>--create-pr</code> to the command. The pull request can be left open or merged directly with <code>--auto-merge</code>.</p>
-<div class="bash codehilite"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
+<div class="codehilite"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
   --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
   --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
   --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
