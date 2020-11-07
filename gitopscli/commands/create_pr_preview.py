@@ -2,7 +2,6 @@ import logging
 
 from gitopscli.commands.create_preview import create_preview_command
 from gitopscli.git.create_git import create_git
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 
 
 def create_pr_preview_command(
@@ -20,20 +19,9 @@ def create_pr_preview_command(
 ):
     assert command == "create-pr-preview"
 
-    apps_tmp_dir = create_tmp_dir()
-
-    try:
-        apps_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            organisation,
-            repository_name,
-            git_provider,
-            git_provider_url,
-            apps_tmp_dir,
-        )
+    with create_git(
+        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
+    ) as apps_git:
 
         pr_branch = apps_git.get_pull_request_branch(pr_id)
 
@@ -56,8 +44,6 @@ def create_pr_preview_command(
             __create_deployment_exist_callback(parent_id, pr_id, pr_branch),
             __create_deployment_new_callback(parent_id, pr_id, pr_branch),
         )
-    finally:
-        delete_tmp_dir(apps_tmp_dir)
 
 
 def __create_deployment_already_up_to_date_callback(parent_id, pr_id):

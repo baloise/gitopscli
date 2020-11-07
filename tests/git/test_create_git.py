@@ -17,7 +17,6 @@ class CreateGitTest(unittest.TestCase):
         mock_github_git_util_constructor.return_value = mock_github_git_util
 
         git = create_git(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -30,7 +29,6 @@ class CreateGitTest(unittest.TestCase):
 
         self.assertEqual(git, mock_github_git_util)
         mock_github_git_util_constructor.assert_called_with(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -45,7 +43,6 @@ class CreateGitTest(unittest.TestCase):
         mock_github_git_util_constructor.return_value = mock_github_git_util
 
         git = create_git(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -58,7 +55,6 @@ class CreateGitTest(unittest.TestCase):
 
         self.assertEqual(git, mock_github_git_util)
         mock_github_git_util_constructor.assert_called_with(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -73,7 +69,6 @@ class CreateGitTest(unittest.TestCase):
         mock_bitbucket_git_util_constructor.return_value = mock_bitbucket_git_util
 
         git = create_git(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -86,7 +81,6 @@ class CreateGitTest(unittest.TestCase):
 
         self.assertEqual(git, mock_bitbucket_git_util)
         mock_bitbucket_git_util_constructor.assert_called_with(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -99,7 +93,6 @@ class CreateGitTest(unittest.TestCase):
     def test_bitbucket_server_missing_git_provider_url(self):
         with pytest.raises(GitOpsException) as ex:
             create_git(
-                tmp_dir="TMP_DIR",
                 username="USER",
                 password="PASS",
                 git_user="GIT_USER",
@@ -117,7 +110,6 @@ class CreateGitTest(unittest.TestCase):
         mock_bitbucket_git_util_constructor.return_value = mock_bitbucket_git_util
 
         git = create_git(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -130,7 +122,6 @@ class CreateGitTest(unittest.TestCase):
 
         self.assertEqual(git, mock_bitbucket_git_util)
         mock_bitbucket_git_util_constructor.assert_called_with(
-            tmp_dir="TMP_DIR",
             username="USER",
             password="PASS",
             git_user="GIT_USER",
@@ -143,7 +134,6 @@ class CreateGitTest(unittest.TestCase):
     def test_unknown_git_provider(self):
         with pytest.raises(GitOpsException) as ex:
             create_git(
-                tmp_dir="TMP_DIR",
                 username="USER",
                 password="PASS",
                 git_user="GIT_USER",
@@ -158,7 +148,6 @@ class CreateGitTest(unittest.TestCase):
     def test_cannot_infer_git_provider_from_url(self):
         with pytest.raises(GitOpsException) as ex:
             create_git(
-                tmp_dir="TMP_DIR",
                 username="USER",
                 password="PASS",
                 git_user="GIT_USER",

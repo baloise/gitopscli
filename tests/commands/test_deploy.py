@@ -16,8 +16,6 @@ class DeployCommandTest(unittest.TestCase):
         # Monkey patch all external functions the command is using:
         self.os_path_isfile_mock = add_patch("gitopscli.commands.deploy.os.path.isfile")
         self.update_yaml_file_mock = add_patch("gitopscli.commands.deploy.update_yaml_file")
-        self.create_tmp_dir_mock = add_patch("gitopscli.commands.deploy.create_tmp_dir")
-        self.delete_tmp_dir_mock = add_patch("gitopscli.commands.deploy.delete_tmp_dir")
         self.logging_mock = add_patch("gitopscli.commands.deploy.logging")
         self.uuid_mock = add_patch("gitopscli.commands.deploy.uuid")
         self.create_git_mock = add_patch("gitopscli.commands.deploy.create_git")
@@ -25,17 +23,15 @@ class DeployCommandTest(unittest.TestCase):
 
         # Attach all mocks to a single mock manager
         self.mock_manager = Mock()
-        self.mock_manager.attach_mock(self.create_tmp_dir_mock, "create_tmp_dir")
         self.mock_manager.attach_mock(self.create_git_mock, "create_git")
         self.mock_manager.attach_mock(self.git_util_mock, "git_util")
-        self.mock_manager.attach_mock(self.delete_tmp_dir_mock, "delete_tmp_dir")
         self.mock_manager.attach_mock(self.update_yaml_file_mock, "update_yaml_file")
         self.mock_manager.attach_mock(self.os_path_isfile_mock, "os.path.isfile")
         self.mock_manager.attach_mock(self.logging_mock, "logging")
 
         # Define some common default return values
         self.create_git_mock.return_value = self.git_util_mock
-        self.create_tmp_dir_mock.return_value = "/tmp/created-tmp-dir"
+        self.git_util_mock.__enter__.return_value = self.git_util_mock
         self.git_util_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
         self.git_util_mock.create_pull_request.return_value = "<dummy-pr-object>"
         self.git_util_mock.get_pull_request_url.side_effect = lambda x: f"<url of {x}>"
@@ -61,11 +57,8 @@ class DeployCommandTest(unittest.TestCase):
             git_provider_url=None,
         )
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -78,7 +71,6 @@ class DeployCommandTest(unittest.TestCase):
             call.git_util.commit("changed 'a.b.d' to 'bar' in test/file.yml"),
             call.git_util.push("master"),
             call.logging.info("Pushed branch %s", "master"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]
 
     def test_create_pr_happy_flow(self):
@@ -99,11 +91,8 @@ class DeployCommandTest(unittest.TestCase):
             git_provider_url=None,
         )
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.new_branch("gitopscli-deploy-b973b5bb"),
@@ -118,7 +107,6 @@ class DeployCommandTest(unittest.TestCase):
             call.git_util.commit("changed 'a.b.d' to 'bar' in test/file.yml"),
             call.git_util.push("gitopscli-deploy-b973b5bb"),
             call.logging.info("Pushed branch %s", "gitopscli-deploy-b973b5bb"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
             call.git_util.create_pull_request(
                 "gitopscli-deploy-b973b5bb",
                 "master",
@@ -147,11 +135,8 @@ class DeployCommandTest(unittest.TestCase):
             git_provider_url=None,
         )
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.new_branch("gitopscli-deploy-b973b5bb"),
@@ -166,7 +151,6 @@ class DeployCommandTest(unittest.TestCase):
             call.git_util.commit("changed 'a.b.d' to 'bar' in test/file.yml"),
             call.git_util.push("gitopscli-deploy-b973b5bb"),
             call.logging.info("Pushed branch %s", "gitopscli-deploy-b973b5bb"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
             call.git_util.create_pull_request(
                 "gitopscli-deploy-b973b5bb",
                 "master",
@@ -199,11 +183,8 @@ class DeployCommandTest(unittest.TestCase):
             git_provider_url=None,
         )
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -215,7 +196,6 @@ class DeployCommandTest(unittest.TestCase):
             call.git_util.commit("updated 2 values in test/file.yml\n\na.b.c: foo\na.b.d: bar"),
             call.git_util.push("master"),
             call.logging.info("Pushed branch %s", "master"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]
 
     def test_commit_message_happy_flow(self):
@@ -237,11 +217,8 @@ class DeployCommandTest(unittest.TestCase):
             commit_message="testcommit",
         )
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -253,7 +230,6 @@ class DeployCommandTest(unittest.TestCase):
             call.git_util.commit("testcommit"),
             call.git_util.push("master"),
             call.logging.info("Pushed branch %s", "master"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]
 
     def test_checkout_error(self):
@@ -279,13 +255,9 @@ class DeployCommandTest(unittest.TestCase):
             )
         self.assertEqual(ex.value, checkout_exception)
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]
 
     def test_file_not_found(self):
@@ -310,16 +282,12 @@ class DeployCommandTest(unittest.TestCase):
             )
         self.assertEqual(str(ex.value), "No such file: test/file.yml")
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]
 
     def test_nothing_to_update(self):
@@ -342,11 +310,8 @@ class DeployCommandTest(unittest.TestCase):
             git_provider_url=None,
         )
 
-        assert self.mock_manager.mock_calls == [
-            call.create_tmp_dir(),
-            call.create_git(
-                "USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None, "/tmp/created-tmp-dir"
-            ),
+        assert self.mock_manager.method_calls == [
+            call.create_git("USERNAME", "PASSWORD", "GIT_USER", "GIT_EMAIL", "ORGA", "REPO", "github", None),
             call.git_util.checkout("master"),
             call.logging.info("Master checkout successful"),
             call.git_util.get_full_file_path("test/file.yml"),
@@ -356,5 +321,4 @@ class DeployCommandTest(unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Yaml property %s already up-to-date", "a.b.d"),
             call.logging.info("All values already up-to-date. I'm done here"),
-            call.delete_tmp_dir("/tmp/created-tmp-dir"),
         ]

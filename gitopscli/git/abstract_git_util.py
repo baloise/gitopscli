@@ -4,27 +4,38 @@ from pathlib import Path
 from git import Repo, GitError, GitCommandError
 
 from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 
 
 class AbstractGitUtil(ABC):
-    _repo = None
-
-    def __init__(self, tmp_dir, username, password, git_user, git_email):
-        self._tmp_dir = tmp_dir
+    def __init__(self, username, password, git_user, git_email):
         self._username = username
         self._password = password
         self._git_user = git_user
         self._git_email = git_email
+        self._repo = None
+        self._tmp_dir = None
 
-    def get_full_file_path(self, file_path):
-        return Path(os.path.join(self._repo.working_dir, file_path))
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.finalize()
+
+    def finalize(self):
+        self.__delete_tmp_dir()
+
+    def get_full_file_path(self, relative_file_path):
+        return Path(os.path.join(self._repo.working_dir, relative_file_path))
 
     def checkout(self, branch):
+        self.__delete_tmp_dir()
+        self._tmp_dir = create_tmp_dir()
         git_options = []
         url = self.get_clone_url()
         try:
             if self._username is not None and self._password is not None:
-                credentials_file = self.create_credentials_file(self._tmp_dir, self._username, self._password)
+                credentials_file = self.__create_credentials_file(self._tmp_dir, self._username, self._password)
                 git_options.append(f"--config credential.helper={credentials_file}")
             self._repo = Repo.clone_from(url=url, to_path=f"{self._tmp_dir}/repo", multi_options=git_options)
         except GitError as ex:
@@ -65,16 +76,6 @@ class AbstractGitUtil(ABC):
     def get_last_commit_hash(self):
         return self._repo.head.commit.hexsha
 
-    @staticmethod
-    def create_credentials_file(directory, username, password):
-        file_path = f"{directory}/credentials.sh"
-        with open(file_path, "w+") as text_file:
-            text_file.write("#!/bin/sh\n")
-            text_file.write(f"echo username={username}\n")
-            text_file.write(f"echo password={password}\n")
-        os.chmod(file_path, 0o700)
-        return file_path
-
     @abstractmethod
     def get_clone_url(self):
         pass
@@ -102,3 +103,17 @@ class AbstractGitUtil(ABC):
     @abstractmethod
     def get_pull_request_branch(self, pr_id):
         pass
+
+    def __delete_tmp_dir(self):
+        if self._tmp_dir:
+            delete_tmp_dir(self._tmp_dir)
+
+    @staticmethod
+    def __create_credentials_file(directory, username, password):
+        file_path = f"{directory}/credentials.sh"
+        with open(file_path, "w+") as text_file:
+            text_file.write("#!/bin/sh\n")
+            text_file.write(f"echo username={username}\n")
+            text_file.write(f"echo password={password}\n")
+        os.chmod(file_path, 0o700)
+        return file_path

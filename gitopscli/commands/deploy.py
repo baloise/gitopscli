@@ -4,7 +4,6 @@ import uuid
 
 from gitopscli.git.create_git import create_git
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -27,20 +26,9 @@ def deploy_command(
 ):
     assert command == "deploy"
 
-    tmp_dir = create_tmp_dir()
-
-    try:
-        git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            organisation,
-            repository_name,
-            git_provider,
-            git_provider_url,
-            tmp_dir,
-        )
+    with create_git(
+        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
+    ) as git:
         git.checkout("master")
         logging.info("Master checkout successful")
 
@@ -57,11 +45,9 @@ def deploy_command(
 
         git.push(config_branch)
         logging.info("Pushed branch %s", config_branch)
-    finally:
-        delete_tmp_dir(tmp_dir)
 
-    if create_pr:
-        __create_pr(git, config_branch, file, updated_values, auto_merge)
+        if create_pr:
+            __create_pr(git, config_branch, file, updated_values, auto_merge)
 
 
 def __update_values(git, file, values, single_commit, commit_message):

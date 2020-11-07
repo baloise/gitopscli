@@ -6,7 +6,6 @@ from gitopscli.commands import delete_preview_command
 from gitopscli.git.create_git import create_git
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io.gitops_config import GitOpsConfig
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 
 
 def delete_pr_preview_command(
@@ -24,21 +23,9 @@ def delete_pr_preview_command(
 ):
     assert command == "delete-pr-preview"
 
-    apps_tmp_dir = create_tmp_dir()
-    root_tmp_dir = create_tmp_dir()
-
-    try:
-        apps_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            organisation,
-            repository_name,
-            git_provider,
-            git_provider_url,
-            apps_tmp_dir,
-        )
+    with create_git(
+        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
+    ) as apps_git:
 
         app_master_branch_name = "master"
         apps_git.checkout(app_master_branch_name)
@@ -49,17 +36,16 @@ def delete_pr_preview_command(
             raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
         logging.info("Read GitOpsConfig: %s", gitops_config)
 
-        root_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            gitops_config.team_config_org,
-            gitops_config.team_config_repo,
-            git_provider,
-            git_provider_url,
-            root_tmp_dir,
-        )
+    with create_git(
+        username,
+        password,
+        git_user,
+        git_email,
+        gitops_config.team_config_org,
+        gitops_config.team_config_repo,
+        git_provider,
+        git_provider_url,
+    ) as root_git:
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
 
@@ -76,10 +62,6 @@ def delete_pr_preview_command(
             branch,
             expect_preview_exists,
         )
-
-    finally:
-        delete_tmp_dir(apps_tmp_dir)
-        delete_tmp_dir(root_tmp_dir)
 
 
 def __create_tmp_dir():

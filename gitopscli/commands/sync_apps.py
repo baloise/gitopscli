@@ -5,7 +5,6 @@ from ruamel.yaml import YAML
 
 from gitopscli.git.create_git import create_git
 from gitopscli.io.yaml_util import merge_yaml_element
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -24,37 +23,19 @@ def sync_apps_command(
 ):
     assert command == "sync-apps"
 
-    apps_tmp_dir = create_tmp_dir()
-    root_tmp_dir = create_tmp_dir()
-
-    try:
-        apps_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            organisation,
-            repository_name,
-            git_provider,
-            git_provider_url,
-            apps_tmp_dir,
-        )
-        root_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            root_organisation,
-            root_repository_name,
-            git_provider,
-            git_provider_url,
-            root_tmp_dir,
-        )
-
+    with create_git(
+        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
+    ) as apps_git, create_git(
+        username,
+        password,
+        git_user,
+        git_email,
+        root_organisation,
+        root_repository_name,
+        git_provider,
+        git_provider_url,
+    ) as root_git:
         __sync_apps(apps_git, root_git)
-    finally:
-        delete_tmp_dir(apps_tmp_dir)
-        delete_tmp_dir(root_tmp_dir)
 
 
 def __sync_apps(apps_git, root_git):
