@@ -22,7 +22,7 @@ def delete_preview_command(
     preview_id,
     expect_preview_exists,
 ):
-    assert command is not None
+    assert command == "delete-preview"
 
     git_config = GitConfig(
         username=username,
