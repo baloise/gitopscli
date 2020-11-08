@@ -1,6 +1,6 @@
 import logging
 
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git, GitConfig
 
 
 def pr_comment_command(
@@ -8,7 +8,16 @@ def pr_comment_command(
 ):
     assert command == "add-pr-comment"
     with create_git(
-        username, password, None, None, organisation, repository_name, git_provider, git_provider_url,
+        GitConfig(
+            username=username,
+            password=password,
+            git_user=None,
+            git_email=None,
+            git_provider=git_provider,
+            git_provider_url=git_provider_url,
+        ),
+        organisation,
+        repository_name,
     ) as apps_git:
         if parent_id:
             logging.info(

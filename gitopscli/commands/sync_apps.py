@@ -3,7 +3,7 @@ import os
 
 from ruamel.yaml import YAML
 
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git, GitConfig
 from gitopscli.io.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
 
@@ -22,20 +22,17 @@ def sync_apps_command(
     git_provider_url,
 ):
     assert command == "sync-apps"
-
-    with create_git(
-        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
-    ) as apps_git, create_git(
-        username,
-        password,
-        git_user,
-        git_email,
-        root_organisation,
-        root_repository_name,
-        git_provider,
-        git_provider_url,
-    ) as root_git:
-        __sync_apps(apps_git, root_git)
+    git_config = GitConfig(
+        username=username,
+        password=password,
+        git_user=git_user,
+        git_email=git_email,
+        git_provider=git_provider,
+        git_provider_url=git_provider_url,
+    )
+    with create_git(git_config, organisation, repository_name) as apps_git:
+        with create_git(git_config, root_organisation, root_repository_name) as root_git:
+            __sync_apps(apps_git, root_git)
 
 
 def __sync_apps(apps_git, root_git):

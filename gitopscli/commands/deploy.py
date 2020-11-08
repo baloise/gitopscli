@@ -2,7 +2,7 @@ import logging
 import os
 import uuid
 
-from gitopscli.git.create_git import create_git
+from gitopscli.git import create_git, GitConfig
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
 from gitopscli.gitops_exception import GitOpsException
 
@@ -25,9 +25,17 @@ def deploy_command(
     commit_message=None,
 ):
     assert command == "deploy"
-
     with create_git(
-        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
+        GitConfig(
+            username=username,
+            password=password,
+            git_user=git_user,
+            git_email=git_email,
+            git_provider=git_provider,
+            git_provider_url=git_provider_url,
+        ),
+        organisation,
+        repository_name,
     ) as git:
         git.checkout("master")
         logging.info("Master checkout successful")

@@ -3,10 +3,10 @@ import logging
 import os
 import shutil
 
-from gitopscli.git.create_git import create_git
-from gitopscli.io.gitops_config import GitOpsConfig
+from gitopscli.git import create_git, GitConfig
 from gitopscli.io.yaml_util import update_yaml_file
 from gitopscli.gitops_exception import GitOpsException
+from .common import load_gitops_config
 
 
 def create_preview_command(
@@ -25,30 +25,20 @@ def create_preview_command(
     deployment_exists_callback=None,
     deployment_new_callback=None,
 ):
-
     assert command is not None
 
-    with create_git(
-        username, password, git_user, git_email, organisation, repository_name, git_provider, git_provider_url,
-    ) as apps_git:
-        apps_git.checkout(git_hash)
-        logging.info("App repo git hash %s checkout successful", git_hash)
-        try:
-            gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
-        except FileNotFoundError as ex:
-            raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
-        logging.info("Read .gitops.config.yaml: %s", gitops_config)
+    git_config = GitConfig(
+        username=username,
+        password=password,
+        git_user=git_user,
+        git_email=git_email,
+        git_provider=git_provider,
+        git_provider_url=git_provider_url,
+    )
 
-    with create_git(
-        username,
-        password,
-        git_user,
-        git_email,
-        gitops_config.team_config_org,
-        gitops_config.team_config_repo,
-        git_provider,
-        git_provider_url,
-    ) as root_git:
+    gitops_config = load_gitops_config(git_config, organisation, repository_name)
+
+    with create_git(git_config, gitops_config.team_config_org, gitops_config.team_config_repo) as root_git:
         root_git.checkout("master")
         logging.info("Config repo branch master checkout successful")
 
@@ -85,7 +75,7 @@ def create_preview_command(
         if not value_replaced:
             logging.info("The image tag %s has already been deployed. Doing nothing.", git_hash)
             if deployment_already_up_to_date_callback:
-                deployment_already_up_to_date_callback(apps_git, git_hash)
+                deployment_already_up_to_date_callback(git_hash)
             return
 
         commit_msg_verb = "Update" if preview_env_already_exist else "Create new"
@@ -97,10 +87,10 @@ def create_preview_command(
 
         if preview_env_already_exist:
             if deployment_exists_callback:
-                deployment_exists_callback(apps_git, gitops_config, route_host)
+                deployment_exists_callback(gitops_config, route_host)
         else:
             if deployment_new_callback:
-                deployment_new_callback(apps_git, gitops_config, route_host)
+                deployment_new_callback(gitops_config, route_host)
 
 
 def __replace_value(
