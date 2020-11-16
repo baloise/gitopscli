@@ -1,20 +1,23 @@
+from typing import Optional
 from github import Github, UnknownObjectException, BadCredentialsException, GitRef, PullRequest, Repository
 from gitopscli.gitops_exception import GitOpsException
 from .git_repo_api import GitRepoApi
 
 
 class GithubGitRepoApiAdapter(GitRepoApi):
-    def __init__(self, username, password, organisation, repository_name):
+    def __init__(
+        self, username: Optional[str], password: Optional[str], organisation: str, repository_name: str
+    ) -> None:
         self.__github = Github(username, password)
         self.__username = username
         self.__password = password
         self.__organisation = organisation
         self.__repository_name = repository_name
 
-    def get_username(self) -> str:
+    def get_username(self) -> Optional[str]:
         return self.__username
 
-    def get_password(self) -> str:
+    def get_password(self) -> Optional[str]:
         return self.__password
 
     def get_clone_url(self) -> str:

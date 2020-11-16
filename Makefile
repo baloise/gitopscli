@@ -13,6 +13,9 @@ format-check:
 lint:
 	pylint gitopscli
 
+mypy:
+	python3 -m mypy .
+
 test:
 	python3 -m pytest -vv -s
 
@@ -21,7 +24,7 @@ coverage:
 	coverage html
 	coverage report
 
-checks: format-check lint test
+checks: format-check lint mypy test
 
 image:
 	docker build -t gitopscli:latest .
@@ -29,4 +32,4 @@ image:
 docs:
 	mkdocs serve
 
-.PHONY: init format format-check lint test coverage checks image docs
+.PHONY: init format format-check lint mypy test coverage checks image docs

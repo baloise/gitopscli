@@ -9,3 +9,4 @@ testrepo/
 *.iml
 .eggs/
 site/
+.mypy_cache

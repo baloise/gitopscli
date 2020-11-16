@@ -17,6 +17,7 @@ FROM build-image AS test-image
 RUN pip install -r requirements-dev.txt
 RUN black --check -l 120 -t py37 gitopscli tests setup.py
 RUN pylint gitopscli
+RUN mypy .
 RUN python -m pytest -v
 
 FROM base-image AS runtime-image

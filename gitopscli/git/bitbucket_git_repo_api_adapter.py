@@ -1,3 +1,4 @@
+from typing import Optional
 import requests
 
 from atlassian import Bitbucket
@@ -7,19 +8,24 @@ from .git_repo_api import GitRepoApi
 
 
 class BitbucketGitRepoApiAdapter(GitRepoApi):
-    def __init__(self, git_provider_url, username, password, organisation, repository_name):
-        if not git_provider_url:
-            raise GitOpsException("Please provide url for bitbucket!")
+    def __init__(
+        self,
+        git_provider_url: str,
+        username: Optional[str],
+        password: Optional[str],
+        organisation: str,
+        repository_name: str,
+    ) -> None:
         self.__bitbucket = Bitbucket(git_provider_url, username, password)
         self.__git_provider_url = git_provider_url
         self.__organisation = organisation
         self.__repository_name = repository_name
 
-    def get_username(self) -> str:
-        return self.__bitbucket.username
+    def get_username(self) -> Optional[str]:
+        return str(self.__bitbucket.username)
 
-    def get_password(self) -> str:
-        return self.__bitbucket.password
+    def get_password(self) -> Optional[str]:
+        return str(self.__bitbucket.password)
 
     def get_clone_url(self) -> str:
         try:
@@ -43,7 +49,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
                 repo_url = clone_link["href"]
         if not repo_url:
             raise GitOpsException("Couldn't determine repository URL.")
-        return repo_url
+        return str(repo_url)
 
     def create_pull_request(
         self, from_branch: str, to_branch: str, title: str, description: str
@@ -87,10 +93,10 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         branches = self.__bitbucket.get_branches(self.__organisation, self.__repository_name, filter=branch, limit=1)
         if not branches:
             raise GitOpsException(f"Branch '{branch}' not found'")
-        return branches[0]["latestCommit"]
+        return str(branches[0]["latestCommit"])
 
     def get_pull_request_branch(self, pr_id: str) -> str:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
         if "errors" in pull_request:
             raise GitOpsException(pull_request["errors"][0]["message"])
-        return pull_request["fromRef"]["displayId"]
+        return str(pull_request["fromRef"]["displayId"])

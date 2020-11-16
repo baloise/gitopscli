@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Callable
 
 from gitopscli.cliparser import create_cli
 from gitopscli.commands import (
@@ -15,7 +16,7 @@ from gitopscli.commands import (
 from gitopscli.gitops_exception import GitOpsException
 
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)-2s %(funcName)s: %(message)s")
     args = create_cli(sys.argv[1:])
 
@@ -41,8 +42,8 @@ if __name__ == "__main__":
     main()
 
 
-def get_command(command):
-    command_func = None
+def get_command(command: str) -> Callable[..., None]:
+    command_func: Callable[..., None]
     if command == "deploy":
         command_func = deploy_command
     elif command == "sync-apps":
@@ -59,4 +60,6 @@ def get_command(command):
         command_func = delete_preview_command
     elif command == "version":
         command_func = version_command
+    else:
+        raise GitOpsException(f"Command {command} not implemented!")
     return command_func
