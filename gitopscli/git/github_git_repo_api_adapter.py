@@ -1,0 +1,72 @@
+from github import Github, UnknownObjectException, BadCredentialsException, GitRef, PullRequest, Repository
+from gitopscli.gitops_exception import GitOpsException
+from .git_repo_api import GitRepoApi
+
+
+class GithubGitRepoApiAdapter(GitRepoApi):
+    def __init__(self, username, password, organisation, repository_name):
+        self.__github = Github(username, password)
+        self.__username = username
+        self.__password = password
+        self.__organisation = organisation
+        self.__repository_name = repository_name
+
+    def get_username(self) -> str:
+        return self.__username
+
+    def get_password(self) -> str:
+        return self.__password
+
+    def get_clone_url(self) -> str:
+        return self.__get_repo().clone_url
+
+    def create_pull_request(
+        self, from_branch: str, to_branch: str, title: str, description: str
+    ) -> GitRepoApi.PullRequestIdAndUrl:
+        repo = self.__get_repo()
+        pull_request = repo.create_pull(title=title, body=description, head=from_branch, base=to_branch)
+        return GitRepoApi.PullRequestIdAndUrl(pr_id=str(pull_request.id), url=pull_request.html_url)
+
+    def merge_pull_request(self, pr_id: str) -> None:
+        pull_request = self.__get_pull_request(pr_id)
+        pull_request.merge()
+
+    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: str = None) -> None:
+        pull_request = self.__get_pull_request(pr_id)
+        pull_request.create_issue_comment(text)
+
+    def delete_branch(self, branch: str) -> None:
+        git_ref = self.__get_branch_ref(branch)
+        git_ref.delete()
+
+    def get_branch_head_hash(self, branch: str) -> str:
+        git_ref = self.__get_branch_ref(branch)
+        return git_ref.object.sha
+
+    def get_pull_request_branch(self, pr_id: str) -> str:
+        pull_request = self.__get_pull_request(pr_id)
+        return pull_request.head.ref
+
+    def __get_branch_ref(self, branch: str) -> GitRef.GitRef:
+        repo = self.__get_repo()
+        try:
+            return repo.get_git_ref(f"heads/{branch}")
+        except UnknownObjectException as ex:
+            raise GitOpsException(f"Branch '{branch}' does not exist.") from ex
+
+    def __get_pull_request(self, pr_id: str) -> PullRequest.PullRequest:
+        repo = self.__get_repo()
+        try:
+            return repo.get_pull(int(pr_id))
+        except UnknownObjectException as ex:
+            raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist.") from ex
+
+    def __get_repo(self) -> Repository.Repository:
+        try:
+            return self.__github.get_repo(f"{self.__organisation}/{self.__repository_name}")
+        except BadCredentialsException as ex:
+            raise GitOpsException("Bad credentials") from ex
+        except UnknownObjectException as ex:
+            raise GitOpsException(
+                f"Repository '{self.__organisation}/{self.__repository_name}' does not exist."
+            ) from ex
