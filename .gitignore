@@ -1,6 +1,8 @@
 *.egg-info
 __pycache__
 .vscode
+.coverage
+htmlcov/
 venv/
 testrepo/
 .idea
