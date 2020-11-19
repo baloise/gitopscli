@@ -52,7 +52,7 @@ class SyncAppsCommandTest(unittest.TestCase):
         self.os_path_isdir_mock.return_value = True
         self.open_mock.return_value = self.open_mock
         self.open_mock.__enter__.return_value = self.open_mock
-        self.os_listdir_mock.return_value = ['folder']
+        self.os_listdir_mock.return_value = ["folder"]
         bootstrap_values_content = {"bootstrap": [{"name": "team-non-prod"}], "repository": "somerepo"}
         apps_team_content = {"teamName": "team1", "repository": "somerepo"}
         self.yaml_mock.load.side_effect = [bootstrap_values_content, apps_team_content]
@@ -72,33 +72,43 @@ class SyncAppsCommandTest(unittest.TestCase):
             git_provider_url=None,
         )
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(GitApiConfig(username='USERNAME', password='PASSWORD', git_provider='github', git_provider_url=None), 'ORGA', 'REPO'),
-            call.GitRepoApiFactory.create(GitApiConfig(username='USERNAME', password='PASSWORD', git_provider='github', git_provider_url=None), 'ROOT_ORGA', 'ROOT_REPO'),
+            call.GitRepoApiFactory.create(
+                GitApiConfig(username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None),
+                "ORGA",
+                "REPO",
+            ),
+            call.GitRepoApiFactory.create(
+                GitApiConfig(username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None),
+                "ROOT_ORGA",
+                "ROOT_REPO",
+            ),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.get_clone_url(),
-            call.logging.info('Team config repository: %s', 'somerepo'),
+            call.logging.info("Team config repository: %s", "somerepo"),
             call.GitRepo.get_clone_url(),
-            call.logging.info('Root config repository: %s', 'somerepo'),
-            call.GitRepo.checkout('master'),
-            call.GitRepo.get_full_file_path('.'),
-            call.os.listdir('/tmp/created-tmp-dir/.'),
-            call.os.path.isdir('/tmp/created-tmp-dir/./folder'),
-            call.logging.info('Found %s app(s) in apps repository: %s', 1, 'folder'),
+            call.logging.info("Root config repository: %s", "somerepo"),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("."),
+            call.os.listdir("/tmp/created-tmp-dir/."),
+            call.os.path.isdir("/tmp/created-tmp-dir/./folder"),
+            call.logging.info("Found %s app(s) in apps repository: %s", 1, "folder"),
             call.logging.info("Searching apps repository in root repository's 'apps/' directory..."),
-            call.GitRepo.checkout('master'),
-            call.GitRepo.get_full_file_path('bootstrap/values.yaml'),
-            call.open('/tmp/created-tmp-dir/bootstrap/values.yaml', 'r'),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("bootstrap/values.yaml"),
+            call.open("/tmp/created-tmp-dir/bootstrap/values.yaml", "r"),
             call.YAML.load(self.open_mock),
-            call.logging.info('Analyzing %s in root repository', 'apps/team-non-prod.yaml'),
-            call.GitRepo.get_full_file_path('apps/team-non-prod.yaml'),
-            call.open('/tmp/created-tmp-dir/apps/team-non-prod.yaml', 'r'),
+            call.logging.info("Analyzing %s in root repository", "apps/team-non-prod.yaml"),
+            call.GitRepo.get_full_file_path("apps/team-non-prod.yaml"),
+            call.open("/tmp/created-tmp-dir/apps/team-non-prod.yaml", "r"),
             call.YAML.load(self.open_mock),
             call.GitRepo.get_clone_url(),
-            call.logging.info('Found apps repository in %s', 'apps/team-non-prod.yaml'),
-            call.logging.info("Sync applications in root repository's %s.", 'apps/team-non-prod.yaml'),
-            call.merge_yaml_element('/tmp/created-tmp-dir/apps/team-non-prod.yaml', 'applications', {'folder': {}}, True),
+            call.logging.info("Found apps repository in %s", "apps/team-non-prod.yaml"),
+            call.logging.info("Sync applications in root repository's %s.", "apps/team-non-prod.yaml"),
+            call.merge_yaml_element(
+                "/tmp/created-tmp-dir/apps/team-non-prod.yaml", "applications", {"folder": {}}, True
+            ),
             call.GitRepo.get_author_from_last_commit(),
-            call.GitRepo.commit('GIT_USER', 'GIT_EMAIL', "author updated apps/team-non-prod.yaml"),
-            call.GitRepo.push('master'),
+            call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "author updated apps/team-non-prod.yaml"),
+            call.GitRepo.push("master"),
         ]
