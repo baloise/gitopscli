@@ -1,1 +1,4 @@
-from .git_factory import create_git, GitConfig
+from .git_repo import GitRepo
+from .git_repo_api import GitRepoApi
+from .git_repo_api_factory import GitRepoApiFactory
+from .git_api_config import GitApiConfig
