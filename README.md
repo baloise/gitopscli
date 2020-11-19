@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/baloise/gitopscli.svg?branch=master)](https://travis-ci.org/baloise/gitopscli) 
+[![Build Status](https://travis-ci.com/baloise/gitopscli.svg?branch=master)](https://travis-ci.com/baloise/gitopscli) 
 [![Latest Release)](https://img.shields.io/github/v/release/baloise/gitopscli)](https://github.com/baloise/gitopscli/releases)
 [![Docker Pulls](https://img.shields.io/docker/pulls/baloise/gitopscli)](https://hub.docker.com/r/baloise/gitopscli/tags)
 [![Python: 3.7](https://img.shields.io/badge/python-3.7-yellow.svg)](https://www.python.org/downloads/release/python-370/)
