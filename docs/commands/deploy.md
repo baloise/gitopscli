@@ -71,6 +71,28 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
     backend.env.[0].value: 'bar'
 ```
 
+### Specific Commit Message
+
+If you want to specify the commit message of the deployment then you can use the following param:
+
+`--commit-message`
+
+```bash
+gitopscli deploy \
+  --git-provider-url https://bitbucket.baloise.dev \
+  --username $GIT_USERNAME \
+  --password $GIT_PASSWORD \
+  --git-user "GitOps CLI" \
+  --git-email "gitopscli@baloise.dev" \
+  --organisation "deployment" \
+  --repository-name "myapp-non-prod" \
+  --commit-message "test commit message" \
+  --file "example/values.yaml" \
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}"
+```
+
+This will end up in one single commit with your specified commit-message.
+
 ### Create Pull Request
 
 In some cases you might want to create a pull request for your updates. You can achieve this by adding `--create-pr` to the command. The pull request can be left open or merged directly with `--auto-merge`.

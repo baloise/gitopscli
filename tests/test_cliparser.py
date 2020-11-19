@@ -165,7 +165,9 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                --preview-id PREVIEW_ID [-v [VERBOSE]]
+                                --preview-id PREVIEW_ID
+                                [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
+                                [-v [VERBOSE]]
 gitopscli delete-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --preview-id
 """
 
@@ -177,7 +179,9 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
                                    [--git-provider-url GIT_PROVIDER_URL]
-                                   --branch BRANCH [-v [VERBOSE]]
+                                   --branch BRANCH
+                                   [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
+                                   [-v [VERBOSE]]
 gitopscli delete-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --branch
 """
 
@@ -187,7 +191,9 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
-                                --preview-id PREVIEW_ID [-v [VERBOSE]]
+                                --preview-id PREVIEW_ID
+                                [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
+                                [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -207,6 +213,8 @@ optional arguments:
                         https://bitbucket.example.tld)
   --preview-id PREVIEW_ID
                         The preview-id for which the preview was created for
+  --expect-preview-exists [EXPECT_PREVIEW_EXISTS]
+                        Fail if preview does not exist
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
@@ -219,7 +227,9 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
                                    [--git-provider-url GIT_PROVIDER_URL]
-                                   --branch BRANCH [-v [VERBOSE]]
+                                   --branch BRANCH
+                                   [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
+                                   [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -238,13 +248,16 @@ optional arguments:
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
   --branch BRANCH       The branch for which the preview was created for
+  --expect-preview-exists [EXPECT_PREVIEW_EXISTS]
+                        Fail if preview does not exist
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
 
 EXPECTED_DEPLOY_NO_ARGS_ERROR = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
-                        [--single-commit [SINGLE_COMMIT]] --username USERNAME
+                        [--single-commit [SINGLE_COMMIT]]
+                        [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
                         [--git-email GIT_EMAIL] --organisation ORGANISATION
                         --repository-name REPOSITORY_NAME
@@ -257,7 +270,8 @@ gitopscli deploy: error: the following arguments are required: --file, --values,
 
 EXPECTED_DEPLOY_HELP = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
-                        [--single-commit [SINGLE_COMMIT]] --username USERNAME
+                        [--single-commit [SINGLE_COMMIT]]
+                        [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
                         [--git-email GIT_EMAIL] --organisation ORGANISATION
                         --repository-name REPOSITORY_NAME
@@ -273,6 +287,8 @@ optional arguments:
                         desired value as value
   --single-commit [SINGLE_COMMIT]
                         Create only single commit for all updates
+  --commit-message COMMIT_MESSAGE
+                        Specify exact commit message of deployment commit
   --username USERNAME   Git username
   --password PASSWORD   Git password or token
   --git-user GIT_USER   Git Username
@@ -724,6 +740,7 @@ class CliParserTest(unittest.TestCase):
 
         self.assertIsNone(cli.git_provider)
         self.assertIsNone(cli.git_provider_url)
+        self.assertFalse(cli.expect_preview_exists)
         self.assertFalse(cli.verbose)
 
     def test_delete_preview_all_args(self):
@@ -748,6 +765,7 @@ class CliParserTest(unittest.TestCase):
                 "REPO",
                 "--preview-id",
                 "abc123",
+                "--expect-preview-exists",
                 "-v",
                 "n",
             ]
@@ -764,6 +782,7 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(cli.git_provider, "GIT_PROVIDER")
         self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(cli.expect_preview_exists)
         self.assertFalse(cli.verbose)
 
     def test_delete_pr_preview_no_args(self):
@@ -816,6 +835,7 @@ class CliParserTest(unittest.TestCase):
 
         self.assertIsNone(cli.git_provider)
         self.assertIsNone(cli.git_provider_url)
+        self.assertFalse(cli.expect_preview_exists)
         self.assertFalse(cli.verbose)
 
     def test_delete_pr_preview_all_args(self):
@@ -840,6 +860,7 @@ class CliParserTest(unittest.TestCase):
                 "REPO",
                 "--branch",
                 "BRANCH",
+                "--expect-preview-exists",
                 "-v",
                 "n",
             ]
@@ -856,6 +877,7 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(cli.git_provider, "GIT_PROVIDER")
         self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(cli.expect_preview_exists)
         self.assertFalse(cli.verbose)
 
     def test_deploy_no_args(self):

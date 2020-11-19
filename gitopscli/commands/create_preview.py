@@ -3,11 +3,10 @@ import logging
 import os
 import shutil
 
-from gitopscli.git.create_git import create_git
-from gitopscli.io.gitops_config import GitOpsConfig
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
 from gitopscli.gitops_exception import GitOpsException
+from .common import load_gitops_config
 
 
 def create_preview_command(
@@ -22,70 +21,42 @@ def create_preview_command(
     git_provider_url,
     git_hash,
     preview_id,
-    deployment_already_up_to_date_callback=None,
-    deployment_exists_callback=None,
-    deployment_new_callback=None,
+    deployment_already_up_to_date_callback=lambda: None,
+    deployment_exists_callback=lambda: None,
+    deployment_new_callback=lambda: None,
 ):
+    assert command == "create-preview"
 
-    assert command is not None
+    git_api_config = GitApiConfig(
+        username=username, password=password, git_provider=git_provider, git_provider_url=git_provider_url,
+    )
 
-    apps_tmp_dir = create_tmp_dir()
-    root_tmp_dir = create_tmp_dir()
+    gitops_config = load_gitops_config(git_api_config, organisation, repository_name)
 
-    try:
-        apps_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            organisation,
-            repository_name,
-            git_provider,
-            git_provider_url,
-            apps_tmp_dir,
-        )
-
-        apps_git.checkout(git_hash)
-        logging.info("App repo git hash %s checkout successful", git_hash)
-        try:
-            gitops_config = GitOpsConfig(apps_git.get_full_file_path(".gitops.config.yaml"))
-        except FileNotFoundError as ex:
-            raise GitOpsException(f"Couldn't find .gitops.config.yaml") from ex
-        logging.info("Read .gitops.config.yaml: %s", gitops_config)
-
-        root_git = create_git(
-            username,
-            password,
-            git_user,
-            git_email,
-            gitops_config.team_config_org,
-            gitops_config.team_config_repo,
-            git_provider,
-            git_provider_url,
-            root_tmp_dir,
-        )
-        root_git.checkout("master")
+    config_git_repo_api = GitRepoApiFactory.create(
+        config=git_api_config,
+        organisation=gitops_config.team_config_org,
+        repository_name=gitops_config.team_config_repo,
+    )
+    with GitRepo(config_git_repo_api) as config_git_repo:
+        config_git_repo.checkout("master")
         logging.info("Config repo branch master checkout successful")
 
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
-        if os.path.isdir(root_git.get_full_file_path(preview_template_folder_name)):
-            logging.info("Using the preview template folder: %s", preview_template_folder_name)
-        else:
+        if not os.path.isdir(config_git_repo.get_full_file_path(preview_template_folder_name)):
             raise GitOpsException(f"The preview template folder does not exist: {preview_template_folder_name}")
+        logging.info("Using the preview template folder: %s", preview_template_folder_name)
 
         hashed_preview_id = hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
         new_preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
         logging.info("New folder for preview: %s", new_preview_folder_name)
-        preview_env_already_exist = os.path.isdir(root_git.get_full_file_path(new_preview_folder_name))
+        preview_env_already_exist = os.path.isdir(config_git_repo.get_full_file_path(new_preview_folder_name))
         logging.info("Is preview env already existing? %s", preview_env_already_exist)
         if not preview_env_already_exist:
             __create_new_preview_env(
-                git_hash,
-                new_preview_folder_name,
-                preview_template_folder_name,
-                root_git,
-                gitops_config.application_name,
+                new_preview_folder_name, preview_template_folder_name, config_git_repo,
             )
+
         logging.info("Using image tag from git hash: %s", git_hash)
         route_host = None
         value_replaced = False
@@ -95,30 +66,29 @@ def create_preview_command(
                 git_hash,
                 new_preview_folder_name,
                 replacement,
-                root_git,
+                config_git_repo,
                 route_host,
                 hashed_preview_id,
                 value_replaced,
             )
         if not value_replaced:
             logging.info("The image tag %s has already been deployed. Doing nothing.", git_hash)
-            if deployment_already_up_to_date_callback:
-                deployment_already_up_to_date_callback(apps_git, git_hash)
+            deployment_already_up_to_date_callback(route_host)
             return
 
-        root_git.commit(f"Update preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.")
-        root_git.push("master")
+        commit_msg_verb = "Update" if preview_env_already_exist else "Create new"
+        config_git_repo.commit(
+            git_user,
+            git_email,
+            f"{commit_msg_verb} preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.",
+        )
+        config_git_repo.push("master")
         logging.info("Pushed branch master")
 
         if preview_env_already_exist:
-            if deployment_exists_callback:
-                deployment_exists_callback(apps_git, gitops_config, route_host)
+            deployment_exists_callback(route_host)
         else:
-            if deployment_new_callback:
-                deployment_new_callback(apps_git, gitops_config, route_host)
-    finally:
-        delete_tmp_dir(apps_tmp_dir)
-        delete_tmp_dir(root_tmp_dir)
+            deployment_new_callback(route_host)
 
 
 def __replace_value(
@@ -154,16 +124,16 @@ def __replace_value(
 
 
 def __create_new_preview_env(
-    git_hash, new_preview_folder_name, preview_template_folder_name, root_git, app_name,
+    new_preview_folder_name, preview_template_folder_name, config_git_repo: GitRepo,
 ):
     shutil.copytree(
-        root_git.get_full_file_path(preview_template_folder_name), root_git.get_full_file_path(new_preview_folder_name),
+        config_git_repo.get_full_file_path(preview_template_folder_name),
+        config_git_repo.get_full_file_path(new_preview_folder_name),
     )
     chart_file_path = new_preview_folder_name + "/Chart.yaml"
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
-    if root_git.get_full_file_path(chart_file_path):
+    if config_git_repo.get_full_file_path(chart_file_path):
         try:
-            update_yaml_file(root_git.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
+            update_yaml_file(config_git_repo.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
         except KeyError as ex:
             raise GitOpsException(f"Key 'name' not found in '{chart_file_path}'") from ex
-    root_git.commit(f"Create new preview environment for '{app_name}' and git hash '{git_hash}'.")

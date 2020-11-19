@@ -22,8 +22,9 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL] --preview-id
-                                PREVIEW_ID
+                                [--git-provider-url GIT_PROVIDER_URL]
+                                --preview-id PREVIEW_ID
+                                [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                 [-v [VERBOSE]]
 
 optional arguments:
@@ -42,7 +43,10 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --preview-id PREVIEW_ID   The preview id for which the preview was created for
+  --preview-id PREVIEW_ID
+                        The preview-id for which the preview was created for
+  --expect-preview-exists [EXPECT_PREVIEW_EXISTS]
+                        Fail if preview does not exist
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```
