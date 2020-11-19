@@ -27,16 +27,12 @@ def create_preview_command(
 ):
     assert command == "create-preview"
 
-    git_api_config = GitApiConfig(
-        username=username, password=password, git_provider=git_provider, git_provider_url=git_provider_url,
-    )
+    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
 
     gitops_config = load_gitops_config(git_api_config, organisation, repository_name)
 
     config_git_repo_api = GitRepoApiFactory.create(
-        config=git_api_config,
-        organisation=gitops_config.team_config_org,
-        repository_name=gitops_config.team_config_repo,
+        git_api_config, gitops_config.team_config_org, gitops_config.team_config_repo,
     )
     with GitRepo(config_git_repo_api) as config_git_repo:
         config_git_repo.checkout("master")

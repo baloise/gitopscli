@@ -7,9 +7,7 @@ def pr_comment_command(
     command, text, username, password, parent_id, pr_id, organisation, repository_name, git_provider, git_provider_url,
 ):
     assert command == "add-pr-comment"
-    git_api_config = GitApiConfig(
-        username=username, password=password, git_provider=git_provider, git_provider_url=git_provider_url,
-    )
+    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name,)
     if parent_id:
         logging.info(

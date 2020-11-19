@@ -25,9 +25,7 @@ def deploy_command(
     commit_message=None,
 ):
     assert command == "deploy"
-    git_api_config = GitApiConfig(
-        username=username, password=password, git_provider=git_provider, git_provider_url=git_provider_url,
-    )
+    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
     with GitRepo(git_repo_api) as git_repo:
         git_repo.checkout("master")

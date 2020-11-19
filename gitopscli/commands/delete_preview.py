@@ -24,9 +24,7 @@ def delete_preview_command(
 ):
     assert command == "delete-preview"
 
-    git_api_config = GitApiConfig(
-        username=username, password=password, git_provider=git_provider, git_provider_url=git_provider_url,
-    )
+    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
 
     gitops_config = load_gitops_config(git_api_config, organisation, repository_name)
 

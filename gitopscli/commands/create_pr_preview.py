@@ -18,9 +18,7 @@ def create_pr_preview_command(
     git_provider_url,
 ):
     assert command == "create-pr-preview"
-    git_api_config = GitApiConfig(
-        username=username, password=password, git_provider=git_provider, git_provider_url=git_provider_url,
-    )
+    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
 
     pr_branch = git_repo_api.get_pull_request_branch(pr_id)

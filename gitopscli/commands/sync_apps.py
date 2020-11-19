@@ -22,9 +22,7 @@ def sync_apps_command(
     git_provider_url,
 ):
     assert command == "sync-apps"
-    git_api_config = GitApiConfig(
-        username=username, password=password, git_provider=git_provider, git_provider_url=git_provider_url,
-    )
+    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
     apps_git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
     root_git_repo_api = GitRepoApiFactory.create(git_api_config, root_organisation, root_repository_name)
     with GitRepo(apps_git_repo_api) as apps_git_repo, GitRepo(root_git_repo_api) as root_git_repo:
@@ -40,7 +38,7 @@ def __sync_apps(apps_git_repo: GitRepo, root_git_repo: GitRepo, git_user: str, g
 
     logging.info("Searching apps repository in root repository's 'apps/' directory...")
     apps_config_file, apps_config_file_name, current_repo_apps, apps_from_other_repos = __find_apps_config_from_repo(
-        root_git_repo, root_git_repo
+        apps_git_repo, root_git_repo
     )
     if apps_config_file is None:
         raise GitOpsException(f"Could't find config file for apps repository in root repository's 'apps/' directory")
