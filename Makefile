@@ -11,10 +11,15 @@ lint:
 test:
 	python3 -m pytest -vv -s
 
+coverage:
+	coverage run -m pytest
+	coverage html
+	coverage report
+
 image:
 	docker build -t gitopscli:latest .
 
 docs:
 	mkdocs serve
 
-.PHONY: init format lint test image docs
+.PHONY: init format lint test coverage image docs
