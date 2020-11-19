@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 
 class GitRepoApi(metaclass=ABCMeta):
@@ -8,11 +8,11 @@ class GitRepoApi(metaclass=ABCMeta):
         url: str
 
     @abstractmethod
-    def get_username(self) -> str:
+    def get_username(self) -> Optional[str]:
         raise NotImplementedError
 
     @abstractmethod
-    def get_password(self) -> str:
+    def get_password(self) -> Optional[str]:
         raise NotImplementedError
 
     @abstractmethod

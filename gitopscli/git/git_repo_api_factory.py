@@ -18,6 +18,8 @@ class GitRepoApiFactory:  # pylint: disable=too-few-public-methods
                 repository_name=repository_name,
             )
         elif config.is_provider_bitbucket:
+            if not config.git_provider_url:
+                raise GitOpsException("Please provide url for bitbucket!")
             git_repo_api = BitbucketGitRepoApiAdapter(
                 git_provider_url=config.git_provider_url,
                 username=config.username,

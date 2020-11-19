@@ -2,6 +2,7 @@
 !gitopscli/
 !tests/
 !.pylintrc
+!mypy.ini
 !requirements-dev.txt
 !requirements.txt
 !setup.py
