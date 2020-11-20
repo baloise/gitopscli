@@ -20,7 +20,7 @@ def create_pr_preview_command(
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
 
     pr_branch = git_repo_api.get_pull_request_branch(pr_id)
-    git_hash = git_repo_api.get_branch_head_hash("master")
+    git_hash = git_repo_api.get_branch_head_hash(pr_branch)
 
     add_pr_comment = lambda comment: git_repo_api.add_pull_request_comment(pr_id, comment, parent_id)
 
