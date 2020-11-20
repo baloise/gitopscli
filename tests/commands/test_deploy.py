@@ -71,7 +71,6 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info("Master checkout successful"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
@@ -81,7 +80,6 @@ class DeployCommandTest(unittest.TestCase):
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.d' to 'bar' in test/file.yml"),
             call.GitRepo.push("master"),
-            call.logging.info("Pushed branch %s", "master"),
         ]
 
     def test_create_pr_happy_flow(self):
@@ -106,9 +104,7 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info("Master checkout successful"),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
-            call.logging.info("Created branch %s", "gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
@@ -118,14 +114,12 @@ class DeployCommandTest(unittest.TestCase):
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.d' to 'bar' in test/file.yml"),
             call.GitRepo.push("gitopscli-deploy-b973b5bb"),
-            call.logging.info("Pushed branch %s", "gitopscli-deploy-b973b5bb"),
             call.GitRepoApi.create_pull_request(
                 "gitopscli-deploy-b973b5bb",
                 "master",
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
-            call.logging.info("Pull request created: %s", "<url of dummy pr>"),
         ]
 
     def test_create_pr_and_merge_happy_flow(self):
@@ -150,9 +144,7 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info("Master checkout successful"),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
-            call.logging.info("Created branch %s", "gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
@@ -162,18 +154,14 @@ class DeployCommandTest(unittest.TestCase):
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.d' to 'bar' in test/file.yml"),
             call.GitRepo.push("gitopscli-deploy-b973b5bb"),
-            call.logging.info("Pushed branch %s", "gitopscli-deploy-b973b5bb"),
             call.GitRepoApi.create_pull_request(
                 "gitopscli-deploy-b973b5bb",
                 "master",
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
-            call.logging.info("Pull request created: %s", "<url of dummy pr>"),
             call.GitRepoApi.merge_pull_request("<dummy pr id>"),
-            call.logging.info("Pull request merged"),
             call.GitRepoApi.delete_branch("gitopscli-deploy-b973b5bb"),
-            call.logging.info("Branch '%s' deleted", "gitopscli-deploy-b973b5bb"),
         ]
 
     def test_single_commit_happy_flow(self):
@@ -198,7 +186,6 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info("Master checkout successful"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
@@ -207,7 +194,6 @@ class DeployCommandTest(unittest.TestCase):
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "updated 2 values in test/file.yml\n\na.b.c: foo\na.b.d: bar"),
             call.GitRepo.push("master"),
-            call.logging.info("Pushed branch %s", "master"),
         ]
 
     def test_commit_message_happy_flow(self):
@@ -233,7 +219,6 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info("Master checkout successful"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
@@ -242,7 +227,6 @@ class DeployCommandTest(unittest.TestCase):
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "testcommit"),
             call.GitRepo.push("master"),
-            call.logging.info("Pushed branch %s", "master"),
         ]
 
     def test_checkout_error(self):
@@ -300,7 +284,6 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info("Master checkout successful"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
         ]
@@ -329,7 +312,6 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info("Master checkout successful"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),

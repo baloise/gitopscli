@@ -33,11 +33,6 @@ def delete_preview_command(
     )
     with GitRepo(config_git_repo_api) as config_git_repo:
         config_git_repo.checkout("master")
-        logging.info(
-            "Config repo '%s/%s' branch 'master' checkout successful",
-            gitops_config.team_config_org,
-            gitops_config.team_config_repo,
-        )
         hashed_preview_id = hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
         preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
         logging.info("Preview folder name: %s", preview_folder_name)
@@ -55,7 +50,6 @@ def delete_preview_command(
                 f"Delete preview environment for '{gitops_config.application_name}' and preview id '{preview_id}'.",
             )
             config_git_repo.push("master")
-            logging.info("Pushed branch 'master'")
         else:
             logging.info(
                 "No preview environment for '%s' and preview id '%s'. Nothing to do..",

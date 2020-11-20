@@ -1,5 +1,3 @@
-import logging
-
 from gitopscli.commands.create_preview import create_preview_command
 from gitopscli.git import GitApiConfig, GitRepoApiFactory
 
@@ -22,11 +20,9 @@ def create_pr_preview_command(
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
 
     pr_branch = git_repo_api.get_pull_request_branch(pr_id)
-    git_hash = git_repo_api.get_branch_head_hash()
+    git_hash = git_repo_api.get_branch_head_hash(pr_branch)
 
-    def add_pr_comment(comment):
-        logging.info("Adding comment to pull request with id %s: %s", pr_id, comment)
-        git_repo_api.add_pull_request_comment(pr_id, comment, parent_id)
+    add_pr_comment = lambda comment: git_repo_api.add_pull_request_comment(pr_id, comment, parent_id)
 
     create_preview_command(
         command="create-preview",

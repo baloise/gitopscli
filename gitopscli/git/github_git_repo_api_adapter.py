@@ -34,7 +34,7 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         pull_request = self.__get_pull_request(pr_id)
         pull_request.merge()
 
-    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: str = None) -> None:
+    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: Optional[str] = None) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.create_issue_comment(text)
 

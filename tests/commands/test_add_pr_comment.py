@@ -16,7 +16,6 @@ class AddPrCommentCommandTest(unittest.TestCase):
             return patcher.start()
 
         # Monkey patch all external functions the command is using:
-        self.logging_mock = add_patch("gitopscli.commands.add_pr_comment.logging")
         self.git_repo_api_factory_mock = add_patch("gitopscli.commands.add_pr_comment.GitRepoApiFactory")
         self.git_repo_api_mock = MagicMock()
 
@@ -24,7 +23,6 @@ class AddPrCommentCommandTest(unittest.TestCase):
         self.mock_manager = Mock()
         self.mock_manager.attach_mock(self.git_repo_api_factory_mock, "GitRepoApiFactory")
         self.mock_manager.attach_mock(self.git_repo_api_mock, "GitRepoApi")
-        self.mock_manager.attach_mock(self.logging_mock, "logging")
 
         # Define some common default return values
         self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
@@ -45,12 +43,6 @@ class AddPrCommentCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
-            call.logging.info(
-                "Creating comment for PR %s as reply to comment %s with content: %s",
-                "<PR ID>",
-                "<PARENT ID>",
-                "Hello World!",
-            ),
             call.GitRepoApi.add_pull_request_comment("<PR ID>", "Hello World!", "<PARENT ID>"),
         ]
 
@@ -70,6 +62,5 @@ class AddPrCommentCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
-            call.logging.info("Creating comment for PR %s with content: %s", "<PR ID>", "Hello World!",),
             call.GitRepoApi.add_pull_request_comment("<PR ID>", "Hello World!", None),
         ]

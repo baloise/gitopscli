@@ -30,7 +30,7 @@ class GitRepoApi(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: str = None) -> None:
+    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: Optional[str] = None) -> None:
         raise NotImplementedError
 
     @abstractmethod

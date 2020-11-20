@@ -29,13 +29,11 @@ def deploy_command(
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
     with GitRepo(git_repo_api) as git_repo:
         git_repo.checkout("master")
-        logging.info("Master checkout successful")
 
         config_branch = f"gitopscli-deploy-{str(uuid.uuid4())[:8]}" if create_pr else "master"
 
         if create_pr:
             git_repo.new_branch(config_branch)
-            logging.info("Created branch %s", config_branch)
 
         updated_values = __update_values(git_repo, git_user, git_email, file, values, single_commit, commit_message)
         if not updated_values:
@@ -43,7 +41,6 @@ def deploy_command(
             return
 
         git_repo.push(config_branch)
-        logging.info("Pushed branch %s", config_branch)
 
     if create_pr:
         __create_pr(git_repo_api, config_branch, file, updated_values, auto_merge)
@@ -96,11 +93,6 @@ Updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in `
 ```
 """
     pull_request = git_repo_api.create_pull_request(branch, "master", title, description)
-    logging.info("Pull request created: %s", pull_request.url)
-
     if auto_merge:
         git_repo_api.merge_pull_request(pull_request.pr_id)
-        logging.info("Pull request merged")
-
         git_repo_api.delete_branch(branch)
-        logging.info("Branch '%s' deleted", branch)
