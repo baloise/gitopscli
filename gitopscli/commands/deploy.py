@@ -96,11 +96,6 @@ Updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in `
 ```
 """
     pull_request = git_repo_api.create_pull_request(branch, "master", title, description)
-    logging.info("Pull request created: %s", pull_request.url)
-
     if auto_merge:
         git_repo_api.merge_pull_request(pull_request.pr_id)
-        logging.info("Pull request merged")
-
         git_repo_api.delete_branch(branch)
-        logging.info("Branch '%s' deleted", branch)

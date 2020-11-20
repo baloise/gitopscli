@@ -125,7 +125,6 @@ class DeployCommandTest(unittest.TestCase):
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
-            call.logging.info("Pull request created: %s", "<url of dummy pr>"),
         ]
 
     def test_create_pr_and_merge_happy_flow(self):
@@ -169,11 +168,8 @@ class DeployCommandTest(unittest.TestCase):
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
-            call.logging.info("Pull request created: %s", "<url of dummy pr>"),
             call.GitRepoApi.merge_pull_request("<dummy pr id>"),
-            call.logging.info("Pull request merged"),
             call.GitRepoApi.delete_branch("gitopscli-deploy-b973b5bb"),
-            call.logging.info("Branch '%s' deleted", "gitopscli-deploy-b973b5bb"),
         ]
 
     def test_single_commit_happy_flow(self):
