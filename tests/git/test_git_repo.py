@@ -2,7 +2,7 @@ from os import path, makedirs, chmod
 import stat
 import unittest
 import uuid
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, call
 from pathlib import Path
 from git import Repo
 import pytest
@@ -75,7 +75,8 @@ class GitRepoTest(unittest.TestCase):
         testee.__exit__(None, None, None)
         self.assertFalse(path.exists(tmp_dir))
 
-    def test_checkout_without_credentials(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_checkout_without_credentials(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
 
@@ -83,8 +84,13 @@ class GitRepoTest(unittest.TestCase):
             self.assertEqual("master branch readme", readme)
 
             self.assertFalse(path.exists(testee.get_full_file_path("../credentials.sh")))
+        assert logging_mock.method_calls == [
+            call.info("Cloning repository: %s", self.__mock_repo_api.get_clone_url()),
+            call.info("Checking out branch: %s", "master"),
+        ]
 
-    def test_checkout_with_credentials(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_checkout_with_credentials(self, logging_mock):
         self.__mock_repo_api.get_username.return_value = "User"
         self.__mock_repo_api.get_password.return_value = "Pass"
         with GitRepo(self.__mock_repo_api) as testee:
@@ -99,25 +105,43 @@ echo password=Pass
 """,
                 credentials_file,
             )
+        assert logging_mock.method_calls == [
+            call.info("Cloning repository: %s", self.__mock_repo_api.get_clone_url()),
+            call.info("Checking out branch: %s", "master"),
+        ]
 
-    def test_checkout_branch(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_checkout_branch(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("xyz")
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("xyz branch readme", readme)
+        assert logging_mock.method_calls == [
+            call.info("Cloning repository: %s", self.__mock_repo_api.get_clone_url()),
+            call.info("Checking out branch: %s", "xyz"),
+        ]
 
-    def test_checkout_unknown_url(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_checkout_unknown_url(self, logging_mock):
         self.__mock_repo_api.get_clone_url.return_value = "invalid_url"
         with GitRepo(self.__mock_repo_api) as testee:
             with pytest.raises(GitOpsException) as ex:
                 testee.checkout("master")
             self.assertEqual("Error cloning 'invalid_url'", str(ex.value))
+        assert logging_mock.method_calls == [
+            call.info("Cloning repository: %s", self.__mock_repo_api.get_clone_url()),
+        ]
 
-    def test_checkout_unknown_branch(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_checkout_unknown_branch(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             with pytest.raises(GitOpsException) as ex:
                 testee.checkout("foo")
             self.assertEqual("Error checking out branch 'foo'", str(ex.value))
+        assert logging_mock.method_calls == [
+            call.info("Cloning repository: %s", self.__mock_repo_api.get_clone_url()),
+            call.info("Checking out branch: %s", "foo"),
+        ]
 
     def test_get_full_file_path(self):
         with GitRepo(self.__mock_repo_api) as testee:
@@ -125,27 +149,35 @@ echo password=Pass
             self.assertTrue(isinstance(testee.get_full_file_path("foo.bar"), Path))
             self.assertRegex(str(testee.get_full_file_path("foo.bar")), r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$")
 
-    def test_new_branch(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_new_branch(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
+            logging_mock.reset_mock()
 
             testee.new_branch("foo")
 
             repo = Repo(testee.get_full_file_path("."))
             branches = [str(b) for b in repo.branches]
             self.assertIn("foo", branches)
+        logging_mock.info.assert_called_once_with("Creating new branch: %s", "foo")
 
-    def test_new_branch_name_collision(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_new_branch_name_collision(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
+            logging_mock.reset_mock()
 
             with pytest.raises(GitOpsException) as ex:
                 testee.new_branch("xyz")
             self.assertEqual("Error creating new branch 'xyz'.", str(ex.value))
+        logging_mock.info.assert_called_once_with("Creating new branch: %s", "xyz")
 
-    def test_commit(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_commit(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
+            logging_mock.reset_mock()
 
             with open(testee.get_full_file_path("foo.md"), "w") as outfile:
                 outfile.write("new file")
@@ -161,10 +193,13 @@ echo password=Pass
             self.assertEqual("john@doe.com", commits[0].author.email)
             self.assertIn("foo.md", commits[0].stats.files)
             self.assertIn("README.md", commits[0].stats.files)
+        logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
 
-    def test_commit_nothing_to_commit(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_commit_nothing_to_commit(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
+            logging_mock.reset_mock()
 
             testee.commit(git_user=None, git_email=None, message="empty commit")
 
@@ -172,8 +207,10 @@ echo password=Pass
             commits = list(repo.iter_commits("master"))
             self.assertEqual(1, len(commits))
             self.assertEqual("initial commit\n", commits[0].message)
+        logging_mock.assert_not_called()
 
-    def test_push(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_push(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
 
@@ -184,26 +221,37 @@ echo password=Pass
             util_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
             util_repo.git.commit("-m", "new commit")
 
+            logging_mock.reset_mock()
+
             testee.push("master")
 
             commits = list(self.__origin.iter_commits("master"))
             self.assertEqual(2, len(commits))
             self.assertEqual("new commit\n", commits[0].message)
+        logging_mock.info.assert_called_once_with("Pushing branch: %s", "master")
 
-    def test_push_no_changes(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_push_no_changes(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
+            logging_mock.reset_mock()
+
             testee.push("master")
+        logging_mock.info.assert_called_once_with("Pushing branch: %s", "master")
 
-    def test_push_unknown_branch(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_push_unknown_branch(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
+            logging_mock.reset_mock()
 
             with pytest.raises(GitOpsException) as ex:
                 testee.push("unknown")
             assert str(ex.value).startswith("Error pushing branch 'unknown' to origin")
+        logging_mock.info.assert_called_once_with("Pushing branch: %s", "unknown")
 
-    def test_push_commit_hook_error_reason_is_shown(self):
+    @patch("gitopscli.git.git_repo.logging")
+    def test_push_commit_hook_error_reason_is_shown(self, logging_mock):
         repo_dir = self.__origin.working_dir
         with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:
             pre_receive_hook.write('echo >&2 "we reject this push"; exit 1')
@@ -219,9 +267,12 @@ echo password=Pass
             util_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
             util_repo.git.commit("-m", "new commit")
 
+            logging_mock.reset_mock()
+
             with pytest.raises(GitOpsException) as ex:
                 testee.push("master")
             assert "pre-receive" in str(ex.value) and "we reject this push" in str(ex.value)
+        logging_mock.info.assert_called_once_with("Pushing branch: %s", "master")
 
     def test_get_author_from_last_commit(self):
         with GitRepo(self.__mock_repo_api) as testee:

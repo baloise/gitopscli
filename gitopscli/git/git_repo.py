@@ -1,4 +1,5 @@
 import os
+import logging
 from pathlib import Path
 from types import TracebackType
 from typing import Optional, Type
@@ -42,6 +43,7 @@ class GitRepo:
         self.__tmp_dir = create_tmp_dir()
         git_options = []
         url = self.get_clone_url()
+        logging.info("Cloning repository: %s", url)
         username = self.__api.get_username()
         password = self.__api.get_password()
         try:
@@ -51,12 +53,15 @@ class GitRepo:
             self.__repo = Repo.clone_from(url=url, to_path=f"{self.__tmp_dir}/repo", multi_options=git_options)
         except GitError as ex:
             raise GitOpsException(f"Error cloning '{url}'") from ex
+
+        logging.info("Checking out branch: %s", branch)
         try:
             self.__repo.git.checkout(branch)
         except GitError as ex:
             raise GitOpsException(f"Error checking out branch '{branch}'") from ex
 
     def new_branch(self, branch: str) -> None:
+        logging.info("Creating new branch: %s", branch)
         repo = self.__get_repo()
         try:
             repo.git.checkout("-b", branch)
@@ -68,6 +73,7 @@ class GitRepo:
         try:
             repo.git.add("--all")
             if repo.index.diff("HEAD"):
+                logging.info("Creating commit with message: %s", message)
                 repo.config_writer().set_value("user", "name", git_user).release()
                 repo.config_writer().set_value("user", "email", git_email).release()
                 repo.git.commit("-m", message)
@@ -75,6 +81,7 @@ class GitRepo:
             raise GitOpsException(f"Error creating commit.") from ex
 
     def push(self, branch: str) -> None:
+        logging.info("Pushing branch: %s", branch)
         repo = self.__get_repo()
         try:
             repo.git.push("--set-upstream", "origin", branch)

@@ -36,7 +36,6 @@ def create_preview_command(
     )
     with GitRepo(config_git_repo_api) as config_git_repo:
         config_git_repo.checkout("master")
-        logging.info("Config repo branch master checkout successful")
 
         preview_template_folder_name = ".preview-templates/" + gitops_config.application_name
         if not os.path.isdir(config_git_repo.get_full_file_path(preview_template_folder_name)):
@@ -79,7 +78,6 @@ def create_preview_command(
             f"{commit_msg_verb} preview environment for '{gitops_config.application_name}' and git hash '{git_hash}'.",
         )
         config_git_repo.push("master")
-        logging.info("Pushed branch master")
 
         if preview_env_already_exist:
             deployment_exists_callback(route_host)

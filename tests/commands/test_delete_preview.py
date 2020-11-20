@@ -68,9 +68,6 @@ class DeletePreviewCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(expected_git_api_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info(
-                "Config repo '%s/%s' branch 'master' checkout successful", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"
-            ),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
             call.GitRepo.get_full_file_path("APP-685912d3-preview"),
             call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
@@ -79,7 +76,6 @@ class DeletePreviewCommandTest(unittest.TestCase):
                 "GIT_USER", "GIT_EMAIL", "Delete preview environment for 'APP' and preview id 'PREVIEW_ID'."
             ),
             call.GitRepo.push("master"),
-            call.logging.info("Pushed branch 'master'"),
         ]
 
     def test_delete_missing_happy_flow(self):
@@ -106,9 +102,6 @@ class DeletePreviewCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(expected_git_api_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info(
-                "Config repo '%s/%s' branch 'master' checkout successful", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"
-            ),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
             call.GitRepo.get_full_file_path("APP-685912d3-preview"),
             call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
@@ -144,9 +137,6 @@ class DeletePreviewCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(expected_git_api_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.logging.info(
-                "Config repo '%s/%s' branch 'master' checkout successful", "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"
-            ),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
             call.GitRepo.get_full_file_path("APP-685912d3-preview"),
             call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
