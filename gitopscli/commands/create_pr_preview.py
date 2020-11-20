@@ -22,7 +22,7 @@ def create_pr_preview_command(
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
 
     pr_branch = git_repo_api.get_pull_request_branch(pr_id)
-    git_hash = git_repo_api.get_branch_head_hash()
+    git_hash = git_repo_api.get_branch_head_hash("master")
 
     def add_pr_comment(comment):
         logging.info("Adding comment to pull request with id %s: %s", pr_id, comment)

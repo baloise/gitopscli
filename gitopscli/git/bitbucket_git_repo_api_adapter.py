@@ -76,7 +76,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             self.__organisation, self.__repository_name, pull_request["id"], pull_request["version"]
         )
 
-    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: str = None) -> None:
+    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: Optional[str] = None) -> None:
         pull_request_comment = self.__bitbucket.add_pull_request_comment(
             self.__organisation, self.__repository_name, pr_id, text, parent_id
         )

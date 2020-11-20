@@ -2,6 +2,7 @@ from gitopscli.gitops_exception import GitOpsException
 from .git_repo_api import GitRepoApi
 from .github_git_repo_api_adapter import GithubGitRepoApiAdapter
 from .bitbucket_git_repo_api_adapter import BitbucketGitRepoApiAdapter
+from .git_repo_api_logging_proxy import GitRepoApiLoggingProxy
 
 from .git_api_config import GitApiConfig
 
@@ -29,4 +30,4 @@ class GitRepoApiFactory:  # pylint: disable=too-few-public-methods
             )
         else:
             raise GitOpsException(f"Unknown git provider: {config.git_provider}")
-        return git_repo_api
+        return GitRepoApiLoggingProxy(git_repo_api)
