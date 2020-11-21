@@ -40,7 +40,7 @@ def __add_deploy_command_parser(subparsers: SubParsersAction) -> None:
     deploy_p.add_argument(
         "--single-commit",
         help="Create only single commit for all updates",
-        type=__str2bool,
+        type=__parse_bool,
         nargs="?",
         const=True,
         default=False,
@@ -124,12 +124,12 @@ def __add_git_parser_args(deploy_p: ArgumentParser, api_only: bool = False) -> N
 
 def __add_branch_pr_parser_args(deploy_p: ArgumentParser) -> None:
     deploy_p.add_argument(
-        "--create-pr", help="Creates a Pull Request", type=__str2bool, nargs="?", const=True, default=False,
+        "--create-pr", help="Creates a Pull Request", type=__parse_bool, nargs="?", const=True, default=False,
     )
     deploy_p.add_argument(
         "--auto-merge",
         help="Automatically merge the created PR (only valid with --create-pr)",
-        type=__str2bool,
+        type=__parse_bool,
         nargs="?",
         const=True,
         default=False,
@@ -152,7 +152,7 @@ def __add_expect_preview_exists_parser(subparsers: ArgumentParser) -> None:
     subparsers.add_argument(
         "--expect-preview-exists",
         help="Fail if preview does not exist",
-        type=__str2bool,
+        type=__parse_bool,
         nargs="?",
         const=True,
         default=False,
@@ -161,15 +161,14 @@ def __add_expect_preview_exists_parser(subparsers: ArgumentParser) -> None:
 
 def __add_verbose_parser(subparsers: ArgumentParser) -> None:
     subparsers.add_argument(
-        "-v", "--verbose", help="Verbose exception logging", type=__str2bool, nargs="?", const=True, default=False,
+        "-v", "--verbose", help="Verbose exception logging", type=__parse_bool, nargs="?", const=True, default=False,
     )
 
 
-def __str2bool(value: str) -> bool:
-    if isinstance(value, bool):
-        return value
-    if value.lower() in ("yes", "true", "t", "y", "1"):
+def __parse_bool(value: str) -> bool:
+    lowercase_value = value.lower()
+    if lowercase_value in ("yes", "true", "t", "y", "1"):
         return True
-    if value.lower() in ("no", "false", "f", "n", "0"):
+    if lowercase_value in ("no", "false", "f", "n", "0"):
         return False
     raise ArgumentTypeError("Boolean value expected.")

@@ -51,7 +51,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     __check_if_app_already_exists(repo_apps, apps_from_other_repos)
 
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
-    merge_yaml_element(apps_config_file, "applications", {repo_app: {} for repo_app in repo_apps}, True)
+    merge_yaml_element(apps_config_file, "applications", {repo_app: {} for repo_app in repo_apps})
     __commit_and_push(team_config_git_repo, root_config_git_repo, git_user, git_email, apps_config_file_name)
 
 
