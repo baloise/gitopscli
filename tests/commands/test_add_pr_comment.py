@@ -33,8 +33,8 @@ class AddPrCommentCommandTest(unittest.TestCase):
             text="Hello World!",
             username="USERNAME",
             password="PASSWORD",
-            parent_id="<PARENT ID>",
-            pr_id="<PR ID>",
+            parent_id=4711,
+            pr_id=42,
             organisation="ORGA",
             repository_name="REPO",
             git_provider="github",
@@ -43,7 +43,7 @@ class AddPrCommentCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
-            call.GitRepoApi.add_pull_request_comment("<PR ID>", "Hello World!", "<PARENT ID>"),
+            call.GitRepoApi.add_pull_request_comment(42, "Hello World!", 4711),
         ]
 
     def test_without_parent_id(self):
@@ -53,7 +53,7 @@ class AddPrCommentCommandTest(unittest.TestCase):
             username="USERNAME",
             password="PASSWORD",
             parent_id=None,
-            pr_id="<PR ID>",
+            pr_id=42,
             organisation="ORGA",
             repository_name="REPO",
             git_provider="github",
@@ -62,5 +62,5 @@ class AddPrCommentCommandTest(unittest.TestCase):
 
         assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
-            call.GitRepoApi.add_pull_request_comment("<PR ID>", "Hello World!", None),
+            call.GitRepoApi.add_pull_request_comment(42, "Hello World!", None),
         ]

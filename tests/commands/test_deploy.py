@@ -40,7 +40,7 @@ class DeployCommandTest(unittest.TestCase):
         # Define some common default return values
         self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
         self.git_repo_api_mock.create_pull_request.return_value = GitRepoApi.PullRequestIdAndUrl(
-            "<dummy pr id>", "<url of dummy pr>"
+            42, "<url of dummy pr>"
         )
         self.git_repo_mock.return_value = self.git_repo_mock
         self.git_repo_mock.__enter__.return_value = self.git_repo_mock
@@ -160,7 +160,7 @@ class DeployCommandTest(unittest.TestCase):
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
-            call.GitRepoApi.merge_pull_request("<dummy pr id>"),
+            call.GitRepoApi.merge_pull_request(42),
             call.GitRepoApi.delete_branch("gitopscli-deploy-b973b5bb"),
         ]
 

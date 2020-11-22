@@ -36,7 +36,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
 
         self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
         self.git_repo_api_mock.create_pull_request.return_value = GitRepoApi.PullRequestIdAndUrl(
-            "<dummy pr id>", "<url of dummy pr>"
+            42, "<url of dummy pr>"
         )
         self.git_repo_mock.return_value = self.git_repo_mock
         self.git_repo_mock.__enter__.return_value = self.git_repo_mock
