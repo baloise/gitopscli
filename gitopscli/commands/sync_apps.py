@@ -1,33 +1,23 @@
 import logging
 import os
-from typing import Any, Optional, Set, Tuple
+from typing import Any, Set, Tuple
 from ruamel.yaml import YAML
 
+from gitopscli.cli import SyncAppsArgs
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
 
 
-def sync_apps_command(
-    command: str,
-    username: Optional[str],
-    password: Optional[str],
-    git_user: str,
-    git_email: str,
-    root_organisation: str,
-    root_repository_name: str,
-    organisation: str,
-    repository_name: str,
-    git_provider: Optional[str],
-    git_provider_url: Optional[str],
-) -> None:
-    assert command == "sync-apps"
-    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
-    team_config_git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
-    root_config_git_repo_api = GitRepoApiFactory.create(git_api_config, root_organisation, root_repository_name)
+def sync_apps_command(args: SyncAppsArgs) -> None:
+    git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
+    team_config_git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name)
+    root_config_git_repo_api = GitRepoApiFactory.create(
+        git_api_config, args.root_organisation, args.root_repository_name
+    )
     with GitRepo(team_config_git_repo_api) as team_config_git_repo:
         with GitRepo(root_config_git_repo_api) as root_config_git_repo:
-            __sync_apps(team_config_git_repo, root_config_git_repo, git_user, git_email)
+            __sync_apps(team_config_git_repo, root_config_git_repo, args.git_user, args.git_email)
 
 
 def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str) -> None:

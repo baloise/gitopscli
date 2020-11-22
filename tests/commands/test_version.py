@@ -3,7 +3,6 @@ import sys
 import unittest
 from contextlib import contextmanager
 from io import StringIO
-import pytest
 
 from gitopscli.commands.version import version_command
 
@@ -22,9 +21,5 @@ def captured_output():
 class VersionCommandTest(unittest.TestCase):
     def test_output(self):
         with captured_output() as stdout:
-            version_command("version")
+            version_command()
         assert re.match(r"^GitOps CLI version (?:\d+\.\d+\.\d+|UNRELEASED)\n$", stdout.getvalue())
-
-    def test_wrong_command_arg(self):
-        with pytest.raises(AssertionError):
-            version_command("foo")

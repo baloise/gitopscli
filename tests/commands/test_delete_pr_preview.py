@@ -2,12 +2,13 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
+from gitopscli.cli import DeletePrPreviewArgs
 from gitopscli.git import GitApiConfig, GitRepoApi
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.delete_pr_preview import delete_pr_preview_command
 
 
-class DeletePRPreviewCommandTest(unittest.TestCase):
+class DeletePrPreviewCommandTest(unittest.TestCase):
     def setUp(self):
         def add_patch(target):
             patcher = patch(target)
@@ -48,17 +49,18 @@ class DeletePRPreviewCommandTest(unittest.TestCase):
 
     def test_delete_existing_happy_flow(self):
         delete_pr_preview_command(
-            command="delete-pr-preview",
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
-            branch="some/branch",
-            expect_preview_exists=False,
+            DeletePrPreviewArgs(
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                branch="some/branch",
+                expect_preview_exists=False,
+            )
         )
         expected_git_api_config = GitApiConfig(
             username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
@@ -82,17 +84,18 @@ class DeletePRPreviewCommandTest(unittest.TestCase):
         self.os_path_exists_mock.return_value = False
 
         delete_pr_preview_command(
-            command="delete-pr-preview",
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
-            branch="some/branch",
-            expect_preview_exists=False,
+            DeletePrPreviewArgs(
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                branch="some/branch",
+                expect_preview_exists=False,
+            )
         )
         expected_git_api_config = GitApiConfig(
             username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
@@ -115,17 +118,18 @@ class DeletePRPreviewCommandTest(unittest.TestCase):
 
         with pytest.raises(GitOpsException) as ex:
             delete_pr_preview_command(
-                command="delete-pr-preview",
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider="github",
-                git_provider_url=None,
-                branch="some/branch",
-                expect_preview_exists=True,  # we expect an existing preview
+                DeletePrPreviewArgs(
+                    username="USERNAME",
+                    password="PASSWORD",
+                    git_user="GIT_USER",
+                    git_email="GIT_EMAIL",
+                    organisation="ORGA",
+                    repository_name="REPO",
+                    git_provider="github",
+                    git_provider_url=None,
+                    branch="some/branch",
+                    expect_preview_exists=True,  # we expect an existing preview
+                )
             )
         self.assertEqual(str(ex.value), "There was no preview with name: APP-7252ebf0-preview")
 
@@ -147,17 +151,18 @@ class DeletePRPreviewCommandTest(unittest.TestCase):
 
         with pytest.raises(GitOpsException):
             delete_pr_preview_command(
-                command="delete-pr-preview",
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider="github",
-                git_provider_url=None,
-                branch="some/branch",
-                expect_preview_exists=True,  # we expect an existing preview
+                DeletePrPreviewArgs(
+                    username="USERNAME",
+                    password="PASSWORD",
+                    git_user="GIT_USER",
+                    git_email="GIT_EMAIL",
+                    organisation="ORGA",
+                    repository_name="REPO",
+                    git_provider="github",
+                    git_provider_url=None,
+                    branch="some/branch",
+                    expect_preview_exists=True,  # we expect an existing preview
+                )
             )
         expected_git_api_config = GitApiConfig(
             username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,

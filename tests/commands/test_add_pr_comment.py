@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock, call
+from gitopscli.cli import AddPrCommentArgs
 from gitopscli.git import GitApiConfig
 from gitopscli.commands.add_pr_comment import pr_comment_command
 
@@ -29,16 +30,17 @@ class AddPrCommentCommandTest(unittest.TestCase):
 
     def test_with_parent_id(self):
         pr_comment_command(
-            command="add-pr-comment",
-            text="Hello World!",
-            username="USERNAME",
-            password="PASSWORD",
-            parent_id=4711,
-            pr_id=42,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            AddPrCommentArgs(
+                text="Hello World!",
+                username="USERNAME",
+                password="PASSWORD",
+                parent_id=4711,
+                pr_id=42,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+            )
         )
 
         assert self.mock_manager.mock_calls == [
@@ -48,16 +50,17 @@ class AddPrCommentCommandTest(unittest.TestCase):
 
     def test_without_parent_id(self):
         pr_comment_command(
-            command="add-pr-comment",
-            text="Hello World!",
-            username="USERNAME",
-            password="PASSWORD",
-            parent_id=None,
-            pr_id=42,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            AddPrCommentArgs(
+                text="Hello World!",
+                username="USERNAME",
+                password="PASSWORD",
+                parent_id=None,
+                pr_id=42,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+            )
         )
 
         assert self.mock_manager.mock_calls == [
