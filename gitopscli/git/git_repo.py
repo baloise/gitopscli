@@ -1,6 +1,5 @@
 import os
 import logging
-from pathlib import Path
 from types import TracebackType
 from typing import Optional, Type
 from typing_extensions import Literal
@@ -31,9 +30,9 @@ class GitRepo:
     def finalize(self) -> None:
         self.__delete_tmp_dir()
 
-    def get_full_file_path(self, relative_path: str) -> Path:
+    def get_full_file_path(self, relative_path: str) -> str:
         repo = self.__get_repo()
-        return Path(os.path.join(repo.working_dir, relative_path))
+        return os.path.join(repo.working_dir, relative_path)
 
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()

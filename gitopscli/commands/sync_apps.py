@@ -1,6 +1,6 @@
 import logging
 import os
-
+from typing import Any, Optional, Set, Tuple
 from ruamel.yaml import YAML
 
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
@@ -9,18 +9,18 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 def sync_apps_command(
-    command,
-    username,
-    password,
-    git_user,
-    git_email,
-    root_organisation,
-    root_repository_name,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
-):
+    command: str,
+    username: Optional[str],
+    password: Optional[str],
+    git_user: str,
+    git_email: str,
+    root_organisation: str,
+    root_repository_name: str,
+    organisation: str,
+    repository_name: str,
+    git_provider: Optional[str],
+    git_provider_url: Optional[str],
+) -> None:
     assert command == "sync-apps"
     git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
     team_config_git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
@@ -41,8 +41,6 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     apps_config_file, apps_config_file_name, current_repo_apps, apps_from_other_repos = __find_apps_config_from_repo(
         team_config_git_repo, root_config_git_repo
     )
-    if apps_config_file is None:
-        raise GitOpsException(f"Could't find config file for apps repository in root repository's 'apps/' directory")
 
     if current_repo_apps == repo_apps:
         logging.info("Root repository already up-to-date. I'm done here.")
@@ -55,12 +53,14 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     __commit_and_push(team_config_git_repo, root_config_git_repo, git_user, git_email, apps_config_file_name)
 
 
-def __find_apps_config_from_repo(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo):
+def __find_apps_config_from_repo(
+    team_config_git_repo: GitRepo, root_config_git_repo: GitRepo
+) -> Tuple[str, str, Set[str], Set[str]]:
     yaml = YAML()
-    apps_from_other_repos = []  # List for all entries in .applications from each config repository
+    apps_from_other_repos: Set[str] = set()  # Set for all entries in .applications from each config repository
     found_app_config_file = None
     found_app_config_file_name = None
-    found_app_config_apps = set()
+    found_app_config_apps: Set[str] = set()
     bootstrap_entries = __get_bootstrap_entries(root_config_git_repo)
     for bootstrap_entry in bootstrap_entries:
         if "name" not in bootstrap_entry:
@@ -81,11 +81,15 @@ def __find_apps_config_from_repo(team_config_git_repo: GitRepo, root_config_git_
             found_app_config_file_name = app_file_name
             found_app_config_apps = __get_applications_from_app_config(app_config_content)
         else:
-            apps_from_other_repos += __get_applications_from_app_config(app_config_content)
+            apps_from_other_repos.update(__get_applications_from_app_config(app_config_content))
+
+    if found_app_config_file is None or found_app_config_file_name is None:
+        raise GitOpsException(f"Could't find config file for apps repository in root repository's 'apps/' directory")
+
     return found_app_config_file, found_app_config_file_name, found_app_config_apps, apps_from_other_repos
 
 
-def __get_applications_from_app_config(app_config):
+def __get_applications_from_app_config(app_config: Any) -> Set[str]:
     apps = []
     if "applications" in app_config and app_config["applications"] is not None:
         apps += app_config["applications"].keys()
@@ -94,13 +98,13 @@ def __get_applications_from_app_config(app_config):
 
 def __commit_and_push(
     team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str, app_file_name: str
-):
+) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
     root_config_git_repo.commit(git_user, git_email, f"{author} updated " + app_file_name)
     root_config_git_repo.push("master")
 
 
-def __get_bootstrap_entries(root_config_git_repo: GitRepo):
+def __get_bootstrap_entries(root_config_git_repo: GitRepo) -> Any:
     root_config_git_repo.checkout("master")
     bootstrap_values_file = root_config_git_repo.get_full_file_path("bootstrap/values.yaml")
     try:
@@ -113,7 +117,7 @@ def __get_bootstrap_entries(root_config_git_repo: GitRepo):
     return bootstrap_yaml["bootstrap"]
 
 
-def __get_repo_apps(team_config_git_repo: GitRepo):
+def __get_repo_apps(team_config_git_repo: GitRepo) -> Set[str]:
     team_config_git_repo.checkout("master")
     repo_dir = team_config_git_repo.get_full_file_path(".")
     return {
@@ -123,7 +127,7 @@ def __get_repo_apps(team_config_git_repo: GitRepo):
     }
 
 
-def __check_if_app_already_exists(apps_dirs, apps_from_other_repos):
+def __check_if_app_already_exists(apps_dirs: Set[str], apps_from_other_repos: Set[str]) -> None:
     for app_key in apps_dirs:
         if app_key in apps_from_other_repos:
             raise GitOpsException(f"application '{app_key}' already exists in a different repository")

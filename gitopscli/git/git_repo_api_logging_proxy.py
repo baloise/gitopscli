@@ -22,11 +22,11 @@ class GitRepoApiLoggingProxy(GitRepoApi):
         logging.info("Creating pull request from '%s' to '%s' with title: %s", from_branch, to_branch, title)
         return self.__api.create_pull_request(from_branch, to_branch, title, description)
 
-    def merge_pull_request(self, pr_id: str) -> None:
+    def merge_pull_request(self, pr_id: int) -> None:
         logging.info("Merging pull request %s", pr_id)
         self.__api.merge_pull_request(pr_id)
 
-    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: Optional[str] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
         if parent_id:
             logging.info(
                 "Creating comment for pull request %s as reply to comment %s with content: %s", pr_id, parent_id, text,
@@ -44,5 +44,5 @@ class GitRepoApiLoggingProxy(GitRepoApi):
     def get_branch_head_hash(self, branch: str) -> str:
         return self.__api.get_branch_head_hash(branch)
 
-    def get_pull_request_branch(self, pr_id: str) -> str:
+    def get_pull_request_branch(self, pr_id: int) -> str:
         return self.__api.get_pull_request_branch(pr_id)

@@ -66,17 +66,15 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         )
         if "errors" in pull_request:
             raise GitOpsException(pull_request["errors"][0]["message"])
-        return GitRepoApi.PullRequestIdAndUrl(
-            pr_id=str(pull_request["id"]), url=pull_request["links"]["self"][0]["href"]
-        )
+        return GitRepoApi.PullRequestIdAndUrl(pr_id=pull_request["id"], url=pull_request["links"]["self"][0]["href"])
 
-    def merge_pull_request(self, pr_id: str) -> None:
+    def merge_pull_request(self, pr_id: int) -> None:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(
             self.__organisation, self.__repository_name, pull_request["id"], pull_request["version"]
         )
 
-    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: Optional[str] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
         pull_request_comment = self.__bitbucket.add_pull_request_comment(
             self.__organisation, self.__repository_name, pr_id, text, parent_id
         )
@@ -95,7 +93,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException(f"Branch '{branch}' not found'")
         return str(branches[0]["latestCommit"])
 
-    def get_pull_request_branch(self, pr_id: str) -> str:
+    def get_pull_request_branch(self, pr_id: int) -> str:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
         if "errors" in pull_request:
             raise GitOpsException(pull_request["errors"][0]["message"])

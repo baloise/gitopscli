@@ -146,8 +146,7 @@ echo password=Pass
     def test_get_full_file_path(self):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
-            self.assertTrue(isinstance(testee.get_full_file_path("foo.bar"), Path))
-            self.assertRegex(str(testee.get_full_file_path("foo.bar")), r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$")
+            self.assertRegex(testee.get_full_file_path("foo.bar"), r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$")
 
     @patch("gitopscli.git.git_repo.logging")
     def test_new_branch(self, logging_mock):

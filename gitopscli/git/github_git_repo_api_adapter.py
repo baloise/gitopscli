@@ -28,13 +28,13 @@ class GithubGitRepoApiAdapter(GitRepoApi):
     ) -> GitRepoApi.PullRequestIdAndUrl:
         repo = self.__get_repo()
         pull_request = repo.create_pull(title=title, body=description, head=from_branch, base=to_branch)
-        return GitRepoApi.PullRequestIdAndUrl(pr_id=str(pull_request.id), url=pull_request.html_url)
+        return GitRepoApi.PullRequestIdAndUrl(pr_id=pull_request.id, url=pull_request.html_url)
 
-    def merge_pull_request(self, pr_id: str) -> None:
+    def merge_pull_request(self, pr_id: int) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.merge()
 
-    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: Optional[str] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.create_issue_comment(text)
 
@@ -46,7 +46,7 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         git_ref = self.__get_branch_ref(branch)
         return git_ref.object.sha
 
-    def get_pull_request_branch(self, pr_id: str) -> str:
+    def get_pull_request_branch(self, pr_id: int) -> str:
         pull_request = self.__get_pull_request(pr_id)
         return pull_request.head.ref
 
@@ -57,10 +57,10 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         except UnknownObjectException as ex:
             raise GitOpsException(f"Branch '{branch}' does not exist.") from ex
 
-    def __get_pull_request(self, pr_id: str) -> PullRequest.PullRequest:
+    def __get_pull_request(self, pr_id: int) -> PullRequest.PullRequest:
         repo = self.__get_repo()
         try:
-            return repo.get_pull(int(pr_id))
+            return repo.get_pull(pr_id)
         except UnknownObjectException as ex:
             raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist.") from ex
 
