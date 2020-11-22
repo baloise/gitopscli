@@ -1,29 +1,22 @@
 import re
+from io import StringIO
+from typing import Any
 from ruamel.yaml import YAML
 
 ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
 
 
-def yaml_load(doc):
-    return YAML().load(doc)
+def yaml_load(yaml_str: str) -> Any:
+    return YAML().load(yaml_str)
 
 
-def yaml_dump(data):
-    class FakeStream:
-        _byte_strings = []
-
-        def write(self, byte_string):
-            self._byte_strings.append(byte_string)
-
-        def get_string(self):
-            return b"".join(self._byte_strings).decode("utf-8").rstrip()
-
-    stream = FakeStream()
-    YAML().dump(data, stream)
-    return stream.get_string()
+def yaml_dump(yaml: Any) -> str:
+    stream = StringIO()
+    YAML().dump(yaml, stream)
+    return stream.getvalue().rstrip()
 
 
-def update_yaml_file(file_path, key, value):
+def update_yaml_file(file_path: str, key: str, value: Any) -> bool:
     yaml = YAML()
     with open(file_path, "r") as stream:
         content = yaml.load(stream)
@@ -36,24 +29,24 @@ def update_yaml_file(file_path, key, value):
         current_key = ".".join(current_key_segments)
         is_array = ARRAY_KEY_SEGMENT_PATTERN.match(current_key_segment)
         if is_array:
-            current_key_segment = int(is_array.group(1))
-            if not isinstance(parent_item, list) or current_key_segment >= len(parent_item):
+            current_array_index = int(is_array.group(1))
+            if not isinstance(parent_item, list) or current_array_index >= len(parent_item):
                 raise KeyError(f"Key '{current_key}' not found in YAML!")
         else:
             if not isinstance(parent_item, dict) or current_key_segment not in parent_item:
                 raise KeyError(f"Key '{current_key}' not found in YAML!")
         if current_key == key:
-            if parent_item[current_key_segment] == value:
+            if parent_item[current_array_index if is_array else current_key_segment] == value:
                 return False  # nothing to update
-            parent_item[current_key_segment] = value
+            parent_item[current_array_index if is_array else current_key_segment] = value
             with open(file_path, "w+") as stream:
                 yaml.dump(content, stream)
             return True
-        parent_item = parent_item[current_key_segment]
+        parent_item = parent_item[current_array_index if is_array else current_key_segment]
     raise KeyError(f"Empty key!")
 
 
-def merge_yaml_element(file_path, element_path, desired_value, delete_missing_key=False):
+def merge_yaml_element(file_path: str, element_path: str, desired_value: Any) -> None:
     yaml = YAML()
     with open(file_path, "r") as stream:
         yaml_file_content = yaml.load(stream)
@@ -72,11 +65,11 @@ def merge_yaml_element(file_path, element_path, desired_value, delete_missing_ke
                 value = {**work_path[key], **value}
         work_path[key] = value
 
-    if delete_missing_key:
-        current = work_path.copy().items()
-        for key, value in current:
-            if key not in desired_value:
-                del work_path[key]
+    # delete missing key:
+    current = work_path.copy().items()
+    for key, value in current:
+        if key not in desired_value:
+            del work_path[key]
 
     with open(file_path, "w+") as stream:
         yaml.dump(yaml_file_content, stream)

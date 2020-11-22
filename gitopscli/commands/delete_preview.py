@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import shutil
+from typing import Optional
 
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
@@ -10,18 +11,18 @@ from .common import load_gitops_config
 
 
 def delete_preview_command(
-    command,
-    username,
-    password,
-    git_user,
-    git_email,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
-    preview_id,
-    expect_preview_exists,
-):
+    command: str,
+    username: Optional[str],
+    password: Optional[str],
+    git_user: str,
+    git_email: str,
+    organisation: str,
+    repository_name: str,
+    git_provider: Optional[str],
+    git_provider_url: Optional[str],
+    preview_id: str,
+    expect_preview_exists: bool,
+) -> None:
     assert command == "delete-preview"
 
     git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)

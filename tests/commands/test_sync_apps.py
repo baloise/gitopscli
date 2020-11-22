@@ -129,9 +129,7 @@ class SyncAppsCommandTest(unittest.TestCase):
             call.GitRepo_team.get_clone_url(),
             call.logging.info("Found apps repository in %s", "apps/team-non-prod.yaml"),
             call.logging.info("Sync applications in root repository's %s.", "apps/team-non-prod.yaml"),
-            call.merge_yaml_element(
-                "/tmp/created-tmp-dir/apps/team-non-prod.yaml", "applications", {"folder": {}}, True
-            ),
+            call.merge_yaml_element("/tmp/created-tmp-dir/apps/team-non-prod.yaml", "applications", {"folder": {}}),
             call.GitRepo_team.get_author_from_last_commit(),
             call.GitRepo_root.commit("GIT_USER", "GIT_EMAIL", "author updated apps/team-non-prod.yaml"),
             call.GitRepo_root.push("master"),

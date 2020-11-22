@@ -3,7 +3,6 @@ import stat
 import unittest
 import uuid
 from unittest.mock import MagicMock, patch, call
-from pathlib import Path
 from git import Repo
 import pytest
 
@@ -146,8 +145,7 @@ echo password=Pass
     def test_get_full_file_path(self):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.checkout("master")
-            self.assertTrue(isinstance(testee.get_full_file_path("foo.bar"), Path))
-            self.assertRegex(str(testee.get_full_file_path("foo.bar")), r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$")
+            self.assertRegex(testee.get_full_file_path("foo.bar"), r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$")
 
     @patch("gitopscli.git.git_repo.logging")
     def test_new_branch(self, logging_mock):
@@ -201,7 +199,7 @@ echo password=Pass
             testee.checkout("master")
             logging_mock.reset_mock()
 
-            testee.commit(git_user=None, git_email=None, message="empty commit")
+            testee.commit(git_user="john doe", git_email="john@doe.com", message="empty commit")
 
             repo = Repo(testee.get_full_file_path("."))
             commits = list(repo.iter_commits("master"))

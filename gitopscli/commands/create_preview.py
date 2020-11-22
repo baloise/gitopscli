@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import shutil
+from typing import Any, Callable, Dict, Optional
 
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file
@@ -10,21 +11,21 @@ from .common import load_gitops_config
 
 
 def create_preview_command(
-    command,
-    username,
-    password,
-    git_user,
-    git_email,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
-    git_hash,
-    preview_id,
-    deployment_already_up_to_date_callback=lambda: None,
-    deployment_exists_callback=lambda: None,
-    deployment_new_callback=lambda: None,
-):
+    command: str,
+    username: Optional[str],
+    password: Optional[str],
+    git_user: str,
+    git_email: str,
+    organisation: str,
+    repository_name: str,
+    git_provider: Optional[str],
+    git_provider_url: Optional[str],
+    git_hash: str,
+    preview_id: str,
+    deployment_already_up_to_date_callback: Callable[[str], None] = lambda _: None,
+    deployment_exists_callback: Callable[[str], None] = lambda _: None,
+    deployment_new_callback: Callable[[str], None] = lambda _: None,
+) -> None:
     assert command == "create-preview"
 
     git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
@@ -53,18 +54,11 @@ def create_preview_command(
             )
 
         logging.info("Using image tag from git hash: %s", git_hash)
-        route_host = None
+        route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
         value_replaced = False
         for replacement in gitops_config.replacements:
-            route_host, value_replaced = __replace_value(
-                gitops_config,
-                git_hash,
-                new_preview_folder_name,
-                replacement,
-                config_git_repo,
-                route_host,
-                hashed_preview_id,
-                value_replaced,
+            value_replaced = value_replaced | __replace_value(
+                git_hash, route_host, new_preview_folder_name, replacement, config_git_repo,
             )
         if not value_replaced:
             logging.info("The image tag %s has already been deployed. Doing nothing.", git_hash)
@@ -86,15 +80,8 @@ def create_preview_command(
 
 
 def __replace_value(
-    gitops_config,
-    new_image_tag,
-    new_preview_folder_name,
-    replacement,
-    root_git,
-    route_host,
-    hashed_preview_id,
-    value_replaced,
-):
+    new_image_tag: str, route_host: str, new_preview_folder_name: str, replacement: Dict[str, Any], root_git: GitRepo,
+) -> bool:
     replacement_value = None
     logging.info("Replacement: %s", replacement)
     replacement_path = replacement["path"]
@@ -102,24 +89,23 @@ def __replace_value(
     if replacement_variable == "GIT_COMMIT":
         replacement_value = new_image_tag
     elif replacement_variable == "ROUTE_HOST":
-        route_host = gitops_config.route_host.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
-        logging.info("Created route host: %s", route_host)
         replacement_value = route_host
     else:
         logging.info("Unknown replacement variable: %s", replacement_variable)
+    value_replaced = False
     try:
-        value_replaced = value_replaced | update_yaml_file(
+        value_replaced = update_yaml_file(
             root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement_path, replacement_value,
         )
     except KeyError as ex:
         raise GitOpsException(f"Key '{replacement_path}' not found in '{new_preview_folder_name}/values.yaml'") from ex
     logging.info("Replacing property %s with value: %s", replacement_path, replacement_value)
-    return route_host, value_replaced
+    return value_replaced
 
 
 def __create_new_preview_env(
-    new_preview_folder_name, preview_template_folder_name, config_git_repo: GitRepo,
-):
+    new_preview_folder_name: str, preview_template_folder_name: str, config_git_repo: GitRepo,
+) -> None:
     shutil.copytree(
         config_git_repo.get_full_file_path(preview_template_folder_name),
         config_git_repo.get_full_file_path(new_preview_folder_name),

@@ -126,7 +126,7 @@ applications:
         )
 
         value = {"app2": {"key2": "value"}, "app3": None}
-        merge_yaml_element(test_file, "applications", value, True)
+        merge_yaml_element(test_file, "applications", value)
 
         expected = """\
 # Kept comment
@@ -150,7 +150,7 @@ applications:
         )
 
         value = {"applications": {"app2": {"key2": "value"}, "app3": None}}
-        merge_yaml_element(test_file, ".", value, True)
+        merge_yaml_element(test_file, ".", value)
 
         expected = """\
 applications:

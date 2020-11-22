@@ -1,6 +1,7 @@
 import logging
 import os
 import uuid
+from typing import Any, Callable, Dict, Optional
 
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
@@ -8,22 +9,22 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 def deploy_command(
-    command,
-    file,
-    values,
-    username,
-    password,
-    git_user,
-    git_email,
-    create_pr,
-    auto_merge,
-    single_commit,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
-    commit_message=None,
-):
+    command: str,
+    file: str,
+    values: Any,
+    username: Optional[str],
+    password: Optional[str],
+    git_user: str,
+    git_email: str,
+    create_pr: bool,
+    auto_merge: bool,
+    single_commit: bool,
+    organisation: str,
+    repository_name: str,
+    git_provider: Optional[str],
+    git_provider_url: Optional[str],
+    commit_message: Optional[str] = None,
+) -> None:
     assert command == "deploy"
     git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
     git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name)
@@ -46,12 +47,20 @@ def deploy_command(
         __create_pr(git_repo_api, config_branch, file, updated_values, auto_merge)
 
 
-def __update_values(git_repo, git_user, git_email, file, values, single_commit, commit_message):
+def __update_values(
+    git_repo: GitRepo,
+    git_user: str,
+    git_email: str,
+    file: str,
+    values: Any,
+    single_commit: bool,
+    commit_message: Optional[str],
+) -> Dict[str, Any]:
     full_file_path = git_repo.get_full_file_path(file)
     if not os.path.isfile(full_file_path):
         raise GitOpsException(f"No such file: {file}")
 
-    commit = lambda message: git_repo.commit(git_user, git_email, message)
+    commit: Callable[[str], None] = lambda message: git_repo.commit(git_user, git_email, message)
 
     updated_values = {}
     for key in values:
@@ -84,7 +93,9 @@ def __update_values(git_repo, git_user, git_email, file, values, single_commit, 
     return updated_values
 
 
-def __create_pr(git_repo_api: GitRepoApi, branch, file, updated_values, auto_merge):
+def __create_pr(
+    git_repo_api: GitRepoApi, branch: str, file: str, updated_values: Dict[str, Any], auto_merge: bool
+) -> None:
     title = f"Updated values in {file}"
     description = f"""\
 Updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in `{file}`:

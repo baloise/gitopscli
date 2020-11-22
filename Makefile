@@ -17,7 +17,7 @@ mypy:
 	python3 -m mypy .
 
 test:
-	python3 -m pytest -vv -s
+	python3 -m pytest -vv -s --typeguard-packages=gitopscli
 
 coverage:
 	coverage run -m pytest

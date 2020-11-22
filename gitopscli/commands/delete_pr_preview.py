@@ -1,19 +1,20 @@
+from typing import Optional
 from gitopscli.commands import delete_preview_command
 
 
 def delete_pr_preview_command(
-    command,
-    branch,
-    username,
-    password,
-    git_user,
-    git_email,
-    organisation,
-    repository_name,
-    git_provider,
-    git_provider_url,
-    expect_preview_exists,
-):
+    command: str,
+    branch: str,
+    username: Optional[str],
+    password: Optional[str],
+    git_user: str,
+    git_email: str,
+    organisation: str,
+    repository_name: str,
+    git_provider: Optional[str],
+    git_provider_url: Optional[str],
+    expect_preview_exists: bool,
+) -> None:
     assert command == "delete-pr-preview"
     delete_preview_command(
         command="delete-preview",

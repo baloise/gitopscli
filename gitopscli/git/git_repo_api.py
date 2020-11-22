@@ -4,7 +4,7 @@ from typing import NamedTuple, Optional
 
 class GitRepoApi(metaclass=ABCMeta):
     class PullRequestIdAndUrl(NamedTuple):
-        pr_id: str
+        pr_id: int
         url: str
 
     @abstractmethod
@@ -26,11 +26,11 @@ class GitRepoApi(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def merge_pull_request(self, pr_id: str) -> None:
+    def merge_pull_request(self, pr_id: int) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def add_pull_request_comment(self, pr_id: str, text: str, parent_id: Optional[str] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
         raise NotImplementedError
 
     @abstractmethod
@@ -42,5 +42,5 @@ class GitRepoApi(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def get_pull_request_branch(self, pr_id: str) -> str:
+    def get_pull_request_branch(self, pr_id: int) -> str:
         raise NotImplementedError
