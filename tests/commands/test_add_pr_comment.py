@@ -1,8 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock, call
-from gitopscli.cli import AddPrCommentArgs
 from gitopscli.git import GitApiConfig
-from gitopscli.commands.add_pr_comment import pr_comment_command
+from gitopscli.commands.add_pr_comment import pr_comment_command, AddPrCommentArgs
 
 
 class AddPrCommentCommandTest(unittest.TestCase):

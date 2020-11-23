@@ -3,11 +3,28 @@ import logging
 import os
 import shutil
 
-from gitopscli.cli import DeletePreviewArgs
+from typing import Optional, NamedTuple
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
 
 from .common import load_gitops_config
+
+
+class DeletePreviewArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    git_user: str
+    git_email: str
+
+    organisation: str
+    repository_name: str
+
+    preview_id: str
+    expect_preview_exists: bool
 
 
 def delete_preview_command(args: DeletePreviewArgs) -> None:

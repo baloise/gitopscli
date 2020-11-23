@@ -1,8 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock, call
-from gitopscli.cli import SyncAppsArgs
 from gitopscli.git import GitApiConfig
-from gitopscli.commands.sync_apps import sync_apps_command
+from gitopscli.commands.sync_apps import sync_apps_command, SyncAppsArgs
 
 
 class SyncAppsCommandTest(unittest.TestCase):

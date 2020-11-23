@@ -1,6 +1,15 @@
-from typing import Callable
-from gitopscli.cli import (
-    CommandArgs,
+from abc import ABCMeta, abstractmethod
+from typing import Callable, Union
+from .add_pr_comment import pr_comment_command, AddPrCommentArgs
+from .create_preview import create_preview_command, CreatePreviewArgs
+from .create_pr_preview import create_pr_preview_command, CreatePrPreviewArgs
+from .delete_preview import delete_preview_command, DeletePreviewArgs
+from .delete_pr_preview import delete_pr_preview_command, DeletePrPreviewArgs
+from .deploy import deploy_command, DeployArgs
+from .sync_apps import sync_apps_command, SyncAppsArgs
+from .version import version_command, VersionArgs
+
+CommandArgs = Union[
     DeployArgs,
     SyncAppsArgs,
     AddPrCommentArgs,
@@ -9,16 +18,13 @@ from gitopscli.cli import (
     DeletePreviewArgs,
     DeletePrPreviewArgs,
     VersionArgs,
-)
-from . import Command
-from ..add_pr_comment import pr_comment_command
-from ..create_preview import create_preview_command
-from ..create_pr_preview import create_pr_preview_command
-from ..delete_preview import delete_preview_command
-from ..delete_pr_preview import delete_pr_preview_command
-from ..deploy import deploy_command
-from ..sync_apps import sync_apps_command
-from ..version import version_command
+]
+
+
+class Command(metaclass=ABCMeta):
+    @abstractmethod
+    def execute(self) -> None:
+        raise NotImplementedError
 
 
 class _CommandFuncWrapper(Command):

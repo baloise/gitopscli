@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, ArgumentTypeError, _SubParsersAction as SubParsersAction
 import sys
 from typing import List, Tuple
-from gitopscli.cli import (
+from gitopscli.commands import (
     CommandArgs,
     DeployArgs,
     SyncAppsArgs,

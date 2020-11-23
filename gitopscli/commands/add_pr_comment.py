@@ -1,5 +1,20 @@
-from gitopscli.cli import AddPrCommentArgs
+from typing import Optional, NamedTuple
 from gitopscli.git import GitApiConfig, GitRepoApiFactory
+
+
+class AddPrCommentArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    organisation: str
+    repository_name: str
+
+    pr_id: int
+    parent_id: Optional[int]
+    text: str
 
 
 def pr_comment_command(args: AddPrCommentArgs) -> None:

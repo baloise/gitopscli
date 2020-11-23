@@ -2,13 +2,29 @@ import hashlib
 import logging
 import os
 import shutil
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional, NamedTuple
 
-from gitopscli.cli import CreatePreviewArgs
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config
+
+
+class CreatePreviewArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    git_user: str
+    git_email: str
+
+    organisation: str
+    repository_name: str
+
+    git_hash: str
+    preview_id: str
 
 
 def create_preview_command(

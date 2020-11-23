@@ -1,4 +1,9 @@
+from typing import NamedTuple
 import pkg_resources
+
+
+class VersionArgs(NamedTuple):
+    pass
 
 
 def version_command() -> None:

@@ -1,7 +1,23 @@
-from typing import Callable
-from gitopscli.cli import CreatePreviewArgs, CreatePrPreviewArgs
+from typing import Callable, Optional, NamedTuple
 from gitopscli.git import GitApiConfig, GitRepoApiFactory
-from .create_preview import create_preview_command
+from .create_preview import create_preview_command, CreatePreviewArgs
+
+
+class CreatePrPreviewArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    git_user: str
+    git_email: str
+
+    organisation: str
+    repository_name: str
+
+    pr_id: int
+    parent_id: Optional[int]
 
 
 def create_pr_preview_command(args: CreatePrPreviewArgs) -> None:

@@ -1,12 +1,28 @@
 import logging
 import os
-from typing import Any, Set, Tuple
+from typing import Any, Set, Tuple, Optional, NamedTuple
 from ruamel.yaml import YAML
 
-from gitopscli.cli import SyncAppsArgs
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
+
+
+class SyncAppsArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    git_user: str
+    git_email: str
+
+    organisation: str
+    repository_name: str
+
+    root_organisation: str
+    root_repository_name: str
 
 
 def sync_apps_command(args: SyncAppsArgs) -> None:

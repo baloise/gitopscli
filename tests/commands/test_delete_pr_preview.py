@@ -2,10 +2,9 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
-from gitopscli.cli import DeletePrPreviewArgs
 from gitopscli.git import GitApiConfig, GitRepoApi
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.delete_pr_preview import delete_pr_preview_command
+from gitopscli.commands.delete_pr_preview import delete_pr_preview_command, DeletePrPreviewArgs
 
 
 class DeletePrPreviewCommandTest(unittest.TestCase):

@@ -1,5 +1,22 @@
-from gitopscli.cli import DeletePreviewArgs, DeletePrPreviewArgs
-from .delete_preview import delete_preview_command
+from typing import Optional, NamedTuple
+from .delete_preview import delete_preview_command, DeletePreviewArgs
+
+
+class DeletePrPreviewArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    git_user: str
+    git_email: str
+
+    organisation: str
+    repository_name: str
+
+    branch: str
+    expect_preview_exists: bool
 
 
 def delete_pr_preview_command(args: DeletePrPreviewArgs) -> None:

@@ -2,9 +2,8 @@ import unittest
 from uuid import UUID
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
-from gitopscli.cli import DeployArgs
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.deploy import deploy_command
+from gitopscli.commands.deploy import deploy_command, DeployArgs
 from gitopscli.git import GitApiConfig, GitRepoApi
 
 

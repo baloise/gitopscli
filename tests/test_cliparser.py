@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from io import StringIO
 import pytest
 
-from gitopscli.cli import (
+from gitopscli.commands import (
     DeployArgs,
     SyncAppsArgs,
     AddPrCommentArgs,

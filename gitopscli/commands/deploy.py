@@ -1,12 +1,34 @@
 import logging
 import os
 import uuid
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional, NamedTuple
 
-from gitopscli.cli import DeployArgs
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
 from gitopscli.gitops_exception import GitOpsException
+
+
+class DeployArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    git_user: str
+    git_email: str
+
+    organisation: str
+    repository_name: str
+
+    file: str
+    values: Any
+
+    single_commit: bool
+    commit_message: Optional[str]
+
+    create_pr: bool
+    auto_merge: bool
 
 
 def deploy_command(args: DeployArgs) -> None:
