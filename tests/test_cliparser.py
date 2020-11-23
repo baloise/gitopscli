@@ -5,7 +5,17 @@ from contextlib import contextmanager
 from io import StringIO
 import pytest
 
-from gitopscli.cliparser import create_cli
+from gitopscli.commands import (
+    DeployArgs,
+    SyncAppsArgs,
+    AddPrCommentArgs,
+    CreatePreviewArgs,
+    CreatePrPreviewArgs,
+    DeletePreviewArgs,
+    DeletePrPreviewArgs,
+    VersionArgs,
+)
+from gitopscli.cliparser import parse_args
 
 EXPECTED_GITOPSCLI_HELP = """\
 usage: gitopscli [-h]
@@ -387,49 +397,52 @@ class CliParserTest(unittest.TestCase):
         cls.maxDiff = None
 
     @staticmethod
-    def _capture_create_cli(args):
+    def _capture_parse_args(args):
         with captured_output() as (stdout, stderr), pytest.raises(SystemExit) as ex:
-            create_cli(args)
+            parse_args(args)
         return ex.value.code, stdout.getvalue(), stderr.getvalue()
 
+    def assertType(self, o: object, t: type):
+        self.assertTrue(isinstance(o, t))
+
     def test_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli([])
+        exit_code, stdout, stderr = self._capture_parse_args([])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_GITOPSCLI_HELP, stderr)
 
     def test_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_GITOPSCLI_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["-h"])
+        exit_code, stdout, stderr = self._capture_parse_args(["-h"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_GITOPSCLI_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["add-pr-comment"])
+        exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_ADD_PR_COMMENT_NO_ARGS_ERROR, stderr)
 
     def test_add_pr_comment_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["add-pr-comment", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["add-pr-comment", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_required_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "add-pr-comment",
                 "--username",
@@ -446,22 +459,22 @@ class CliParserTest(unittest.TestCase):
                 "TEXT",
             ]
         )
-        self.assertEqual(cli.command, "add-pr-comment")
+        self.assertType(args, AddPrCommentArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.pr_id, 4711)
-        self.assertEqual(cli.text, "TEXT")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.pr_id, 4711)
+        self.assertEqual(args.text, "TEXT")
 
-        self.assertIsNone(cli.parent_id)
-        self.assertIsNone(cli.git_provider)
-        self.assertIsNone(cli.git_provider_url)
-        self.assertFalse(cli.verbose)
+        self.assertIsNone(args.parent_id)
+        self.assertIsNone(args.git_provider)
+        self.assertIsNone(args.git_provider_url)
+        self.assertFalse(verbose)
 
     def test_add_pr_comment_all_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "add-pr-comment",
                 "--username",
@@ -485,39 +498,39 @@ class CliParserTest(unittest.TestCase):
                 "--verbose",
             ]
         )
-        self.assertEqual(cli.command, "add-pr-comment")
+        self.assertType(args, AddPrCommentArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
-        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.pr_id, 4711)
-        self.assertEqual(cli.parent_id, 42)
-        self.assertEqual(cli.text, "TEXT")
-        self.assertTrue(cli.verbose)
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.pr_id, 4711)
+        self.assertEqual(args.parent_id, 42)
+        self.assertEqual(args.text, "TEXT")
+        self.assertTrue(verbose)
 
     def test_create_preview_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-preview"])
+        exit_code, stdout, stderr = self._capture_parse_args(["create-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_CREATE_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_create_preview_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["create-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_CREATE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_preview_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["create-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_CREATE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_preview_required_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "create-preview",
                 "--username",
@@ -538,23 +551,23 @@ class CliParserTest(unittest.TestCase):
                 "abc123",
             ]
         )
-        self.assertEqual(cli.command, "create-preview")
+        self.assertType(args, CreatePreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
-        self.assertEqual(cli.preview_id, "abc123")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
+        self.assertEqual(args.preview_id, "abc123")
 
-        self.assertIsNone(cli.git_provider)
-        self.assertIsNone(cli.git_provider_url)
-        self.assertFalse(cli.verbose)
+        self.assertIsNone(args.git_provider)
+        self.assertIsNone(args.git_provider_url)
+        self.assertFalse(verbose)
 
     def test_create_preview_all_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "create-preview",
                 "--username",
@@ -580,41 +593,41 @@ class CliParserTest(unittest.TestCase):
                 "-v",
             ]
         )
-        self.assertEqual(cli.command, "create-preview")
+        self.assertType(args, CreatePreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
-        self.assertEqual(cli.preview_id, "abc123")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
+        self.assertEqual(args.preview_id, "abc123")
 
-        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
-        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.verbose)
+        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(verbose)
 
     def test_create_pr_preview_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-pr-preview"])
+        exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_create_pr_preview_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-pr-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_pr_preview_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["create-pr-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_pr_preview_required_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "create-pr-preview",
                 "--username",
@@ -633,23 +646,23 @@ class CliParserTest(unittest.TestCase):
                 "4711",
             ]
         )
-        self.assertEqual(cli.command, "create-pr-preview")
+        self.assertType(args, CreatePrPreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.pr_id, 4711)
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.pr_id, 4711)
 
-        self.assertIsNone(cli.git_provider)
-        self.assertIsNone(cli.git_provider_url)
-        self.assertIsNone(cli.parent_id)
-        self.assertFalse(cli.verbose)
+        self.assertIsNone(args.git_provider)
+        self.assertIsNone(args.git_provider_url)
+        self.assertIsNone(args.parent_id)
+        self.assertFalse(verbose)
 
     def test_create_pr_preview_all_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "create-pr-preview",
                 "--username",
@@ -675,41 +688,41 @@ class CliParserTest(unittest.TestCase):
                 "-v",
             ]
         )
-        self.assertEqual(cli.command, "create-pr-preview")
+        self.assertType(args, CreatePrPreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.pr_id, 4711)
-        self.assertEqual(cli.parent_id, 42)
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.pr_id, 4711)
+        self.assertEqual(args.parent_id, 42)
 
-        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
-        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.verbose)
+        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(verbose)
 
     def test_delete_preview_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["delete-preview"])
+        exit_code, stdout, stderr = self._capture_parse_args(["delete-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_DELETE_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_delete_preview_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["delete-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["delete-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_DELETE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_preview_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["delete-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["delete-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_DELETE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_preview_required_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "delete-preview",
                 "--username",
@@ -728,23 +741,23 @@ class CliParserTest(unittest.TestCase):
                 "abc123",
             ]
         )
-        self.assertEqual(cli.command, "delete-preview")
+        self.assertType(args, DeletePreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.preview_id, "abc123")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.preview_id, "abc123")
 
-        self.assertIsNone(cli.git_provider)
-        self.assertIsNone(cli.git_provider_url)
-        self.assertFalse(cli.expect_preview_exists)
-        self.assertFalse(cli.verbose)
+        self.assertIsNone(args.git_provider)
+        self.assertIsNone(args.git_provider_url)
+        self.assertFalse(args.expect_preview_exists)
+        self.assertFalse(verbose)
 
     def test_delete_preview_all_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "delete-preview",
                 "--username",
@@ -770,41 +783,41 @@ class CliParserTest(unittest.TestCase):
                 "n",
             ]
         )
-        self.assertEqual(cli.command, "delete-preview")
+        self.assertType(args, DeletePreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.preview_id, "abc123")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.preview_id, "abc123")
 
-        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
-        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.expect_preview_exists)
-        self.assertFalse(cli.verbose)
+        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(args.expect_preview_exists)
+        self.assertFalse(verbose)
 
     def test_delete_pr_preview_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["delete-pr-preview"])
+        exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_delete_pr_preview_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["delete-pr-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_pr_preview_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["delete-pr-preview", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_pr_preview_required_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "delete-pr-preview",
                 "--username",
@@ -823,23 +836,23 @@ class CliParserTest(unittest.TestCase):
                 "BRANCH",
             ]
         )
-        self.assertEqual(cli.command, "delete-pr-preview")
+        self.assertType(args, DeletePrPreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.branch, "BRANCH")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.branch, "BRANCH")
 
-        self.assertIsNone(cli.git_provider)
-        self.assertIsNone(cli.git_provider_url)
-        self.assertFalse(cli.expect_preview_exists)
-        self.assertFalse(cli.verbose)
+        self.assertIsNone(args.git_provider)
+        self.assertIsNone(args.git_provider_url)
+        self.assertFalse(args.expect_preview_exists)
+        self.assertFalse(verbose)
 
     def test_delete_pr_preview_all_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "delete-pr-preview",
                 "--username",
@@ -865,41 +878,41 @@ class CliParserTest(unittest.TestCase):
                 "n",
             ]
         )
-        self.assertEqual(cli.command, "delete-pr-preview")
+        self.assertType(args, DeletePrPreviewArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.branch, "BRANCH")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.branch, "BRANCH")
 
-        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
-        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.expect_preview_exists)
-        self.assertFalse(cli.verbose)
+        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(args.expect_preview_exists)
+        self.assertFalse(verbose)
 
     def test_deploy_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["deploy"])
+        exit_code, stdout, stderr = self._capture_parse_args(["deploy"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_DEPLOY_NO_ARGS_ERROR, stderr)
 
     def test_deploy_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["deploy", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["deploy", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_DEPLOY_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_deploy_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["deploy", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["deploy", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_DEPLOY_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_deploy_required_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "deploy",
                 "--username",
@@ -920,26 +933,26 @@ class CliParserTest(unittest.TestCase):
                 '{"a.b": 42}',  # json
             ]
         )
-        self.assertEqual(cli.command, "deploy")
+        self.assertType(args, DeployArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.file, "FILE")
-        self.assertEqual(cli.values, {"a.b": 42})
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.file, "FILE")
+        self.assertEqual(args.values, {"a.b": 42})
 
-        self.assertIsNone(cli.git_provider)
-        self.assertIsNone(cli.git_provider_url)
-        self.assertFalse(cli.create_pr)
-        self.assertFalse(cli.auto_merge)
-        self.assertFalse(cli.single_commit)
-        self.assertFalse(cli.verbose)
+        self.assertIsNone(args.git_provider)
+        self.assertIsNone(args.git_provider_url)
+        self.assertFalse(args.create_pr)
+        self.assertFalse(args.auto_merge)
+        self.assertFalse(args.single_commit)
+        self.assertFalse(verbose)
 
     def test_deploy_all_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "deploy",
                 "--username",
@@ -968,44 +981,44 @@ class CliParserTest(unittest.TestCase):
                 "--verbose",
             ]
         )
-        self.assertEqual(cli.command, "deploy")
+        self.assertType(args, DeployArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.file, "FILE")
-        self.assertEqual(cli.values, {"a.b": 42})
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.file, "FILE")
+        self.assertEqual(args.values, {"a.b": 42})
 
-        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
-        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.create_pr)
-        self.assertTrue(cli.auto_merge)
-        self.assertTrue(cli.single_commit)
-        self.assertTrue(cli.verbose)
+        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(args.create_pr)
+        self.assertTrue(args.auto_merge)
+        self.assertTrue(args.single_commit)
+        self.assertTrue(verbose)
 
     def test_sync_apps_no_args(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["sync-apps"])
+        exit_code, stdout, stderr = self._capture_parse_args(["sync-apps"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
         self.assertEqual(EXPECTED_SYNC_APPS_NO_ARGS_ERROR, stderr)
 
     def test_sync_apps_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["sync-apps", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["sync-apps", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_SYNC_APPS_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_sync_apps_help_shortcut(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["sync-apps", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["sync-apps", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_SYNC_APPS_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_sync_apps_required_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "sync-apps",
                 "--username",
@@ -1026,23 +1039,23 @@ class CliParserTest(unittest.TestCase):
                 "ROOT_REPO",
             ]
         )
-        self.assertEqual(cli.command, "sync-apps")
+        self.assertType(args, SyncAppsArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.root_organisation, "ROOT_ORGA")
-        self.assertEqual(cli.root_repository_name, "ROOT_REPO")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.root_organisation, "ROOT_ORGA")
+        self.assertEqual(args.root_repository_name, "ROOT_REPO")
 
-        self.assertIsNone(cli.git_provider)
-        self.assertIsNone(cli.git_provider_url)
-        self.assertFalse(cli.verbose)
+        self.assertIsNone(args.git_provider)
+        self.assertIsNone(args.git_provider_url)
+        self.assertFalse(verbose)
 
     def test_sync_apps_all_args(self):
-        cli = create_cli(
+        verbose, args = parse_args(
             [
                 "sync-apps",
                 "--username",
@@ -1068,27 +1081,27 @@ class CliParserTest(unittest.TestCase):
                 "--verbose",
             ]
         )
-        self.assertEqual(cli.command, "sync-apps")
+        self.assertType(args, SyncAppsArgs)
 
-        self.assertEqual(cli.username, "USER")
-        self.assertEqual(cli.password, "PASS")
-        self.assertEqual(cli.git_user, "GIT_USER")
-        self.assertEqual(cli.git_email, "GIT_EMAIL")
-        self.assertEqual(cli.organisation, "ORG")
-        self.assertEqual(cli.repository_name, "REPO")
-        self.assertEqual(cli.root_organisation, "ROOT_ORGA")
-        self.assertEqual(cli.root_repository_name, "ROOT_REPO")
+        self.assertEqual(args.username, "USER")
+        self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_user, "GIT_USER")
+        self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.root_organisation, "ROOT_ORGA")
+        self.assertEqual(args.root_repository_name, "ROOT_REPO")
 
-        self.assertEqual(cli.git_provider, "GIT_PROVIDER")
-        self.assertEqual(cli.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(cli.verbose)
+        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertTrue(verbose)
 
     def test_version_args(self):
-        cli = create_cli(["version"])
-        self.assertEqual(cli.command, "version")
+        verbose, args = parse_args(["version"])
+        self.assertType(args, VersionArgs)
 
     def test_version_help(self):
-        exit_code, stdout, stderr = self._capture_create_cli(["version", "--help"])
+        exit_code, stdout, stderr = self._capture_parse_args(["version", "--help"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_VERSION_HELP, stdout)
         self.assertEqual("", stderr)

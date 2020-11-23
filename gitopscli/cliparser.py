@@ -1,10 +1,21 @@
-from argparse import ArgumentParser, ArgumentTypeError, Namespace, _SubParsersAction as SubParsersAction
+from argparse import ArgumentParser, ArgumentTypeError, _SubParsersAction as SubParsersAction
 import sys
 from typing import List, Tuple
+from gitopscli.commands import (
+    CommandArgs,
+    DeployArgs,
+    SyncAppsArgs,
+    AddPrCommentArgs,
+    CreatePreviewArgs,
+    CreatePrPreviewArgs,
+    DeletePreviewArgs,
+    DeletePrPreviewArgs,
+    VersionArgs,
+)
 from gitopscli.io.yaml_util import yaml_load
 
 
-def create_cli(args: List[str]) -> Namespace:
+def parse_args(raw_args: List[str]) -> Tuple[bool, CommandArgs]:
     parser, subparsers = __create_cli_parser()
     __add_deploy_command_parser(subparsers)
     __add_sync_apps_command_parser(subparsers)
@@ -15,11 +26,42 @@ def create_cli(args: List[str]) -> Namespace:
     __add_delete_pr_preview_command_parser(subparsers)
     __add_version_command_parser(subparsers)
 
-    if len(args) == 0:
+    if len(raw_args) == 0:
         parser.print_help(sys.stderr)
         sys.exit(2)
 
-    return parser.parse_args(args)
+    parsed_args = parser.parse_args(raw_args)
+
+    verbose = False
+    if "verbose" in parsed_args:
+        verbose = parsed_args.verbose
+        del parsed_args.verbose
+
+    command = parsed_args.command
+    del parsed_args.command
+
+    typed_args: CommandArgs
+
+    if command == "deploy":
+        typed_args = DeployArgs(**vars(parsed_args))
+    elif command == "sync-apps":
+        typed_args = SyncAppsArgs(**vars(parsed_args))
+    elif command == "add-pr-comment":
+        typed_args = AddPrCommentArgs(**vars(parsed_args))
+    elif command == "create-preview":
+        typed_args = CreatePreviewArgs(**vars(parsed_args))
+    elif command == "create-pr-preview":
+        typed_args = CreatePrPreviewArgs(**vars(parsed_args))
+    elif command == "delete-preview":
+        typed_args = DeletePreviewArgs(**vars(parsed_args))
+    elif command == "delete-pr-preview":
+        typed_args = DeletePrPreviewArgs(**vars(parsed_args))
+    elif command == "version":
+        typed_args = VersionArgs()
+    else:
+        raise NotImplementedError(f"Unknown command: {command}")
+
+    return verbose, typed_args
 
 
 def __create_cli_parser() -> Tuple[ArgumentParser, SubParsersAction]:

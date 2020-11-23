@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock, call
-from gitopscli.git import GitApiConfig, GitRepoApi
-from gitopscli.commands.sync_apps import sync_apps_command
+from gitopscli.git import GitApiConfig
+from gitopscli.commands.sync_apps import sync_apps_command, SyncAppsArgs
 
 
 class SyncAppsCommandTest(unittest.TestCase):
@@ -83,17 +83,18 @@ class SyncAppsCommandTest(unittest.TestCase):
 
     def test_sync_apps_happy_flow(self):
         sync_apps_command(
-            command="sync-apps",
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            root_organisation="ROOT_ORGA",
-            root_repository_name="ROOT_REPO",
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            SyncAppsArgs(
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                root_organisation="ROOT_ORGA",
+                root_repository_name="ROOT_REPO",
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+            )
         )
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(

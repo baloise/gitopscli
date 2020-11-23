@@ -1,20 +1,23 @@
-from typing import Optional
+from typing import Optional, NamedTuple
 from gitopscli.git import GitApiConfig, GitRepoApiFactory
 
 
-def pr_comment_command(
-    command: str,
-    text: str,
-    username: Optional[str],
-    password: Optional[str],
-    parent_id: Optional[int],
-    pr_id: int,
-    organisation: str,
-    repository_name: str,
-    git_provider: Optional[str],
-    git_provider_url: Optional[str],
-) -> None:
-    assert command == "add-pr-comment"
-    git_api_config = GitApiConfig(username, password, git_provider, git_provider_url,)
-    git_repo_api = GitRepoApiFactory.create(git_api_config, organisation, repository_name,)
-    git_repo_api.add_pull_request_comment(pr_id, text, parent_id)
+class AddPrCommentArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    organisation: str
+    repository_name: str
+
+    pr_id: int
+    parent_id: Optional[int]
+    text: str
+
+
+def pr_comment_command(args: AddPrCommentArgs) -> None:
+    git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
+    git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name,)
+    git_repo_api.add_pull_request_comment(args.pr_id, args.text, args.parent_id)

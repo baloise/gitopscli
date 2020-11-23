@@ -1,31 +1,36 @@
-from typing import Optional
-from gitopscli.commands import delete_preview_command
+from typing import Optional, NamedTuple
+from .delete_preview import delete_preview_command, DeletePreviewArgs
 
 
-def delete_pr_preview_command(
-    command: str,
-    branch: str,
-    username: Optional[str],
-    password: Optional[str],
-    git_user: str,
-    git_email: str,
-    organisation: str,
-    repository_name: str,
-    git_provider: Optional[str],
-    git_provider_url: Optional[str],
-    expect_preview_exists: bool,
-) -> None:
-    assert command == "delete-pr-preview"
+class DeletePrPreviewArgs(NamedTuple):
+    git_provider: Optional[str]
+    git_provider_url: Optional[str]
+
+    username: str
+    password: str
+
+    git_user: str
+    git_email: str
+
+    organisation: str
+    repository_name: str
+
+    branch: str
+    expect_preview_exists: bool
+
+
+def delete_pr_preview_command(args: DeletePrPreviewArgs) -> None:
     delete_preview_command(
-        command="delete-preview",
-        username=username,
-        password=password,
-        git_user=git_user,
-        git_email=git_email,
-        organisation=organisation,
-        repository_name=repository_name,
-        git_provider=git_provider,
-        git_provider_url=git_provider_url,
-        preview_id=branch,  # use branch as preview id
-        expect_preview_exists=expect_preview_exists,
+        DeletePreviewArgs(
+            username=args.username,
+            password=args.password,
+            git_user=args.git_user,
+            git_email=args.git_email,
+            organisation=args.organisation,
+            repository_name=args.repository_name,
+            git_provider=args.git_provider,
+            git_provider_url=args.git_provider_url,
+            preview_id=args.branch,  # use branch as preview id
+            expect_preview_exists=args.expect_preview_exists,
+        )
     )

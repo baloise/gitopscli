@@ -7,7 +7,7 @@ from .git_repo_api_logging_proxy import GitRepoApiLoggingProxy
 from .git_api_config import GitApiConfig
 
 
-class GitRepoApiFactory:  # pylint: disable=too-few-public-methods
+class GitRepoApiFactory:
     @staticmethod
     def create(config: GitApiConfig, organisation: str, repository_name: str) -> GitRepoApi:
         git_repo_api: GitRepoApi

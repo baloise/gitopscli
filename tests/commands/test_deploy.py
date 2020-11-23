@@ -3,7 +3,7 @@ from uuid import UUID
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.deploy import deploy_command
+from gitopscli.commands.deploy import deploy_command, DeployArgs
 from gitopscli.git import GitApiConfig, GitRepoApi
 
 
@@ -51,20 +51,22 @@ class DeployCommandTest(unittest.TestCase):
 
     def test_happy_flow(self):
         deploy_command(
-            command="deploy",
-            file="test/file.yml",
-            values={"a.b.c": "foo", "a.b.d": "bar"},
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            create_pr=False,
-            auto_merge=False,
-            single_commit=False,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            DeployArgs(
+                file="test/file.yml",
+                values={"a.b.c": "foo", "a.b.d": "bar"},
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                create_pr=False,
+                auto_merge=False,
+                single_commit=False,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                commit_message=None,
+            )
         )
 
         assert self.mock_manager.method_calls == [
@@ -84,20 +86,22 @@ class DeployCommandTest(unittest.TestCase):
 
     def test_create_pr_happy_flow(self):
         deploy_command(
-            command="deploy",
-            file="test/file.yml",
-            values={"a.b.c": "foo", "a.b.d": "bar"},
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            create_pr=True,
-            auto_merge=False,
-            single_commit=False,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            DeployArgs(
+                file="test/file.yml",
+                values={"a.b.c": "foo", "a.b.d": "bar"},
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                create_pr=True,
+                auto_merge=False,
+                single_commit=False,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                commit_message=None,
+            )
         )
 
         assert self.mock_manager.method_calls == [
@@ -124,20 +128,22 @@ class DeployCommandTest(unittest.TestCase):
 
     def test_create_pr_and_merge_happy_flow(self):
         deploy_command(
-            command="deploy",
-            file="test/file.yml",
-            values={"a.b.c": "foo", "a.b.d": "bar"},
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            create_pr=True,
-            auto_merge=True,
-            single_commit=False,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            DeployArgs(
+                file="test/file.yml",
+                values={"a.b.c": "foo", "a.b.d": "bar"},
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                create_pr=True,
+                auto_merge=True,
+                single_commit=False,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                commit_message=None,
+            )
         )
 
         assert self.mock_manager.method_calls == [
@@ -166,20 +172,22 @@ class DeployCommandTest(unittest.TestCase):
 
     def test_single_commit_happy_flow(self):
         deploy_command(
-            command="deploy",
-            file="test/file.yml",
-            values={"a.b.c": "foo", "a.b.d": "bar"},
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            create_pr=False,
-            auto_merge=False,
-            single_commit=True,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            DeployArgs(
+                file="test/file.yml",
+                values={"a.b.c": "foo", "a.b.d": "bar"},
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                create_pr=False,
+                auto_merge=False,
+                single_commit=True,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                commit_message=None,
+            )
         )
 
         assert self.mock_manager.method_calls == [
@@ -198,21 +206,22 @@ class DeployCommandTest(unittest.TestCase):
 
     def test_commit_message_happy_flow(self):
         deploy_command(
-            command="deploy",
-            file="test/file.yml",
-            values={"a.b.c": "foo", "a.b.d": "bar"},
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            create_pr=False,
-            auto_merge=False,
-            single_commit=False,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
-            commit_message="testcommit",
+            DeployArgs(
+                file="test/file.yml",
+                values={"a.b.c": "foo", "a.b.d": "bar"},
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                create_pr=False,
+                auto_merge=False,
+                single_commit=False,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                commit_message="testcommit",
+            )
         )
 
         assert self.mock_manager.method_calls == [
@@ -235,20 +244,22 @@ class DeployCommandTest(unittest.TestCase):
 
         with pytest.raises(GitOpsException) as ex:
             deploy_command(
-                command="deploy",
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=False,
-                auto_merge=False,
-                single_commit=False,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider="github",
-                git_provider_url=None,
+                DeployArgs(
+                    file="test/file.yml",
+                    values={"a.b.c": "foo", "a.b.d": "bar"},
+                    username="USERNAME",
+                    password="PASSWORD",
+                    git_user="GIT_USER",
+                    git_email="GIT_EMAIL",
+                    create_pr=False,
+                    auto_merge=False,
+                    single_commit=False,
+                    organisation="ORGA",
+                    repository_name="REPO",
+                    git_provider="github",
+                    git_provider_url=None,
+                    commit_message=None,
+                )
             )
         self.assertEqual(ex.value, checkout_exception)
 
@@ -263,20 +274,22 @@ class DeployCommandTest(unittest.TestCase):
 
         with pytest.raises(GitOpsException) as ex:
             deploy_command(
-                command="deploy",
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=False,
-                auto_merge=False,
-                single_commit=False,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider="github",
-                git_provider_url=None,
+                DeployArgs(
+                    file="test/file.yml",
+                    values={"a.b.c": "foo", "a.b.d": "bar"},
+                    username="USERNAME",
+                    password="PASSWORD",
+                    git_user="GIT_USER",
+                    git_email="GIT_EMAIL",
+                    create_pr=False,
+                    auto_merge=False,
+                    single_commit=False,
+                    organisation="ORGA",
+                    repository_name="REPO",
+                    git_provider="github",
+                    git_provider_url=None,
+                    commit_message=None,
+                )
             )
         self.assertEqual(str(ex.value), "No such file: test/file.yml")
 
@@ -292,20 +305,22 @@ class DeployCommandTest(unittest.TestCase):
         self.update_yaml_file_mock.return_value = False
 
         deploy_command(
-            command="deploy",
-            file="test/file.yml",
-            values={"a.b.c": "foo", "a.b.d": "bar"},
-            username="USERNAME",
-            password="PASSWORD",
-            git_user="GIT_USER",
-            git_email="GIT_EMAIL",
-            create_pr=False,
-            auto_merge=False,
-            single_commit=False,
-            organisation="ORGA",
-            repository_name="REPO",
-            git_provider="github",
-            git_provider_url=None,
+            DeployArgs(
+                file="test/file.yml",
+                values={"a.b.c": "foo", "a.b.d": "bar"},
+                username="USERNAME",
+                password="PASSWORD",
+                git_user="GIT_USER",
+                git_email="GIT_EMAIL",
+                create_pr=False,
+                auto_merge=False,
+                single_commit=False,
+                organisation="ORGA",
+                repository_name="REPO",
+                git_provider="github",
+                git_provider_url=None,
+                commit_message=None,
+            )
         )
 
         assert self.mock_manager.method_calls == [
