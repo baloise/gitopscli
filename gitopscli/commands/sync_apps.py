@@ -6,26 +6,34 @@ from ruamel.yaml import YAML
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
+from .command import Command
 
 
-class SyncAppsArgs(NamedTuple):
-    git_provider: Optional[str]
-    git_provider_url: Optional[str]
+class SyncAppsCommand(Command):
+    class Args(NamedTuple):
+        git_provider: Optional[str]
+        git_provider_url: Optional[str]
 
-    username: str
-    password: str
+        username: str
+        password: str
 
-    git_user: str
-    git_email: str
+        git_user: str
+        git_email: str
 
-    organisation: str
-    repository_name: str
+        organisation: str
+        repository_name: str
 
-    root_organisation: str
-    root_repository_name: str
+        root_organisation: str
+        root_repository_name: str
+
+    def __init__(self, args: Args) -> None:
+        self.__args = args
+
+    def execute(self) -> None:
+        _sync_apps_command(self.__args)
 
 
-def sync_apps_command(args: SyncAppsArgs) -> None:
+def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
     git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
     team_config_git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name)
     root_config_git_repo_api = GitRepoApiFactory.create(

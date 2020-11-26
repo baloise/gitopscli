@@ -8,30 +8,56 @@ from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config
+from .command import Command
 
 
-class CreatePreviewArgs(NamedTuple):
-    git_provider: Optional[str]
-    git_provider_url: Optional[str]
+class CreatePreviewCommand(Command):
+    class Args(NamedTuple):
+        git_provider: Optional[str]
+        git_provider_url: Optional[str]
 
-    username: str
-    password: str
+        username: str
+        password: str
 
-    git_user: str
-    git_email: str
+        git_user: str
+        git_email: str
 
-    organisation: str
-    repository_name: str
+        organisation: str
+        repository_name: str
 
-    git_hash: str
-    preview_id: str
+        git_hash: str
+        preview_id: str
+
+    def __init__(self, args: Args) -> None:
+        self.__args = args
+        self.__deployment_already_up_to_date_callback: Callable[[str], None] = lambda _: None
+        self.__deployment_updated_callback: Callable[[str], None] = lambda _: None
+        self.__deployment_created_callback: Callable[[str], None] = lambda _: None
+
+    def register_callbacks(
+        self,
+        deployment_already_up_to_date_callback: Callable[[str], None],
+        deployment_updated_callback: Callable[[str], None],
+        deployment_created_callback: Callable[[str], None],
+    ) -> None:
+        self.__deployment_already_up_to_date_callback = deployment_already_up_to_date_callback
+        self.__deployment_updated_callback = deployment_updated_callback
+        self.__deployment_created_callback = deployment_created_callback
+
+    def execute(self,) -> None:
+        _create_preview_command(
+            self.__args,
+            self.__deployment_already_up_to_date_callback,
+            self.__deployment_updated_callback,
+            self.__deployment_created_callback,
+        )
 
 
-def create_preview_command(
-    args: CreatePreviewArgs,
-    deployment_already_up_to_date_callback: Callable[[str], None] = lambda _: None,
-    deployment_exists_callback: Callable[[str], None] = lambda _: None,
-    deployment_new_callback: Callable[[str], None] = lambda _: None,
+def _create_preview_command(
+    args: CreatePreviewCommand.Args,
+    deployment_already_up_to_date_callback: Callable[[str], None],
+    deployment_updated_callback: Callable[[str], None],
+    deployment_created_callback: Callable[[str], None],
 ) -> None:
     git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
     gitops_config = load_gitops_config(git_api_config, args.organisation, args.repository_name)
@@ -79,9 +105,9 @@ def create_preview_command(
         config_git_repo.push("master")
 
         if preview_env_already_exist:
-            deployment_exists_callback(route_host)
+            deployment_updated_callback(route_host)
         else:
-            deployment_new_callback(route_host)
+            deployment_created_callback(route_host)
 
 
 def __replace_value(

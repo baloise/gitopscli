@@ -6,32 +6,40 @@ from typing import Any, Callable, Dict, Optional, NamedTuple
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
 from gitopscli.gitops_exception import GitOpsException
+from .command import Command
 
 
-class DeployArgs(NamedTuple):
-    git_provider: Optional[str]
-    git_provider_url: Optional[str]
+class DeployCommand(Command):
+    class Args(NamedTuple):
+        git_provider: Optional[str]
+        git_provider_url: Optional[str]
 
-    username: str
-    password: str
+        username: str
+        password: str
 
-    git_user: str
-    git_email: str
+        git_user: str
+        git_email: str
 
-    organisation: str
-    repository_name: str
+        organisation: str
+        repository_name: str
 
-    file: str
-    values: Any
+        file: str
+        values: Any
 
-    single_commit: bool
-    commit_message: Optional[str]
+        single_commit: bool
+        commit_message: Optional[str]
 
-    create_pr: bool
-    auto_merge: bool
+        create_pr: bool
+        auto_merge: bool
+
+    def __init__(self, args: Args) -> None:
+        self.__args = args
+
+    def execute(self) -> None:
+        _deploy_command(self.__args)
 
 
-def deploy_command(args: DeployArgs) -> None:
+def _deploy_command(args: DeployCommand.Args) -> None:
     git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
     git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name)
     with GitRepo(git_repo_api) as git_repo:
@@ -53,7 +61,7 @@ def deploy_command(args: DeployArgs) -> None:
         __create_pr(git_repo_api, config_branch, updated_values, args)
 
 
-def __update_values(git_repo: GitRepo, args: DeployArgs) -> Dict[str, Any]:
+def __update_values(git_repo: GitRepo, args: DeployCommand.Args) -> Dict[str, Any]:
     full_file_path = git_repo.get_full_file_path(args.file)
     if not os.path.isfile(full_file_path):
         raise GitOpsException(f"No such file: {args.file}")
@@ -91,7 +99,9 @@ def __update_values(git_repo: GitRepo, args: DeployArgs) -> Dict[str, Any]:
     return updated_values
 
 
-def __create_pr(git_repo_api: GitRepoApi, branch: str, updated_values: Dict[str, Any], args: DeployArgs) -> None:
+def __create_pr(
+    git_repo_api: GitRepoApi, branch: str, updated_values: Dict[str, Any], args: DeployCommand.Args
+) -> None:
     title = f"Updated values in {args.file}"
     description = f"""\
 Updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in `{args.file}`:

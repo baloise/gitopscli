@@ -1,10 +1,11 @@
-from .command import Command, CommandArgs, CommandFactory
+from .command import Command
+from .command_factory import CommandArgs, CommandFactory
 
-from .add_pr_comment import AddPrCommentArgs
-from .create_preview import CreatePreviewArgs
-from .create_pr_preview import CreatePrPreviewArgs
-from .delete_preview import DeletePreviewArgs
-from .delete_pr_preview import DeletePrPreviewArgs
-from .deploy import DeployArgs
-from .sync_apps import SyncAppsArgs
-from .version import VersionArgs
+from .add_pr_comment import AddPrCommentCommand
+from .create_preview import CreatePreviewCommand
+from .create_pr_preview import CreatePrPreviewCommand
+from .delete_preview import DeletePreviewCommand
+from .delete_pr_preview import DeletePrPreviewCommand
+from .deploy import DeployCommand
+from .sync_apps import SyncAppsCommand
+from .version import VersionCommand

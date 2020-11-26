@@ -8,26 +8,34 @@ from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
 
 from .common import load_gitops_config
+from .command import Command
 
 
-class DeletePreviewArgs(NamedTuple):
-    git_provider: Optional[str]
-    git_provider_url: Optional[str]
+class DeletePreviewCommand(Command):
+    class Args(NamedTuple):
+        git_provider: Optional[str]
+        git_provider_url: Optional[str]
 
-    username: str
-    password: str
+        username: str
+        password: str
 
-    git_user: str
-    git_email: str
+        git_user: str
+        git_email: str
 
-    organisation: str
-    repository_name: str
+        organisation: str
+        repository_name: str
 
-    preview_id: str
-    expect_preview_exists: bool
+        preview_id: str
+        expect_preview_exists: bool
+
+    def __init__(self, args: Args) -> None:
+        self.__args = args
+
+    def execute(self) -> None:
+        _delete_preview_command(self.__args)
 
 
-def delete_preview_command(args: DeletePreviewArgs) -> None:
+def _delete_preview_command(args: DeletePreviewCommand.Args) -> None:
     git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
     gitops_config = load_gitops_config(git_api_config, args.organisation, args.repository_name)
 

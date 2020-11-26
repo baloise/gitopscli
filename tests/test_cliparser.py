@@ -6,14 +6,14 @@ from io import StringIO
 import pytest
 
 from gitopscli.commands import (
-    DeployArgs,
-    SyncAppsArgs,
-    AddPrCommentArgs,
-    CreatePreviewArgs,
-    CreatePrPreviewArgs,
-    DeletePreviewArgs,
-    DeletePrPreviewArgs,
-    VersionArgs,
+    DeployCommand,
+    SyncAppsCommand,
+    AddPrCommentCommand,
+    CreatePreviewCommand,
+    CreatePrPreviewCommand,
+    DeletePreviewCommand,
+    DeletePrPreviewCommand,
+    VersionCommand,
 )
 from gitopscli.cliparser import parse_args
 
@@ -459,7 +459,7 @@ class CliParserTest(unittest.TestCase):
                 "TEXT",
             ]
         )
-        self.assertType(args, AddPrCommentArgs)
+        self.assertType(args, AddPrCommentCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -498,7 +498,7 @@ class CliParserTest(unittest.TestCase):
                 "--verbose",
             ]
         )
-        self.assertType(args, AddPrCommentArgs)
+        self.assertType(args, AddPrCommentCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -551,7 +551,7 @@ class CliParserTest(unittest.TestCase):
                 "abc123",
             ]
         )
-        self.assertType(args, CreatePreviewArgs)
+        self.assertType(args, CreatePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -593,7 +593,7 @@ class CliParserTest(unittest.TestCase):
                 "-v",
             ]
         )
-        self.assertType(args, CreatePreviewArgs)
+        self.assertType(args, CreatePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -646,7 +646,7 @@ class CliParserTest(unittest.TestCase):
                 "4711",
             ]
         )
-        self.assertType(args, CreatePrPreviewArgs)
+        self.assertType(args, CreatePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -688,7 +688,7 @@ class CliParserTest(unittest.TestCase):
                 "-v",
             ]
         )
-        self.assertType(args, CreatePrPreviewArgs)
+        self.assertType(args, CreatePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -741,7 +741,7 @@ class CliParserTest(unittest.TestCase):
                 "abc123",
             ]
         )
-        self.assertType(args, DeletePreviewArgs)
+        self.assertType(args, DeletePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -783,7 +783,7 @@ class CliParserTest(unittest.TestCase):
                 "n",
             ]
         )
-        self.assertType(args, DeletePreviewArgs)
+        self.assertType(args, DeletePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -836,7 +836,7 @@ class CliParserTest(unittest.TestCase):
                 "BRANCH",
             ]
         )
-        self.assertType(args, DeletePrPreviewArgs)
+        self.assertType(args, DeletePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -878,7 +878,7 @@ class CliParserTest(unittest.TestCase):
                 "n",
             ]
         )
-        self.assertType(args, DeletePrPreviewArgs)
+        self.assertType(args, DeletePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -933,7 +933,7 @@ class CliParserTest(unittest.TestCase):
                 '{"a.b": 42}',  # json
             ]
         )
-        self.assertType(args, DeployArgs)
+        self.assertType(args, DeployCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -981,7 +981,7 @@ class CliParserTest(unittest.TestCase):
                 "--verbose",
             ]
         )
-        self.assertType(args, DeployArgs)
+        self.assertType(args, DeployCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1039,7 +1039,7 @@ class CliParserTest(unittest.TestCase):
                 "ROOT_REPO",
             ]
         )
-        self.assertType(args, SyncAppsArgs)
+        self.assertType(args, SyncAppsCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1081,7 +1081,7 @@ class CliParserTest(unittest.TestCase):
                 "--verbose",
             ]
         )
-        self.assertType(args, SyncAppsArgs)
+        self.assertType(args, SyncAppsCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1098,7 +1098,7 @@ class CliParserTest(unittest.TestCase):
 
     def test_version_args(self):
         verbose, args = parse_args(["version"])
-        self.assertType(args, VersionArgs)
+        self.assertType(args, VersionCommand.Args)
 
     def test_version_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["version", "--help"])
