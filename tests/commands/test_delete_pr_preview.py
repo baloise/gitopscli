@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock, Mock, call
 import pytest
 from gitopscli.git import GitApiConfig, GitRepoApi
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.delete_pr_preview import delete_pr_preview_command, DeletePrPreviewArgs
+from gitopscli.commands.delete_pr_preview import DeletePrPreviewCommand
 
 
 class DeletePrPreviewCommandTest(unittest.TestCase):
@@ -47,8 +47,8 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
         )
 
     def test_delete_existing_happy_flow(self):
-        delete_pr_preview_command(
-            DeletePrPreviewArgs(
+        DeletePrPreviewCommand(
+            DeletePrPreviewCommand.Args(
                 username="USERNAME",
                 password="PASSWORD",
                 git_user="GIT_USER",
@@ -60,7 +60,7 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
                 branch="some/branch",
                 expect_preview_exists=False,
             )
-        )
+        ).execute()
         expected_git_api_config = GitApiConfig(
             username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
         )
@@ -82,8 +82,8 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
     def test_delete_missing_happy_flow(self):
         self.os_path_exists_mock.return_value = False
 
-        delete_pr_preview_command(
-            DeletePrPreviewArgs(
+        DeletePrPreviewCommand(
+            DeletePrPreviewCommand.Args(
                 username="USERNAME",
                 password="PASSWORD",
                 git_user="GIT_USER",
@@ -95,7 +95,7 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
                 branch="some/branch",
                 expect_preview_exists=False,
             )
-        )
+        ).execute()
         expected_git_api_config = GitApiConfig(
             username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
         )
@@ -116,8 +116,8 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
         self.os_path_exists_mock.return_value = False
 
         with pytest.raises(GitOpsException) as ex:
-            delete_pr_preview_command(
-                DeletePrPreviewArgs(
+            DeletePrPreviewCommand(
+                DeletePrPreviewCommand.Args(
                     username="USERNAME",
                     password="PASSWORD",
                     git_user="GIT_USER",
@@ -129,7 +129,7 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
                     branch="some/branch",
                     expect_preview_exists=True,  # we expect an existing preview
                 )
-            )
+            ).execute()
         self.assertEqual(str(ex.value), "There was no preview with name: APP-7252ebf0-preview")
 
         expected_git_api_config = GitApiConfig(
@@ -149,8 +149,8 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
         self.load_gitops_config_mock.side_effect = GitOpsException()
 
         with pytest.raises(GitOpsException):
-            delete_pr_preview_command(
-                DeletePrPreviewArgs(
+            DeletePrPreviewCommand(
+                DeletePrPreviewCommand.Args(
                     username="USERNAME",
                     password="PASSWORD",
                     git_user="GIT_USER",
@@ -162,7 +162,7 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
                     branch="some/branch",
                     expect_preview_exists=True,  # we expect an existing preview
                 )
-            )
+            ).execute()
         expected_git_api_config = GitApiConfig(
             username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
         )

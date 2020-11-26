@@ -3,7 +3,7 @@ from uuid import UUID
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.deploy import deploy_command, DeployArgs
+from gitopscli.commands.deploy import DeployCommand
 from gitopscli.git import GitApiConfig, GitRepoApi
 
 
@@ -50,8 +50,8 @@ class DeployCommandTest(unittest.TestCase):
         self.uuid_mock.uuid4.return_value = UUID("b973b5bb-64a6-4735-a840-3113d531b41c")
 
     def test_happy_flow(self):
-        deploy_command(
-            DeployArgs(
+        DeployCommand(
+            DeployCommand.Args(
                 file="test/file.yml",
                 values={"a.b.c": "foo", "a.b.d": "bar"},
                 username="USERNAME",
@@ -67,7 +67,7 @@ class DeployCommandTest(unittest.TestCase):
                 git_provider_url=None,
                 commit_message=None,
             )
-        )
+        ).execute()
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
@@ -85,8 +85,8 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_create_pr_happy_flow(self):
-        deploy_command(
-            DeployArgs(
+        DeployCommand(
+            DeployCommand.Args(
                 file="test/file.yml",
                 values={"a.b.c": "foo", "a.b.d": "bar"},
                 username="USERNAME",
@@ -102,7 +102,7 @@ class DeployCommandTest(unittest.TestCase):
                 git_provider_url=None,
                 commit_message=None,
             )
-        )
+        ).execute()
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
@@ -127,8 +127,8 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_create_pr_and_merge_happy_flow(self):
-        deploy_command(
-            DeployArgs(
+        DeployCommand(
+            DeployCommand.Args(
                 file="test/file.yml",
                 values={"a.b.c": "foo", "a.b.d": "bar"},
                 username="USERNAME",
@@ -144,7 +144,7 @@ class DeployCommandTest(unittest.TestCase):
                 git_provider_url=None,
                 commit_message=None,
             )
-        )
+        ).execute()
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
@@ -171,8 +171,8 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_single_commit_happy_flow(self):
-        deploy_command(
-            DeployArgs(
+        DeployCommand(
+            DeployCommand.Args(
                 file="test/file.yml",
                 values={"a.b.c": "foo", "a.b.d": "bar"},
                 username="USERNAME",
@@ -188,7 +188,7 @@ class DeployCommandTest(unittest.TestCase):
                 git_provider_url=None,
                 commit_message=None,
             )
-        )
+        ).execute()
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
@@ -205,8 +205,8 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_commit_message_happy_flow(self):
-        deploy_command(
-            DeployArgs(
+        DeployCommand(
+            DeployCommand.Args(
                 file="test/file.yml",
                 values={"a.b.c": "foo", "a.b.d": "bar"},
                 username="USERNAME",
@@ -222,7 +222,7 @@ class DeployCommandTest(unittest.TestCase):
                 git_provider_url=None,
                 commit_message="testcommit",
             )
-        )
+        ).execute()
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
@@ -243,8 +243,8 @@ class DeployCommandTest(unittest.TestCase):
         self.git_repo_mock.checkout.side_effect = checkout_exception
 
         with pytest.raises(GitOpsException) as ex:
-            deploy_command(
-                DeployArgs(
+            DeployCommand(
+                DeployCommand.Args(
                     file="test/file.yml",
                     values={"a.b.c": "foo", "a.b.d": "bar"},
                     username="USERNAME",
@@ -260,7 +260,7 @@ class DeployCommandTest(unittest.TestCase):
                     git_provider_url=None,
                     commit_message=None,
                 )
-            )
+            ).execute()
         self.assertEqual(ex.value, checkout_exception)
 
         assert self.mock_manager.method_calls == [
@@ -273,8 +273,8 @@ class DeployCommandTest(unittest.TestCase):
         self.os_path_isfile_mock.return_value = False
 
         with pytest.raises(GitOpsException) as ex:
-            deploy_command(
-                DeployArgs(
+            DeployCommand(
+                DeployCommand.Args(
                     file="test/file.yml",
                     values={"a.b.c": "foo", "a.b.d": "bar"},
                     username="USERNAME",
@@ -290,7 +290,7 @@ class DeployCommandTest(unittest.TestCase):
                     git_provider_url=None,
                     commit_message=None,
                 )
-            )
+            ).execute()
         self.assertEqual(str(ex.value), "No such file: test/file.yml")
 
         assert self.mock_manager.method_calls == [
@@ -304,8 +304,8 @@ class DeployCommandTest(unittest.TestCase):
     def test_nothing_to_update(self):
         self.update_yaml_file_mock.return_value = False
 
-        deploy_command(
-            DeployArgs(
+        DeployCommand(
+            DeployCommand.Args(
                 file="test/file.yml",
                 values={"a.b.c": "foo", "a.b.d": "bar"},
                 username="USERNAME",
@@ -321,7 +321,7 @@ class DeployCommandTest(unittest.TestCase):
                 git_provider_url=None,
                 commit_message=None,
             )
-        )
+        ).execute()
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),

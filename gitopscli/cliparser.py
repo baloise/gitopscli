@@ -3,14 +3,14 @@ import sys
 from typing import List, Tuple
 from gitopscli.commands import (
     CommandArgs,
-    DeployArgs,
-    SyncAppsArgs,
-    AddPrCommentArgs,
-    CreatePreviewArgs,
-    CreatePrPreviewArgs,
-    DeletePreviewArgs,
-    DeletePrPreviewArgs,
-    VersionArgs,
+    DeployCommand,
+    SyncAppsCommand,
+    AddPrCommentCommand,
+    CreatePreviewCommand,
+    CreatePrPreviewCommand,
+    DeletePreviewCommand,
+    DeletePrPreviewCommand,
+    VersionCommand,
 )
 from gitopscli.io.yaml_util import yaml_load
 
@@ -43,21 +43,21 @@ def parse_args(raw_args: List[str]) -> Tuple[bool, CommandArgs]:
     typed_args: CommandArgs
 
     if command == "deploy":
-        typed_args = DeployArgs(**vars(parsed_args))
+        typed_args = DeployCommand.Args(**vars(parsed_args))
     elif command == "sync-apps":
-        typed_args = SyncAppsArgs(**vars(parsed_args))
+        typed_args = SyncAppsCommand.Args(**vars(parsed_args))
     elif command == "add-pr-comment":
-        typed_args = AddPrCommentArgs(**vars(parsed_args))
+        typed_args = AddPrCommentCommand.Args(**vars(parsed_args))
     elif command == "create-preview":
-        typed_args = CreatePreviewArgs(**vars(parsed_args))
+        typed_args = CreatePreviewCommand.Args(**vars(parsed_args))
     elif command == "create-pr-preview":
-        typed_args = CreatePrPreviewArgs(**vars(parsed_args))
+        typed_args = CreatePrPreviewCommand.Args(**vars(parsed_args))
     elif command == "delete-preview":
-        typed_args = DeletePreviewArgs(**vars(parsed_args))
+        typed_args = DeletePreviewCommand.Args(**vars(parsed_args))
     elif command == "delete-pr-preview":
-        typed_args = DeletePrPreviewArgs(**vars(parsed_args))
+        typed_args = DeletePrPreviewCommand.Args(**vars(parsed_args))
     elif command == "version":
-        typed_args = VersionArgs()
+        typed_args = VersionCommand.Args()
     else:
         raise NotImplementedError(f"Unknown command: {command}")
 

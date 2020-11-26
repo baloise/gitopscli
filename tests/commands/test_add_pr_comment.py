@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock, call
 from gitopscli.git import GitApiConfig
-from gitopscli.commands.add_pr_comment import pr_comment_command, AddPrCommentArgs
+from gitopscli.commands.add_pr_comment import AddPrCommentCommand
 
 
 class AddPrCommentCommandTest(unittest.TestCase):
@@ -28,8 +28,8 @@ class AddPrCommentCommandTest(unittest.TestCase):
         self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
 
     def test_with_parent_id(self):
-        pr_comment_command(
-            AddPrCommentArgs(
+        AddPrCommentCommand(
+            AddPrCommentCommand.Args(
                 text="Hello World!",
                 username="USERNAME",
                 password="PASSWORD",
@@ -40,7 +40,7 @@ class AddPrCommentCommandTest(unittest.TestCase):
                 git_provider="github",
                 git_provider_url=None,
             )
-        )
+        ).execute()
 
         assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
@@ -48,8 +48,8 @@ class AddPrCommentCommandTest(unittest.TestCase):
         ]
 
     def test_without_parent_id(self):
-        pr_comment_command(
-            AddPrCommentArgs(
+        AddPrCommentCommand(
+            AddPrCommentCommand.Args(
                 text="Hello World!",
                 username="USERNAME",
                 password="PASSWORD",
@@ -60,7 +60,7 @@ class AddPrCommentCommandTest(unittest.TestCase):
                 git_provider="github",
                 git_provider_url=None,
             )
-        )
+        ).execute()
 
         assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),

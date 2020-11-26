@@ -4,7 +4,7 @@ import unittest
 from contextlib import contextmanager
 from io import StringIO
 
-from gitopscli.commands.version import version_command
+from gitopscli.commands.version import VersionCommand
 
 
 @contextmanager
@@ -21,5 +21,5 @@ def captured_output():
 class VersionCommandTest(unittest.TestCase):
     def test_output(self):
         with captured_output() as stdout:
-            version_command()
+            VersionCommand(VersionCommand.Args()).execute()
         assert re.match(r"^GitOps CLI version (?:\d+\.\d+\.\d+|UNRELEASED)\n$", stdout.getvalue())
