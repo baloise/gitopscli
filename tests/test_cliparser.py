@@ -129,8 +129,7 @@ optional arguments:
                         https://bitbucket.example.tld)
   --git-hash GIT_HASH   the git hash which should be deployed
   --preview-id PREVIEW_ID
-                        the id of folder in the config repo which will be
-                        created
+                        The user-defined preview ID
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
@@ -222,7 +221,7 @@ optional arguments:
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
   --preview-id PREVIEW_ID
-                        The preview-id for which the preview was created for
+                        The user-defined preview ID
   --expect-preview-exists [EXPECT_PREVIEW_EXISTS]
                         Fail if preview does not exist
   -v [VERBOSE], --verbose [VERBOSE]
@@ -979,6 +978,7 @@ class CliParserTest(unittest.TestCase):
                 "--auto-merge",
                 "--single-commit",
                 "--verbose",
+                "yes",
             ]
         )
         self.assertType(args, DeployCommand.Args)
@@ -1079,6 +1079,7 @@ class CliParserTest(unittest.TestCase):
                 "--root-repository-name",
                 "ROOT_REPO",
                 "--verbose",
+                "false",
             ]
         )
         self.assertType(args, SyncAppsCommand.Args)
@@ -1094,10 +1095,10 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(args.git_provider, "GIT_PROVIDER")
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
-        self.assertTrue(verbose)
+        self.assertFalse(verbose)
 
     def test_version_args(self):
-        verbose, args = parse_args(["version"])
+        _, args = parse_args(["version"])
         self.assertType(args, VersionCommand.Args)
 
     def test_version_help(self):
@@ -1105,3 +1106,58 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertEqual(EXPECTED_VERSION_HELP, stdout)
         self.assertEqual("", stderr)
+
+    def test_invalid_boolean(self):
+        exit_code, stdout, stderr = self._capture_parse_args(
+            [
+                "add-pr-comment",
+                "--username",
+                "x",
+                "--password",
+                "x",
+                "--organisation",
+                "x",
+                "--repository-name",
+                "x",
+                "--pr-id",
+                "1",
+                "--text",
+                "x",
+                "--verbose",
+                "INVALID_BOOL",
+            ]
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        last_stderr_line = stderr.splitlines()[-1]
+        self.assertEqual(
+            "gitopscli add-pr-comment: error: argument -v/--verbose: invalid bool value: 'INVALID_BOOL'",
+            last_stderr_line,
+        )
+
+    def test_invalid_int(self):
+        exit_code, stdout, stderr = self._capture_parse_args(
+            [
+                "add-pr-comment",
+                "--username",
+                "x",
+                "--password",
+                "x",
+                "--organisation",
+                "x",
+                "--repository-name",
+                "x",
+                "--pr-id",
+                "INVALID_INT",
+                "--text",
+                "x",
+                "--verbose",
+                "y",
+            ]
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        last_stderr_line = stderr.splitlines()[-1]
+        self.assertEqual(
+            "gitopscli add-pr-comment: error: argument --pr-id: invalid int value: 'INVALID_INT'", last_stderr_line
+        )

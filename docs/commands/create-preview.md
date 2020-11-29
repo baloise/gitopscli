@@ -99,8 +99,9 @@ optional arguments:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  --git-hash GIT_HASH         the git hash of the app repo which should be deployed
-  --preview-id PREVIEW_ID         the id of the created preview environment
+  --git-hash GIT_HASH   the git hash which should be deployed
+  --preview-id PREVIEW_ID
+                        The user-defined preview ID
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```
