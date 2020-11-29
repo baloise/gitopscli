@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock, call
-from gitopscli.git import GitApiConfig
+from gitopscli.git import GitApiConfig, GitProvider
 from gitopscli.commands.sync_apps import SyncAppsCommand
 
 
@@ -92,18 +92,22 @@ class SyncAppsCommandTest(unittest.TestCase):
                 root_repository_name="ROOT_REPO",
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
             )
         ).execute()
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(
-                GitApiConfig(username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None),
+                GitApiConfig(
+                    username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None
+                ),
                 "ORGA",
                 "REPO",
             ),
             call.GitRepoApiFactory.create(
-                GitApiConfig(username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None),
+                GitApiConfig(
+                    username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None
+                ),
                 "ROOT_ORGA",
                 "ROOT_REPO",
             ),

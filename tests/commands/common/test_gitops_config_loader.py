@@ -2,13 +2,13 @@ import unittest
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.git import GitApiConfig
+from gitopscli.git import GitApiConfig, GitProvider
 from gitopscli.commands.common import load_gitops_config
 
 
 class GitOpsConfigLoaderTest(unittest.TestCase):
     git_api_config = GitApiConfig(
-        username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
+        username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
     )
 
     def setUp(self):

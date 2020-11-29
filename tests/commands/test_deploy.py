@@ -4,12 +4,12 @@ from unittest.mock import patch, MagicMock, Mock, call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.deploy import DeployCommand
-from gitopscli.git import GitApiConfig, GitRepoApi
+from gitopscli.git import GitApiConfig, GitRepoApi, GitProvider
 
 
 class DeployCommandTest(unittest.TestCase):
     _expected_github_api_config = GitApiConfig(
-        username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
+        username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
     )
 
     def setUp(self):
@@ -63,7 +63,7 @@ class DeployCommandTest(unittest.TestCase):
                 single_commit=False,
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 commit_message=None,
             )
@@ -98,7 +98,7 @@ class DeployCommandTest(unittest.TestCase):
                 single_commit=False,
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 commit_message=None,
             )
@@ -140,7 +140,7 @@ class DeployCommandTest(unittest.TestCase):
                 single_commit=False,
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 commit_message=None,
             )
@@ -184,7 +184,7 @@ class DeployCommandTest(unittest.TestCase):
                 single_commit=True,
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 commit_message=None,
             )
@@ -218,7 +218,7 @@ class DeployCommandTest(unittest.TestCase):
                 single_commit=False,
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 commit_message="testcommit",
             )
@@ -256,7 +256,7 @@ class DeployCommandTest(unittest.TestCase):
                     single_commit=False,
                     organisation="ORGA",
                     repository_name="REPO",
-                    git_provider="github",
+                    git_provider=GitProvider.GITHUB,
                     git_provider_url=None,
                     commit_message=None,
                 )
@@ -286,7 +286,7 @@ class DeployCommandTest(unittest.TestCase):
                     single_commit=False,
                     organisation="ORGA",
                     repository_name="REPO",
-                    git_provider="github",
+                    git_provider=GitProvider.GITHUB,
                     git_provider_url=None,
                     commit_message=None,
                 )
@@ -317,7 +317,7 @@ class DeployCommandTest(unittest.TestCase):
                 single_commit=False,
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 commit_message=None,
             )

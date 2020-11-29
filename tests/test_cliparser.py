@@ -16,6 +16,7 @@ from gitopscli.commands import (
     VersionCommand,
 )
 from gitopscli.cliparser import parse_args
+from gitopscli.git import GitProvider
 
 EXPECTED_GITOPSCLI_HELP = """\
 usage: gitopscli [-h]
@@ -448,6 +449,8 @@ class CliParserTest(unittest.TestCase):
                 "USER",
                 "--password",
                 "PASS",
+                "--git-provider",
+                "GitHub",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -462,13 +465,13 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.pr_id, 4711)
         self.assertEqual(args.text, "TEXT")
 
         self.assertIsNone(args.parent_id)
-        self.assertIsNone(args.git_provider)
         self.assertIsNone(args.git_provider_url)
         self.assertFalse(verbose)
 
@@ -481,7 +484,7 @@ class CliParserTest(unittest.TestCase):
                 "--password",
                 "PASS",
                 "--git-provider",
-                "GIT_PROVIDER",
+                "GitHub",
                 "--git-provider-url",
                 "GIT_PROVIDER_URL",
                 "--organisation",
@@ -501,7 +504,7 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
-        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
@@ -540,6 +543,8 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-provider",
+                "GitHub",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -556,12 +561,12 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
         self.assertEqual(args.preview_id, "abc123")
 
-        self.assertIsNone(args.git_provider)
         self.assertIsNone(args.git_provider_url)
         self.assertFalse(verbose)
 
@@ -578,7 +583,7 @@ class CliParserTest(unittest.TestCase):
                 "--git-email",
                 "GIT_EMAIL",
                 "--git-provider",
-                "GIT_PROVIDER",
+                "Bitbucket-Server",
                 "--git-provider-url",
                 "GIT_PROVIDER_URL",
                 "--organisation",
@@ -603,7 +608,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
         self.assertEqual(args.preview_id, "abc123")
 
-        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider, GitProvider.BITBUCKET)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
         self.assertTrue(verbose)
 
@@ -637,6 +642,8 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-provider",
+                "GitHub",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -651,11 +658,11 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.pr_id, 4711)
 
-        self.assertIsNone(args.git_provider)
         self.assertIsNone(args.git_provider_url)
         self.assertIsNone(args.parent_id)
         self.assertFalse(verbose)
@@ -673,7 +680,7 @@ class CliParserTest(unittest.TestCase):
                 "--git-email",
                 "GIT_EMAIL",
                 "--git-provider",
-                "GIT_PROVIDER",
+                "Github",
                 "--git-provider-url",
                 "GIT_PROVIDER_URL",
                 "--organisation",
@@ -698,7 +705,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.pr_id, 4711)
         self.assertEqual(args.parent_id, 42)
 
-        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
         self.assertTrue(verbose)
 
@@ -732,6 +739,8 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-provider-url",
+                "https://github.com/",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -746,12 +755,12 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
+        self.assertEqual(args.git_provider_url, "https://github.com/")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.preview_id, "abc123")
 
-        self.assertIsNone(args.git_provider)
-        self.assertIsNone(args.git_provider_url)
         self.assertFalse(args.expect_preview_exists)
         self.assertFalse(verbose)
 
@@ -768,7 +777,7 @@ class CliParserTest(unittest.TestCase):
                 "--git-email",
                 "GIT_EMAIL",
                 "--git-provider",
-                "GIT_PROVIDER",
+                "bitbucket-server",
                 "--git-provider-url",
                 "GIT_PROVIDER_URL",
                 "--organisation",
@@ -792,7 +801,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.preview_id, "abc123")
 
-        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider, GitProvider.BITBUCKET)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
         self.assertTrue(args.expect_preview_exists)
         self.assertFalse(verbose)
@@ -827,6 +836,8 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-provider-url",
+                "https://bitbucket.some-company.com/",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -841,12 +852,12 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_provider, GitProvider.BITBUCKET)
+        self.assertEqual(args.git_provider_url, "https://bitbucket.some-company.com/")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.branch, "BRANCH")
 
-        self.assertIsNone(args.git_provider)
-        self.assertIsNone(args.git_provider_url)
         self.assertFalse(args.expect_preview_exists)
         self.assertFalse(verbose)
 
@@ -863,7 +874,7 @@ class CliParserTest(unittest.TestCase):
                 "--git-email",
                 "GIT_EMAIL",
                 "--git-provider",
-                "GIT_PROVIDER",
+                "github",
                 "--git-provider-url",
                 "GIT_PROVIDER_URL",
                 "--organisation",
@@ -887,7 +898,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.branch, "BRANCH")
 
-        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
         self.assertTrue(args.expect_preview_exists)
         self.assertFalse(verbose)
@@ -922,6 +933,8 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-provider",
+                "Bitbucket-server",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -938,12 +951,12 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_provider, GitProvider.BITBUCKET)
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.file, "FILE")
         self.assertEqual(args.values, {"a.b": 42})
 
-        self.assertIsNone(args.git_provider)
         self.assertIsNone(args.git_provider_url)
         self.assertFalse(args.create_pr)
         self.assertFalse(args.auto_merge)
@@ -963,7 +976,7 @@ class CliParserTest(unittest.TestCase):
                 "--git-email",
                 "GIT_EMAIL",
                 "--git-provider",
-                "GIT_PROVIDER",
+                "Bitbucket-Server",
                 "--git-provider-url",
                 "GIT_PROVIDER_URL",
                 "--organisation",
@@ -992,7 +1005,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.file, "FILE")
         self.assertEqual(args.values, {"a.b": 42})
 
-        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider, GitProvider.BITBUCKET)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
         self.assertTrue(args.create_pr)
         self.assertTrue(args.auto_merge)
@@ -1029,6 +1042,8 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-provider",
+                "GitHub",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -1050,7 +1065,6 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.root_organisation, "ROOT_ORGA")
         self.assertEqual(args.root_repository_name, "ROOT_REPO")
 
-        self.assertIsNone(args.git_provider)
         self.assertIsNone(args.git_provider_url)
         self.assertFalse(verbose)
 
@@ -1067,7 +1081,7 @@ class CliParserTest(unittest.TestCase):
                 "--git-email",
                 "GIT_EMAIL",
                 "--git-provider",
-                "GIT_PROVIDER",
+                "GitHub",
                 "--git-provider-url",
                 "GIT_PROVIDER_URL",
                 "--organisation",
@@ -1093,7 +1107,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.root_organisation, "ROOT_ORGA")
         self.assertEqual(args.root_repository_name, "ROOT_REPO")
 
-        self.assertEqual(args.git_provider, "GIT_PROVIDER")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
         self.assertFalse(verbose)
 
@@ -1111,6 +1125,8 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(
             [
                 "add-pr-comment",
+                "--git-provider",
+                "github",
                 "--username",
                 "x",
                 "--password",
@@ -1139,6 +1155,8 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(
             [
                 "add-pr-comment",
+                "--git-provider",
+                "github",
                 "--username",
                 "x",
                 "--password",
@@ -1160,4 +1178,91 @@ class CliParserTest(unittest.TestCase):
         last_stderr_line = stderr.splitlines()[-1]
         self.assertEqual(
             "gitopscli add-pr-comment: error: argument --pr-id: invalid int value: 'INVALID_INT'", last_stderr_line
+        )
+
+    def test_invalid_git_provider(self):
+        exit_code, stdout, stderr = self._capture_parse_args(
+            [
+                "add-pr-comment",
+                "--git-provider",
+                "INVALID_PROVIDER",
+                "--username",
+                "x",
+                "--password",
+                "x",
+                "--organisation",
+                "x",
+                "--repository-name",
+                "x",
+                "--pr-id",
+                "1",
+                "--text",
+                "x",
+                "--verbose",
+                "y",
+            ]
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        last_stderr_line = stderr.splitlines()[-1]
+        self.assertEqual(
+            "gitopscli add-pr-comment: error: argument --git-provider: invalid git provider value: 'INVALID_PROVIDER'",
+            last_stderr_line,
+        )
+
+    def test_missing_git_provider_and_url(self):
+        exit_code, stdout, stderr = self._capture_parse_args(
+            [
+                "add-pr-comment",
+                "--username",
+                "x",
+                "--password",
+                "x",
+                "--organisation",
+                "x",
+                "--repository-name",
+                "x",
+                "--pr-id",
+                "1",
+                "--text",
+                "x",
+                "--verbose",
+                "y",
+            ]
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        last_stderr_line = stderr.splitlines()[-1]
+        self.assertEqual(
+            "gitopscli: error: please provide either --git-provider or --git-provider-url", last_stderr_line
+        )
+
+    def test_failed_git_provider_deduction_from_url(self):
+        exit_code, stdout, stderr = self._capture_parse_args(
+            [
+                "add-pr-comment",
+                "--git-provider-url",
+                "http://some-unknown-url.com/",
+                "--username",
+                "x",
+                "--password",
+                "x",
+                "--organisation",
+                "x",
+                "--repository-name",
+                "x",
+                "--pr-id",
+                "1",
+                "--text",
+                "x",
+                "--verbose",
+                "y",
+            ]
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        last_stderr_line = stderr.splitlines()[-1]
+        self.assertEqual(
+            "gitopscli: error: Cannot deduce git provider from --git-provider-url. Please provide --git-provider",
+            last_stderr_line,
         )

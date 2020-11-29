@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.git import GitRepoApiFactory, GitApiConfig
+from gitopscli.git import GitRepoApiFactory, GitApiConfig, GitProvider
 
 
 class GitRepoApiFactoryTest(unittest.TestCase):
@@ -16,7 +16,9 @@ class GitRepoApiFactoryTest(unittest.TestCase):
         mock_logging_proxy_constructor.return_value = mock_logging_proxy
 
         git_repo_api = GitRepoApiFactory.create(
-            config=GitApiConfig(username="USER", password="PASS", git_provider="github", git_provider_url=None,),
+            config=GitApiConfig(
+                username="USER", password="PASS", git_provider=GitProvider.GITHUB, git_provider_url=None,
+            ),
             organisation="ORG",
             repository_name="REPO",
         )
@@ -39,7 +41,7 @@ class GitRepoApiFactoryTest(unittest.TestCase):
 
         git_repo_api = GitRepoApiFactory.create(
             config=GitApiConfig(
-                username="USER", password="PASS", git_provider="bitbucket-server", git_provider_url="PROVIDER_URL",
+                username="USER", password="PASS", git_provider=GitProvider.BITBUCKET, git_provider_url="PROVIDER_URL",
             ),
             organisation="ORG",
             repository_name="REPO",
@@ -60,24 +62,11 @@ class GitRepoApiFactoryTest(unittest.TestCase):
         try:
             GitRepoApiFactory.create(
                 config=GitApiConfig(
-                    username="USER", password="PASS", git_provider="bitbucket-server", git_provider_url=None,
+                    username="USER", password="PASS", git_provider=GitProvider.BITBUCKET, git_provider_url=None,
                 ),
                 organisation="ORG",
                 repository_name="REPO",
             )
             self.fail("Expected a GitOpsException")
         except GitOpsException as ex:
-            self.assertEqual("Please provide url for bitbucket!", str(ex))
-
-    def test_create_unknown_provider(self):
-        try:
-            GitRepoApiFactory.create(
-                config=GitApiConfig(
-                    username="USER", password="PASS", git_provider="unknown-provider", git_provider_url="PROVIDER_URL",
-                ),
-                organisation="ORG",
-                repository_name="REPO",
-            )
-            self.fail("Expected a GitOpsException")
-        except GitOpsException as ex:
-            self.assertEqual("Unknown git provider: unknown-provider", str(ex))
+            self.assertEqual("Please provide url for Bitbucket!", str(ex))
