@@ -1,16 +1,12 @@
-from typing import Optional, NamedTuple
-from gitopscli.git import GitApiConfig, GitRepoApiFactory, GitProvider
+from dataclasses import dataclass
+from typing import Optional
+from gitopscli.git import GitApiConfig, GitRepoApiFactory
 from .command import Command
 
 
 class AddPrCommentCommand(Command):
-    class Args(NamedTuple):
-        git_provider: GitProvider
-        git_provider_url: Optional[str]
-
-        username: str
-        password: str
-
+    @dataclass(frozen=True)
+    class Args(GitApiConfig):
         organisation: str
         repository_name: str
 
@@ -23,6 +19,5 @@ class AddPrCommentCommand(Command):
 
     def execute(self) -> None:
         args = self.__args
-        git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
-        git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name,)
+        git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name,)
         git_repo_api.add_pull_request_comment(args.pr_id, args.text, args.parent_id)

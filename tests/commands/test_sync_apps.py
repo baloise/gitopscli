@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock, call
-from gitopscli.git import GitApiConfig, GitProvider
+from gitopscli.git import GitProvider
 from gitopscli.commands.sync_apps import SyncAppsCommand
 
 
@@ -82,35 +82,22 @@ class SyncAppsCommandTest(unittest.TestCase):
         self.yaml_mock.load.side_effect = [bootstrap_values_content, apps_team_content]
 
     def test_sync_apps_happy_flow(self):
-        SyncAppsCommand(
-            SyncAppsCommand.Args(
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                root_organisation="ROOT_ORGA",
-                root_repository_name="ROOT_REPO",
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-            )
-        ).execute()
+        args = SyncAppsCommand.Args(
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            root_organisation="ROOT_ORGA",
+            root_repository_name="ROOT_REPO",
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+        )
+        SyncAppsCommand(args).execute()
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(
-                GitApiConfig(
-                    username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None
-                ),
-                "ORGA",
-                "REPO",
-            ),
-            call.GitRepoApiFactory.create(
-                GitApiConfig(
-                    username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None
-                ),
-                "ROOT_ORGA",
-                "ROOT_REPO",
-            ),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO",),
+            call.GitRepoApiFactory.create(args, "ROOT_ORGA", "ROOT_REPO",),
             call.GitRepo(self.team_config_git_repo_api_mock),
             call.GitRepo(self.root_config_git_repo_api_mock),
             call.GitRepo_team.get_clone_url(),

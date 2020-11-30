@@ -1,17 +1,13 @@
-from typing import Callable, Optional, NamedTuple
-from gitopscli.git import GitApiConfig, GitRepoApiFactory, GitProvider
+from dataclasses import dataclass
+from typing import Callable, Optional
+from gitopscli.git import GitApiConfig, GitRepoApiFactory
 from .create_preview import CreatePreviewCommand
 from .command import Command
 
 
 class CreatePrPreviewCommand(Command):
-    class Args(NamedTuple):
-        git_provider: GitProvider
-        git_provider_url: Optional[str]
-
-        username: str
-        password: str
-
+    @dataclass(frozen=True)
+    class Args(GitApiConfig):
         git_user: str
         git_email: str
 
@@ -29,8 +25,7 @@ class CreatePrPreviewCommand(Command):
 
 
 def _create_pr_preview_command(args: CreatePrPreviewCommand.Args) -> None:
-    git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
-    git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name)
+    git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name)
 
     pr_branch = git_repo_api.get_pull_request_branch(args.pr_id)
     git_hash = git_repo_api.get_branch_head_hash(pr_branch)

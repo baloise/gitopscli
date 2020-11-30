@@ -2,9 +2,9 @@ import hashlib
 import logging
 import os
 import shutil
-from typing import Any, Callable, Dict, Optional, NamedTuple
-
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory, GitProvider
+from dataclasses import dataclass
+from typing import Any, Callable, Dict
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config
@@ -12,13 +12,8 @@ from .command import Command
 
 
 class CreatePreviewCommand(Command):
-    class Args(NamedTuple):
-        git_provider: GitProvider
-        git_provider_url: Optional[str]
-
-        username: str
-        password: str
-
+    @dataclass(frozen=True)
+    class Args(GitApiConfig):
         git_user: str
         git_email: str
 
@@ -59,12 +54,9 @@ def _create_preview_command(
     deployment_updated_callback: Callable[[str], None],
     deployment_created_callback: Callable[[str], None],
 ) -> None:
-    git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
-    gitops_config = load_gitops_config(git_api_config, args.organisation, args.repository_name)
+    gitops_config = load_gitops_config(args, args.organisation, args.repository_name)
 
-    config_git_repo_api = GitRepoApiFactory.create(
-        git_api_config, gitops_config.team_config_org, gitops_config.team_config_repo,
-    )
+    config_git_repo_api = GitRepoApiFactory.create(args, gitops_config.team_config_org, gitops_config.team_config_repo,)
     with GitRepo(config_git_repo_api) as config_git_repo:
         config_git_repo.checkout("master")
 

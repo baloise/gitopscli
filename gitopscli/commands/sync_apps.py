@@ -1,22 +1,17 @@
 import logging
 import os
-from typing import Any, Set, Tuple, Optional, NamedTuple
+from dataclasses import dataclass
+from typing import Any, Set, Tuple
 from ruamel.yaml import YAML
-
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory, GitProvider
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
 
 class SyncAppsCommand(Command):
-    class Args(NamedTuple):
-        git_provider: GitProvider
-        git_provider_url: Optional[str]
-
-        username: str
-        password: str
-
+    @dataclass(frozen=True)
+    class Args(GitApiConfig):
         git_user: str
         git_email: str
 
@@ -34,11 +29,8 @@ class SyncAppsCommand(Command):
 
 
 def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
-    git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
-    team_config_git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name)
-    root_config_git_repo_api = GitRepoApiFactory.create(
-        git_api_config, args.root_organisation, args.root_repository_name
-    )
+    team_config_git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name)
+    root_config_git_repo_api = GitRepoApiFactory.create(args, args.root_organisation, args.root_repository_name)
     with GitRepo(team_config_git_repo_api) as team_config_git_repo:
         with GitRepo(root_config_git_repo_api) as root_config_git_repo:
             __sync_apps(team_config_git_repo, root_config_git_repo, args.git_user, args.git_email)
