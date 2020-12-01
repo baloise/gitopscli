@@ -3,7 +3,7 @@ import os
 from typing import Any, Set, Tuple, Optional, NamedTuple
 from ruamel.yaml import YAML
 
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory, GitProvider
 from gitopscli.io.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
@@ -11,7 +11,7 @@ from .command import Command
 
 class SyncAppsCommand(Command):
     class Args(NamedTuple):
-        git_provider: Optional[str]
+        git_provider: GitProvider
         git_provider_url: Optional[str]
 
         username: str

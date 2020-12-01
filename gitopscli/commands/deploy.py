@@ -3,7 +3,7 @@ import os
 import uuid
 from typing import Any, Callable, Dict, Optional, NamedTuple
 
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
@@ -11,7 +11,7 @@ from .command import Command
 
 class DeployCommand(Command):
     class Args(NamedTuple):
-        git_provider: Optional[str]
+        git_provider: GitProvider
         git_provider_url: Optional[str]
 
         username: str

@@ -1,11 +1,12 @@
 from typing import Optional, NamedTuple
+from gitopscli.git import GitProvider
 from .delete_preview import DeletePreviewCommand
 from .command import Command
 
 
 class DeletePrPreviewCommand(Command):
     class Args(NamedTuple):
-        git_provider: Optional[str]
+        git_provider: GitProvider
         git_provider_url: Optional[str]
 
         username: str

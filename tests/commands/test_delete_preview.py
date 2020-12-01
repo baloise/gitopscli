@@ -2,7 +2,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch, MagicMock, Mock, call
 import pytest
-from gitopscli.git import GitApiConfig, GitRepoApi
+from gitopscli.git import GitApiConfig, GitRepoApi, GitProvider
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.delete_preview import DeletePreviewCommand
 
@@ -55,14 +55,14 @@ class DeletePreviewCommandTest(unittest.TestCase):
                 git_email="GIT_EMAIL",
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 preview_id="PREVIEW_ID",
                 expect_preview_exists=False,
             )
         ).execute()
         expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
+            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
         )
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),
@@ -90,14 +90,14 @@ class DeletePreviewCommandTest(unittest.TestCase):
                 git_email="GIT_EMAIL",
                 organisation="ORGA",
                 repository_name="REPO",
-                git_provider="github",
+                git_provider=GitProvider.GITHUB,
                 git_provider_url=None,
                 preview_id="PREVIEW_ID",
                 expect_preview_exists=False,
             )
         ).execute()
         expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
+            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
         )
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),
@@ -124,7 +124,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
                     git_email="GIT_EMAIL",
                     organisation="ORGA",
                     repository_name="REPO",
-                    git_provider="github",
+                    git_provider=GitProvider.GITHUB,
                     git_provider_url=None,
                     preview_id="PREVIEW_ID",
                     expect_preview_exists=True,  # we expect an existing preview
@@ -133,7 +133,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
         self.assertEqual(str(ex.value), "There was no preview with name: APP-685912d3-preview")
 
         expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
+            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
         )
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),
@@ -157,14 +157,14 @@ class DeletePreviewCommandTest(unittest.TestCase):
                     git_email="GIT_EMAIL",
                     organisation="ORGA",
                     repository_name="REPO",
-                    git_provider="github",
+                    git_provider=GitProvider.GITHUB,
                     git_provider_url=None,
                     preview_id="PREVIEW_ID",
                     expect_preview_exists=True,  # we expect an existing preview
                 )
             ).execute()
         expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider="github", git_provider_url=None,
+            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
         )
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),

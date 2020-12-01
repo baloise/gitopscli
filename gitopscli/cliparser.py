@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, ArgumentTypeError
 import sys
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, NoReturn, Callable
 from gitopscli.commands import (
     CommandArgs,
     DeployCommand,
@@ -12,6 +12,7 @@ from gitopscli.commands import (
     DeletePrPreviewCommand,
     VersionCommand,
 )
+from gitopscli.git import GitProvider
 from gitopscli.io.yaml_util import yaml_load
 
 
@@ -22,6 +23,7 @@ def parse_args(raw_args: List[str]) -> Tuple[bool, CommandArgs]:
         __print_help_and_exit(parser)
 
     args = vars(parser.parse_args(raw_args))
+    args = __deduce_empty_git_provider_from_git_provider_url(args, parser.error)
 
     verbose = args.pop("verbose", False)
     command_args = __create_command_args(args)
@@ -192,7 +194,7 @@ def __add_git_org_and_repo_args(deploy_p: ArgumentParser) -> None:
 
 
 def __add_git_provider_args(deploy_p: ArgumentParser) -> None:
-    deploy_p.add_argument("--git-provider", help="Git server provider")
+    deploy_p.add_argument("--git-provider", help="Git server provider", type=__parse_git_provider)
     deploy_p.add_argument("--git-provider-url", help="Git provider base API URL (e.g. https://bitbucket.example.tld)")
 
 
@@ -234,14 +236,42 @@ def __parse_bool(value: str) -> bool:
     raise ArgumentTypeError(f"invalid bool value: '{value}'")
 
 
-def __print_help_and_exit(parser: ArgumentParser) -> None:
+def __parse_git_provider(value: str) -> GitProvider:
+    mapping = {"github": GitProvider.GITHUB, "bitbucket-server": GitProvider.BITBUCKET}
+    assert set(mapping.values()) == set(GitProvider), "git provider mapping not exhaustive"
+    lowercase_stripped_value = value.lower().strip()
+    if lowercase_stripped_value not in mapping:
+        raise ArgumentTypeError(f"invalid git provider value: '{value}'")
+    return mapping[lowercase_stripped_value]
+
+
+def __print_help_and_exit(parser: ArgumentParser) -> NoReturn:
     parser.print_help(sys.stderr)
-    sys.exit(2)
+    parser.exit(2)
+
+
+def __deduce_empty_git_provider_from_git_provider_url(
+    args: Dict[str, Any], error: Callable[[str], NoReturn]
+) -> Dict[str, Any]:
+    if "git_provider" not in args or args["git_provider"] is not None:
+        return args
+    git_provider_url = args["git_provider_url"]
+    updated_args = dict(args)
+    if git_provider_url is None:
+        error("please provide either --git-provider or --git-provider-url")
+    elif "github" in git_provider_url.lower():
+        updated_args["git_provider"] = GitProvider.GITHUB
+    elif "bitbucket" in git_provider_url.lower():
+        updated_args["git_provider"] = GitProvider.BITBUCKET
+    else:
+        error("Cannot deduce git provider from --git-provider-url. Please provide --git-provider")
+    return updated_args
 
 
 def __create_command_args(args: Dict[str, Any]) -> CommandArgs:
     args = dict(args)
     command = args.pop("command")
+
     command_args: CommandArgs
     if command == "deploy":
         command_args = DeployCommand.Args(**args)

@@ -4,7 +4,7 @@ import os
 import shutil
 
 from typing import Optional, NamedTuple
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_exception import GitOpsException
 
 from .common import load_gitops_config
@@ -13,7 +13,7 @@ from .command import Command
 
 class DeletePreviewCommand(Command):
     class Args(NamedTuple):
-        git_provider: Optional[str]
+        git_provider: GitProvider
         git_provider_url: Optional[str]
 
         username: str

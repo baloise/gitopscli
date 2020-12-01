@@ -1,11 +1,11 @@
 from typing import Optional, NamedTuple
-from gitopscli.git import GitApiConfig, GitRepoApiFactory
+from gitopscli.git import GitApiConfig, GitRepoApiFactory, GitProvider
 from .command import Command
 
 
 class AddPrCommentCommand(Command):
     class Args(NamedTuple):
-        git_provider: Optional[str]
+        git_provider: GitProvider
         git_provider_url: Optional[str]
 
         username: str

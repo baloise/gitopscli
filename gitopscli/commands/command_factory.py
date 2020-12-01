@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 from .command import Command
 from .add_pr_comment import AddPrCommentCommand
 from .create_preview import CreatePreviewCommand
@@ -25,7 +25,7 @@ CommandArgs = Union[
 class CommandFactory:
     @staticmethod
     def create(args: CommandArgs) -> Command:
-        command: Command
+        command: Optional[Command]
         if isinstance(args, DeployCommand.Args):
             command = DeployCommand(args)
         elif isinstance(args, SyncAppsCommand.Args):
@@ -42,6 +42,4 @@ class CommandFactory:
             command = DeletePrPreviewCommand(args)
         elif isinstance(args, VersionCommand.Args):
             command = VersionCommand(args)
-        else:
-            raise NotImplementedError(f"Command for {type(args)} not implemented!")
         return command

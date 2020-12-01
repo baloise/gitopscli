@@ -1,12 +1,12 @@
 from typing import Callable, Optional, NamedTuple
-from gitopscli.git import GitApiConfig, GitRepoApiFactory
+from gitopscli.git import GitApiConfig, GitRepoApiFactory, GitProvider
 from .create_preview import CreatePreviewCommand
 from .command import Command
 
 
 class CreatePrPreviewCommand(Command):
     class Args(NamedTuple):
-        git_provider: Optional[str]
+        git_provider: GitProvider
         git_provider_url: Optional[str]
 
         username: str
