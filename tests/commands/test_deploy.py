@@ -79,7 +79,45 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepo.push("master"),
         ]
 
-    def test_create_pr_happy_flow(self):
+    def test_create_pr_single_value_change_happy_flow(self):
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=True,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        DeployCommand(args).execute()
+
+        assert self.mock_manager.method_calls == [
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
+            call.GitRepo.get_full_file_path("test/file.yml"),
+            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
+            call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
+            call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
+            call.GitRepo.push("gitopscli-deploy-b973b5bb"),
+            call.GitRepoApi.create_pull_request(
+                "gitopscli-deploy-b973b5bb",
+                "master",
+                "Updated values in test/file.yml",
+                "Updated 1 value in `test/file.yml`:\n```yaml\na.b.c: foo\n```\n",
+            ),
+        ]
+
+    def test_create_pr_multiple_value_changes_happy_flow(self):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo", "a.b.d": "bar"},
@@ -196,7 +234,38 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepo.push("master"),
         ]
 
-    def test_commit_message_happy_flow(self):
+    def test_single_commit_single_value_change_happy_flow(self):
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=True,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        DeployCommand(args).execute()
+
+        assert self.mock_manager.method_calls == [
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("test/file.yml"),
+            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
+            call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
+            call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
+            call.GitRepo.push("master"),
+        ]
+
+    def test_commit_message_multiple_value_changes_happy_flow(self):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo", "a.b.d": "bar"},
@@ -288,6 +357,38 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
+        ]
+
+    def test_key_not_found(self):
+        self.update_yaml_file_mock.side_effect = KeyError("dummy key error")
+
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        with pytest.raises(GitOpsException) as ex:
+            DeployCommand(args).execute()
+        self.assertEqual(str(ex.value), "Key 'a.b.c' not found in test/file.yml")
+
+        assert self.mock_manager.method_calls == [
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("test/file.yml"),
+            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
         ]
 
     def test_nothing_to_update(self):
