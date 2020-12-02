@@ -1,17 +1,12 @@
-from typing import Optional, NamedTuple
-from gitopscli.git import GitProvider
+from dataclasses import dataclass
+from gitopscli.git import GitApiConfig
 from .delete_preview import DeletePreviewCommand
 from .command import Command
 
 
 class DeletePrPreviewCommand(Command):
-    class Args(NamedTuple):
-        git_provider: GitProvider
-        git_provider_url: Optional[str]
-
-        username: str
-        password: str
-
+    @dataclass(frozen=True)
+    class Args(GitApiConfig):
         git_user: str
         git_email: str
 

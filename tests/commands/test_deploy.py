@@ -4,14 +4,10 @@ from unittest.mock import patch, MagicMock, Mock, call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.deploy import DeployCommand
-from gitopscli.git import GitApiConfig, GitRepoApi, GitProvider
+from gitopscli.git import GitRepoApi, GitProvider
 
 
 class DeployCommandTest(unittest.TestCase):
-    _expected_github_api_config = GitApiConfig(
-        username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
-    )
-
     def setUp(self):
         def add_patch(target):
             patcher = patch(target)
@@ -50,27 +46,26 @@ class DeployCommandTest(unittest.TestCase):
         self.uuid_mock.uuid4.return_value = UUID("b973b5bb-64a6-4735-a840-3113d531b41c")
 
     def test_happy_flow(self):
-        DeployCommand(
-            DeployCommand.Args(
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=False,
-                auto_merge=False,
-                single_commit=False,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-                commit_message=None,
-            )
-        ).execute()
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        DeployCommand(args).execute()
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
@@ -85,27 +80,26 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_create_pr_happy_flow(self):
-        DeployCommand(
-            DeployCommand.Args(
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=True,
-                auto_merge=False,
-                single_commit=False,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-                commit_message=None,
-            )
-        ).execute()
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=True,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        DeployCommand(args).execute()
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
@@ -127,27 +121,26 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_create_pr_and_merge_happy_flow(self):
-        DeployCommand(
-            DeployCommand.Args(
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=True,
-                auto_merge=True,
-                single_commit=False,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-                commit_message=None,
-            )
-        ).execute()
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=True,
+            auto_merge=True,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        DeployCommand(args).execute()
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
@@ -171,27 +164,26 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_single_commit_happy_flow(self):
-        DeployCommand(
-            DeployCommand.Args(
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=False,
-                auto_merge=False,
-                single_commit=True,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-                commit_message=None,
-            )
-        ).execute()
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=True,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        DeployCommand(args).execute()
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
@@ -205,27 +197,26 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_commit_message_happy_flow(self):
-        DeployCommand(
-            DeployCommand.Args(
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=False,
-                auto_merge=False,
-                single_commit=False,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-                commit_message="testcommit",
-            )
-        ).execute()
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message="testcommit",
+        )
+        DeployCommand(args).execute()
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
@@ -242,29 +233,28 @@ class DeployCommandTest(unittest.TestCase):
         checkout_exception = GitOpsException("dummy checkout error")
         self.git_repo_mock.checkout.side_effect = checkout_exception
 
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
         with pytest.raises(GitOpsException) as ex:
-            DeployCommand(
-                DeployCommand.Args(
-                    file="test/file.yml",
-                    values={"a.b.c": "foo", "a.b.d": "bar"},
-                    username="USERNAME",
-                    password="PASSWORD",
-                    git_user="GIT_USER",
-                    git_email="GIT_EMAIL",
-                    create_pr=False,
-                    auto_merge=False,
-                    single_commit=False,
-                    organisation="ORGA",
-                    repository_name="REPO",
-                    git_provider=GitProvider.GITHUB,
-                    git_provider_url=None,
-                    commit_message=None,
-                )
-            ).execute()
+            DeployCommand(args).execute()
         self.assertEqual(ex.value, checkout_exception)
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
         ]
@@ -272,29 +262,28 @@ class DeployCommandTest(unittest.TestCase):
     def test_file_not_found(self):
         self.os_path_isfile_mock.return_value = False
 
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
         with pytest.raises(GitOpsException) as ex:
-            DeployCommand(
-                DeployCommand.Args(
-                    file="test/file.yml",
-                    values={"a.b.c": "foo", "a.b.d": "bar"},
-                    username="USERNAME",
-                    password="PASSWORD",
-                    git_user="GIT_USER",
-                    git_email="GIT_EMAIL",
-                    create_pr=False,
-                    auto_merge=False,
-                    single_commit=False,
-                    organisation="ORGA",
-                    repository_name="REPO",
-                    git_provider=GitProvider.GITHUB,
-                    git_provider_url=None,
-                    commit_message=None,
-                )
-            ).execute()
+            DeployCommand(args).execute()
         self.assertEqual(str(ex.value), "No such file: test/file.yml")
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
@@ -304,27 +293,26 @@ class DeployCommandTest(unittest.TestCase):
     def test_nothing_to_update(self):
         self.update_yaml_file_mock.return_value = False
 
-        DeployCommand(
-            DeployCommand.Args(
-                file="test/file.yml",
-                values={"a.b.c": "foo", "a.b.d": "bar"},
-                username="USERNAME",
-                password="PASSWORD",
-                git_user="GIT_USER",
-                git_email="GIT_EMAIL",
-                create_pr=False,
-                auto_merge=False,
-                single_commit=False,
-                organisation="ORGA",
-                repository_name="REPO",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-                commit_message=None,
-            )
-        ).execute()
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        DeployCommand(args).execute()
 
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(self._expected_github_api_config, "ORGA", "REPO"),
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),

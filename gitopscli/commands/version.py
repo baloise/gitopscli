@@ -1,10 +1,11 @@
-from typing import NamedTuple
+from dataclasses import dataclass
 import pkg_resources
 from .command import Command
 
 
 class VersionCommand(Command):
-    class Args(NamedTuple):
+    @dataclass(frozen=True)
+    class Args:
         pass
 
     def __init__(self, args: Args) -> None:

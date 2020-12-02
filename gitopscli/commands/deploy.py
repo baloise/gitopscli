@@ -1,22 +1,17 @@
 import logging
 import os
 import uuid
-from typing import Any, Callable, Dict, Optional, NamedTuple
-
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, Optional
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
 
 class DeployCommand(Command):
-    class Args(NamedTuple):
-        git_provider: GitProvider
-        git_provider_url: Optional[str]
-
-        username: str
-        password: str
-
+    @dataclass(frozen=True)
+    class Args(GitApiConfig):
         git_user: str
         git_email: str
 
@@ -40,8 +35,7 @@ class DeployCommand(Command):
 
 
 def _deploy_command(args: DeployCommand.Args) -> None:
-    git_api_config = GitApiConfig(args.username, args.password, args.git_provider, args.git_provider_url,)
-    git_repo_api = GitRepoApiFactory.create(git_api_config, args.organisation, args.repository_name)
+    git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name)
     with GitRepo(git_repo_api) as git_repo:
         git_repo.checkout("master")
 

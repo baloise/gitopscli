@@ -1,10 +1,7 @@
 import unittest
-from types import SimpleNamespace
-from unittest.mock import patch, MagicMock, Mock, call
-import pytest
-from gitopscli.git import GitApiConfig, GitRepoApi, GitProvider
-from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.delete_pr_preview import DeletePrPreviewCommand
+from unittest.mock import patch
+from gitopscli.git import GitProvider
+from gitopscli.commands.delete_pr_preview import DeletePrPreviewCommand, DeletePreviewCommand
 
 
 class DeletePrPreviewCommandTest(unittest.TestCase):
@@ -14,39 +11,12 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
             self.addCleanup(patcher.stop)
             return patcher.start()
 
-        # Monkey patch all external functions the command is using:
-        self.os_path_exists_mock = add_patch("gitopscli.commands.delete_preview.os.path.exists")
-        self.shutil_rmtree_mock = add_patch("gitopscli.commands.delete_preview.shutil.rmtree")
-        self.logging_mock = add_patch("gitopscli.commands.delete_preview.logging")
-        self.load_gitops_config_mock = add_patch("gitopscli.commands.delete_preview.load_gitops_config")
-        self.git_repo_api_factory_mock = add_patch("gitopscli.commands.delete_preview.GitRepoApiFactory")
-        self.git_repo_mock = add_patch("gitopscli.commands.delete_preview.GitRepo")
+        # Inject DeletePreviewCommand mock:
+        self.delete_preview_command_mock = add_patch("gitopscli.commands.delete_pr_preview.DeletePreviewCommand")
+        self.delete_preview_command_mock.Args = DeletePreviewCommand.Args
+        self.delete_preview_command_mock.return_value = self.delete_preview_command_mock
 
-        self.git_repo_api_mock = MagicMock()
-
-        # Attach all mocks to a single mock manager
-        self.mock_manager = Mock()
-        self.mock_manager.attach_mock(self.git_repo_api_factory_mock, "GitRepoApiFactory")
-        self.mock_manager.attach_mock(self.git_repo_api_mock, "GitRepoApi")
-        self.mock_manager.attach_mock(self.git_repo_mock, "GitRepo")
-        self.mock_manager.attach_mock(self.os_path_exists_mock, "os.path.exists")
-        self.mock_manager.attach_mock(self.shutil_rmtree_mock, "shutil.rmtree")
-        self.mock_manager.attach_mock(self.logging_mock, "logging")
-        self.mock_manager.attach_mock(self.load_gitops_config_mock, "load_gitops_config")
-
-        self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
-        self.git_repo_api_mock.create_pull_request.return_value = GitRepoApi.PullRequestIdAndUrl(
-            42, "<url of dummy pr>"
-        )
-        self.git_repo_mock.return_value = self.git_repo_mock
-        self.git_repo_mock.__enter__.return_value = self.git_repo_mock
-        self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
-        self.os_path_exists_mock.return_value = True
-        self.load_gitops_config_mock.return_value = SimpleNamespace(
-            team_config_org="TEAM_CONFIG_ORG", team_config_repo="TEAM_CONFIG_REPO", application_name="APP"
-        )
-
-    def test_delete_existing_happy_flow(self):
+    def test_delete_pr_preview(self):
         DeletePrPreviewCommand(
             DeletePrPreviewCommand.Args(
                 username="USERNAME",
@@ -56,34 +26,14 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
                 organisation="ORGA",
                 repository_name="REPO",
                 git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
+                git_provider_url="URL",
                 branch="some/branch",
-                expect_preview_exists=False,
+                expect_preview_exists=True,
             )
         ).execute()
-        expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
-        )
-        assert self.mock_manager.method_calls == [
-            call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(expected_git_api_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
-            call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
-            call.logging.info("Preview folder name: %s", "APP-7252ebf0-preview"),
-            call.GitRepo.get_full_file_path("APP-7252ebf0-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/APP-7252ebf0-preview"),
-            call.shutil.rmtree("/tmp/created-tmp-dir/APP-7252ebf0-preview", ignore_errors=True),
-            call.GitRepo.commit(
-                "GIT_USER", "GIT_EMAIL", "Delete preview environment for 'APP' and preview id 'some/branch'."
-            ),
-            call.GitRepo.push("master"),
-        ]
 
-    def test_delete_missing_happy_flow(self):
-        self.os_path_exists_mock.return_value = False
-
-        DeletePrPreviewCommand(
-            DeletePrPreviewCommand.Args(
+        self.delete_preview_command_mock.assert_called_once_with(
+            DeletePreviewCommand.Args(
                 username="USERNAME",
                 password="PASSWORD",
                 git_user="GIT_USER",
@@ -91,81 +41,9 @@ class DeletePrPreviewCommandTest(unittest.TestCase):
                 organisation="ORGA",
                 repository_name="REPO",
                 git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
-                branch="some/branch",
-                expect_preview_exists=False,
+                git_provider_url="URL",
+                preview_id="some/branch",  # call DeletePreviewCommand with branch as preview_id
+                expect_preview_exists=True,
             )
-        ).execute()
-        expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
         )
-        assert self.mock_manager.method_calls == [
-            call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(expected_git_api_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
-            call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
-            call.logging.info("Preview folder name: %s", "APP-7252ebf0-preview"),
-            call.GitRepo.get_full_file_path("APP-7252ebf0-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/APP-7252ebf0-preview"),
-            call.logging.info(
-                "No preview environment for '%s' and preview id '%s'. Nothing to do..", "APP", "some/branch"
-            ),
-        ]
-
-    def test_delete_missing_but_expected_error(self):
-        self.os_path_exists_mock.return_value = False
-
-        with pytest.raises(GitOpsException) as ex:
-            DeletePrPreviewCommand(
-                DeletePrPreviewCommand.Args(
-                    username="USERNAME",
-                    password="PASSWORD",
-                    git_user="GIT_USER",
-                    git_email="GIT_EMAIL",
-                    organisation="ORGA",
-                    repository_name="REPO",
-                    git_provider=GitProvider.GITHUB,
-                    git_provider_url=None,
-                    branch="some/branch",
-                    expect_preview_exists=True,  # we expect an existing preview
-                )
-            ).execute()
-        self.assertEqual(str(ex.value), "There was no preview with name: APP-7252ebf0-preview")
-
-        expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
-        )
-        assert self.mock_manager.method_calls == [
-            call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(expected_git_api_config, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
-            call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
-            call.logging.info("Preview folder name: %s", "APP-7252ebf0-preview"),
-            call.GitRepo.get_full_file_path("APP-7252ebf0-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/APP-7252ebf0-preview"),
-        ]
-
-    def test_missing_gitops_config_yaml_error(self):
-        self.load_gitops_config_mock.side_effect = GitOpsException()
-
-        with pytest.raises(GitOpsException):
-            DeletePrPreviewCommand(
-                DeletePrPreviewCommand.Args(
-                    username="USERNAME",
-                    password="PASSWORD",
-                    git_user="GIT_USER",
-                    git_email="GIT_EMAIL",
-                    organisation="ORGA",
-                    repository_name="REPO",
-                    git_provider=GitProvider.GITHUB,
-                    git_provider_url=None,
-                    branch="some/branch",
-                    expect_preview_exists=True,  # we expect an existing preview
-                )
-            ).execute()
-        expected_git_api_config = GitApiConfig(
-            username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
-        )
-        assert self.mock_manager.method_calls == [
-            call.load_gitops_config(expected_git_api_config, "ORGA", "REPO"),
-        ]
+        self.delete_preview_command_mock.execute.assert_called_once()
