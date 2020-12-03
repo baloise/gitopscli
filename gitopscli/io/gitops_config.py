@@ -1,13 +1,11 @@
 from typing import List, Any
-from .yaml_util import yaml_load
+from .yaml_util import yaml_file_load
 from ..gitops_exception import GitOpsException
 
 
 class GitOpsConfig:
     def __init__(self, filename: str) -> None:
-        with open(filename, "r") as input_stream:
-            yaml_str = input_stream.read()
-        self._data = yaml_load(yaml_str)
+        self._data = yaml_file_load(filename)
 
     @property
     def application_name(self) -> str:

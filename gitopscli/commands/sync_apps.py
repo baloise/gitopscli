@@ -2,9 +2,8 @@ import logging
 import os
 from dataclasses import dataclass
 from typing import Any, Set, Tuple
-from ruamel.yaml import YAML
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
-from gitopscli.io.yaml_util import merge_yaml_element
+from gitopscli.io.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
@@ -62,7 +61,6 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 def __find_apps_config_from_repo(
     team_config_git_repo: GitRepo, root_config_git_repo: GitRepo
 ) -> Tuple[str, str, Set[str], Set[str]]:
-    yaml = YAML()
     apps_from_other_repos: Set[str] = set()  # Set for all entries in .applications from each config repository
     found_app_config_file = None
     found_app_config_file_name = None
@@ -75,8 +73,7 @@ def __find_apps_config_from_repo(
         logging.info("Analyzing %s in root repository", app_file_name)
         app_config_file = root_config_git_repo.get_full_file_path(app_file_name)
         try:
-            with open(app_config_file, "r") as stream:
-                app_config_content = yaml.load(stream)
+            app_config_content = yaml_file_load(app_config_file)
         except FileNotFoundError as ex:
             raise GitOpsException(f"File '{app_file_name}' not found in root repository.") from ex
         if "repository" not in app_config_content:
@@ -114,8 +111,7 @@ def __get_bootstrap_entries(root_config_git_repo: GitRepo) -> Any:
     root_config_git_repo.checkout("master")
     bootstrap_values_file = root_config_git_repo.get_full_file_path("bootstrap/values.yaml")
     try:
-        with open(bootstrap_values_file, "r") as stream:
-            bootstrap_yaml = YAML().load(stream)
+        bootstrap_yaml = yaml_file_load(bootstrap_values_file)
     except FileNotFoundError as ex:
         raise GitOpsException("File 'bootstrap/values.yaml' not found in root repository.") from ex
     if "bootstrap" not in bootstrap_yaml:

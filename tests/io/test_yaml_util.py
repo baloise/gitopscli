@@ -4,7 +4,14 @@ import unittest
 import uuid
 import pytest
 
-from gitopscli.io.yaml_util import yaml_load, yaml_dump, update_yaml_file, merge_yaml_element
+from gitopscli.io.yaml_util import (
+    yaml_file_load,
+    yaml_file_dump,
+    yaml_load,
+    yaml_dump,
+    update_yaml_file,
+    merge_yaml_element,
+)
 
 
 class YamlUtilTest(unittest.TestCase):
@@ -17,15 +24,51 @@ class YamlUtilTest(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp_dir, ignore_errors=True)
 
+    def _create_tmp_file_path(self):
+        return f"{self.tmp_dir}/{uuid.uuid4()}"
+
     def _create_file(self, content):
-        path = f"{self.tmp_dir}/{uuid.uuid4()}"
-        with open(path, "w+") as stream:
+        path = self._create_tmp_file_path()
+        with open(path, "w") as stream:
             stream.write(content)
         return path
 
     def _read_file(self, path):
         with open(path, "r") as stream:
             return stream.read()
+
+    def test_yaml_file_load(self):
+        path = self._create_file("answer: #comment\n  is: '42'\n")
+        self.assertEqual(yaml_file_load(path), {"answer": {"is": "42"}})
+
+    def test_yaml_file_load_file_not_found(self):
+        try:
+            self.assertEqual(yaml_file_load("unknown"), {"answer": {"is": "42"}})
+            self.fail()
+        except FileNotFoundError:
+            pass
+
+    def test_yaml_file_dump(self):
+        path = self._create_tmp_file_path()
+        yaml_file_dump({"answer": {"is": "42"}}, path)
+        yaml_content = self._read_file(path)
+        self.assertEqual(yaml_content, "answer:\n  is: '42'\n")
+
+    def test_yaml_file_dump_unknown_directory(self):
+        try:
+            yaml_file_dump({"answer": {"is": "42"}}, "/unknown-dir/foo")
+            self.fail()
+        except FileNotFoundError:
+            pass
+
+    def test_yaml_file_load_and_dump_roundtrip(self):
+        input_content = "answer: #comment\n  is: '42'\n"  # comment should be preserved
+        input_path = self._create_file(input_content)
+        yaml = yaml_file_load(input_path)
+        output_path = self._create_tmp_file_path()
+        yaml_file_dump(yaml, output_path)
+        output_content = self._read_file(output_path)
+        self.assertEqual(output_content, input_content)
 
     def test_yaml_load(self):
         self.assertEqual(yaml_load("{answer: '42'}"), {"answer": "42"})

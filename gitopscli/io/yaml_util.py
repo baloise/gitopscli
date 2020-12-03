@@ -6,6 +6,16 @@ from ruamel.yaml import YAML
 ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
 
 
+def yaml_file_load(file_path: str) -> Any:
+    with open(file_path, "r") as stream:
+        return YAML().load(stream)
+
+
+def yaml_file_dump(yaml: Any, file_path: str) -> None:
+    with open(file_path, "w+") as stream:
+        YAML().dump(yaml, stream)
+
+
 def yaml_load(yaml_str: str) -> Any:
     return YAML().load(yaml_str)
 
@@ -17,9 +27,7 @@ def yaml_dump(yaml: Any) -> str:
 
 
 def update_yaml_file(file_path: str, key: str, value: Any) -> bool:
-    yaml = YAML()
-    with open(file_path, "r") as stream:
-        content = yaml.load(stream)
+    content = yaml_file_load(file_path)
 
     key_segments = key.split(".")
     current_key_segments = []
@@ -39,17 +47,14 @@ def update_yaml_file(file_path: str, key: str, value: Any) -> bool:
             if parent_item[current_array_index if is_array else current_key_segment] == value:
                 return False  # nothing to update
             parent_item[current_array_index if is_array else current_key_segment] = value
-            with open(file_path, "w+") as stream:
-                yaml.dump(content, stream)
+            yaml_file_dump(content, file_path)
             return True
         parent_item = parent_item[current_array_index if is_array else current_key_segment]
     raise KeyError(f"Empty key!")
 
 
 def merge_yaml_element(file_path: str, element_path: str, desired_value: Any) -> None:
-    yaml = YAML()
-    with open(file_path, "r") as stream:
-        yaml_file_content = yaml.load(stream)
+    yaml_file_content = yaml_file_load(file_path)
     work_path = yaml_file_content
 
     if element_path != ".":
@@ -71,5 +76,4 @@ def merge_yaml_element(file_path: str, element_path: str, desired_value: Any) ->
         if key not in desired_value:
             del work_path[key]
 
-    with open(file_path, "w+") as stream:
-        yaml.dump(yaml_file_content, stream)
+    yaml_file_dump(yaml_file_content, file_path)
