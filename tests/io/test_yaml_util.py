@@ -154,6 +154,10 @@ a: # comment 1
             update_yaml_file(test_file, "a.e.[2].[2]", "foo")
         self.assertEqual("\"Key 'a.e.[2].[2]' not found in YAML!\"", str(ex.value))
 
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "", "foo")
+        self.assertEqual("'Empty key!'", str(ex.value))
+
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
@@ -176,6 +180,27 @@ applications:
 applications:
   app2:
     key: value
+    key2: value
+  app3:
+"""
+        actual = self._read_file(test_file)
+        self.assertEqual(expected, actual)
+
+    def test_merge_yaml_element_create(self):
+        test_file = self._create_file(
+            """\
+# Kept comment
+applications: null
+"""
+        )
+
+        value = {"app2": {"key2": "value"}, "app3": None}
+        merge_yaml_element(test_file, "applications", value)
+
+        expected = """\
+# Kept comment
+applications:
+  app2:
     key2: value
   app3:
 """

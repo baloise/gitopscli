@@ -29,7 +29,7 @@ def yaml_dump(yaml: Any) -> str:
 def update_yaml_file(file_path: str, key: str, value: Any) -> bool:
     content = yaml_file_load(file_path)
 
-    key_segments = key.split(".")
+    key_segments = key.split(".") if key else []
     current_key_segments = []
     parent_item = content
     for current_key_segment in key_segments:
