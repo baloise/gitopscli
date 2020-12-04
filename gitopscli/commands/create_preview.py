@@ -67,10 +67,11 @@ def _create_preview_command(
 
         hashed_preview_id = hashlib.sha256(args.preview_id.encode("utf-8")).hexdigest()[:8]
         new_preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
-        logging.info("New folder for preview: %s", new_preview_folder_name)
         preview_env_already_exist = os.path.isdir(config_git_repo.get_full_file_path(new_preview_folder_name))
-        logging.info("Is preview env already existing? %s", preview_env_already_exist)
-        if not preview_env_already_exist:
+        if preview_env_already_exist:
+            logging.info("Use existing folder for preview: %s", new_preview_folder_name)
+        else:
+            logging.info("Create new folder for preview: %s", new_preview_folder_name)
             __create_new_preview_env(
                 new_preview_folder_name, preview_template_folder_name, config_git_repo,
             )
@@ -114,7 +115,7 @@ def __replace_value(
     elif replacement_variable == "ROUTE_HOST":
         replacement_value = route_host
     else:
-        logging.info("Unknown replacement variable: %s", replacement_variable)
+        raise GitOpsException(f"Unknown replacement variable for '{replacement_path}': {replacement_variable}")
     value_replaced = False
     try:
         value_replaced = update_yaml_file(
@@ -122,7 +123,8 @@ def __replace_value(
         )
     except KeyError as ex:
         raise GitOpsException(f"Key '{replacement_path}' not found in '{new_preview_folder_name}/values.yaml'") from ex
-    logging.info("Replacing property %s with value: %s", replacement_path, replacement_value)
+    if value_replaced:
+        logging.info("Replaced property %s with value: %s", replacement_path, replacement_value)
     return value_replaced
 
 
@@ -135,8 +137,9 @@ def __create_new_preview_env(
     )
     chart_file_path = new_preview_folder_name + "/Chart.yaml"
     logging.info("Looking for Chart.yaml at: %s", chart_file_path)
-    if config_git_repo.get_full_file_path(chart_file_path):
+    full_chart_file_path = config_git_repo.get_full_file_path(chart_file_path)
+    if full_chart_file_path:
         try:
-            update_yaml_file(config_git_repo.get_full_file_path(chart_file_path), "name", new_preview_folder_name)
+            update_yaml_file(full_chart_file_path, "name", new_preview_folder_name)
         except KeyError as ex:
             raise GitOpsException(f"Key 'name' not found in '{chart_file_path}'") from ex
