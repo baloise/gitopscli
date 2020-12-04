@@ -1,4 +1,4 @@
-FROM python:3.7-alpine AS base-image
+FROM python:3.8-alpine AS base-image
 
 ENV PATH="/opt/venv/bin:$PATH"
 RUN apk add --no-cache git
@@ -18,7 +18,7 @@ RUN pip install -r requirements-dev.txt
 RUN black --check -l 120 -t py37 gitopscli tests setup.py
 RUN pylint gitopscli
 RUN mypy .
-RUN python -m pytest -v --typeguard-packages=gitopscli
+RUN python -m pytest -vv -s --typeguard-packages=gitopscli
 
 FROM base-image AS runtime-image
 
