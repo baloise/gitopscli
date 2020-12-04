@@ -1,20 +1,19 @@
 import unittest
-from unittest.mock import patch
 from gitopscli.git import GitProvider
 from gitopscli.commands.delete_pr_preview import DeletePrPreviewCommand, DeletePreviewCommand
+from .mock_mixin import MockMixin
 
 
-class DeletePrPreviewCommandTest(unittest.TestCase):
+class DeletePrPreviewCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
-        def add_patch(target):
-            patcher = patch(target)
-            self.addCleanup(patcher.stop)
-            return patcher.start()
+        self.init_mock_manager(DeletePrPreviewCommand)
 
-        # Inject DeletePreviewCommand mock:
-        self.delete_preview_command_mock = add_patch("gitopscli.commands.delete_pr_preview.DeletePreviewCommand")
+        self.delete_preview_command_mock = self.monkey_patch(DeletePreviewCommand)
         self.delete_preview_command_mock.Args = DeletePreviewCommand.Args
         self.delete_preview_command_mock.return_value = self.delete_preview_command_mock
+        self.delete_preview_command_mock.execute.return_value = None
+
+        self.seal_mocks()
 
     def test_delete_pr_preview(self):
         DeletePrPreviewCommand(

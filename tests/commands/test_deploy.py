@@ -1,49 +1,54 @@
+import logging
+import os
+import uuid
 import unittest
 from uuid import UUID
-from unittest.mock import patch, MagicMock, Mock, call
+from unittest.mock import call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.deploy import DeployCommand
-from gitopscli.git import GitRepoApi, GitProvider
+from gitopscli.git import GitRepoApi, GitProvider, GitRepoApiFactory, GitRepo
+from gitopscli.io.yaml_util import update_yaml_file
+from .mock_mixin import MockMixin
 
 
-class DeployCommandTest(unittest.TestCase):
+class DeployCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
-        def add_patch(target):
-            patcher = patch(target)
-            self.addCleanup(patcher.stop)
-            return patcher.start()
+        self.init_mock_manager(DeployCommand)
 
-        # Monkey patch all external functions the command is using:
-        self.os_path_isfile_mock = add_patch("gitopscli.commands.deploy.os.path.isfile")
-        self.update_yaml_file_mock = add_patch("gitopscli.commands.deploy.update_yaml_file")
-        self.logging_mock = add_patch("gitopscli.commands.deploy.logging")
-        self.uuid_mock = add_patch("gitopscli.commands.deploy.uuid")
-        self.git_repo_api_factory_mock = add_patch("gitopscli.commands.deploy.GitRepoApiFactory")
-        self.git_repo_mock = add_patch("gitopscli.commands.deploy.GitRepo")
+        self.os_mock = self.monkey_patch(os)
+        self.os_mock.path.isfile.return_value = True
 
-        self.git_repo_api_mock = MagicMock()
+        self.update_yaml_file_mock = self.monkey_patch(update_yaml_file)
+        self.update_yaml_file_mock.return_value = True
 
-        # Attach all mocks to a single mock manager
-        self.mock_manager = Mock()
-        self.mock_manager.attach_mock(self.git_repo_api_factory_mock, "GitRepoApiFactory")
-        self.mock_manager.attach_mock(self.git_repo_api_mock, "GitRepoApi")
-        self.mock_manager.attach_mock(self.git_repo_mock, "GitRepo")
-        self.mock_manager.attach_mock(self.update_yaml_file_mock, "update_yaml_file")
-        self.mock_manager.attach_mock(self.os_path_isfile_mock, "os.path.isfile")
-        self.mock_manager.attach_mock(self.logging_mock, "logging")
+        self.logging_mock = self.monkey_patch(logging)
+        self.logging_mock.info.return_value = None
 
-        # Define some common default return values
-        self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
+        self.uuid_mock = self.monkey_patch(uuid)
+        self.uuid_mock.uuid4.return_value = UUID("b973b5bb-64a6-4735-a840-3113d531b41c")
+
+        self.git_repo_api_mock = self.create_mock(GitRepoApi)
         self.git_repo_api_mock.create_pull_request.return_value = GitRepoApi.PullRequestIdAndUrl(
             42, "<url of dummy pr>"
         )
+        self.git_repo_api_mock.merge_pull_request.return_value = None
+        self.git_repo_api_mock.delete_branch.return_value = None
+
+        self.git_repo_api_factory_mock = self.monkey_patch(GitRepoApiFactory)
+        self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
+
+        self.git_repo_mock = self.monkey_patch(GitRepo)
         self.git_repo_mock.return_value = self.git_repo_mock
         self.git_repo_mock.__enter__.return_value = self.git_repo_mock
+        self.git_repo_mock.__exit__.return_value = False
+        self.git_repo_mock.checkout.return_value = None
+        self.git_repo_mock.new_branch.return_value = None
+        self.git_repo_mock.commit.return_value = None
+        self.git_repo_mock.push.return_value = None
         self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
-        self.os_path_isfile_mock.return_value = True
-        self.update_yaml_file_mock.return_value = True
-        self.uuid_mock.uuid4.return_value = UUID("b973b5bb-64a6-4735-a840-3113d531b41c")
+
+        self.seal_mocks()
 
     def test_happy_flow(self):
         args = DeployCommand.Args(
@@ -102,6 +107,7 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
+            call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
@@ -140,6 +146,7 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
+            call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
@@ -181,6 +188,7 @@ class DeployCommandTest(unittest.TestCase):
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
+            call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
@@ -329,7 +337,7 @@ class DeployCommandTest(unittest.TestCase):
         ]
 
     def test_file_not_found(self):
-        self.os_path_isfile_mock.return_value = False
+        self.os_mock.path.isfile.return_value = False
 
         args = DeployCommand.Args(
             file="test/file.yml",

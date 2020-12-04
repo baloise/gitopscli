@@ -39,7 +39,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     logging.info("Team config repository: %s", team_config_git_repo.get_clone_url())
     logging.info("Root config repository: %s", root_config_git_repo.get_clone_url())
 
-    repo_apps = __get_repo_apps(root_config_git_repo)
+    repo_apps = __get_repo_apps(team_config_git_repo)
     logging.info("Found %s app(s) in apps repository: %s", len(repo_apps), ", ".join(repo_apps))
 
     logging.info("Searching apps repository in root repository's 'apps/' directory...")

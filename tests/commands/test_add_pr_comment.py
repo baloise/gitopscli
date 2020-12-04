@@ -1,27 +1,21 @@
 import unittest
-from unittest.mock import patch, MagicMock, Mock, call
-from gitopscli.git import GitProvider
+from unittest.mock import call
+from gitopscli.git import GitProvider, GitRepoApi, GitRepoApiFactory
 from gitopscli.commands.add_pr_comment import AddPrCommentCommand
+from .mock_mixin import MockMixin
 
 
-class AddPrCommentCommandTest(unittest.TestCase):
+class AddPrCommentCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
-        def add_patch(target):
-            patcher = patch(target)
-            self.addCleanup(patcher.stop)
-            return patcher.start()
+        self.init_mock_manager(AddPrCommentCommand)
 
-        # Monkey patch all external functions the command is using:
-        self.git_repo_api_factory_mock = add_patch("gitopscli.commands.add_pr_comment.GitRepoApiFactory")
-        self.git_repo_api_mock = MagicMock()
+        git_repo_api_mock = self.create_mock(GitRepoApi)
+        git_repo_api_mock.add_pull_request_comment.return_value = None
 
-        # Attach all mocks to a single mock manager
-        self.mock_manager = Mock()
-        self.mock_manager.attach_mock(self.git_repo_api_factory_mock, "GitRepoApiFactory")
-        self.mock_manager.attach_mock(self.git_repo_api_mock, "GitRepoApi")
+        git_repo_api_factory_mock = self.monkey_patch(GitRepoApiFactory)
+        git_repo_api_factory_mock.create.return_value = git_repo_api_mock
 
-        # Define some common default return values
-        self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
+        self.seal_mocks()
 
     def test_with_parent_id(self):
         args = AddPrCommentCommand.Args(
