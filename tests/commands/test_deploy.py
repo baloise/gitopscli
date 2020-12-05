@@ -1,5 +1,4 @@
 import logging
-import os
 import uuid
 import unittest
 from uuid import UUID
@@ -15,9 +14,6 @@ from .mock_mixin import MockMixin
 class DeployCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
         self.init_mock_manager(DeployCommand)
-
-        self.os_mock = self.monkey_patch(os)
-        self.os_mock.path.isfile.return_value = True
 
         self.update_yaml_file_mock = self.monkey_patch(update_yaml_file)
         self.update_yaml_file_mock.return_value = True
@@ -74,7 +70,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
@@ -110,7 +105,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
@@ -118,7 +112,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApi.create_pull_request(
                 "gitopscli-deploy-b973b5bb",
                 "master",
-                "Updated values in test/file.yml",
+                "Updated value in test/file.yml",
                 "Updated 1 value in `test/file.yml`:\n```yaml\na.b.c: foo\n```\n",
             ),
         ]
@@ -149,7 +143,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
@@ -191,7 +184,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
@@ -233,7 +225,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
@@ -266,7 +257,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
@@ -297,7 +287,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
@@ -337,7 +326,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         ]
 
     def test_file_not_found(self):
-        self.os_mock.path.isfile.return_value = False
+        self.update_yaml_file_mock.side_effect = FileNotFoundError
 
         args = DeployCommand.Args(
             file="test/file.yml",
@@ -364,7 +353,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
         ]
 
     def test_key_not_found(self):
@@ -395,7 +384,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
         ]
 
@@ -425,7 +413,6 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path("test/file.yml"),
-            call.os.path.isfile("/tmp/created-tmp-dir/test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Yaml property %s already up-to-date", "a.b.c"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),

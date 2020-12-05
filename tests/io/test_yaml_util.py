@@ -161,6 +161,20 @@ a: # comment 1
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
+    def test_update_yaml_file_not_found_error(self):
+        try:
+            update_yaml_file("/some-unknown-dir/some-random-unknown-file", "a.b", "foo")
+            self.fail()
+        except FileNotFoundError:
+            pass
+
+    def test_update_yaml_file_is_a_directory_error(self):
+        try:
+            update_yaml_file("/tmp", "a.b", "foo")
+            self.fail()
+        except IsADirectoryError:
+            pass
+
     def test_merge_yaml_element(self):
         test_file = self._create_file(
             """\
