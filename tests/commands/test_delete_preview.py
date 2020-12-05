@@ -1,50 +1,52 @@
+import os
+import shutil
 import unittest
+import logging
 from types import SimpleNamespace
-from unittest.mock import patch, MagicMock, Mock, call
+from unittest.mock import call
 import pytest
-from gitopscli.git import GitRepoApi, GitProvider
+from gitopscli.git import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.delete_preview import DeletePreviewCommand
+from gitopscli.commands.delete_preview import DeletePreviewCommand, load_gitops_config
+from .mock_mixin import MockMixin
 
 
-class DeletePreviewCommandTest(unittest.TestCase):
+class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
-        def add_patch(target):
-            patcher = patch(target)
-            self.addCleanup(patcher.stop)
-            return patcher.start()
+        self.init_mock_manager(DeletePreviewCommand)
 
-        # Monkey patch all external functions the command is using:
-        self.os_path_exists_mock = add_patch("gitopscli.commands.delete_preview.os.path.exists")
-        self.shutil_rmtree_mock = add_patch("gitopscli.commands.delete_preview.shutil.rmtree")
-        self.logging_mock = add_patch("gitopscli.commands.delete_preview.logging")
-        self.load_gitops_config_mock = add_patch("gitopscli.commands.delete_preview.load_gitops_config")
-        self.git_repo_api_factory_mock = add_patch("gitopscli.commands.delete_preview.GitRepoApiFactory")
-        self.git_repo_mock = add_patch("gitopscli.commands.delete_preview.GitRepo")
+        self.os_mock = self.monkey_patch(os)
+        self.os_mock.path.exists.return_value = True
 
-        self.git_repo_api_mock = MagicMock()
+        self.shutil_mock = self.monkey_patch(shutil)
+        self.shutil_mock.rmtree.return_value = None
 
-        # Attach all mocks to a single mock manager
-        self.mock_manager = Mock()
-        self.mock_manager.attach_mock(self.git_repo_api_factory_mock, "GitRepoApiFactory")
-        self.mock_manager.attach_mock(self.git_repo_api_mock, "GitRepoApi")
-        self.mock_manager.attach_mock(self.git_repo_mock, "GitRepo")
-        self.mock_manager.attach_mock(self.os_path_exists_mock, "os.path.exists")
-        self.mock_manager.attach_mock(self.shutil_rmtree_mock, "shutil.rmtree")
-        self.mock_manager.attach_mock(self.logging_mock, "logging")
-        self.mock_manager.attach_mock(self.load_gitops_config_mock, "load_gitops_config")
+        self.logging_mock = self.monkey_patch(logging)
+        self.logging_mock.info.return_value = None
 
-        self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
-        self.git_repo_api_mock.create_pull_request.return_value = GitRepoApi.PullRequestIdAndUrl(
-            42, "<url of dummy pr>"
-        )
-        self.git_repo_mock.return_value = self.git_repo_mock
-        self.git_repo_mock.__enter__.return_value = self.git_repo_mock
-        self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
-        self.os_path_exists_mock.return_value = True
+        self.load_gitops_config_mock = self.monkey_patch(load_gitops_config)
         self.load_gitops_config_mock.return_value = SimpleNamespace(
             team_config_org="TEAM_CONFIG_ORG", team_config_repo="TEAM_CONFIG_REPO", application_name="APP"
         )
+
+        self.git_repo_api_mock = self.create_mock(GitRepoApi)
+        self.git_repo_api_mock.create_pull_request.return_value = GitRepoApi.PullRequestIdAndUrl(
+            42, "<url of dummy pr>"
+        )
+
+        self.git_repo_api_factory_mock = self.monkey_patch(GitRepoApiFactory)
+        self.git_repo_api_factory_mock.create.return_value = self.git_repo_api_mock
+
+        self.git_repo_mock = self.monkey_patch(GitRepo)
+        self.git_repo_mock.return_value = self.git_repo_mock
+        self.git_repo_mock.__enter__.return_value = self.git_repo_mock
+        self.git_repo_mock.__exit__.return_value = False
+        self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
+        self.git_repo_mock.checkout.return_value = None
+        self.git_repo_mock.commit.return_value = None
+        self.git_repo_mock.push.return_value = None
+
+        self.seal_mocks()
 
     def test_delete_existing_happy_flow(self):
         args = DeletePreviewCommand.Args(
@@ -76,7 +78,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
         ]
 
     def test_delete_missing_happy_flow(self):
-        self.os_path_exists_mock.return_value = False
+        self.os_mock.path.exists.return_value = False
 
         args = DeletePreviewCommand.Args(
             username="USERNAME",
@@ -105,7 +107,7 @@ class DeletePreviewCommandTest(unittest.TestCase):
         ]
 
     def test_delete_missing_but_expected_error(self):
-        self.os_path_exists_mock.return_value = False
+        self.os_mock.path.exists.return_value = False
 
         args = DeletePreviewCommand.Args(
             username="USERNAME",

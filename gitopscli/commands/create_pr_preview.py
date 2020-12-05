@@ -35,7 +35,7 @@ def _create_pr_preview_command(args: CreatePrPreviewCommand.Args) -> None:
     )
 
     create_preview_command = CreatePreviewCommand(
-        args=CreatePreviewCommand.Args(
+        CreatePreviewCommand.Args(
             username=args.username,
             password=args.password,
             git_user=args.git_user,
