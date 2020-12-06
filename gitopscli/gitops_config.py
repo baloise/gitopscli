@@ -1,3 +1,4 @@
+import hashlib
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Any
@@ -23,17 +24,29 @@ class GitOpsConfig:
     application_name: str
     team_config_org: str
     team_config_repo: str
-    route_host: str
+    route_host_template: str
     replacements: List[Replacement]
 
     def __post_init__(self) -> None:
         assert isinstance(self.application_name, str), "application_name of wrong type!"
         assert isinstance(self.team_config_org, str), "team_config_org of wrong type!"
         assert isinstance(self.team_config_repo, str), "team_config_repo of wrong type!"
-        assert isinstance(self.route_host, str), "route_host of wrong type!"
+        assert isinstance(self.route_host_template, str), "route_host_template of wrong type!"
         assert isinstance(self.replacements, list), "replacements of wrong type!"
         for index, replacement in enumerate(self.replacements):
             assert isinstance(replacement, self.Replacement), f"replacement[{index}] of wrong type!"
+
+    def get_route_host(self, preview_id: str) -> str:
+        hashed_preview_id = self.__create_hashed_preview_id(preview_id)
+        return self.route_host_template.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
+
+    def get_preview_namespace(self, preview_id: str) -> str:
+        hashed_preview_id = self.__create_hashed_preview_id(preview_id)
+        return f"{self.application_name}-{hashed_preview_id}-preview"
+
+    @staticmethod
+    def __create_hashed_preview_id(preview_id: str) -> str:
+        return hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
 
     @staticmethod
     def from_yaml(yaml: Any) -> "GitOpsConfig":
@@ -91,6 +104,6 @@ class GitOpsConfig:
             application_name=get_string_value("deploymentConfig.applicationName"),
             team_config_org=get_string_value("deploymentConfig.org"),
             team_config_repo=get_string_value("deploymentConfig.repository"),
-            route_host=get_string_value("previewConfig.route.host.template"),
+            route_host_template=get_string_value("previewConfig.route.host.template"),
             replacements=replacements,
         )

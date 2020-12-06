@@ -1,9 +1,9 @@
-import hashlib
 import logging
 import os
 import shutil
 from dataclasses import dataclass
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
+from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory, GitRepoApi
+from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config
 from .command import Command
@@ -25,36 +25,46 @@ class DeletePreviewCommand(Command):
         self.__args = args
 
     def execute(self) -> None:
-        _delete_preview_command(self.__args)
+        gitops_config = self.__get_gitops_config()
+        preview_id = self.__args.preview_id
 
+        team_config_git_repo_api = self.__create_team_config_git_repo_api(gitops_config)
+        with GitRepo(team_config_git_repo_api) as team_config_git_repo:
+            team_config_git_repo.checkout("master")
 
-def _delete_preview_command(args: DeletePreviewCommand.Args) -> None:
-    gitops_config = load_gitops_config(args, args.organisation, args.repository_name)
+            preview_namespace = gitops_config.get_preview_namespace(preview_id)
+            logging.info("Preview folder name: %s", preview_namespace)
 
-    config_git_repo_api = GitRepoApiFactory.create(args, gitops_config.team_config_org, gitops_config.team_config_repo,)
-    with GitRepo(config_git_repo_api) as config_git_repo:
-        config_git_repo.checkout("master")
-        hashed_preview_id = hashlib.sha256(args.preview_id.encode("utf-8")).hexdigest()[:8]
-        preview_folder_name = gitops_config.application_name + "-" + hashed_preview_id + "-preview"
-        logging.info("Preview folder name: %s", preview_folder_name)
-        preview_folder_full_path = config_git_repo.get_full_file_path(preview_folder_name)
-        branch_preview_env_exists = os.path.exists(preview_folder_full_path)
+            preview_folder_exists = self.__delete_folder_if_exists(team_config_git_repo, preview_namespace)
+            if not preview_folder_exists:
+                if self.__args.expect_preview_exists:
+                    raise GitOpsException(f"There was no preview with name: {preview_namespace}")
+                logging.info(
+                    "No preview environment for '%s' and preview id '%s'. I'm done here.",
+                    gitops_config.application_name,
+                    preview_id,
+                )
+                return
 
-        if args.expect_preview_exists and not branch_preview_env_exists:
-            raise GitOpsException(f"There was no preview with name: {preview_folder_name}")
-
-        if branch_preview_env_exists:
-            shutil.rmtree(preview_folder_full_path, ignore_errors=True)
-            config_git_repo.commit(
-                args.git_user,
-                args.git_email,
-                f"Delete preview environment for '{gitops_config.application_name}' "
-                f"and preview id '{args.preview_id}'.",
+            self.__commit_and_push(
+                team_config_git_repo,
+                f"Delete preview environment for '{gitops_config.application_name}' and preview id '{preview_id}'.",
             )
-            config_git_repo.push("master")
-        else:
-            logging.info(
-                "No preview environment for '%s' and preview id '%s'. Nothing to do..",
-                gitops_config.application_name,
-                args.preview_id,
-            )
+
+    def __get_gitops_config(self) -> GitOpsConfig:
+        return load_gitops_config(self.__args, self.__args.organisation, self.__args.repository_name)
+
+    def __create_team_config_git_repo_api(self, gitops_config: GitOpsConfig) -> GitRepoApi:
+        return GitRepoApiFactory.create(self.__args, gitops_config.team_config_org, gitops_config.team_config_repo)
+
+    def __commit_and_push(self, git_repo: GitRepo, message: str) -> None:
+        git_repo.commit(self.__args.git_user, self.__args.git_email, message)
+        git_repo.push("master")
+
+    @staticmethod
+    def __delete_folder_if_exists(git_repo: GitRepo, folder_name: str) -> bool:
+        folder_full_path = git_repo.get_full_file_path(folder_name)
+        if not os.path.exists(folder_full_path):
+            return False
+        shutil.rmtree(folder_full_path, ignore_errors=True)
+        return True

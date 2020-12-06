@@ -47,7 +47,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             team_config_org="TEAM_CONFIG_ORG",
             team_config_repo="TEAM_CONFIG_REPO",
             application_name="my-app",
-            route_host="app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld",
+            route_host_template="app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld",
             replacements=[
                 GitOpsConfig.Replacement(path="image.tag", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
                 GitOpsConfig.Replacement(path="route.host", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),
@@ -72,8 +72,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
     def test_create_new_preview(self):
         self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/created-tmp-dir/.preview-templates/my-app": True,
             "/tmp/created-tmp-dir/my-app-685912d3-preview": False,  # doesn't exist yet -> expect create
+            "/tmp/created-tmp-dir/.preview-templates/my-app": True,
         }[path]
 
         deployment_created_callback = Mock(return_value=None)
@@ -93,23 +93,19 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
+            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
+            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.shutil.copytree(
                 "/tmp/created-tmp-dir/.preview-templates/my-app", "/tmp/created-tmp-dir/my-app-685912d3-preview"
             ),
-            call.logging.info("Looking for Chart.yaml at: %s", "my-app-685912d3-preview/Chart.yaml"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
             ),
-            call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
@@ -117,13 +113,13 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
             call.logging.info(
-                "Replaced property %s with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
+                "Replaced property '%s' with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
             ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
             ),
-            call.logging.info("Replaced property %s with value: %s", "route.host", "app.xy-685912d3.example.tld"),
+            call.logging.info("Replaced property '%s' with value: %s", "route.host", "app.xy-685912d3.example.tld"),
             call.GitRepo.commit(
                 "GIT_USER",
                 "GIT_EMAIL",
@@ -134,7 +130,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
     def test_update_existing_preview(self):
         self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/created-tmp-dir/.preview-templates/my-app": True,
             "/tmp/created-tmp-dir/my-app-685912d3-preview": True,  # already exists -> expect update
         }[path]
 
@@ -155,13 +150,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
@@ -169,13 +160,13 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
             call.logging.info(
-                "Replaced property %s with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
+                "Replaced property '%s' with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
             ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
             ),
-            call.logging.info("Replaced property %s with value: %s", "route.host", "app.xy-685912d3.example.tld"),
+            call.logging.info("Replaced property '%s' with value: %s", "route.host", "app.xy-685912d3.example.tld"),
             call.GitRepo.commit(
                 "GIT_USER",
                 "GIT_EMAIL",
@@ -186,7 +177,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
     def test_preview_already_up_to_date(self):
         self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/created-tmp-dir/.preview-templates/my-app": True,
             "/tmp/created-tmp-dir/my-app-685912d3-preview": True,  # already exists -> expect update
         }[path]
 
@@ -209,30 +199,27 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
                 "image.tag",
                 "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
+            call.logging.info("Keep property '%s' value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
             ),
-            call.logging.info(
-                "The image tag %s has already been deployed. Doing nothing.", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
-            ),
+            call.logging.info("Keep property '%s' value: %s", "route.host", "app.xy-685912d3.example.tld"),
+            call.logging.info("The preview is already up-to-date. I'm done here."),
         ]
 
     def test_create_preview_for_unknown_template(self):
         self.os_mock.path.isdir.side_effect = lambda path: {
+            "/tmp/created-tmp-dir/my-app-685912d3-preview": False,
             "/tmp/created-tmp-dir/.preview-templates/my-app": False,  # preview template missing -> expect error
         }[path]
 
@@ -247,6 +234,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
+            call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
+            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
         ]
@@ -265,13 +255,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
@@ -282,8 +268,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
     def test_create_new_preview_invalid_chart_template(self):
         self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/created-tmp-dir/.preview-templates/my-app": True,
             "/tmp/created-tmp-dir/my-app-685912d3-preview": False,  # doesn't exist yet -> expect create
+            "/tmp/created-tmp-dir/.preview-templates/my-app": True,
         }[path]
 
         self.update_yaml_file_mock.side_effect = KeyError()
@@ -299,18 +285,15 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.checkout("master"),
-            call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
+            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
+            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.shutil.copytree(
                 "/tmp/created-tmp-dir/.preview-templates/my-app", "/tmp/created-tmp-dir/my-app-685912d3-preview"
             ),
-            call.logging.info("Looking for Chart.yaml at: %s", "my-app-685912d3-preview/Chart.yaml"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"

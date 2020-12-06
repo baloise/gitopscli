@@ -417,5 +417,5 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Yaml property %s already up-to-date", "a.b.c"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Yaml property %s already up-to-date", "a.b.d"),
-            call.logging.info("All values already up-to-date. I'm done here"),
+            call.logging.info("All values already up-to-date. I'm done here."),
         ]
