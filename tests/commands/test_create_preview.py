@@ -49,8 +49,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             application_name="my-app",
             route_host="app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld",
             replacements=[
-                GitOpsConfig.Replacement(path="image.tag", variable="GIT_COMMIT"),
-                GitOpsConfig.Replacement(path="route.host", variable="ROUTE_HOST"),
+                GitOpsConfig.Replacement(path="image.tag", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
+                GitOpsConfig.Replacement(path="route.host", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),
             ],
         )
 
@@ -249,35 +249,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.checkout("master"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-        ]
-
-    def test_create_preview_with_unknown_replacement_variable(self):
-        self.load_gitops_config_mock.return_value = GitOpsConfig(
-            team_config_org="TEAM_CONFIG_ORG",
-            team_config_repo="TEAM_CONFIG_REPO",
-            application_name="my-app",
-            route_host="app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld",
-            replacements=[GitOpsConfig.Replacement(path="image.tag", variable="UNKNOWN"),],  # this should fail
-        )
-
-        try:
-            CreatePreviewCommand(ARGS).execute()
-            self.fail()
-        except GitOpsException as ex:
-            self.assertEqual("Unknown replacement variable for 'image.tag': UNKNOWN", str(ex))
-
-        assert self.mock_manager.method_calls == [
-            call.load_gitops_config(ARGS, "ORGA", "REPO",),
-            call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
-            call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
-            call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
-            call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
-            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
         ]
 
     def test_create_preview_with_invalid_replacement_path(self):

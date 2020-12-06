@@ -84,8 +84,8 @@ class GitOpsConfigTest(unittest.TestCase):
         self.assertEqual(
             config.replacements,
             [
-                GitOpsConfig.Replacement(path="a.b", variable="ROUTE_HOST"),
-                GitOpsConfig.Replacement(path="c.d", variable="GIT_COMMIT"),
+                GitOpsConfig.Replacement(path="a.b", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),
+                GitOpsConfig.Replacement(path="c.d", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
             ],
         )
 
@@ -120,5 +120,5 @@ class GitOpsConfigTest(unittest.TestCase):
     def test_replacements_invalid_list_items_unknown_variable(self):
         self.yaml["previewConfig"]["replace"][0]["variable"] = "FOO"
         self.assert_load_error(
-            "Item 'previewConfig.replace.[0].variable' should be be either 'GIT_COMMIT' or 'ROUTE_HOST' in GitOps config!"
+            "Item 'previewConfig.replace.[0].variable' should be one of the following values in GitOps config: GIT_COMMIT, ROUTE_HOST"
         )

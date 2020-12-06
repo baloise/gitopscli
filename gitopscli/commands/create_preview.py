@@ -112,9 +112,9 @@ def __replace_value(
     root_git: GitRepo,
 ) -> bool:
     replacement_value = None
-    if replacement.variable == "GIT_COMMIT":
+    if replacement.variable == GitOpsConfig.Replacement.Variable.GIT_COMMIT:
         replacement_value = new_image_tag
-    elif replacement.variable == "ROUTE_HOST":
+    elif replacement.variable == GitOpsConfig.Replacement.Variable.ROUTE_HOST:
         replacement_value = route_host
     else:
         raise GitOpsException(f"Unknown replacement variable for '{replacement.path}': {replacement.variable}")
