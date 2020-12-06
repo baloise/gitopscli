@@ -3,9 +3,10 @@ import logging
 import os
 import shutil
 from dataclasses import dataclass
-from typing import Any, Callable, Dict
+from typing import Callable
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file
+from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config
 from .command import Command
@@ -104,27 +105,28 @@ def _create_preview_command(
 
 
 def __replace_value(
-    new_image_tag: str, route_host: str, new_preview_folder_name: str, replacement: Dict[str, Any], root_git: GitRepo,
+    new_image_tag: str,
+    route_host: str,
+    new_preview_folder_name: str,
+    replacement: GitOpsConfig.Replacement,
+    root_git: GitRepo,
 ) -> bool:
     replacement_value = None
-    logging.info("Replacement: %s", replacement)
-    replacement_path = replacement["path"]
-    replacement_variable = replacement["variable"]
-    if replacement_variable == "GIT_COMMIT":
+    if replacement.variable == GitOpsConfig.Replacement.Variable.GIT_COMMIT:
         replacement_value = new_image_tag
-    elif replacement_variable == "ROUTE_HOST":
+    elif replacement.variable == GitOpsConfig.Replacement.Variable.ROUTE_HOST:
         replacement_value = route_host
     else:
-        raise GitOpsException(f"Unknown replacement variable for '{replacement_path}': {replacement_variable}")
+        raise GitOpsException(f"Unknown replacement variable for '{replacement.path}': {replacement.variable}")
     value_replaced = False
     try:
         value_replaced = update_yaml_file(
-            root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement_path, replacement_value,
+            root_git.get_full_file_path(new_preview_folder_name + "/values.yaml"), replacement.path, replacement_value,
         )
     except KeyError as ex:
-        raise GitOpsException(f"Key '{replacement_path}' not found in '{new_preview_folder_name}/values.yaml'") from ex
+        raise GitOpsException(f"Key '{replacement.path}' not found in '{new_preview_folder_name}/values.yaml'") from ex
     if value_replaced:
-        logging.info("Replaced property %s with value: %s", replacement_path, replacement_value)
+        logging.info("Replaced property %s with value: %s", replacement.path, replacement_value)
     return value_replaced
 
 

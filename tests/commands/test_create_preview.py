@@ -2,10 +2,10 @@ import os
 import unittest
 import shutil
 import logging
-from types import SimpleNamespace
 from unittest.mock import call, Mock
 from gitopscli.io.yaml_util import update_yaml_file
 from gitopscli.git import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
+from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.create_preview import CreatePreviewCommand, load_gitops_config
 from .mock_mixin import MockMixin
@@ -43,14 +43,14 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         self.update_yaml_file_mock.return_value = True
 
         self.load_gitops_config_mock = self.monkey_patch(load_gitops_config)
-        self.load_gitops_config_mock.return_value = SimpleNamespace(
+        self.load_gitops_config_mock.return_value = GitOpsConfig(
             team_config_org="TEAM_CONFIG_ORG",
             team_config_repo="TEAM_CONFIG_REPO",
             application_name="my-app",
             route_host="app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld",
             replacements=[
-                {"path": "image.tag", "variable": "GIT_COMMIT"},
-                {"path": "route.host", "variable": "ROUTE_HOST"},
+                GitOpsConfig.Replacement(path="image.tag", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
+                GitOpsConfig.Replacement(path="route.host", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),
             ],
         )
 
@@ -110,7 +110,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
             ),
             call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
-            call.logging.info("Replacement: %s", {"path": "image.tag", "variable": "GIT_COMMIT"}),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
@@ -120,7 +119,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.logging.info(
                 "Replaced property %s with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
             ),
-            call.logging.info("Replacement: %s", {"path": "route.host", "variable": "ROUTE_HOST"}),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
@@ -164,7 +162,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
-            call.logging.info("Replacement: %s", {"path": "image.tag", "variable": "GIT_COMMIT"}),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
@@ -174,7 +171,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.logging.info(
                 "Replaced property %s with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
             ),
-            call.logging.info("Replacement: %s", {"path": "route.host", "variable": "ROUTE_HOST"}),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
@@ -220,14 +216,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
-            call.logging.info("Replacement: %s", {"path": "image.tag", "variable": "GIT_COMMIT"}),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
                 "image.tag",
                 "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
-            call.logging.info("Replacement: %s", {"path": "route.host", "variable": "ROUTE_HOST"}),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
@@ -257,39 +251,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
         ]
 
-    def test_create_preview_with_unknown_replacement_variable(self):
-        self.load_gitops_config_mock.return_value = SimpleNamespace(
-            team_config_org="TEAM_CONFIG_ORG",
-            team_config_repo="TEAM_CONFIG_REPO",
-            application_name="my-app",
-            route_host="app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld",
-            replacements=[
-                {"path": "image.tag", "variable": "UNKNOWN"},  # this should fail
-                {"path": "route.host", "variable": "ROUTE_HOST"},
-            ],
-        )
-
-        try:
-            CreatePreviewCommand(ARGS).execute()
-            self.fail()
-        except GitOpsException as ex:
-            self.assertEqual("Unknown replacement variable for 'image.tag': UNKNOWN", str(ex))
-
-        assert self.mock_manager.method_calls == [
-            call.load_gitops_config(ARGS, "ORGA", "REPO",),
-            call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
-            call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
-            call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
-            call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
-            call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
-            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
-            call.logging.info("Replacement: %s", {"path": "image.tag", "variable": "UNKNOWN"}),
-        ]
-
     def test_create_preview_with_invalid_replacement_path(self):
         self.update_yaml_file_mock.side_effect = KeyError()
 
@@ -311,7 +272,6 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.logging.info("Using image tag from git hash: %s", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
-            call.logging.info("Replacement: %s", {"path": "image.tag", "variable": "GIT_COMMIT"}),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",

@@ -1,6 +1,6 @@
-from enum import Flag, auto
+from enum import Enum, auto
 
 
-class GitProvider(Flag):
+class GitProvider(Enum):
     GITHUB = auto()
     BITBUCKET = auto()
