@@ -1,8 +1,7 @@
 import logging
-import os
 import uuid
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
 from gitopscli.gitops_exception import GitOpsException
@@ -31,79 +30,78 @@ class DeployCommand(Command):
         self.__args = args
 
     def execute(self) -> None:
-        _deploy_command(self.__args)
+        git_repo_api = self.__create_git_repo_api()
+        with GitRepo(git_repo_api) as git_repo:
+            branch = "master"
+            git_repo.checkout(branch)
 
+            if self.__args.create_pr:
+                branch = f"gitopscli-deploy-{str(uuid.uuid4())[:8]}"
+                git_repo.new_branch(branch)
 
-def _deploy_command(args: DeployCommand.Args) -> None:
-    git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name)
-    with GitRepo(git_repo_api) as git_repo:
-        git_repo.checkout("master")
+            updated_values = self.__update_values(git_repo)
+            if not updated_values:
+                logging.info("All values already up-to-date. I'm done here")
+                return
 
-        config_branch = f"gitopscli-deploy-{str(uuid.uuid4())[:8]}" if args.create_pr else "master"
+            git_repo.push(branch)
 
-        if args.create_pr:
-            git_repo.new_branch(config_branch)
+        if self.__args.create_pr:
+            title, description = self.__create_pull_request_title_and_description(updated_values)
+            pr_id = git_repo_api.create_pull_request(branch, "master", title, description).pr_id
 
-        updated_values = __update_values(git_repo, args)
-        if not updated_values:
-            logging.info("All values already up-to-date. I'm done here")
-            return
+            if self.__args.auto_merge:
+                git_repo_api.merge_pull_request(pr_id)
+                git_repo_api.delete_branch(branch)
 
-        git_repo.push(config_branch)
+    def __create_git_repo_api(self) -> GitRepoApi:
+        return GitRepoApiFactory.create(self.__args, self.__args.organisation, self.__args.repository_name)
 
-    if args.create_pr:
-        __create_pr(git_repo_api, config_branch, updated_values, args)
+    def __update_values(self, git_repo: GitRepo) -> Dict[str, Any]:
+        args = self.__args
+        single_commit = args.single_commit or args.commit_message
+        full_file_path = git_repo.get_full_file_path(args.file)
+        updated_values = {}
+        for key, value in args.values.items():
+            try:
+                updated_value = update_yaml_file(full_file_path, key, value)
+            except (FileNotFoundError, IsADirectoryError) as ex:
+                raise GitOpsException(f"No such file: {args.file}") from ex
+            except KeyError as ex:
+                raise GitOpsException(f"Key '{key}' not found in {args.file}") from ex
 
+            if not updated_value:
+                logging.info("Yaml property %s already up-to-date", key)
+                continue
 
-def __update_values(git_repo: GitRepo, args: DeployCommand.Args) -> Dict[str, Any]:
-    full_file_path = git_repo.get_full_file_path(args.file)
-    if not os.path.isfile(full_file_path):
-        raise GitOpsException(f"No such file: {args.file}")
+            logging.info("Updated yaml property %s to %s", key, value)
+            updated_values[key] = value
 
-    commit: Callable[[str], None] = lambda message: git_repo.commit(args.git_user, args.git_email, message)
+            if not single_commit:
+                self.__commit(git_repo, f"changed '{key}' to '{value}' in {args.file}")
 
-    updated_values = {}
-    for key in args.values:
-        value = args.values[key]
-        try:
-            updated_value = update_yaml_file(full_file_path, key, value)
-        except KeyError as ex:
-            raise GitOpsException(f"Key '{key}' not found in {args.file}") from ex
-        if not updated_value:
-            logging.info("Yaml property %s already up-to-date", key)
-            continue
-        logging.info("Updated yaml property %s to %s", key, value)
-        updated_values[key] = value
+        if single_commit and updated_values:
+            if args.commit_message:
+                message = args.commit_message
+            elif len(updated_values) == 1:
+                key, value = list(updated_values.items())[0]
+                message = f"changed '{key}' to '{value}' in {args.file}"
+            else:
+                updates_count = len(updated_values)
+                message = f"updated {updates_count} value{'s' if updates_count > 1 else ''} in {args.file}"
+                message += f"\n\n{yaml_dump(updated_values)}"
+            self.__commit(git_repo, message)
 
-        if not args.single_commit and args.commit_message is None:
-            commit(f"changed '{key}' to '{value}' in {args.file}")
+        return updated_values
 
-    if updated_values and args.single_commit and args.commit_message is None:
-        if len(updated_values) == 1:
-            key, value = list(updated_values.items())[0]
-            commit(f"changed '{key}' to '{value}' in {args.file}")
-        else:
-            msg = f"updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in {args.file}"
-            msg += f"\n\n{yaml_dump(updated_values)}"
-            commit(msg)
+    def __create_pull_request_title_and_description(self, updated_values: Dict[str, Any]) -> Tuple[str, str]:
+        updated_file_name = self.__args.file
+        updates_count = len(updated_values)
+        value_or_values = "values" if updates_count > 1 else "value"
+        title = f"Updated {value_or_values} in {updated_file_name}"
+        description = f"Updated {updates_count} {value_or_values} in `{updated_file_name}`:\n"
+        description += f"```yaml\n{yaml_dump(updated_values)}\n```\n"
+        return title, description
 
-    if updated_values and args.commit_message is not None:
-        commit(args.commit_message)
-
-    return updated_values
-
-
-def __create_pr(
-    git_repo_api: GitRepoApi, branch: str, updated_values: Dict[str, Any], args: DeployCommand.Args
-) -> None:
-    title = f"Updated values in {args.file}"
-    description = f"""\
-Updated {len(updated_values)} value{'s' if len(updated_values) > 1 else ''} in `{args.file}`:
-```yaml
-{yaml_dump(updated_values)}
-```
-"""
-    pull_request = git_repo_api.create_pull_request(branch, "master", title, description)
-    if args.auto_merge:
-        git_repo_api.merge_pull_request(pull_request.pr_id)
-        git_repo_api.delete_branch(branch)
+    def __commit(self, git_repo: GitRepo, message: str) -> None:
+        git_repo.commit(self.__args.git_user, self.__args.git_email, message)
