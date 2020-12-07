@@ -58,7 +58,7 @@ class CreatePreviewCommand(Command):
                 logging.info("The preview is already up-to-date. I'm done here.")
                 return
 
-            self.__commit_and_push(
+            self.__commit_and_push_to_master(
                 team_config_git_repo,
                 f"{'Create new' if created_new_preview else 'Update'} preview environment for "
                 f"'{gitops_config.application_name}' and git hash '{self.__args.git_hash}'.",
@@ -69,7 +69,7 @@ class CreatePreviewCommand(Command):
         else:
             self.__deployment_updated_callback(route_host)
 
-    def __commit_and_push(self, git_repo: GitRepo, message: str) -> None:
+    def __commit_and_push_to_master(self, git_repo: GitRepo, message: str) -> None:
         git_repo.commit(self.__args.git_user, self.__args.git_email, message)
         git_repo.push("master")
 
