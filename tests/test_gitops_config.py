@@ -59,9 +59,9 @@ class GitOpsConfigTest(unittest.TestCase):
         self.yaml["deploymentConfig"]["repository"] = []
         self.assert_load_error("Item 'deploymentConfig.repository' should be a string in GitOps config!")
 
-    def test_route_host(self):
+    def test_route_host_template(self):
         config = self.load()
-        self.assertEqual(config.route_host, "my-host-template")
+        self.assertEqual(config.route_host_template, "my-host-template")
 
     def test_route_missing(self):
         del self.yaml["previewConfig"]["route"]
@@ -75,7 +75,7 @@ class GitOpsConfigTest(unittest.TestCase):
         del self.yaml["previewConfig"]["route"]["host"]["template"]
         self.assert_load_error("Key 'previewConfig.route.host.template' not found in GitOps config!")
 
-    def test_route_host_not_a_string(self):
+    def test_route_host_template_not_a_string(self):
         self.yaml["previewConfig"]["route"]["host"]["template"] = []
         self.assert_load_error("Item 'previewConfig.route.host.template' should be a string in GitOps config!")
 

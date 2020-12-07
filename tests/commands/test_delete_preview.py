@@ -2,9 +2,9 @@ import os
 import shutil
 import unittest
 import logging
-from types import SimpleNamespace
-from unittest.mock import call
+from unittest.mock import call, PropertyMock
 import pytest
+from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.git import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.delete_preview import DeletePreviewCommand, load_gitops_config
@@ -25,8 +25,12 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         self.logging_mock.info.return_value = None
 
         self.load_gitops_config_mock = self.monkey_patch(load_gitops_config)
-        self.load_gitops_config_mock.return_value = SimpleNamespace(
-            team_config_org="TEAM_CONFIG_ORG", team_config_repo="TEAM_CONFIG_REPO", application_name="APP"
+        self.load_gitops_config_mock.return_value = GitOpsConfig(
+            application_name="APP",
+            team_config_org="TEAM_CONFIG_ORG",
+            team_config_repo="TEAM_CONFIG_REPO",
+            route_host_template="www.foo.bar",
+            replacements=[],
         )
 
         self.git_repo_api_mock = self.create_mock(GitRepoApi)
@@ -102,7 +106,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("APP-685912d3-preview"),
             call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
             call.logging.info(
-                "No preview environment for '%s' and preview id '%s'. Nothing to do..", "APP", "PREVIEW_ID"
+                "No preview environment for '%s' and preview id '%s'. I'm done here.", "APP", "PREVIEW_ID"
             ),
         ]
 

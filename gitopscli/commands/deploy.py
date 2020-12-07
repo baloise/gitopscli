@@ -41,7 +41,7 @@ class DeployCommand(Command):
 
             updated_values = self.__update_values(git_repo)
             if not updated_values:
-                logging.info("All values already up-to-date. I'm done here")
+                logging.info("All values already up-to-date. I'm done here.")
                 return
 
             git_repo.push(branch)
