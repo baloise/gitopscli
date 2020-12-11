@@ -3,7 +3,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.io.yaml_util import update_yaml_file, yaml_dump
+from gitopscli.io.yaml_util import update_yaml_file, yaml_dump, YAMLException
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
@@ -67,8 +67,10 @@ class DeployCommand(Command):
                 updated_value = update_yaml_file(full_file_path, key, value)
             except (FileNotFoundError, IsADirectoryError) as ex:
                 raise GitOpsException(f"No such file: {args.file}") from ex
+            except YAMLException as ex:
+                raise GitOpsException(f"Error loading file: {args.file}") from ex
             except KeyError as ex:
-                raise GitOpsException(f"Key '{key}' not found in {args.file}") from ex
+                raise GitOpsException(f"Key '{key}' not found in file: {args.file}") from ex
 
             if not updated_value:
                 logging.info("Yaml property %s already up-to-date", key)

@@ -9,6 +9,7 @@ from gitopscli.io.yaml_util import (
     yaml_file_dump,
     yaml_load,
     yaml_dump,
+    YAMLException,
     update_yaml_file,
     merge_yaml_element,
 )
@@ -43,10 +44,18 @@ class YamlUtilTest(unittest.TestCase):
 
     def test_yaml_file_load_file_not_found(self):
         try:
-            self.assertEqual(yaml_file_load("unknown"), {"answer": {"is": "42"}})
+            yaml_file_load("unknown")
             self.fail()
         except FileNotFoundError:
             pass
+
+    def test_yaml_file_load_yaml_exception(self):
+        path = self._create_file("{ INVALID YAML")
+        try:
+            yaml_file_load(path)
+            self.fail()
+        except YAMLException as ex:
+            self.assertEqual(f"Error parsing YAML file: {path}", str(ex))
 
     def test_yaml_file_dump(self):
         path = self._create_tmp_file_path()
@@ -74,6 +83,13 @@ class YamlUtilTest(unittest.TestCase):
         self.assertEqual(yaml_load("{answer: '42'}"), {"answer": "42"})
         self.assertEqual(yaml_load("{answer: 42}"), {"answer": 42})
         self.assertEqual(yaml_load("answer: 42"), {"answer": 42})
+
+    def test_yaml_load_yaml_exception(self):
+        try:
+            yaml_load("{ INVALID YAML")
+            self.fail()
+        except YAMLException as ex:
+            self.assertEqual("Error parsing YAML string '{ INVALID YAML'", str(ex))
 
     def test_yaml_dump(self):
         self.assertEqual(yaml_dump({"answer": "42"}), "answer: '42'")

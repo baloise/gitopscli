@@ -1180,6 +1180,37 @@ class CliParserTest(unittest.TestCase):
             "gitopscli add-pr-comment: error: argument --pr-id: invalid int value: 'INVALID_INT'", last_stderr_line
         )
 
+    def test_invalid_yaml(self):
+        exit_code, stdout, stderr = self._capture_parse_args(
+            [
+                "deploy",
+                "--git-provider",
+                "github",
+                "--username",
+                "x",
+                "--password",
+                "x",
+                "--organisation",
+                "x",
+                "--repository-name",
+                "x",
+                "--git-user",
+                "x",
+                "--git-email",
+                "x",
+                "--file",
+                "x",
+                "--values",
+                "{ INVALID YAML",
+            ]
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual("", stdout)
+        last_stderr_line = stderr.splitlines()[-1]
+        self.assertEqual(
+            "gitopscli deploy: error: argument --values: invalid YAML value: '{ INVALID YAML'", last_stderr_line,
+        )
+
     def test_invalid_git_provider(self):
         exit_code, stdout, stderr = self._capture_parse_args(
             [

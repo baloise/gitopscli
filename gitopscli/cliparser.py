@@ -13,7 +13,7 @@ from gitopscli.commands import (
     VersionCommand,
 )
 from gitopscli.git import GitProvider
-from gitopscli.io.yaml_util import yaml_load
+from gitopscli.io.yaml_util import yaml_load, YAMLException
 
 
 def parse_args(raw_args: List[str]) -> Tuple[bool, CommandArgs]:
@@ -69,7 +69,7 @@ def __create_deploy_parser() -> ArgumentParser:
     parser.add_argument(
         "--values",
         help="YAML/JSON object with the YAML path as key and the desired value as value",
-        type=yaml_load,
+        type=__parse_yaml,
         required=True,
     )
     parser.add_argument(
@@ -234,6 +234,13 @@ def __parse_bool(value: str) -> bool:
     if lowercase_value in ("no", "false", "f", "n", "0"):
         return False
     raise ArgumentTypeError(f"invalid bool value: '{value}'")
+
+
+def __parse_yaml(value: str) -> Any:
+    try:
+        return yaml_load(value)
+    except YAMLException as ex:
+        raise ArgumentTypeError(f"invalid YAML value: '{value}'") from ex
 
 
 def __parse_git_provider(value: str) -> GitProvider:

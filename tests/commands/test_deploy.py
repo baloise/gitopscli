@@ -7,7 +7,7 @@ import pytest
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.deploy import DeployCommand
 from gitopscli.git import GitRepoApi, GitProvider, GitRepoApiFactory, GitRepo
-from gitopscli.io.yaml_util import update_yaml_file
+from gitopscli.io.yaml_util import update_yaml_file, YAMLException
 from .mock_mixin import MockMixin
 
 
@@ -356,6 +356,37 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
         ]
 
+    def test_file_parse_error(self):
+        self.update_yaml_file_mock.side_effect = YAMLException
+
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo", "a.b.d": "bar"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+        )
+        with pytest.raises(GitOpsException) as ex:
+            DeployCommand(args).execute()
+        self.assertEqual(str(ex.value), "Error loading file: test/file.yml")
+
+        assert self.mock_manager.method_calls == [
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
+        ]
+
     def test_key_not_found(self):
         self.update_yaml_file_mock.side_effect = KeyError("dummy key error")
 
@@ -377,7 +408,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
-        self.assertEqual(str(ex.value), "Key 'a.b.c' not found in test/file.yml")
+        self.assertEqual(str(ex.value), "Key 'a.b.c' not found in file: test/file.yml")
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
