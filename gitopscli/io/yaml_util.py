@@ -1,14 +1,22 @@
 import re
 from io import StringIO
 from typing import Any
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, YAMLError
 
-ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
+
+_ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
+
+
+class YAMLException(Exception):
+    pass
 
 
 def yaml_file_load(file_path: str) -> Any:
     with open(file_path, "r") as stream:
-        return YAML().load(stream)
+        try:
+            return YAML().load(stream)
+        except YAMLError as ex:
+            raise YAMLException(f"Error parsing YAML file: {file_path}") from ex
 
 
 def yaml_file_dump(yaml: Any, file_path: str) -> None:
@@ -17,7 +25,10 @@ def yaml_file_dump(yaml: Any, file_path: str) -> None:
 
 
 def yaml_load(yaml_str: str) -> Any:
-    return YAML().load(yaml_str)
+    try:
+        return YAML().load(yaml_str)
+    except YAMLError as ex:
+        raise YAMLException(f"Error parsing YAML string '{yaml_str}'") from ex
 
 
 def yaml_dump(yaml: Any) -> str:
@@ -35,7 +46,7 @@ def update_yaml_file(file_path: str, key: str, value: Any) -> bool:
     for current_key_segment in key_segments:
         current_key_segments.append(current_key_segment)
         current_key = ".".join(current_key_segments)
-        is_array = ARRAY_KEY_SEGMENT_PATTERN.match(current_key_segment)
+        is_array = _ARRAY_KEY_SEGMENT_PATTERN.match(current_key_segment)
         if is_array:
             current_array_index = int(is_array.group(1))
             if not isinstance(parent_item, list) or current_array_index >= len(parent_item):

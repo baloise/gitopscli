@@ -4,7 +4,7 @@ import shutil
 from dataclasses import dataclass
 from typing import Any, Callable, Dict
 from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.io.yaml_util import update_yaml_file
+from gitopscli.io.yaml_util import update_yaml_file, YAMLException
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config
@@ -126,5 +126,9 @@ class CreatePreviewCommand(Command):
         full_file_path = git_repo.get_full_file_path(file_path)
         try:
             return update_yaml_file(full_file_path, key, value)
+        except (FileNotFoundError, IsADirectoryError) as ex:
+            raise GitOpsException(f"No such file: {file_path}") from ex
+        except YAMLException as ex:
+            raise GitOpsException(f"Error loading file: {file_path}") from ex
         except KeyError as ex:
-            raise GitOpsException(f"Key '{key}' not found in '{file_path}'") from ex
+            raise GitOpsException(f"Key '{key}' not found in file: {file_path}") from ex

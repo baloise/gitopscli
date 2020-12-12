@@ -3,7 +3,7 @@ import unittest
 import shutil
 import logging
 from unittest.mock import call, Mock
-from gitopscli.io.yaml_util import update_yaml_file
+from gitopscli.io.yaml_util import update_yaml_file, YAMLException
 from gitopscli.git import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
@@ -241,6 +241,56 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.os.path.isdir("/tmp/created-tmp-dir/.preview-templates/my-app"),
         ]
 
+    def test_create_preview_values_yaml_not_found(self):
+        self.update_yaml_file_mock.side_effect = FileNotFoundError()
+
+        try:
+            CreatePreviewCommand(ARGS).execute()
+            self.fail()
+        except GitOpsException as ex:
+            self.assertEqual("No such file: my-app-685912d3-preview/values.yaml", str(ex))
+
+        assert self.mock_manager.method_calls == [
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
+            call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
+            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
+            call.update_yaml_file(
+                "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
+                "image.tag",
+                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
+            ),
+        ]
+
+    def test_create_preview_values_yaml_parse_error(self):
+        self.update_yaml_file_mock.side_effect = YAMLException()
+
+        try:
+            CreatePreviewCommand(ARGS).execute()
+            self.fail()
+        except GitOpsException as ex:
+            self.assertEqual("Error loading file: my-app-685912d3-preview/values.yaml", str(ex))
+
+        assert self.mock_manager.method_calls == [
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.checkout("master"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
+            call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
+            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
+            call.update_yaml_file(
+                "/tmp/created-tmp-dir/my-app-685912d3-preview/values.yaml",
+                "image.tag",
+                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
+            ),
+        ]
+
     def test_create_preview_with_invalid_replacement_path(self):
         self.update_yaml_file_mock.side_effect = KeyError()
 
@@ -248,7 +298,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             CreatePreviewCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("Key 'image.tag' not found in 'my-app-685912d3-preview/values.yaml'", str(ex))
+            self.assertEqual("Key 'image.tag' not found in file: my-app-685912d3-preview/values.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
@@ -278,7 +328,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             CreatePreviewCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("Key 'name' not found in 'my-app-685912d3-preview/Chart.yaml'", str(ex))
+            self.assertEqual("Key 'name' not found in file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),

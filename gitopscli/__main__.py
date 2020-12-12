@@ -17,6 +17,7 @@ def main() -> None:
             logging.exception(ex)
         else:
             logging.error(ex)
+            logging.error("Provide verbose flag '-v' for more error details...")
         sys.exit(1)
 
 
