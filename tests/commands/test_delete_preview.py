@@ -46,7 +46,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.__enter__.return_value = self.git_repo_mock
         self.git_repo_mock.__exit__.return_value = False
         self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
-        self.git_repo_mock.checkout.return_value = None
+        self.git_repo_mock.clone.return_value = None
         self.git_repo_mock.commit.return_value = None
         self.git_repo_mock.push.return_value = None
 
@@ -70,7 +70,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(args, "ORGA", "REPO"),
             call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
             call.GitRepo.get_full_file_path("APP-685912d3-preview"),
             call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
@@ -78,7 +78,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.commit(
                 "GIT_USER", "GIT_EMAIL", "Delete preview environment for 'APP' and preview id 'PREVIEW_ID'."
             ),
-            call.GitRepo.push("master"),
+            call.GitRepo.push(),
         ]
 
     def test_delete_missing_happy_flow(self):
@@ -101,7 +101,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(args, "ORGA", "REPO"),
             call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
             call.GitRepo.get_full_file_path("APP-685912d3-preview"),
             call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
@@ -133,7 +133,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(args, "ORGA", "REPO"),
             call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
             call.GitRepo.get_full_file_path("APP-685912d3-preview"),
             call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),

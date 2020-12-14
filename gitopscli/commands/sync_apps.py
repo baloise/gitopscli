@@ -55,7 +55,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
     merge_yaml_element(apps_config_file, "applications", {repo_app: {} for repo_app in repo_apps})
-    __commit_and_push_to_master(team_config_git_repo, root_config_git_repo, git_user, git_email, apps_config_file_name)
+    __commit_and_push(team_config_git_repo, root_config_git_repo, git_user, git_email, apps_config_file_name)
 
 
 def __find_apps_config_from_repo(
@@ -100,16 +100,16 @@ def __get_applications_from_app_config(app_config: Any) -> Set[str]:
     return set(apps)
 
 
-def __commit_and_push_to_master(
+def __commit_and_push(
     team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str, app_file_name: str
 ) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
     root_config_git_repo.commit(git_user, git_email, f"{author} updated " + app_file_name)
-    root_config_git_repo.push("master")
+    root_config_git_repo.push()
 
 
 def __get_bootstrap_entries(root_config_git_repo: GitRepo) -> Any:
-    root_config_git_repo.checkout("master")
+    root_config_git_repo.clone()
     bootstrap_values_file = root_config_git_repo.get_full_file_path("bootstrap/values.yaml")
     try:
         bootstrap_yaml = yaml_file_load(bootstrap_values_file)
@@ -121,7 +121,7 @@ def __get_bootstrap_entries(root_config_git_repo: GitRepo) -> Any:
 
 
 def __get_repo_apps(team_config_git_repo: GitRepo) -> Set[str]:
-    team_config_git_repo.checkout("master")
+    team_config_git_repo.clone()
     repo_dir = team_config_git_repo.get_full_file_path(".")
     return {
         name

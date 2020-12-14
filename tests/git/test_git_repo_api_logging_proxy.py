@@ -55,6 +55,23 @@ class GitRepoApiLoggingProxyTest(unittest.TestCase):
         )
 
     @patch("gitopscli.git.git_repo_api_logging_proxy.logging")
+    def test_create_pull_request_to_default_branch(self, logging_mock):
+        expected_return_value = GitRepoApi.PullRequestIdAndUrl(42, "<url>")
+        self.__mock_repo_api.create_pull_request_to_default_branch.return_value = expected_return_value
+
+        actual_return_value = self.__testee.create_pull_request_to_default_branch(
+            from_branch="<from branch>", title="<title>", description="<description>"
+        )
+
+        self.assertEqual(actual_return_value, expected_return_value)
+        self.__mock_repo_api.create_pull_request_to_default_branch.assert_called_once_with(
+            "<from branch>", "<title>", "<description>"
+        )
+        logging_mock.info.assert_called_once_with(
+            "Creating pull request from '%s' to default branch with title: %s", "<from branch>", "<title>",
+        )
+
+    @patch("gitopscli.git.git_repo_api_logging_proxy.logging")
     def test_merge_pull_request(self, logging_mock):
         self.__testee.merge_pull_request(pr_id=42)
         self.__mock_repo_api.merge_pull_request.assert_called_once_with(42)

@@ -16,6 +16,12 @@ class GitRepoApiLoggingProxy(GitRepoApi):
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
 
+    def create_pull_request_to_default_branch(
+        self, from_branch: str, title: str, description: str
+    ) -> GitRepoApi.PullRequestIdAndUrl:
+        logging.info("Creating pull request from '%s' to default branch with title: %s", from_branch, title)
+        return self.__api.create_pull_request_to_default_branch(from_branch, title, description)
+
     def create_pull_request(
         self, from_branch: str, to_branch: str, title: str, description: str
     ) -> GitRepoApi.PullRequestIdAndUrl:

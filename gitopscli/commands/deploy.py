@@ -32,27 +32,26 @@ class DeployCommand(Command):
     def execute(self) -> None:
         git_repo_api = self.__create_git_repo_api()
         with GitRepo(git_repo_api) as git_repo:
-            branch = "master"
-            git_repo.checkout(branch)
+            git_repo.clone()
 
             if self.__args.create_pr:
-                branch = f"gitopscli-deploy-{str(uuid.uuid4())[:8]}"
-                git_repo.new_branch(branch)
+                pr_branch = f"gitopscli-deploy-{str(uuid.uuid4())[:8]}"
+                git_repo.new_branch(pr_branch)
 
             updated_values = self.__update_values(git_repo)
             if not updated_values:
                 logging.info("All values already up-to-date. I'm done here.")
                 return
 
-            git_repo.push(branch)
+            git_repo.push()
 
         if self.__args.create_pr:
             title, description = self.__create_pull_request_title_and_description(updated_values)
-            pr_id = git_repo_api.create_pull_request(branch, "master", title, description).pr_id
+            pr_id = git_repo_api.create_pull_request_to_default_branch(pr_branch, title, description).pr_id
 
             if self.__args.auto_merge:
                 git_repo_api.merge_pull_request(pr_id)
-                git_repo_api.delete_branch(branch)
+                git_repo_api.delete_branch(pr_branch)
 
     def __create_git_repo_api(self) -> GitRepoApi:
         return GitRepoApiFactory.create(self.__args, self.__args.organisation, self.__args.repository_name)

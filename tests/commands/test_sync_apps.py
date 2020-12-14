@@ -41,7 +41,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.team_config_git_repo_mock.__enter__.return_value = self.team_config_git_repo_mock
         self.team_config_git_repo_mock.__exit__.return_value = False
         self.team_config_git_repo_mock.get_clone_url.return_value = "https://team.config.repo.git"
-        self.team_config_git_repo_mock.checkout.return_value = None
+        self.team_config_git_repo_mock.clone.return_value = None
         self.team_config_git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/team-config-repo/{x}"
         self.team_config_git_repo_mock.get_author_from_last_commit.return_value = "author"
 
@@ -50,7 +50,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.root_config_git_repo_mock.__exit__.return_value = False
         self.root_config_git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/root-config-repo/{x}"
         self.root_config_git_repo_mock.get_clone_url.return_value = "https://root.config.repo.git"
-        self.root_config_git_repo_mock.checkout.return_value = None
+        self.root_config_git_repo_mock.clone.return_value = None
         self.root_config_git_repo_mock.commit.return_value = None
         self.root_config_git_repo_mock.push.return_value = None
 
@@ -97,14 +97,14 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Team config repository: %s", "https://team.config.repo.git"),
             call.GitRepo_root.get_clone_url(),
             call.logging.info("Root config repository: %s", "https://root.config.repo.git"),
-            call.GitRepo_team.checkout("master"),
+            call.GitRepo_team.clone(),
             call.GitRepo_team.get_full_file_path("."),
             call.os.listdir("/tmp/team-config-repo/."),
             call.os.path.join("/tmp/team-config-repo/.", "my-app"),
             call.os.path.isdir("/tmp/team-config-repo/./my-app"),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
             call.logging.info("Searching apps repository in root repository's 'apps/' directory..."),
-            call.GitRepo_root.checkout("master"),
+            call.GitRepo_root.clone(),
             call.GitRepo_root.get_full_file_path("bootstrap/values.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/bootstrap/values.yaml"),
             call.GitRepo_team.get_clone_url(),
@@ -119,7 +119,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.merge_yaml_element("/tmp/root-config-repo/apps/team-non-prod.yaml", "applications", {"my-app": {}}),
             call.GitRepo_team.get_author_from_last_commit(),
             call.GitRepo_root.commit("GIT_USER", "GIT_EMAIL", "author updated apps/team-non-prod.yaml"),
-            call.GitRepo_root.push("master"),
+            call.GitRepo_root.push(),
         ]
 
     def test_sync_apps_already_up_to_date(self):
@@ -147,14 +147,14 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Team config repository: %s", "https://team.config.repo.git"),
             call.GitRepo_root.get_clone_url(),
             call.logging.info("Root config repository: %s", "https://root.config.repo.git"),
-            call.GitRepo_team.checkout("master"),
+            call.GitRepo_team.clone(),
             call.GitRepo_team.get_full_file_path("."),
             call.os.listdir("/tmp/team-config-repo/."),
             call.os.path.join("/tmp/team-config-repo/.", "my-app"),
             call.os.path.isdir("/tmp/team-config-repo/./my-app"),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
             call.logging.info("Searching apps repository in root repository's 'apps/' directory..."),
-            call.GitRepo_root.checkout("master"),
+            call.GitRepo_root.clone(),
             call.GitRepo_root.get_full_file_path("bootstrap/values.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/bootstrap/values.yaml"),
             call.GitRepo_team.get_clone_url(),

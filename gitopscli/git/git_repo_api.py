@@ -20,6 +20,12 @@ class GitRepoApi(metaclass=ABCMeta):
         ...
 
     @abstractmethod
+    def create_pull_request_to_default_branch(
+        self, from_branch: str, title: str, description: str
+    ) -> "PullRequestIdAndUrl":
+        ...
+
+    @abstractmethod
     def create_pull_request(
         self, from_branch: str, to_branch: str, title: str, description: str
     ) -> "PullRequestIdAndUrl":

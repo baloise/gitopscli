@@ -51,6 +51,12 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException("Couldn't determine repository URL.")
         return str(repo_url)
 
+    def create_pull_request_to_default_branch(
+        self, from_branch: str, title: str, description: str
+    ) -> GitRepoApi.PullRequestIdAndUrl:
+        to_branch = self.__get_default_branch()
+        return self.create_pull_request(from_branch, to_branch, title, description)
+
     def create_pull_request(
         self, from_branch: str, to_branch: str, title: str, description: str
     ) -> GitRepoApi.PullRequestIdAndUrl:
@@ -98,3 +104,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         if "errors" in pull_request:
             raise GitOpsException(pull_request["errors"][0]["message"])
         return str(pull_request["fromRef"]["displayId"])
+
+    def __get_default_branch(self) -> str:
+        default_branch = self.__bitbucket.get_default_branch(self.__organisation, self.__repository_name)
+        return str(default_branch["id"])
