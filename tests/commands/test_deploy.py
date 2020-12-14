@@ -25,7 +25,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         self.uuid_mock.uuid4.return_value = UUID("b973b5bb-64a6-4735-a840-3113d531b41c")
 
         self.git_repo_api_mock = self.create_mock(GitRepoApi)
-        self.git_repo_api_mock.create_pull_request.return_value = GitRepoApi.PullRequestIdAndUrl(
+        self.git_repo_api_mock.create_pull_request_to_default_branch.return_value = GitRepoApi.PullRequestIdAndUrl(
             42, "<url of dummy pr>"
         )
         self.git_repo_api_mock.merge_pull_request.return_value = None
@@ -38,7 +38,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.return_value = self.git_repo_mock
         self.git_repo_mock.__enter__.return_value = self.git_repo_mock
         self.git_repo_mock.__exit__.return_value = False
-        self.git_repo_mock.checkout.return_value = None
+        self.git_repo_mock.clone.return_value = None
         self.git_repo_mock.new_branch.return_value = None
         self.git_repo_mock.commit.return_value = None
         self.git_repo_mock.push.return_value = None
@@ -68,7 +68,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
@@ -76,7 +76,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.d' to 'bar' in test/file.yml"),
-            call.GitRepo.push("master"),
+            call.GitRepo.push(),
         ]
 
     def test_create_pr_single_value_change_happy_flow(self):
@@ -101,17 +101,16 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
-            call.GitRepo.push("gitopscli-deploy-b973b5bb"),
-            call.GitRepoApi.create_pull_request(
+            call.GitRepo.push(),
+            call.GitRepoApi.create_pull_request_to_default_branch(
                 "gitopscli-deploy-b973b5bb",
-                "master",
                 "Updated value in test/file.yml",
                 "Updated 1 value in `test/file.yml`:\n```yaml\na.b.c: foo\n```\n",
             ),
@@ -139,7 +138,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
@@ -149,10 +148,9 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.d' to 'bar' in test/file.yml"),
-            call.GitRepo.push("gitopscli-deploy-b973b5bb"),
-            call.GitRepoApi.create_pull_request(
+            call.GitRepo.push(),
+            call.GitRepoApi.create_pull_request_to_default_branch(
                 "gitopscli-deploy-b973b5bb",
-                "master",
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
@@ -180,7 +178,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.uuid.uuid4(),
             call.GitRepo.new_branch("gitopscli-deploy-b973b5bb"),
             call.GitRepo.get_full_file_path("test/file.yml"),
@@ -190,10 +188,9 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.d' to 'bar' in test/file.yml"),
-            call.GitRepo.push("gitopscli-deploy-b973b5bb"),
-            call.GitRepoApi.create_pull_request(
+            call.GitRepo.push(),
+            call.GitRepoApi.create_pull_request_to_default_branch(
                 "gitopscli-deploy-b973b5bb",
-                "master",
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
@@ -223,14 +220,14 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "updated 2 values in test/file.yml\n\na.b.c: foo\na.b.d: bar"),
-            call.GitRepo.push("master"),
+            call.GitRepo.push(),
         ]
 
     def test_single_commit_single_value_change_happy_flow(self):
@@ -255,12 +252,12 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "changed 'a.b.c' to 'foo' in test/file.yml"),
-            call.GitRepo.push("master"),
+            call.GitRepo.push(),
         ]
 
     def test_commit_message_multiple_value_changes_happy_flow(self):
@@ -285,19 +282,19 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "testcommit"),
-            call.GitRepo.push("master"),
+            call.GitRepo.push(),
         ]
 
-    def test_checkout_error(self):
-        checkout_exception = GitOpsException("dummy checkout error")
-        self.git_repo_mock.checkout.side_effect = checkout_exception
+    def test_clone_error(self):
+        clone_exception = GitOpsException("dummy clone error")
+        self.git_repo_mock.clone.side_effect = clone_exception
 
         args = DeployCommand.Args(
             file="test/file.yml",
@@ -317,12 +314,12 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
-        self.assertEqual(ex.value, checkout_exception)
+        self.assertEqual(ex.value, clone_exception)
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
         ]
 
     def test_file_not_found(self):
@@ -351,7 +348,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
         ]
@@ -382,7 +379,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
         ]
@@ -413,7 +410,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
         ]
@@ -442,7 +439,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("test/file.yml"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Yaml property %s already up-to-date", "a.b.c"),

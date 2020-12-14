@@ -36,7 +36,7 @@ class GitRepo:
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
 
-    def checkout(self, branch: str) -> None:
+    def clone(self) -> None:
         self.__delete_tmp_dir()
         self.__tmp_dir = create_tmp_dir()
         git_options = []
@@ -51,12 +51,6 @@ class GitRepo:
             self.__repo = Repo.clone_from(url=url, to_path=f"{self.__tmp_dir}/repo", multi_options=git_options)
         except GitError as ex:
             raise GitOpsException(f"Error cloning '{url}'") from ex
-
-        logging.info("Checking out branch: %s", branch)
-        try:
-            self.__repo.git.checkout(branch)
-        except GitError as ex:
-            raise GitOpsException(f"Error checking out branch '{branch}'") from ex
 
     def new_branch(self, branch: str) -> None:
         logging.info("Creating new branch: %s", branch)
@@ -78,9 +72,11 @@ class GitRepo:
         except GitError as ex:
             raise GitOpsException(f"Error creating commit.") from ex
 
-    def push(self, branch: str) -> None:
-        logging.info("Pushing branch: %s", branch)
+    def push(self, branch: Optional[str] = None) -> None:
         repo = self.__get_repo()
+        if not branch:
+            branch = repo.git.branch("--show-current")
+        logging.info("Pushing branch: %s", branch)
         try:
             repo.git.push("--set-upstream", "origin", branch)
         except GitCommandError as ex:

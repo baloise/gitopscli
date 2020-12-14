@@ -23,12 +23,18 @@ class GithubGitRepoApiAdapter(GitRepoApi):
     def get_clone_url(self) -> str:
         return self.__get_repo().clone_url
 
+    def create_pull_request_to_default_branch(
+        self, from_branch: str, title: str, description: str
+    ) -> GitRepoApi.PullRequestIdAndUrl:
+        to_branch = self.__get_repo().default_branch
+        return self.create_pull_request(from_branch, to_branch, title, description)
+
     def create_pull_request(
         self, from_branch: str, to_branch: str, title: str, description: str
     ) -> GitRepoApi.PullRequestIdAndUrl:
         repo = self.__get_repo()
         pull_request = repo.create_pull(title=title, body=description, head=from_branch, base=to_branch)
-        return GitRepoApi.PullRequestIdAndUrl(pr_id=pull_request.id, url=pull_request.html_url)
+        return GitRepoApi.PullRequestIdAndUrl(pr_id=pull_request.number, url=pull_request.html_url)
 
     def merge_pull_request(self, pr_id: int) -> None:
         pull_request = self.__get_pull_request(pr_id)

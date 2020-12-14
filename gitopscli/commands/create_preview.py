@@ -45,7 +45,7 @@ class CreatePreviewCommand(Command):
 
         team_config_git_repo_api = self.__create_team_config_git_repo_api(gitops_config)
         with GitRepo(team_config_git_repo_api) as team_config_git_repo:
-            team_config_git_repo.checkout("master")
+            team_config_git_repo.clone()
 
             created_new_preview = self.__create_preview_from_template_if_not_existing(
                 team_config_git_repo, gitops_config
@@ -58,7 +58,7 @@ class CreatePreviewCommand(Command):
                 logging.info("The preview is already up-to-date. I'm done here.")
                 return
 
-            self.__commit_and_push_to_master(
+            self.__commit_and_push(
                 team_config_git_repo,
                 f"{'Create new' if created_new_preview else 'Update'} preview environment for "
                 f"'{gitops_config.application_name}' and git hash '{self.__args.git_hash}'.",
@@ -69,9 +69,9 @@ class CreatePreviewCommand(Command):
         else:
             self.__deployment_updated_callback(route_host)
 
-    def __commit_and_push_to_master(self, git_repo: GitRepo, message: str) -> None:
+    def __commit_and_push(self, git_repo: GitRepo, message: str) -> None:
         git_repo.commit(self.__args.git_user, self.__args.git_email, message)
-        git_repo.push("master")
+        git_repo.push()
 
     def __get_gitops_config(self) -> GitOpsConfig:
         return load_gitops_config(self.__args, self.__args.organisation, self.__args.repository_name)

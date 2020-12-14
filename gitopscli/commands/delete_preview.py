@@ -30,7 +30,7 @@ class DeletePreviewCommand(Command):
 
         team_config_git_repo_api = self.__create_team_config_git_repo_api(gitops_config)
         with GitRepo(team_config_git_repo_api) as team_config_git_repo:
-            team_config_git_repo.checkout("master")
+            team_config_git_repo.clone()
 
             preview_namespace = gitops_config.get_preview_namespace(preview_id)
             logging.info("Preview folder name: %s", preview_namespace)
@@ -46,7 +46,7 @@ class DeletePreviewCommand(Command):
                 )
                 return
 
-            self.__commit_and_push_to_master(
+            self.__commit_and_push(
                 team_config_git_repo,
                 f"Delete preview environment for '{gitops_config.application_name}' and preview id '{preview_id}'.",
             )
@@ -57,9 +57,9 @@ class DeletePreviewCommand(Command):
     def __create_team_config_git_repo_api(self, gitops_config: GitOpsConfig) -> GitRepoApi:
         return GitRepoApiFactory.create(self.__args, gitops_config.team_config_org, gitops_config.team_config_repo)
 
-    def __commit_and_push_to_master(self, git_repo: GitRepo, message: str) -> None:
+    def __commit_and_push(self, git_repo: GitRepo, message: str) -> None:
         git_repo.commit(self.__args.git_user, self.__args.git_email, message)
-        git_repo.push("master")
+        git_repo.push()
 
     @staticmethod
     def __delete_folder_if_exists(git_repo: GitRepo, folder_name: str) -> bool:

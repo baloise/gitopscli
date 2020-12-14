@@ -32,7 +32,7 @@ class GitOpsConfigLoaderTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.return_value = self.git_repo_mock
         self.git_repo_mock.__enter__.return_value = self.git_repo_mock
         self.git_repo_mock.__exit__.return_value = False
-        self.git_repo_mock.checkout.return_value = None
+        self.git_repo_mock.clone.return_value = None
         self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/repo-dir/{x}"
 
         self.seal_mocks()
@@ -47,7 +47,7 @@ class GitOpsConfigLoaderTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self.git_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path(".gitops.config.yaml"),
             call.yaml_file_load("/repo-dir/.gitops.config.yaml"),
             call.GitOpsConfig.from_yaml({"dummy": "gitopsconfig"}),
@@ -64,7 +64,7 @@ class GitOpsConfigLoaderTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(self.git_api_config, "ORGA", "REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path(".gitops.config.yaml"),
             call.yaml_file_load("/repo-dir/.gitops.config.yaml"),
         ]

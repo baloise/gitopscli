@@ -64,7 +64,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.__enter__.return_value = self.git_repo_mock
         self.git_repo_mock.__exit__.return_value = False
         self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
-        self.git_repo_mock.checkout.return_value = None
+        self.git_repo_mock.clone.return_value = None
         self.git_repo_mock.commit.return_value = None
         self.git_repo_mock.push.return_value = None
 
@@ -92,7 +92,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
@@ -125,7 +125,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "GIT_EMAIL",
                 "Create new preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
-            call.GitRepo.push("master"),
+            call.GitRepo.push(),
         ]
 
     def test_update_existing_preview(self):
@@ -149,7 +149,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
@@ -172,7 +172,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "GIT_EMAIL",
                 "Update preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
-            call.GitRepo.push("master"),
+            call.GitRepo.push(),
         ]
 
     def test_preview_already_up_to_date(self):
@@ -198,7 +198,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
@@ -233,7 +233,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
@@ -254,7 +254,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
@@ -279,7 +279,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
@@ -304,7 +304,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
@@ -334,7 +334,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.checkout("master"),
+            call.GitRepo.clone(),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/created-tmp-dir/my-app-685912d3-preview"),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),

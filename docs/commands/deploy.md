@@ -18,7 +18,7 @@ backend:
     value: foo # <- and even one in a list
 ```
 
-With the following command GitOps CLI will update both values to `1.1.0` on the `master` branch.
+With the following command GitOps CLI will update both values to `1.1.0` on the default branch.
 
 ```bash
 gitopscli deploy \
