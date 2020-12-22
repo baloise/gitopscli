@@ -13,7 +13,7 @@ from gitopscli.commands import (
     VersionCommand,
 )
 from gitopscli.git_api import GitProvider
-from gitopscli.io.yaml_util import yaml_load, YAMLException
+from gitopscli.io_api.yaml_util import yaml_load, YAMLException
 
 
 def parse_args(raw_args: List[str]) -> Tuple[bool, CommandArgs]:

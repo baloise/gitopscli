@@ -3,7 +3,7 @@ import unittest
 import shutil
 import logging
 from unittest.mock import call, Mock
-from gitopscli.io.yaml_util import update_yaml_file, YAMLException
+from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException
 from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException

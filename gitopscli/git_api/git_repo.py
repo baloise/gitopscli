@@ -4,7 +4,7 @@ from types import TracebackType
 from typing import Optional, Type, Literal
 from git import Repo, GitError, GitCommandError
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
+from gitopscli.io_api.tmp_dir import create_tmp_dir, delete_tmp_dir
 from .git_repo_api import GitRepoApi
 
 

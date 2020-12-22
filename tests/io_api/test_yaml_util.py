@@ -4,7 +4,7 @@ import unittest
 import uuid
 import pytest
 
-from gitopscli.io.yaml_util import (
+from gitopscli.io_api.yaml_util import (
     yaml_file_load,
     yaml_file_dump,
     yaml_load,
