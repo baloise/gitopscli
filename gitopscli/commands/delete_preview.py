@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 from dataclasses import dataclass
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory, GitRepoApi
+from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory, GitRepoApi
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config

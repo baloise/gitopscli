@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from gitopscli.git import GitApiConfig
+from gitopscli.git_api import GitApiConfig
 from .delete_preview import DeletePreviewCommand
 from .command import Command
 

@@ -2,7 +2,7 @@ import logging
 import os
 import unittest
 from unittest.mock import call
-from gitopscli.git import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
+from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.commands.sync_apps import SyncAppsCommand
 from gitopscli.io.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException

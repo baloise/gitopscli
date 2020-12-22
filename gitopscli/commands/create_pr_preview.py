@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
-from gitopscli.git import GitApiConfig, GitRepoApiFactory
+from gitopscli.git_api import GitApiConfig, GitRepoApiFactory
 from .create_preview import CreatePreviewCommand
 from .command import Command
 

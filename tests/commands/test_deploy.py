@@ -6,7 +6,7 @@ from unittest.mock import call
 import pytest
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.deploy import DeployCommand
-from gitopscli.git import GitRepoApi, GitProvider, GitRepoApiFactory, GitRepo
+from gitopscli.git_api import GitRepoApi, GitProvider, GitRepoApiFactory, GitRepo
 from gitopscli.io.yaml_util import update_yaml_file, YAMLException
 from .mock_mixin import MockMixin
 

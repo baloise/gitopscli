@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import call
-from gitopscli.git import GitProvider, GitRepoApi, GitRepoApiFactory
+from gitopscli.git_api import GitProvider, GitRepoApi, GitRepoApiFactory
 from gitopscli.commands.create_pr_preview import CreatePrPreviewCommand, CreatePreviewCommand
 from .mock_mixin import MockMixin
 

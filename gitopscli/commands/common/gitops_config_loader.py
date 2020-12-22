@@ -1,4 +1,4 @@
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
+from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io.yaml_util import yaml_file_load

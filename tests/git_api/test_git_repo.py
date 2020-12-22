@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 from git import Repo
 import pytest
 
-from gitopscli.git import GitRepo, GitRepoApi
+from gitopscli.git_api import GitRepo, GitRepoApi
 from gitopscli.gitops_exception import GitOpsException
 
 
@@ -77,7 +77,7 @@ class GitRepoTest(unittest.TestCase):
         testee.__exit__(None, None, None)
         self.assertFalse(path.exists(tmp_dir))
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_clone_without_credentials(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -88,7 +88,7 @@ class GitRepoTest(unittest.TestCase):
             self.assertFalse(path.exists(testee.get_full_file_path("../credentials.sh")))
         logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_clone_with_credentials(self, logging_mock):
         self.__mock_repo_api.get_username.return_value = "User"
         self.__mock_repo_api.get_password.return_value = "Pass"
@@ -106,7 +106,7 @@ echo password=Pass
             )
         logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_clone_unknown_url(self, logging_mock):
         self.__mock_repo_api.get_clone_url.return_value = "invalid_url"
         with GitRepo(self.__mock_repo_api) as testee:
@@ -120,7 +120,7 @@ echo password=Pass
             testee.clone()
             self.assertRegex(testee.get_full_file_path("foo.bar"), r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_new_branch(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -133,7 +133,7 @@ echo password=Pass
             self.assertIn("foo", branches)
         logging_mock.info.assert_called_once_with("Creating new branch: %s", "foo")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_new_branch_name_collision(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -144,7 +144,7 @@ echo password=Pass
             self.assertEqual("Error creating new branch 'master'.", str(ex.value))
         logging_mock.info.assert_called_once_with("Creating new branch: %s", "master")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_commit(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -166,7 +166,7 @@ echo password=Pass
             self.assertIn("README.md", commits[0].stats.files)
         logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_commit_nothing_to_commit(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -180,7 +180,7 @@ echo password=Pass
             self.assertEqual("initial commit\n", commits[0].message)
         logging_mock.assert_not_called()
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_push(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -201,7 +201,7 @@ echo password=Pass
             self.assertEqual("new commit\n", commits[0].message)
         logging_mock.info.assert_called_once_with("Pushing branch: %s", "master")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_push_no_changes(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -210,7 +210,7 @@ echo password=Pass
             testee.push("master")
         logging_mock.info.assert_called_once_with("Pushing branch: %s", "master")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_push_current_branch(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -220,7 +220,7 @@ echo password=Pass
             testee.push()  # current branch
         logging_mock.info.assert_called_once_with("Pushing branch: %s", "foo")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_push_unknown_branch(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -231,7 +231,7 @@ echo password=Pass
             assert str(ex.value).startswith("Error pushing branch 'unknown' to origin")
         logging_mock.info.assert_called_once_with("Pushing branch: %s", "unknown")
 
-    @patch("gitopscli.git.git_repo.logging")
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_push_commit_hook_error_reason_is_shown(self, logging_mock):
         repo_dir = self.__origin.working_dir
         with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:

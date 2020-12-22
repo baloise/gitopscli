@@ -2,12 +2,12 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.git import GitRepoApiFactory, GitApiConfig, GitProvider
+from gitopscli.git_api import GitRepoApiFactory, GitApiConfig, GitProvider
 
 
 class GitRepoApiFactoryTest(unittest.TestCase):
-    @patch("gitopscli.git.git_repo_api_factory.GitRepoApiLoggingProxy")
-    @patch("gitopscli.git.git_repo_api_factory.GithubGitRepoApiAdapter")
+    @patch("gitopscli.git_api.git_repo_api_factory.GitRepoApiLoggingProxy")
+    @patch("gitopscli.git_api.git_repo_api_factory.GithubGitRepoApiAdapter")
     def test_create_github(self, mock_github_adapter_constructor, mock_logging_proxy_constructor):
         mock_github_adapter = MagicMock()
         mock_github_adapter_constructor.return_value = mock_github_adapter
@@ -30,8 +30,8 @@ class GitRepoApiFactoryTest(unittest.TestCase):
         )
         mock_logging_proxy_constructor.assert_called_with(mock_github_adapter)
 
-    @patch("gitopscli.git.git_repo_api_factory.GitRepoApiLoggingProxy")
-    @patch("gitopscli.git.git_repo_api_factory.BitbucketGitRepoApiAdapter")
+    @patch("gitopscli.git_api.git_repo_api_factory.GitRepoApiLoggingProxy")
+    @patch("gitopscli.git_api.git_repo_api_factory.BitbucketGitRepoApiAdapter")
     def test_create_bitbucket(self, mock_bitbucket_adapter_constructor, mock_logging_proxy_constructor):
         mock_bitbucket_adapter = MagicMock()
         mock_bitbucket_adapter_constructor.return_value = mock_bitbucket_adapter
