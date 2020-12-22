@@ -12,7 +12,7 @@ from gitopscli.commands import (
     DeletePrPreviewCommand,
     VersionCommand,
 )
-from gitopscli.git import GitProvider
+from gitopscli.git_api import GitProvider
 from gitopscli.io.yaml_util import yaml_load, YAMLException
 
 

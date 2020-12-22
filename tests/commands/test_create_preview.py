@@ -4,7 +4,7 @@ import shutil
 import logging
 from unittest.mock import call, Mock
 from gitopscli.io.yaml_util import update_yaml_file, YAMLException
-from gitopscli.git import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
+from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.create_preview import CreatePreviewCommand, load_gitops_config

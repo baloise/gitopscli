@@ -5,7 +5,7 @@ import logging
 from unittest.mock import call, PropertyMock
 import pytest
 from gitopscli.gitops_config import GitOpsConfig
-from gitopscli.git import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
+from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.delete_preview import DeletePreviewCommand, load_gitops_config
 from .mock_mixin import MockMixin

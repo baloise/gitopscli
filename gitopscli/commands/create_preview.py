@@ -3,7 +3,7 @@ import os
 import shutil
 from dataclasses import dataclass
 from typing import Any, Callable, Dict
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
+from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io.yaml_util import update_yaml_file, YAMLException
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException

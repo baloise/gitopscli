@@ -16,7 +16,7 @@ from gitopscli.commands import (
     VersionCommand,
 )
 from gitopscli.cliparser import parse_args
-from gitopscli.git import GitProvider
+from gitopscli.git_api import GitProvider
 
 EXPECTED_GITOPSCLI_HELP = """\
 usage: gitopscli [-h]

@@ -1,5 +1,5 @@
 import unittest
-from gitopscli.git import GitProvider
+from gitopscli.git_api import GitProvider
 from gitopscli.commands.delete_pr_preview import DeletePrPreviewCommand, DeletePreviewCommand
 from .mock_mixin import MockMixin
 

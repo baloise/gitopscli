@@ -2,7 +2,7 @@ import logging
 import os
 from dataclasses import dataclass
 from typing import Any, Set, Tuple
-from gitopscli.git import GitApiConfig, GitRepo, GitRepoApiFactory
+from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
