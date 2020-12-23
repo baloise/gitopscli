@@ -3,7 +3,7 @@ import shutil
 import unittest
 import uuid
 
-from gitopscli.io.tmp_dir import create_tmp_dir, delete_tmp_dir
+from gitopscli.io_api.tmp_dir import create_tmp_dir, delete_tmp_dir
 
 
 class TmpDirTest(unittest.TestCase):

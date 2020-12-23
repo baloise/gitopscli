@@ -1,7 +1,7 @@
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.io.yaml_util import yaml_file_load
+from gitopscli.io_api.yaml_util import yaml_file_load
 
 
 def load_gitops_config(git_api_config: GitApiConfig, organisation: str, repository_name: str) -> GitOpsConfig:

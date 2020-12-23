@@ -3,7 +3,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.io.yaml_util import update_yaml_file, yaml_dump, YAMLException
+from gitopscli.io_api.yaml_util import update_yaml_file, yaml_dump, YAMLException
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
