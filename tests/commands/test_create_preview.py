@@ -3,7 +3,7 @@ import unittest
 import shutil
 import logging
 from unittest.mock import call, Mock
-from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException
+from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException, yaml_file_dump
 from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
@@ -25,6 +25,13 @@ ARGS = CreatePreviewCommand.Args(
     git_hash=DUMMY_GIT_HASH,
 )
 
+INFO_YAML = {
+    "previewId": "PREVIEW_ID",
+    "previewIdHash": "685912d3",
+    "routeHost": "app.xy-685912d3.example.tld",
+    "namespace": "my-app-685912d3-preview",
+}
+
 
 class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
@@ -41,6 +48,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         self.update_yaml_file_mock = self.monkey_patch(update_yaml_file)
         self.update_yaml_file_mock.return_value = True
+
+        self.yaml_file_dump_mock = self.monkey_patch(yaml_file_dump)
+        self.yaml_file_dump_mock.return_value = None
 
         self.load_gitops_config_mock = self.monkey_patch(load_gitops_config)
         self.load_gitops_config_mock.return_value = GitOpsConfig(
@@ -90,6 +100,15 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(
+                {
+                    "previewId": "PREVIEW_ID",
+                    "previewIdHash": "685912d3",
+                    "routeHost": "app.xy-685912d3.example.tld",
+                    "namespace": "my-app-685912d3-preview",
+                },
+                "/tmp/gitopscli-preview-info.yaml",
+            ),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
@@ -147,6 +166,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
@@ -196,6 +216,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
@@ -231,6 +252,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
@@ -252,6 +274,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
@@ -277,6 +300,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
@@ -302,6 +326,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
@@ -332,6 +357,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
             call.GitRepoApiFactory.create(ARGS, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO",),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
