@@ -122,7 +122,7 @@ class CreatePreviewCommand(Command):
                 logging.info("Keep property '%s' value: %s", replacement.path, replacement_value)
         return any_value_replaced
 
-    def __create_preview_info_file(self, gitops_config: GitOpsConfig):
+    def __create_preview_info_file(self, gitops_config: GitOpsConfig) -> None:
         preview_id = self.__args.preview_id
         yaml_file_dump(
             {
