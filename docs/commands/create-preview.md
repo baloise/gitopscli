@@ -58,6 +58,17 @@ previewConfig:
       variable: ROUTE_HOST # this is the resolved host.template from above
 ```
 
+## Returned Information
+
+After running this command you'll find a YAML file at `/tmp/gitopscli-preview-info.yaml`. It contains generated information about your preview environment:
+
+```yaml
+previewId: PREVIEW_ID
+previewIdHash: 685912d3
+routeHost: app.xy-685912d3.example.tld
+namespace: my-app-685912d3-preview
+```
+
 ## Example
 
 ```bash

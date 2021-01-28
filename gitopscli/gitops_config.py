@@ -37,15 +37,15 @@ class GitOpsConfig:
             assert isinstance(replacement, self.Replacement), f"replacement[{index}] of wrong type!"
 
     def get_route_host(self, preview_id: str) -> str:
-        hashed_preview_id = self.__create_hashed_preview_id(preview_id)
+        hashed_preview_id = self.create_hashed_preview_id(preview_id)
         return self.route_host_template.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
 
     def get_preview_namespace(self, preview_id: str) -> str:
-        hashed_preview_id = self.__create_hashed_preview_id(preview_id)
+        hashed_preview_id = self.create_hashed_preview_id(preview_id)
         return f"{self.application_name}-{hashed_preview_id}-preview"
 
     @staticmethod
-    def __create_hashed_preview_id(preview_id: str) -> str:
+    def create_hashed_preview_id(preview_id: str) -> str:
         return hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
 
     @staticmethod

@@ -4,7 +4,7 @@ import shutil
 from dataclasses import dataclass
 from typing import Any, Callable, Dict
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException
+from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException, yaml_file_dump
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 from .common import load_gitops_config
@@ -41,6 +41,7 @@ class CreatePreviewCommand(Command):
 
     def execute(self,) -> None:
         gitops_config = self.__get_gitops_config()
+        self.__create_preview_info_file(gitops_config)
         route_host = gitops_config.get_route_host(self.__args.preview_id)
 
         team_config_git_repo_api = self.__create_team_config_git_repo_api(gitops_config)
@@ -120,6 +121,18 @@ class CreatePreviewCommand(Command):
             else:
                 logging.info("Keep property '%s' value: %s", replacement.path, replacement_value)
         return any_value_replaced
+
+    def __create_preview_info_file(self, gitops_config: GitOpsConfig) -> None:
+        preview_id = self.__args.preview_id
+        yaml_file_dump(
+            {
+                "previewId": preview_id,
+                "previewIdHash": gitops_config.create_hashed_preview_id(preview_id),
+                "routeHost": gitops_config.get_route_host(preview_id),
+                "namespace": gitops_config.get_preview_namespace(preview_id),
+            },
+            "/tmp/gitopscli-preview-info.yaml",
+        )
 
     @staticmethod
     def __update_yaml_file(git_repo: GitRepo, file_path: str, key: str, value: Any) -> bool:
