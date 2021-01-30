@@ -9,18 +9,23 @@ from .git_repo_api import GitRepoApi
 
 class GitlabGitRepoApiAdapter(GitRepoApi):
     def __init__(
-        self, git_provider_url: str, username: Optional[str], password: Optional[str], repository_name: str,
+        self,
+        git_provider_url: str,
+        username: Optional[str],
+        password: Optional[str],
+        organisation: str,
+        repository_name: str,
     ) -> None:
         try:
             self.__gitlab = gitlab.Gitlab(git_provider_url, private_token=password)
-            project = self.__gitlab.projects.get(id=repository_name)
+            project = self.__gitlab.projects.get(f"{organisation}/{repository_name}")
         except requests.exceptions.ConnectionError as ex:
             raise GitOpsException(f"Error connecting to '{git_provider_url}''") from ex
         except gitlab.exceptions.GitlabAuthenticationError as ex:
             raise GitOpsException("Bad Personal Access Token")
         except gitlab.exceptions.GitlabGetError as ex:
             if ex.response_code == 404:
-                raise GitOpsException(f"Repository with Project ID '{repository_name}' does not exist")
+                raise GitOpsException(f"Repository '{organisation}/{repository_name}' does not exist")
             raise GitOpsException(f"Error getting repository: '{ex.error_message}'")
 
         self.__token_name = username

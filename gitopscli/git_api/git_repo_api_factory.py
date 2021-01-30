@@ -38,6 +38,7 @@ class GitRepoApiFactory:
                 git_provider_url=provider_url,
                 username=config.username,
                 password=config.password,
+                organisation=organisation,
                 repository_name=repository_name,
             )
         return GitRepoApiLoggingProxy(git_repo_api)
