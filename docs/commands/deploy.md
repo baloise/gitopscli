@@ -30,7 +30,7 @@ gitopscli deploy \
   --organisation "deployment" \
   --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}"
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env.[0].value': bar}"
 ```
 
 ### Number Of Commits
@@ -88,7 +88,7 @@ gitopscli deploy \
   --repository-name "myapp-non-prod" \
   --commit-message "test commit message" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}"
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env.[0].value': bar}"
 ```
 
 This will end up in one single commit with your specified commit-message.
@@ -107,7 +107,7 @@ gitopscli deploy \
   --organisation "deployment" \
   --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}" \
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env.[0].value': bar}" \
   --create-pr \
   --auto-merge
 ```
