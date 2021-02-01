@@ -244,7 +244,7 @@ def __parse_yaml(value: str) -> Any:
 
 
 def __parse_git_provider(value: str) -> GitProvider:
-    mapping = {"github": GitProvider.GITHUB, "bitbucket-server": GitProvider.BITBUCKET}
+    mapping = {"github": GitProvider.GITHUB, "bitbucket-server": GitProvider.BITBUCKET, "gitlab": GitProvider.GITLAB}
     assert set(mapping.values()) == set(GitProvider), "git provider mapping not exhaustive"
     lowercase_stripped_value = value.lower().strip()
     if lowercase_stripped_value not in mapping:
@@ -270,6 +270,8 @@ def __deduce_empty_git_provider_from_git_provider_url(
         updated_args["git_provider"] = GitProvider.GITHUB
     elif "bitbucket" in git_provider_url.lower():
         updated_args["git_provider"] = GitProvider.BITBUCKET
+    elif "gitlab" in git_provider_url.lower():
+        updated_args["git_provider"] = GitProvider.GITLAB
     else:
         error("Cannot deduce git provider from --git-provider-url. Please provide --git-provider")
     return updated_args

@@ -31,7 +31,7 @@ docker run --rm -it baloise/gitopscli --help
 For detailed installation and usage instructions, visit [https://baloise.github.io/gitopscli/](https://baloise.github.io/gitopscli/).
 
 ## Git Provider Support
-Currently, we support both BitBucket Server and GitHub.
+Currently, we support BitBucket Server, GitHub and Gitlab.
 
 ## License
 [Apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
