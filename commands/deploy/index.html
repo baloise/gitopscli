@@ -639,7 +639,7 @@
   --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
   --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
   --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}&quot;</span>
+  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env.[0].value&#39;: bar}&quot;</span>
 </code></pre></div>
 
 <h3 id="number-of-commits">Number Of Commits<a class="headerlink" href="#number-of-commits" title="Permanent link">&para;</a></h3>
@@ -688,7 +688,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
   --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
   --commit-message <span class="s2">&quot;test commit message&quot;</span> <span class="se">\</span>
   --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}&quot;</span>
+  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env.[0].value&#39;: bar}&quot;</span>
 </code></pre></div>
 
 <p>This will end up in one single commit with your specified commit-message.</p>
@@ -703,7 +703,7 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
   --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
   --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
   --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, backend.env.[0].value: bar}&quot;</span> <span class="se">\</span>
+  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env.[0].value&#39;: bar}&quot;</span> <span class="se">\</span>
   --create-pr <span class="se">\</span>
   --auto-merge
 </code></pre></div>
