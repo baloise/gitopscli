@@ -69,9 +69,7 @@ gitopscli create-pr-preview \
   --git-email "gitopscli@baloise.dev" \
   --organisation "my-team" \
   --repository-name "app-xy" \
-  --pr-id 4711 \
-  --create-pr \
-  --auto-merge
+  --pr-id 4711
 ```
 
 ## Usage
