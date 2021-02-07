@@ -61,8 +61,10 @@ usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -114,8 +116,10 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -148,8 +152,10 @@ usage: gitopscli create-pr-preview [-h] --username USERNAME --password
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -207,8 +213,10 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -243,8 +251,10 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -299,8 +309,10 @@ optional arguments:
                         Create only single commit for all updates
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -346,8 +358,10 @@ usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -395,6 +409,17 @@ class CliParserTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.maxDiff = None
+
+    def setUp(self):
+        self.environ_backup = dict(os.environ)
+        if "GITOPSCLI_USERNAME" in os.environ:
+            os.environ.pop("GITOPSCLI_USERNAME")
+        if "GITOPSCLI_PASSWORD" in os.environ:
+            os.environ.pop("GITOPSCLI_PASSWORD")
+
+    def tearDown(self):
+        os.environ.clear()
+        os.environ.update(self.environ_backup)
 
     @staticmethod
     def _capture_parse_args(args):
@@ -465,6 +490,38 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
+        self.assertEqual(args.git_provider, GitProvider.GITHUB)
+        self.assertEqual(args.organisation, "ORG")
+        self.assertEqual(args.repository_name, "REPO")
+        self.assertEqual(args.pr_id, 4711)
+        self.assertEqual(args.text, "TEXT")
+
+        self.assertIsNone(args.parent_id)
+        self.assertIsNone(args.git_provider_url)
+        self.assertFalse(verbose)
+
+    def test_add_pr_comment_required_args_and_credentials_env_vars(self):
+        os.environ["GITOPSCLI_USERNAME"] = "ENV_USER"
+        os.environ["GITOPSCLI_PASSWORD"] = "ENV_PASS"
+        verbose, args = parse_args(
+            [
+                "add-pr-comment",
+                "--git-provider",
+                "GitHub",
+                "--organisation",
+                "ORG",
+                "--repository-name",
+                "REPO",
+                "--pr-id",
+                "4711",
+                "--text",
+                "TEXT",
+            ]
+        )
+        self.assertType(args, AddPrCommentCommand.Args)
+
+        self.assertEqual(args.username, "ENV_USER")
+        self.assertEqual(args.password, "ENV_PASS")
         self.assertEqual(args.git_provider, GitProvider.GITHUB)
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")

@@ -31,8 +31,10 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email

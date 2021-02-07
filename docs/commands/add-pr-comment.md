@@ -25,8 +25,10 @@ usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
 
 optional arguments:
   -h, --help            show this help message and exit
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME

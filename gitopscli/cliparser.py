@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, ArgumentTypeError
+import os
 import sys
 from typing import List, Tuple, Dict, Any, NoReturn, Callable
 from gitopscli.commands import (
@@ -179,8 +180,18 @@ def __create_version_parser() -> ArgumentParser:
 
 
 def __add_git_credentials_args(deploy_p: ArgumentParser) -> None:
-    deploy_p.add_argument("--username", help="Git username", required=True)
-    deploy_p.add_argument("--password", help="Git password or token", required=True)
+    deploy_p.add_argument(
+        "--username",
+        help="Git username (alternative: GITOPSCLI_USERNAME env variable)",
+        required="GITOPSCLI_USERNAME" not in os.environ,
+        default=os.environ.get("GITOPSCLI_USERNAME"),
+    )
+    deploy_p.add_argument(
+        "--password",
+        help="Git password or token (alternative: GITOPSCLI_PASSWORD env variable)",
+        required="GITOPSCLI_PASSWORD" not in os.environ,
+        default=os.environ.get("GITOPSCLI_PASSWORD"),
+    )
 
 
 def __add_git_commit_user_args(deploy_p: ArgumentParser) -> None:

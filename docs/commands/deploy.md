@@ -136,8 +136,10 @@ optional arguments:
                         desired value as value
   --single-commit [SINGLE_COMMIT]
                         Create only single commit for all updates
-  --username USERNAME   Git username
-  --password PASSWORD   Git password or token
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
