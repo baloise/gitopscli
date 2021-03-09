@@ -1,10 +1,14 @@
 from typing import Optional
+import logging
+import time
 import requests
 
 import gitlab
 from gitopscli.gitops_exception import GitOpsException
 
 from .git_repo_api import GitRepoApi
+
+MAX_MERGE_RETRIES = 5
 
 
 class GitlabGitRepoApiAdapter(GitRepoApi):
@@ -57,7 +61,20 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
 
     def merge_pull_request(self, pr_id: int) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
-        merge_request.merge()
+
+        max_retries = MAX_MERGE_RETRIES
+        while max_retries > 0:
+            try:
+                logging.info("(%s/%s) Trying to merge ...", (MAX_MERGE_RETRIES - max_retries) + 1, MAX_MERGE_RETRIES)
+                merge_request.merge()
+                return
+            except gitlab.exceptions.GitlabMRClosedError:
+                # "Branch cannot be merged" error can occur if the server
+                # is still processing the merge request internally"""
+                max_retries -= 1
+                time.sleep(2.5)
+
+        raise GitOpsException("Error merging pull request: 'Branch cannot be merged'")
 
     def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
