@@ -6,6 +6,9 @@ from ruamel.yaml import YAML, YAMLError
 
 _ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
 
+YAML_INSTANCE = YAML()
+YAML_INSTANCE.preserve_quotes = True  # type: ignore
+
 
 class YAMLException(Exception):
     pass
@@ -14,26 +17,26 @@ class YAMLException(Exception):
 def yaml_file_load(file_path: str) -> Any:
     with open(file_path, "r") as stream:
         try:
-            return YAML().load(stream)
+            return YAML_INSTANCE.load(stream)
         except YAMLError as ex:
             raise YAMLException(f"Error parsing YAML file: {file_path}") from ex
 
 
 def yaml_file_dump(yaml: Any, file_path: str) -> None:
     with open(file_path, "w+") as stream:
-        YAML().dump(yaml, stream)
+        YAML_INSTANCE.dump(yaml, stream)
 
 
 def yaml_load(yaml_str: str) -> Any:
     try:
-        return YAML().load(yaml_str)
+        return YAML_INSTANCE.load(yaml_str)
     except YAMLError as ex:
         raise YAMLException(f"Error parsing YAML string '{yaml_str}'") from ex
 
 
 def yaml_dump(yaml: Any) -> str:
     stream = StringIO()
-    YAML().dump(yaml, stream)
+    YAML_INSTANCE.dump(yaml, stream)
     return stream.getvalue().rstrip()
 
 
