@@ -111,6 +111,7 @@ a: # comment 1
   b:
     d: 1 # comment 3
     c: 2 # comment 4
+    e: "expect quotes are preserved"
   e:
   - f: 3 # comment 5
     g: 4 # comment 6
@@ -137,6 +138,7 @@ a: # comment 1
   b:
     d: 1 # comment 3
     c: '2' # comment 4
+    e: "expect quotes are preserved"
   e:
   - f: 3 # comment 5
     g: 42 # comment 6
