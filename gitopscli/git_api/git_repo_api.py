@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, Literal
 
 
 class GitRepoApi(metaclass=ABCMeta):
@@ -32,7 +32,7 @@ class GitRepoApi(metaclass=ABCMeta):
         ...
 
     @abstractmethod
-    def merge_pull_request(self, pr_id: int) -> None:
+    def merge_pull_request(self, pr_id: int, merge_method: Optional[Literal["squash", "rebase"]] = None) -> None:
         ...
 
     @abstractmethod
