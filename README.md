@@ -33,5 +33,29 @@ For detailed installation and usage instructions, visit [https://baloise.github.
 ## Git Provider Support
 Currently, we support BitBucket Server, GitHub and Gitlab.
 
+## Development
+
+### Setup
+
+```bash
+python3 -m venv venv  # create and activate virtual environment
+source venv/bin/activate  # enter virtual environment
+make init  # install dependencies and setup dev gitopscli
+deactivate  # leave virtual environment (after development)
+```
+
+### Commands
+```bash
+make format  # format code
+make format-check  # check formatting
+make lint  # run linter
+make mypy  # run type checks
+make test  # run unit tests
+make coverage  # run unit tests and create coverage report
+make checks  # run all checks (format-check + lint + mypy + test)
+make image  # build docker image
+make docs  # serves web docs
+```
+
 ## License
 [Apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
