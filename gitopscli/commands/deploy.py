@@ -25,7 +25,7 @@ class DeployCommand(Command):
 
         create_pr: bool
         auto_merge: bool
-        merge_method: Optional[Literal["squash", "rebase"]] = None
+        merge_method: Optional[Literal["squash", "rebase", "merge"]] = "merge"
 
     def __init__(self, args: Args) -> None:
         self.__args = args

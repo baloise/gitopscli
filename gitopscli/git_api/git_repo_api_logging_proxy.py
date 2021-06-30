@@ -28,7 +28,7 @@ class GitRepoApiLoggingProxy(GitRepoApi):
         logging.info("Creating pull request from '%s' to '%s' with title: %s", from_branch, to_branch, title)
         return self.__api.create_pull_request(from_branch, to_branch, title, description)
 
-    def merge_pull_request(self, pr_id: int, merge_method: Optional[Literal["squash", "rebase"]] = None) -> None:
+    def merge_pull_request(self, pr_id: int, merge_method: Optional[Literal["squash", "rebase", "merge"]] = "merge") -> None:
         logging.info("Merging pull request %s", pr_id)
         self.__api.merge_pull_request(pr_id, merge_method=merge_method)
 

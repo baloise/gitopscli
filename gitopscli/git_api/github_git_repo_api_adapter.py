@@ -37,7 +37,7 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         pull_request = repo.create_pull(title=title, body=description, head=from_branch, base=to_branch)
         return GitRepoApi.PullRequestIdAndUrl(pr_id=pull_request.number, url=pull_request.html_url)
 
-    def merge_pull_request(self, pr_id: int, merge_method: Optional[Literal["squash", "rebase"]] = None) -> None:
+    def merge_pull_request(self, pr_id: int, merge_method: Optional[Literal["squash", "rebase", "merge"]] = "merge") -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.merge(merge_method=merge_method)
 
