@@ -284,7 +284,7 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
-                        [-v [VERBOSE]]
+                        [--merge-method MERGE_METHOD] [-v [VERBOSE]]
 gitopscli deploy: error: the following arguments are required: --file, --values, --username, --password, --organisation, --repository-name
 """
 
@@ -298,7 +298,7 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
-                        [-v [VERBOSE]]
+                        [--merge-method MERGE_METHOD] [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -330,6 +330,9 @@ optional arguments:
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with
                         --create-pr)
+  --merge-method MERGE_METHOD
+                        Merge Method (e.g., 'squash', 'rebase', 'merge')
+                        (default: merge)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
@@ -1265,7 +1268,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual("", stdout)
         last_stderr_line = stderr.splitlines()[-1]
         self.assertEqual(
-            "gitopscli deploy: error: argument --values: invalid YAML value: '{ INVALID YAML'", last_stderr_line,
+            "gitopscli deploy: error: argument --values: invalid YAML value: '{ INVALID YAML'",
+            last_stderr_line,
         )
 
     def test_invalid_git_provider(self):

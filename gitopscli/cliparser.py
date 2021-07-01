@@ -44,7 +44,9 @@ def __create_parser() -> ArgumentParser:
         parents=[__create_sync_apps_parser()],
     )
     subparsers.add_parser(
-        "add-pr-comment", help="Create a comment on the pull request", parents=[__create_add_pr_comment_parser()],
+        "add-pr-comment",
+        help="Create a comment on the pull request",
+        parents=[__create_add_pr_comment_parser()],
     )
     subparsers.add_parser(
         "create-preview", help="Create a preview environment", parents=[__create_create_preview_parser()]
@@ -56,7 +58,9 @@ def __create_parser() -> ArgumentParser:
         "delete-preview", help="Delete a preview environment", parents=[__create_delete_preview_parser()]
     )
     subparsers.add_parser(
-        "delete-pr-preview", help="Delete a pr preview environment", parents=[__create_delete_pr_preview_parser()],
+        "delete-pr-preview",
+        help="Delete a pr preview environment",
+        parents=[__create_delete_pr_preview_parser()],
     )
     subparsers.add_parser(
         "version", help="Show the GitOps CLI version information", parents=[__create_version_parser()]
@@ -82,14 +86,22 @@ def __create_deploy_parser() -> ArgumentParser:
         default=False,
     )
     parser.add_argument(
-        "--commit-message", help="Specify exact commit message of deployment commit", type=str, default=None,
+        "--commit-message",
+        help="Specify exact commit message of deployment commit",
+        type=str,
+        default=None,
     )
     __add_git_credentials_args(parser)
     __add_git_commit_user_args(parser)
     __add_git_org_and_repo_args(parser)
     __add_git_provider_args(parser)
     parser.add_argument(
-        "--create-pr", help="Creates a Pull Request", type=__parse_bool, nargs="?", const=True, default=False,
+        "--create-pr",
+        help="Creates a Pull Request",
+        type=__parse_bool,
+        nargs="?",
+        const=True,
+        default=False,
     )
     parser.add_argument(
         "--auto-merge",
@@ -99,8 +111,12 @@ def __create_deploy_parser() -> ArgumentParser:
         const=True,
         default=False,
     )
-    parser.add_argument("--merge-method", help="Merge Method (e.g., 'squash', 'rebase', 'merge') (default: merge)", type=str,
-                        default="merge")
+    parser.add_argument(
+        "--merge-method",
+        help="Merge Method (e.g., 'squash', 'rebase', 'merge') (default: merge)",
+        type=str,
+        default="merge",
+    )
     __add_verbose_arg(parser)
     return parser
 
@@ -236,7 +252,13 @@ def __add_expect_preview_exists_arg(parser: ArgumentParser) -> None:
 
 def __add_verbose_arg(parser: ArgumentParser) -> None:
     parser.add_argument(
-        "-v", "--verbose", help="Verbose exception logging", type=__parse_bool, nargs="?", const=True, default=False,
+        "-v",
+        "--verbose",
+        help="Verbose exception logging",
+        type=__parse_bool,
+        nargs="?",
+        const=True,
+        default=False,
     )
 
 

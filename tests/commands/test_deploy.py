@@ -194,7 +194,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
                 "Updated values in test/file.yml",
                 "Updated 2 values in `test/file.yml`:\n```yaml\na.b.c: foo\na.b.d: bar\n```\n",
             ),
-            call.GitRepoApi.merge_pull_request(42),
+            call.GitRepoApi.merge_pull_request(42, "merge"),
             call.GitRepoApi.delete_branch("gitopscli-deploy-b973b5bb"),
         ]
 

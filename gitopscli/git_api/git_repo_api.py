@@ -32,7 +32,9 @@ class GitRepoApi(metaclass=ABCMeta):
         ...
 
     @abstractmethod
-    def merge_pull_request(self, pr_id: int, merge_method: Optional[Literal["squash", "rebase", "merge"]] = "merge") -> None:
+    def merge_pull_request(
+        self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge"
+    ) -> None:
         ...
 
     @abstractmethod

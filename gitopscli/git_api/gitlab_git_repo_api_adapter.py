@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 import logging
 import time
 import requests
@@ -59,12 +59,17 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         )
         return GitRepoApi.PullRequestIdAndUrl(pr_id=merge_request.iid, url=merge_request.web_url)
 
-    def merge_pull_request(self, pr_id: int) -> None:
+    def merge_pull_request(
+        self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge"
+    ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
 
         max_retries = MAX_MERGE_RETRIES
         while max_retries > 0:
             try:
+                if merge_method == "rebase":
+                    merge_request.rebase()
+                    return
                 merge_request.merge()
                 return
             except gitlab.exceptions.GitlabMRClosedError as ex:

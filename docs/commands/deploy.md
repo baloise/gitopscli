@@ -119,20 +119,30 @@ gitopscli deploy \
 
 ## Usage
 ```
-usage: gitopscli deploy [-h] --file FILE --values VALUES [--single-commit [SINGLE_COMMIT]] [--commit-message COMMIT_MESSAGE] --username USERNAME --password PASSWORD [--git-user GIT_USER]
-                        [--git-email GIT_EMAIL] --organisation ORGANISATION --repository-name REPOSITORY_NAME [--git-provider GIT_PROVIDER] [--git-provider-url GIT_PROVIDER_URL] [--create-pr [CREATE_PR]]
-                        [--auto-merge [AUTO_MERGE]] [--merge-method MERGE_METHOD] [-v [VERBOSE]]
+usage: gitopscli deploy [-h] --file FILE --values VALUES
+                        [--single-commit [SINGLE_COMMIT]]
+                        [--commit-message COMMIT_MESSAGE] --username USERNAME
+                        --password PASSWORD [--git-user GIT_USER]
+                        [--git-email GIT_EMAIL] --organisation ORGANISATION
+                        --repository-name REPOSITORY_NAME
+                        [--git-provider GIT_PROVIDER]
+                        [--git-provider-url GIT_PROVIDER_URL]
+                        [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
+                        [--merge-method MERGE_METHOD] [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
   --file FILE           YAML file path
-  --values VALUES       YAML/JSON object with the YAML path as key and the desired value as value
+  --values VALUES       YAML/JSON object with the YAML path as key and the
+                        desired value as value
   --single-commit [SINGLE_COMMIT]
                         Create only single commit for all updates
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
-  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env variable)
-  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD env variable)
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -143,13 +153,16 @@ optional arguments:
   --git-provider GIT_PROVIDER
                         Git server provider
   --git-provider-url GIT_PROVIDER_URL
-                        Git provider base API URL (e.g. https://bitbucket.example.tld)
+                        Git provider base API URL (e.g.
+                        https://bitbucket.example.tld)
   --create-pr [CREATE_PR]
                         Creates a Pull Request
   --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with --create-pr)
+                        Automatically merge the created PR (only valid with
+                        --create-pr)
   --merge-method MERGE_METHOD
-                        Merge Method (e.g., 'squash', 'rebase', 'merge') (default: merge)
+                        Merge Method (e.g., 'squash', 'rebase', 'merge')
+                        (default: merge)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```
