@@ -1,4 +1,5 @@
 from typing import Optional, Literal
+
 from github import (
     Github,
     UnknownObjectException,
@@ -6,8 +7,8 @@ from github import (
     GitRef,
     PullRequest,
     Repository,
-    GithubException,
 )
+
 from gitopscli.gitops_exception import GitOpsException
 from .git_repo_api import GitRepoApi
 
