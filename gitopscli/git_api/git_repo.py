@@ -68,7 +68,7 @@ class GitRepo:
                 logging.info("Creating commit with message: %s", message)
                 repo.config_writer().set_value("user", "name", git_user).release()
                 repo.config_writer().set_value("user", "email", git_email).release()
-                repo.git.commit("-m", message)
+                repo.git.commit("-m", message, "--author", f"{git_user} <{git_email}>")
         except GitError as ex:
             raise GitOpsException(f"Error creating commit.") from ex
 

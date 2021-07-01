@@ -1,0 +1,28 @@
+fail_fast: true
+repos:
+- repo: local
+  hooks:
+  - id: format-check
+    name: make format-check
+    entry: make format-check
+    language: system
+    pass_filenames: false
+    always_run: true
+  - id: lint
+    name: make lint
+    entry: make lint
+    language: system
+    pass_filenames: false
+    always_run: true
+  - id: mypy
+    name: make mypy
+    entry: make mypy
+    language: system
+    pass_filenames: false
+    always_run: true
+  - id: test
+    name: make test
+    entry: make test
+    language: system
+    pass_filenames: false
+    always_run: true
