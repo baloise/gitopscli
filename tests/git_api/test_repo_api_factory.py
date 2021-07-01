@@ -17,10 +17,7 @@ class GitRepoApiFactoryTest(unittest.TestCase):
 
         git_repo_api = GitRepoApiFactory.create(
             config=GitApiConfig(
-                username="USER",
-                password="PASS",
-                git_provider=GitProvider.GITHUB,
-                git_provider_url=None,
+                username="USER", password="PASS", git_provider=GitProvider.GITHUB, git_provider_url=None,
             ),
             organisation="ORG",
             repository_name="REPO",
@@ -29,10 +26,7 @@ class GitRepoApiFactoryTest(unittest.TestCase):
         self.assertEqual(git_repo_api, mock_logging_proxy)
 
         mock_github_adapter_constructor.assert_called_with(
-            username="USER",
-            password="PASS",
-            organisation="ORG",
-            repository_name="REPO",
+            username="USER", password="PASS", organisation="ORG", repository_name="REPO",
         )
         mock_logging_proxy_constructor.assert_called_with(mock_github_adapter)
 
@@ -47,10 +41,7 @@ class GitRepoApiFactoryTest(unittest.TestCase):
 
         git_repo_api = GitRepoApiFactory.create(
             config=GitApiConfig(
-                username="USER",
-                password="PASS",
-                git_provider=GitProvider.BITBUCKET,
-                git_provider_url="PROVIDER_URL",
+                username="USER", password="PASS", git_provider=GitProvider.BITBUCKET, git_provider_url="PROVIDER_URL",
             ),
             organisation="ORG",
             repository_name="REPO",
@@ -71,10 +62,7 @@ class GitRepoApiFactoryTest(unittest.TestCase):
         try:
             GitRepoApiFactory.create(
                 config=GitApiConfig(
-                    username="USER",
-                    password="PASS",
-                    git_provider=GitProvider.BITBUCKET,
-                    git_provider_url=None,
+                    username="USER", password="PASS", git_provider=GitProvider.BITBUCKET, git_provider_url=None,
                 ),
                 organisation="ORG",
                 repository_name="REPO",

@@ -59,9 +59,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         )
         return GitRepoApi.PullRequestIdAndUrl(pr_id=merge_request.iid, url=merge_request.web_url)
 
-    def merge_pull_request(
-        self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge"
-    ) -> None:
+    def merge_pull_request(self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge") -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
 
         max_retries = MAX_MERGE_RETRIES
