@@ -33,20 +33,22 @@ class GitRepoTest(unittest.TestCase):
         repo_dir = self.__create_tmp_dir()
 
         repo = Repo.init(repo_dir)
-        repo.config_writer().set_value("user", "name", "unit tester").release()
-        repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+        git_user = "unit tester"
+        git_email = "unit@tester.com"
+        repo.config_writer().set_value("user", "name", git_user).release()
+        repo.config_writer().set_value("user", "email", git_email).release()
 
         with open(f"{repo_dir}/README.md", "w") as readme:
             readme.write("master branch readme")
         repo.git.add("--all")
-        repo.git.commit("-m", "initial commit")
+        repo.git.commit("-m", "initial commit", "--author", f"{git_user} <{git_email}>")
 
         repo.create_head("xyz").checkout()
 
         with open(f"{repo_dir}/README.md", "w") as readme:
             readme.write("xyz branch readme")
         repo.git.add("--all")
-        repo.git.commit("-m", "xyz brach commit")
+        repo.git.commit("-m", "xyz brach commit", "--author", f"{git_user} <{git_email}>")
 
         repo.git.checkout("master")  # master = default branch
         repo.git.config("receive.denyCurrentBranch", "ignore")

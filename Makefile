@@ -3,6 +3,7 @@ BLACK_ARGS = -l 120 -t py37 gitopscli tests setup.py
 init:
 	pip3 install --editable .
 	pip3 install -r requirements-dev.txt
+	pre-commit install
 
 format:
 	black $(BLACK_ARGS)
