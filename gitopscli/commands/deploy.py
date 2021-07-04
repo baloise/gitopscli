@@ -1,7 +1,7 @@
 import logging
 import uuid
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Literal
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io_api.yaml_util import update_yaml_file, yaml_dump, YAMLException
 from gitopscli.gitops_exception import GitOpsException
@@ -25,6 +25,7 @@ class DeployCommand(Command):
 
         create_pr: bool
         auto_merge: bool
+        merge_method: Literal["squash", "rebase", "merge"] = "merge"
 
     def __init__(self, args: Args) -> None:
         self.__args = args
@@ -50,7 +51,7 @@ class DeployCommand(Command):
             pr_id = git_repo_api.create_pull_request_to_default_branch(pr_branch, title, description).pr_id
 
             if self.__args.auto_merge:
-                git_repo_api.merge_pull_request(pr_id)
+                git_repo_api.merge_pull_request(pr_id, self.__args.merge_method)
                 git_repo_api.delete_branch(pr_branch)
 
     def __create_git_repo_api(self) -> GitRepoApi:

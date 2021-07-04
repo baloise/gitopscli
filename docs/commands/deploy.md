@@ -120,14 +120,15 @@ gitopscli deploy \
 ## Usage
 ```
 usage: gitopscli deploy [-h] --file FILE --values VALUES
-                        [--single-commit [SINGLE_COMMIT]] --username USERNAME
+                        [--single-commit [SINGLE_COMMIT]]
+                        [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
                         [--git-email GIT_EMAIL] --organisation ORGANISATION
                         --repository-name REPOSITORY_NAME
                         [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
-                        [-v [VERBOSE]]
+                        [--merge-method MERGE_METHOD] [-v [VERBOSE]]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -136,6 +137,8 @@ optional arguments:
                         desired value as value
   --single-commit [SINGLE_COMMIT]
                         Create only single commit for all updates
+  --commit-message COMMIT_MESSAGE
+                        Specify exact commit message of deployment commit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
   --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
@@ -157,6 +160,9 @@ optional arguments:
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with
                         --create-pr)
+  --merge-method MERGE_METHOD
+                        Merge Method (e.g., 'squash', 'rebase', 'merge')
+                        (default: merge)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```

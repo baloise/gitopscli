@@ -1,5 +1,14 @@
-from typing import Optional
-from github import Github, UnknownObjectException, BadCredentialsException, GitRef, PullRequest, Repository
+from typing import Optional, Literal
+
+from github import (
+    Github,
+    UnknownObjectException,
+    BadCredentialsException,
+    GitRef,
+    PullRequest,
+    Repository,
+)
+
 from gitopscli.gitops_exception import GitOpsException
 from .git_repo_api import GitRepoApi
 
@@ -36,9 +45,9 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         pull_request = repo.create_pull(title=title, body=description, head=from_branch, base=to_branch)
         return GitRepoApi.PullRequestIdAndUrl(pr_id=pull_request.number, url=pull_request.html_url)
 
-    def merge_pull_request(self, pr_id: int) -> None:
+    def merge_pull_request(self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge") -> None:
         pull_request = self.__get_pull_request(pr_id)
-        pull_request.merge()
+        pull_request.merge(merge_method=merge_method)
 
     def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
         pull_request = self.__get_pull_request(pr_id)

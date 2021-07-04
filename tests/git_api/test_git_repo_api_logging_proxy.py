@@ -74,7 +74,7 @@ class GitRepoApiLoggingProxyTest(unittest.TestCase):
     @patch("gitopscli.git_api.git_repo_api_logging_proxy.logging")
     def test_merge_pull_request(self, logging_mock):
         self.__testee.merge_pull_request(pr_id=42)
-        self.__mock_repo_api.merge_pull_request.assert_called_once_with(42)
+        self.__mock_repo_api.merge_pull_request.assert_called_once_with(42, merge_method="merge")
         logging_mock.info.assert_called_once_with(
             "Merging pull request %s", 42,
         )
