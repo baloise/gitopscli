@@ -106,11 +106,10 @@ class CreatePreviewCommand(Command):
             logging.info("Use existing folder for preview: %s", preview_namespace)
             return False
         logging.info("Create new folder for preview: %s", preview_namespace)
-        preview_template_folder_name = f".preview-templates/{gitops_config.application_name}"
-        full_preview_template_folder_path = template_git_repo.get_full_file_path(preview_template_folder_name)
+        full_preview_template_folder_path = template_git_repo.get_full_file_path(gitops_config.preview_template_path)
         if not os.path.isdir(full_preview_template_folder_path):
-            raise GitOpsException(f"The preview template folder does not exist: {preview_template_folder_name}")
-        logging.info("Using the preview template folder: %s", preview_template_folder_name)
+            raise GitOpsException(f"The preview template folder does not exist: {gitops_config.preview_template_path}")
+        logging.info("Using the preview template folder: %s", gitops_config.preview_template_path)
         shutil.copytree(
             full_preview_template_folder_path, full_preview_folder_path,
         )

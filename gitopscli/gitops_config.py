@@ -28,6 +28,7 @@ class GitOpsConfig:
 
     preview_template_organisation: str
     preview_template_repository: str
+    preview_template_path: str
 
     preview_target_organisation: str
     preview_target_repository: str
@@ -39,6 +40,7 @@ class GitOpsConfig:
         assert isinstance(self.preview_host_template, str), "preview_host_template of wrong type!"
         assert isinstance(self.preview_template_organisation, str), "preview_template_organisation of wrong type!"
         assert isinstance(self.preview_template_repository, str), "preview_template_repository of wrong type!"
+        assert isinstance(self.preview_template_path, str), "preview_template_path of wrong type!"
         assert isinstance(self.preview_target_organisation, str), "preview_target_organisation of wrong type!"
         assert isinstance(self.preview_target_repository, str), "preview_target_repository of wrong type!"
         assert isinstance(self.replacements, list), "replacements of wrong type!"
@@ -123,15 +125,17 @@ class _GitOpsConfigYamlParser:
                 ) from ex
             replacements.append(GitOpsConfig.Replacement(path=path, variable=variable))
 
+        application_name = self.__get_string_value("deploymentConfig.applicationName")
         preview_target_organisation = self.__get_string_value("deploymentConfig.org")
         preview_target_repository = self.__get_string_value("deploymentConfig.repository")
 
         return GitOpsConfig(
             api_version=0,
-            application_name=self.__get_string_value("deploymentConfig.applicationName"),
+            application_name=application_name,
             preview_host_template=self.__get_string_value("previewConfig.route.host.template"),
             preview_template_organisation=preview_target_organisation,
             preview_template_repository=preview_target_repository,
+            preview_template_path=f".preview-templates/{application_name}",
             preview_target_organisation=preview_target_organisation,
             preview_target_repository=preview_target_repository,
             replacements=replacements,
