@@ -1,7 +1,7 @@
 import hashlib
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import List, Any
+from typing import List, Any, Optional
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -29,9 +29,11 @@ class GitOpsConfig:
     preview_template_organisation: str
     preview_template_repository: str
     preview_template_path: str
+    preview_template_branch: Optional[str]
 
     preview_target_organisation: str
     preview_target_repository: str
+    preview_target_branch: Optional[str]
 
     replacements: List[Replacement]
 
@@ -41,8 +43,12 @@ class GitOpsConfig:
         assert isinstance(self.preview_template_organisation, str), "preview_template_organisation of wrong type!"
         assert isinstance(self.preview_template_repository, str), "preview_template_repository of wrong type!"
         assert isinstance(self.preview_template_path, str), "preview_template_path of wrong type!"
+        if self.preview_template_branch is not None:
+            assert isinstance(self.preview_template_branch, str), "preview_template_branch of wrong type!"
         assert isinstance(self.preview_target_organisation, str), "preview_target_organisation of wrong type!"
         assert isinstance(self.preview_target_repository, str), "preview_target_repository of wrong type!"
+        if self.preview_target_branch is not None:
+            assert isinstance(self.preview_target_branch, str), "preview_target_branch of wrong type!"
         assert isinstance(self.replacements, list), "replacements of wrong type!"
         for index, replacement in enumerate(self.replacements):
             assert isinstance(replacement, self.Replacement), f"replacement[{index}] of wrong type!"
@@ -59,6 +65,7 @@ class GitOpsConfig:
         return (
             self.preview_template_organisation == self.preview_target_organisation
             and self.preview_template_repository == self.preview_target_repository
+            and self.preview_template_branch == self.preview_target_branch
         )
 
     @staticmethod
@@ -136,7 +143,9 @@ class _GitOpsConfigYamlParser:
             preview_template_organisation=preview_target_organisation,
             preview_template_repository=preview_target_repository,
             preview_template_path=f".preview-templates/{application_name}",
+            preview_template_branch=None,  # use default branch
             preview_target_organisation=preview_target_organisation,
             preview_target_repository=preview_target_repository,
+            preview_target_branch=None,  # use default branch
             replacements=replacements,
         )

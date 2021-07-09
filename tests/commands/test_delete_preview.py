@@ -32,8 +32,10 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_template_organisation="PREVIEW_TEMPLATE_ORG",
             preview_template_repository="PREVIEW_TEMPLATE_REPO",
             preview_template_path=".preview-templates/my-app",
+            preview_template_branch="template-branch",
             preview_target_organisation="PREVIEW_TARGET_ORG",
             preview_target_repository="PREVIEW_TARGET_REPO",
+            preview_target_branch=None,
             replacements=[],
         )
 

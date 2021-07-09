@@ -46,7 +46,7 @@ class CreatePreviewCommand(Command):
 
         preview_target_git_repo_api = self.__create_preview_target_git_repo_api(gitops_config)
         with GitRepo(preview_target_git_repo_api) as preview_target_git_repo:
-            preview_target_git_repo.clone()
+            preview_target_git_repo.clone(gitops_config.preview_target_branch)
 
             if gitops_config.is_preview_template_equal_target():
                 preview_template_repo = preview_target_git_repo
@@ -56,7 +56,7 @@ class CreatePreviewCommand(Command):
             else:
                 preview_template_git_repo_api = self.__create_preview_template_git_repo_api(gitops_config)
                 with GitRepo(preview_template_git_repo_api) as preview_template_repo:
-                    preview_template_repo.clone()
+                    preview_template_repo.clone(gitops_config.preview_template_branch)
                     created_new_preview = self.__create_preview_from_template_if_not_existing(
                         preview_template_repo, preview_target_git_repo, gitops_config
                     )

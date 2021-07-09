@@ -36,20 +36,27 @@ class GitRepo:
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
 
-    def clone(self) -> None:
+    def clone(self, branch: Optional[str] = None) -> None:
         self.__delete_tmp_dir()
         self.__tmp_dir = create_tmp_dir()
         git_options = []
         url = self.get_clone_url()
-        logging.info("Cloning repository: %s", url)
+        if branch:
+            logging.info("Cloning repository: %s (branch: %s)", url, branch)
+        else:
+            logging.info("Cloning repository: %s", url)
         username = self.__api.get_username()
         password = self.__api.get_password()
         try:
             if username is not None and password is not None:
                 credentials_file = self.__create_credentials_file(username, password)
                 git_options.append(f"--config credential.helper={credentials_file}")
+            if branch:
+                git_options.append(f"--branch {branch}")
             self.__repo = Repo.clone_from(url=url, to_path=f"{self.__tmp_dir}/repo", multi_options=git_options)
         except GitError as ex:
+            if branch:
+                raise GitOpsException(f"Error cloning branch '{branch}' of '{url}'") from ex
             raise GitOpsException(f"Error cloning '{url}'") from ex
 
     def new_branch(self, branch: str) -> None:
