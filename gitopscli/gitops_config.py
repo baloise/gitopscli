@@ -13,12 +13,12 @@ class GitOpsConfig:
         class Context:
             gitops_config: "GitOpsConfig"
             preview_id: str
-            git_commit: str
+            git_hash: str
 
         __VARIABLE_REGEX = re.compile(r"{(\w+)}")
         __VARIABLE_MAPPERS: Dict[str, Callable[["GitOpsConfig.Replacement.Context"], str]] = {
-            "GIT_COMMIT": lambda context: context.git_commit,
-            "ROUTE_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
+            "GIT_HASH": lambda context: context.git_hash,
+            "PREVIEW_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
             "PREVIEW_NAMESPACE": lambda context: context.gitops_config.get_preview_namespace(context.preview_id),
         }
 
@@ -154,6 +154,10 @@ class _GitOpsConfigYamlParser:
                 )
             if "{" in variable or "}" in variable:
                 raise GitOpsException(f"Item 'previewConfig.replace.[{index}].variable' must not contain '{{' or '}}'!")
+            if variable == "ROUTE_HOST":
+                variable = "PREVIEW_HOST"  # backwards compatability
+            if variable == "GIT_COMMIT":
+                variable = "GIT_HASH"  # backwards compatability
             replacements["values.yaml"].append(GitOpsConfig.Replacement(path, f"{{{variable}}}"))
 
         application_name = self.__get_string_value("deploymentConfig.applicationName")

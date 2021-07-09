@@ -113,9 +113,9 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
         self.assertEqual(len(config.replacements["values.yaml"]), 2)
         self.assertEqual(config.replacements["values.yaml"][0].path, "a.b")
-        self.assertEqual(config.replacements["values.yaml"][0].value_template, "{ROUTE_HOST}")
+        self.assertEqual(config.replacements["values.yaml"][0].value_template, "{PREVIEW_HOST}")
         self.assertEqual(config.replacements["values.yaml"][1].path, "c.d")
-        self.assertEqual(config.replacements["values.yaml"][1].value_template, "{GIT_COMMIT}")
+        self.assertEqual(config.replacements["values.yaml"][1].value_template, "{GIT_HASH}")
 
     def test_replacements_missing(self):
         del self.yaml["previewConfig"]["replace"]

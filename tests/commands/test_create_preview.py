@@ -68,8 +68,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             replacements={
                 "Chart.yaml": [GitOpsConfig.Replacement(path="name", value_template="{PREVIEW_NAMESPACE}"),],
                 "values.yaml": [
-                    GitOpsConfig.Replacement(path="image.tag", value_template="{GIT_COMMIT}"),
-                    GitOpsConfig.Replacement(path="route.host", value_template="{ROUTE_HOST}"),
+                    GitOpsConfig.Replacement(path="image.tag", value_template="{GIT_HASH}"),
+                    GitOpsConfig.Replacement(path="route.host", value_template="{PREVIEW_HOST}"),
                 ],
             },
         )
