@@ -34,6 +34,7 @@ class GitOpsConfig:
     preview_target_organisation: str
     preview_target_repository: str
     preview_target_branch: Optional[str]
+    preview_target_namespace_template: str
 
     replacements: List[Replacement]
 
@@ -49,17 +50,20 @@ class GitOpsConfig:
         assert isinstance(self.preview_target_repository, str), "preview_target_repository of wrong type!"
         if self.preview_target_branch is not None:
             assert isinstance(self.preview_target_branch, str), "preview_target_branch of wrong type!"
+        assert isinstance(
+            self.preview_target_namespace_template, str
+        ), "preview_target_namespace_template of wrong type!"
         assert isinstance(self.replacements, list), "replacements of wrong type!"
         for index, replacement in enumerate(self.replacements):
             assert isinstance(replacement, self.Replacement), f"replacement[{index}] of wrong type!"
 
     def get_preview_host(self, preview_id: str) -> str:
-        hashed_preview_id = self.create_hashed_preview_id(preview_id)
-        return self.preview_host_template.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
+        preview_id_hash = self.create_preview_id_hash(preview_id)
+        return self.preview_host_template.replace("{PREVIEW_ID_HASH}", preview_id_hash)
 
     def get_preview_namespace(self, preview_id: str) -> str:
-        hashed_preview_id = self.create_hashed_preview_id(preview_id)
-        return f"{self.application_name}-{hashed_preview_id}-preview"
+        preview_id_hash = self.create_preview_id_hash(preview_id)
+        return self.preview_target_namespace_template.replace("{PREVIEW_ID_HASH}", preview_id_hash)
 
     def is_preview_template_equal_target(self) -> bool:
         return (
@@ -69,7 +73,7 @@ class GitOpsConfig:
         )
 
     @staticmethod
-    def create_hashed_preview_id(preview_id: str) -> str:
+    def create_preview_id_hash(preview_id: str) -> str:
         return hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
 
     @staticmethod
@@ -139,7 +143,9 @@ class _GitOpsConfigYamlParser:
         return GitOpsConfig(
             api_version=0,
             application_name=application_name,
-            preview_host_template=self.__get_string_value("previewConfig.route.host.template"),
+            preview_host_template=self.__get_string_value("previewConfig.route.host.template").replace(
+                "{SHA256_8CHAR_BRANCH_HASH}", "{PREVIEW_ID_HASH}"  # backwards compatibility
+            ),
             preview_template_organisation=preview_target_organisation,
             preview_template_repository=preview_target_repository,
             preview_template_path=f".preview-templates/{application_name}",
@@ -147,5 +153,6 @@ class _GitOpsConfigYamlParser:
             preview_target_organisation=preview_target_organisation,
             preview_target_repository=preview_target_repository,
             preview_target_branch=None,  # use default branch
+            preview_target_namespace_template=f"{application_name}-{{PREVIEW_ID_HASH}}-preview",
             replacements=replacements,
         )

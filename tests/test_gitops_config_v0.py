@@ -5,12 +5,12 @@ from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 
 
-class GitOpsConfigTest(unittest.TestCase):
+class GitOpsConfigV0Test(unittest.TestCase):
     def setUp(self):
         self.yaml = {
             "deploymentConfig": {"applicationName": "my-app", "org": "my-org", "repository": "my-repo"},
             "previewConfig": {
-                "route": {"host": {"template": "my-host-template"}},
+                "route": {"host": {"template": "my-{SHA256_8CHAR_BRANCH_HASH}-host-template"}},
                 "replace": [{"path": "a.b", "variable": "ROUTE_HOST"}, {"path": "c.d", "variable": "GIT_COMMIT"}],
             },
         }
@@ -39,6 +39,7 @@ class GitOpsConfigTest(unittest.TestCase):
         config = self.load()
         self.assertEqual(config.preview_template_organisation, "my-org")
         self.assertEqual(config.preview_target_organisation, "my-org")
+        self.assertTrue(config.is_preview_template_equal_target())
 
     def test_deployment_config_org_missing(self):
         del self.yaml["deploymentConfig"]["org"]
@@ -52,6 +53,7 @@ class GitOpsConfigTest(unittest.TestCase):
         config = self.load()
         self.assertEqual(config.preview_template_repository, "my-repo")
         self.assertEqual(config.preview_target_repository, "my-repo")
+        self.assertTrue(config.is_preview_template_equal_target())
 
     def test_deployment_config_repo_missing(self):
         del self.yaml["deploymentConfig"]["repository"]
@@ -61,9 +63,21 @@ class GitOpsConfigTest(unittest.TestCase):
         self.yaml["deploymentConfig"]["repository"] = []
         self.assert_load_error("Item 'deploymentConfig.repository' should be a string in GitOps config!")
 
+    def test_preview_template_branch_is_none(self):
+        config = self.load()
+        self.assertIsNone(config.preview_template_branch)
+
+    def test_preview_target_branch_is_none(self):
+        config = self.load()
+        self.assertIsNone(config.preview_target_branch)
+
     def test_route_host_template(self):
         config = self.load()
-        self.assertEqual(config.preview_host_template, "my-host-template")
+        self.assertEqual(config.preview_host_template, "my-{PREVIEW_ID_HASH}-host-template")
+
+    def test_route_host(self):
+        config = self.load()
+        self.assertEqual(config.get_preview_host("preview-1"), "my-3e355b4a-host-template")
 
     def test_route_missing(self):
         del self.yaml["previewConfig"]["route"]
@@ -80,6 +94,14 @@ class GitOpsConfigTest(unittest.TestCase):
     def test_route_host_template_not_a_string(self):
         self.yaml["previewConfig"]["route"]["host"]["template"] = []
         self.assert_load_error("Item 'previewConfig.route.host.template' should be a string in GitOps config!")
+
+    def test_namespace_template(self):
+        config = self.load()
+        self.assertEqual(config.preview_target_namespace_template, "my-app-{PREVIEW_ID_HASH}-preview")
+
+    def test_namespace(self):
+        config = self.load()
+        self.assertEqual(config.get_preview_namespace("preview-1"), "my-app-3e355b4a-preview")
 
     def test_replacements(self):
         config = self.load()

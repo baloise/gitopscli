@@ -56,7 +56,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         self.load_gitops_config_mock.return_value = GitOpsConfig(
             api_version=0,
             application_name="my-app",
-            preview_host_template="app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld",
+            preview_host_template="app.xy-{PREVIEW_ID_HASH}.example.tld",
             preview_template_organisation="PREVIEW_TEMPLATE_ORG",
             preview_template_repository="PREVIEW_TEMPLATE_REPO",
             preview_template_path=".preview-templates/my-app",
@@ -64,6 +64,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_organisation="PREVIEW_TARGET_ORG",
             preview_target_repository="PREVIEW_TARGET_REPO",
             preview_target_branch=None,
+            preview_target_namespace_template=f"my-app-{{PREVIEW_ID_HASH}}-preview",
             replacements=[
                 GitOpsConfig.Replacement(path="image.tag", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
                 GitOpsConfig.Replacement(path="route.host", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),

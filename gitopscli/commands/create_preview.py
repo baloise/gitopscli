@@ -146,7 +146,7 @@ class CreatePreviewCommand(Command):
         yaml_file_dump(
             {
                 "previewId": preview_id,
-                "previewIdHash": gitops_config.create_hashed_preview_id(preview_id),
+                "previewIdHash": gitops_config.create_preview_id_hash(preview_id),
                 "routeHost": gitops_config.get_preview_host(preview_id),
                 "namespace": gitops_config.get_preview_namespace(preview_id),
             },
