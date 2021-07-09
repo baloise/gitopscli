@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 from dataclasses import dataclass
-from typing import Any, Callable, Dict
+from typing import Any, Callable
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException, yaml_file_dump
 from gitopscli.gitops_config import GitOpsConfig
@@ -113,32 +113,26 @@ class CreatePreviewCommand(Command):
         shutil.copytree(
             full_preview_template_folder_path, full_preview_folder_path,
         )
-        self.__update_yaml_file(target_git_repo, f"{preview_namespace}/Chart.yaml", "name", preview_namespace)
         return True
 
-    def __get_value_for_variable(self, gitops_config: GitOpsConfig, variable: GitOpsConfig.Replacement.Variable) -> str:
-        mapping: Dict[GitOpsConfig.Replacement.Variable, Callable[[], str]] = {
-            GitOpsConfig.Replacement.Variable.ROUTE_HOST: lambda: gitops_config.get_preview_host(
-                self.__args.preview_id
-            ),
-            GitOpsConfig.Replacement.Variable.GIT_COMMIT: lambda: self.__args.git_hash,
-        }
-        assert set(mapping.keys()) == set(GitOpsConfig.Replacement.Variable), "variable to value mapping not complete"
-        return mapping[variable]()
-
     def __replace_values(self, git_repo: GitRepo, gitops_config: GitOpsConfig) -> bool:
+        preview_id = self.__args.preview_id
         preview_folder_name = gitops_config.get_preview_namespace(self.__args.preview_id)
+        context = GitOpsConfig.Replacement.Context(gitops_config, preview_id, self.__args.git_hash)
         any_value_replaced = False
-        for replacement in gitops_config.replacements:
-            replacement_value = self.__get_value_for_variable(gitops_config, replacement.variable)
-            value_replaced = self.__update_yaml_file(
-                git_repo, f"{preview_folder_name}/values.yaml", replacement.path, replacement_value,
-            )
-            if value_replaced:
-                any_value_replaced = True
-                logging.info("Replaced property '%s' with value: %s", replacement.path, replacement_value)
-            else:
-                logging.info("Keep property '%s' value: %s", replacement.path, replacement_value)
+        for file, replacements in gitops_config.replacements.items():
+            for replacement in replacements:
+                replacement_value = replacement.get_value(context)
+                value_replaced = self.__update_yaml_file(
+                    git_repo, f"{preview_folder_name}/{file}", replacement.path, replacement_value,
+                )
+                if value_replaced:
+                    any_value_replaced = True
+                    logging.info(
+                        "Replaced property '%s' in '%s' with value: %s", replacement.path, file, replacement_value
+                    )
+                else:
+                    logging.info("Keep property '%s' in '%s' value: %s", replacement.path, file, replacement_value)
         return any_value_replaced
 
     def __create_preview_info_file(self, gitops_config: GitOpsConfig) -> None:

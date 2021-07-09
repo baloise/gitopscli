@@ -37,7 +37,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_repository="PREVIEW_TARGET_REPO",
             preview_target_branch=None,
             preview_target_namespace_template=f"APP-{{PREVIEW_ID_HASH}}-preview",
-            replacements=[],
+            replacements={},
         )
 
         self.git_repo_api_mock = self.create_mock(GitRepoApi)

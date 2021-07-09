@@ -105,13 +105,17 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
     def test_replacements(self):
         config = self.load()
-        self.assertEqual(
-            config.replacements,
-            [
-                GitOpsConfig.Replacement(path="a.b", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),
-                GitOpsConfig.Replacement(path="c.d", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
-            ],
-        )
+        self.assertEqual(config.replacements.keys(), {"Chart.yaml", "values.yaml"})
+
+        self.assertEqual(len(config.replacements["Chart.yaml"]), 1)
+        self.assertEqual(config.replacements["Chart.yaml"][0].path, "name")
+        self.assertEqual(config.replacements["Chart.yaml"][0].value_template, "{PREVIEW_NAMESPACE}")
+
+        self.assertEqual(len(config.replacements["values.yaml"]), 2)
+        self.assertEqual(config.replacements["values.yaml"][0].path, "a.b")
+        self.assertEqual(config.replacements["values.yaml"][0].value_template, "{ROUTE_HOST}")
+        self.assertEqual(config.replacements["values.yaml"][1].path, "c.d")
+        self.assertEqual(config.replacements["values.yaml"][1].value_template, "{GIT_COMMIT}")
 
     def test_replacements_missing(self):
         del self.yaml["previewConfig"]["replace"]
@@ -143,6 +147,8 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
     def test_replacements_invalid_list_items_unknown_variable(self):
         self.yaml["previewConfig"]["replace"][0]["variable"] = "FOO"
-        self.assert_load_error(
-            "Item 'previewConfig.replace.[0].variable' should be one of the following values in GitOps config: GIT_COMMIT, ROUTE_HOST"
-        )
+        self.assert_load_error("Replacement value '{FOO}' for path 'a.b' contains invalid variable: FOO")
+
+    def test_replacements_invalid_list_items_invalid_variable(self):
+        self.yaml["previewConfig"]["replace"][0]["variable"] = "{FOO"
+        self.assert_load_error("Item 'previewConfig.replace.[0].variable' must not contain '{' or '}'!")

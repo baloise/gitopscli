@@ -65,10 +65,13 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_repository="PREVIEW_TARGET_REPO",
             preview_target_branch=None,
             preview_target_namespace_template=f"my-app-{{PREVIEW_ID_HASH}}-preview",
-            replacements=[
-                GitOpsConfig.Replacement(path="image.tag", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
-                GitOpsConfig.Replacement(path="route.host", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),
-            ],
+            replacements={
+                "Chart.yaml": [GitOpsConfig.Replacement(path="name", value_template="{PREVIEW_NAMESPACE}"),],
+                "values.yaml": [
+                    GitOpsConfig.Replacement(path="image.tag", value_template="{GIT_COMMIT}"),
+                    GitOpsConfig.Replacement(path="route.host", value_template="{ROUTE_HOST}"),
+                ],
+            },
         )
 
         self.template_git_repo_api_mock = self.create_mock(GitRepoApi)
@@ -158,6 +161,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
             ),
+            call.logging.info(
+                "Replaced property '%s' in '%s' with value: %s", "name", "Chart.yaml", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/values.yaml",
@@ -165,13 +171,21 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
             call.logging.info(
-                "Replaced property '%s' with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
+                "Replaced property '%s' in '%s' with value: %s",
+                "image.tag",
+                "values.yaml",
+                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
             ),
-            call.logging.info("Replaced property '%s' with value: %s", "route.host", "app.xy-685912d3.example.tld"),
+            call.logging.info(
+                "Replaced property '%s' in '%s' with value: %s",
+                "route.host",
+                "values.yaml",
+                "app.xy-685912d3.example.tld",
+            ),
             call.GitRepo.commit(
                 "GIT_USER",
                 "GIT_EMAIL",
@@ -209,6 +223,13 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
+            call.update_yaml_file(
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
+            ),
+            call.logging.info(
+                "Replaced property '%s' in '%s' with value: %s", "name", "Chart.yaml", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/values.yaml",
@@ -216,13 +237,21 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
             call.logging.info(
-                "Replaced property '%s' with value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
+                "Replaced property '%s' in '%s' with value: %s",
+                "image.tag",
+                "values.yaml",
+                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
             ),
-            call.logging.info("Replaced property '%s' with value: %s", "route.host", "app.xy-685912d3.example.tld"),
+            call.logging.info(
+                "Replaced property '%s' in '%s' with value: %s",
+                "route.host",
+                "values.yaml",
+                "app.xy-685912d3.example.tld",
+            ),
             call.GitRepo.commit(
                 "GIT_USER",
                 "GIT_EMAIL",
@@ -262,18 +291,30 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
+            call.update_yaml_file(
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
+            ),
+            call.logging.info("Keep property '%s' in '%s' value: %s", "name", "Chart.yaml", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/values.yaml",
                 "image.tag",
                 "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
             ),
-            call.logging.info("Keep property '%s' value: %s", "image.tag", "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"),
+            call.logging.info(
+                "Keep property '%s' in '%s' value: %s",
+                "image.tag",
+                "values.yaml",
+                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/values.yaml", "route.host", "app.xy-685912d3.example.tld"
             ),
-            call.logging.info("Keep property '%s' value: %s", "route.host", "app.xy-685912d3.example.tld"),
+            call.logging.info(
+                "Keep property '%s' in '%s' value: %s", "route.host", "values.yaml", "app.xy-685912d3.example.tld"
+            ),
             call.logging.info("The preview is already up-to-date. I'm done here."),
         ]
 
@@ -312,7 +353,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             CreatePreviewCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("No such file: my-app-685912d3-preview/values.yaml", str(ex))
+            self.assertEqual("No such file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
@@ -326,11 +367,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
-                "/tmp/target-repo/my-app-685912d3-preview/values.yaml",
-                "image.tag",
-                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview",
             ),
         ]
 
@@ -341,7 +380,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             CreatePreviewCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("Error loading file: my-app-685912d3-preview/values.yaml", str(ex))
+            self.assertEqual("Error loading file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
@@ -355,11 +394,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
-                "/tmp/target-repo/my-app-685912d3-preview/values.yaml",
-                "image.tag",
-                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview",
             ),
         ]
 
@@ -370,7 +407,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             CreatePreviewCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("Key 'image.tag' not found in file: my-app-685912d3-preview/values.yaml", str(ex))
+            self.assertEqual("Key 'name' not found in file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
@@ -384,11 +421,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
-            call.GitRepo.get_full_file_path("my-app-685912d3-preview/values.yaml"),
+            call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
-                "/tmp/target-repo/my-app-685912d3-preview/values.yaml",
-                "image.tag",
-                "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9",
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview",
             ),
         ]
 

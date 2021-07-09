@@ -1,25 +1,46 @@
+import re
 import hashlib
 from dataclasses import dataclass
-from enum import Enum, auto
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict, Callable
 
 from gitopscli.gitops_exception import GitOpsException
 
 
 @dataclass(frozen=True)
 class GitOpsConfig:
-    @dataclass(frozen=True)
     class Replacement:
-        class Variable(Enum):
-            GIT_COMMIT = auto()
-            ROUTE_HOST = auto()
+        @dataclass(frozen=True)
+        class Context:
+            gitops_config: "GitOpsConfig"
+            preview_id: str
+            git_commit: str
 
-        path: str
-        variable: Variable
+        __VARIABLE_REGEX = re.compile(r"{(\w+)}")
+        __VARIABLE_MAPPERS: Dict[str, Callable[["GitOpsConfig.Replacement.Context"], str]] = {
+            "GIT_COMMIT": lambda context: context.git_commit,
+            "ROUTE_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
+            "PREVIEW_NAMESPACE": lambda context: context.gitops_config.get_preview_namespace(context.preview_id),
+        }
 
-        def __post_init__(self) -> None:
-            assert isinstance(self.path, str), "path of wrong type!"
-            assert isinstance(self.variable, self.Variable), "variable of wrong type!"
+        def __init__(self, path: str, value_template: str):
+            assert isinstance(path, str), "path of wrong type!"
+            assert isinstance(value_template, str), "value_template of wrong type!"
+
+            self.path = path
+            self.value_template = value_template
+
+            for var in self.__VARIABLE_REGEX.findall(self.value_template):
+                if var not in self.__VARIABLE_MAPPERS.keys():
+                    raise GitOpsException(
+                        f"Replacement value '{self.value_template}' for path '{self.path}' "
+                        f"contains invalid variable: {var}"
+                    )
+
+        def get_value(self, context: Context) -> str:
+            val = self.value_template
+            for variable, value_func in self.__VARIABLE_MAPPERS.items():
+                val = val.replace(f"{{{variable}}}", value_func(context))
+            return val
 
     api_version: int
     application_name: str
@@ -36,7 +57,7 @@ class GitOpsConfig:
     preview_target_branch: Optional[str]
     preview_target_namespace_template: str
 
-    replacements: List[Replacement]
+    replacements: Dict[str, List[Replacement]]
 
     def __post_init__(self) -> None:
         assert isinstance(self.application_name, str), "application_name of wrong type!"
@@ -53,9 +74,11 @@ class GitOpsConfig:
         assert isinstance(
             self.preview_target_namespace_template, str
         ), "preview_target_namespace_template of wrong type!"
-        assert isinstance(self.replacements, list), "replacements of wrong type!"
-        for index, replacement in enumerate(self.replacements):
-            assert isinstance(replacement, self.Replacement), f"replacement[{index}] of wrong type!"
+        assert isinstance(self.replacements, dict), "replacements of wrong type!"
+        for file, replacements in self.replacements.items():
+            assert isinstance(file, str), f"replacement file '{file}' of wrong type!"
+            for index, replacement in enumerate(replacements):
+                assert isinstance(replacement, self.Replacement), f"replacement[{file}][{index}] of wrong type!"
 
     def get_preview_host(self, preview_id: str) -> str:
         preview_id_hash = self.create_preview_id_hash(preview_id)
@@ -107,7 +130,10 @@ class _GitOpsConfigYamlParser:
         return value
 
     def parse(self) -> GitOpsConfig:
-        replacements: List[GitOpsConfig.Replacement] = []
+        replacements: Dict[str, List[GitOpsConfig.Replacement]] = {
+            "Chart.yaml": [GitOpsConfig.Replacement("name", "{PREVIEW_NAMESPACE}")],
+            "values.yaml": [],
+        }
         replacement_dicts = self.__get_list_value("previewConfig.replace")
         for index, replacement_dict in enumerate(replacement_dicts):
             if not isinstance(replacement_dict, dict):
@@ -117,24 +143,18 @@ class _GitOpsConfigYamlParser:
             if "variable" not in replacement_dict:
                 raise GitOpsException(f"Key 'previewConfig.replace.[{index}].variable' not found in GitOps config!")
             path = replacement_dict["path"]
-            variable_str = replacement_dict["variable"]
+            variable = replacement_dict["variable"]
             if not isinstance(path, str):
                 raise GitOpsException(
                     f"Item 'previewConfig.replace.[{index}].path' should be a string in GitOps config!"
                 )
-            if not isinstance(variable_str, str):
+            if not isinstance(variable, str):
                 raise GitOpsException(
                     f"Item 'previewConfig.replace.[{index}].variable' should be a string in GitOps config!"
                 )
-            try:
-                variable = GitOpsConfig.Replacement.Variable[variable_str]
-            except KeyError as ex:
-                possible_values = ", ".join(sorted([v.name for v in GitOpsConfig.Replacement.Variable]))
-                raise GitOpsException(
-                    f"Item 'previewConfig.replace.[{index}].variable' should be one of the following values in "
-                    f"GitOps config: {possible_values}"
-                ) from ex
-            replacements.append(GitOpsConfig.Replacement(path=path, variable=variable))
+            if "{" in variable or "}" in variable:
+                raise GitOpsException(f"Item 'previewConfig.replace.[{index}].variable' must not contain '{{' or '}}'!")
+            replacements["values.yaml"].append(GitOpsConfig.Replacement(path, f"{{{variable}}}"))
 
         application_name = self.__get_string_value("deploymentConfig.applicationName")
         preview_target_organisation = self.__get_string_value("deploymentConfig.org")
