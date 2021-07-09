@@ -21,28 +21,43 @@ class GitOpsConfig:
             assert isinstance(self.path, str), "path of wrong type!"
             assert isinstance(self.variable, self.Variable), "variable of wrong type!"
 
+    api_version: int
     application_name: str
-    team_config_org: str
-    team_config_repo: str
-    route_host_template: str
+
+    preview_host_template: str
+
+    preview_template_organisation: str
+    preview_template_repository: str
+
+    preview_target_organisation: str
+    preview_target_repository: str
+
     replacements: List[Replacement]
 
     def __post_init__(self) -> None:
         assert isinstance(self.application_name, str), "application_name of wrong type!"
-        assert isinstance(self.team_config_org, str), "team_config_org of wrong type!"
-        assert isinstance(self.team_config_repo, str), "team_config_repo of wrong type!"
-        assert isinstance(self.route_host_template, str), "route_host_template of wrong type!"
+        assert isinstance(self.preview_host_template, str), "preview_host_template of wrong type!"
+        assert isinstance(self.preview_template_organisation, str), "preview_template_organisation of wrong type!"
+        assert isinstance(self.preview_template_repository, str), "preview_template_repository of wrong type!"
+        assert isinstance(self.preview_target_organisation, str), "preview_target_organisation of wrong type!"
+        assert isinstance(self.preview_target_repository, str), "preview_target_repository of wrong type!"
         assert isinstance(self.replacements, list), "replacements of wrong type!"
         for index, replacement in enumerate(self.replacements):
             assert isinstance(replacement, self.Replacement), f"replacement[{index}] of wrong type!"
 
-    def get_route_host(self, preview_id: str) -> str:
+    def get_preview_host(self, preview_id: str) -> str:
         hashed_preview_id = self.create_hashed_preview_id(preview_id)
-        return self.route_host_template.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
+        return self.preview_host_template.replace("{SHA256_8CHAR_BRANCH_HASH}", hashed_preview_id)
 
     def get_preview_namespace(self, preview_id: str) -> str:
         hashed_preview_id = self.create_hashed_preview_id(preview_id)
         return f"{self.application_name}-{hashed_preview_id}-preview"
+
+    def is_preview_template_equal_target(self) -> bool:
+        return (
+            self.preview_template_organisation == self.preview_target_organisation
+            and self.preview_template_repository == self.preview_target_repository
+        )
 
     @staticmethod
     def create_hashed_preview_id(preview_id: str) -> str:
@@ -50,29 +65,37 @@ class GitOpsConfig:
 
     @staticmethod
     def from_yaml(yaml: Any) -> "GitOpsConfig":
-        def get_value(key: str) -> Any:
-            keys = key.split(".")
-            data = yaml
-            for k in keys:
-                if not isinstance(data, dict) or k not in data:
-                    raise GitOpsException(f"Key '{key}' not found in GitOps config!")
-                data = data[k]
-            return data
+        return _GitOpsConfigYamlParser(yaml).parse()
 
-        def get_string_value(key: str) -> str:
-            value = get_value(key)
-            if not isinstance(value, str):
-                raise GitOpsException(f"Item '{key}' should be a string in GitOps config!")
-            return value
 
-        def get_list_value(key: str) -> List[Any]:
-            value = get_value(key)
-            if not isinstance(value, list):
-                raise GitOpsException(f"Item '{key}' should be a list in GitOps config!")
-            return value
+class _GitOpsConfigYamlParser:
+    def __init__(self, yaml: Any):
+        self.__yaml = yaml
 
+    def __get_value(self, key: str) -> Any:
+        keys = key.split(".")
+        data = self.__yaml
+        for k in keys:
+            if not isinstance(data, dict) or k not in data:
+                raise GitOpsException(f"Key '{key}' not found in GitOps config!")
+            data = data[k]
+        return data
+
+    def __get_string_value(self, key: str) -> str:
+        value = self.__get_value(key)
+        if not isinstance(value, str):
+            raise GitOpsException(f"Item '{key}' should be a string in GitOps config!")
+        return value
+
+    def __get_list_value(self, key: str) -> List[Any]:
+        value = self.__get_value(key)
+        if not isinstance(value, list):
+            raise GitOpsException(f"Item '{key}' should be a list in GitOps config!")
+        return value
+
+    def parse(self) -> GitOpsConfig:
         replacements: List[GitOpsConfig.Replacement] = []
-        replacement_dicts = get_list_value("previewConfig.replace")
+        replacement_dicts = self.__get_list_value("previewConfig.replace")
         for index, replacement_dict in enumerate(replacement_dicts):
             if not isinstance(replacement_dict, dict):
                 raise GitOpsException(f"Item 'previewConfig.replace.[{index}]' should be a object in GitOps config!")
@@ -100,10 +123,16 @@ class GitOpsConfig:
                 ) from ex
             replacements.append(GitOpsConfig.Replacement(path=path, variable=variable))
 
+        preview_target_organisation = self.__get_string_value("deploymentConfig.org")
+        preview_target_repository = self.__get_string_value("deploymentConfig.repository")
+
         return GitOpsConfig(
-            application_name=get_string_value("deploymentConfig.applicationName"),
-            team_config_org=get_string_value("deploymentConfig.org"),
-            team_config_repo=get_string_value("deploymentConfig.repository"),
-            route_host_template=get_string_value("previewConfig.route.host.template"),
+            api_version=0,
+            application_name=self.__get_string_value("deploymentConfig.applicationName"),
+            preview_host_template=self.__get_string_value("previewConfig.route.host.template"),
+            preview_template_organisation=preview_target_organisation,
+            preview_template_repository=preview_target_repository,
+            preview_target_organisation=preview_target_organisation,
+            preview_target_repository=preview_target_repository,
             replacements=replacements,
         )

@@ -26,10 +26,13 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
 
         self.load_gitops_config_mock = self.monkey_patch(load_gitops_config)
         self.load_gitops_config_mock.return_value = GitOpsConfig(
+            api_version=0,
             application_name="APP",
-            team_config_org="TEAM_CONFIG_ORG",
-            team_config_repo="TEAM_CONFIG_REPO",
-            route_host_template="www.foo.bar",
+            preview_host_template="www.foo.bar",
+            preview_template_organisation="PREVIEW_TEMPLATE_ORG",
+            preview_template_repository="PREVIEW_TEMPLATE_REPO",
+            preview_target_organisation="PREVIEW_TARGET_ORG",
+            preview_target_repository="PREVIEW_TARGET_REPO",
             replacements=[],
         )
 
@@ -68,7 +71,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         DeletePreviewCommand(args).execute()
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
+            call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
@@ -99,7 +102,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         DeletePreviewCommand(args).execute()
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
+            call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
@@ -131,7 +134,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
+            call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone(),
             call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),

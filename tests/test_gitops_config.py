@@ -37,31 +37,33 @@ class GitOpsConfigTest(unittest.TestCase):
 
     def test_team_config_org(self):
         config = self.load()
-        self.assertEqual(config.team_config_org, "my-org")
+        self.assertEqual(config.preview_template_organisation, "my-org")
+        self.assertEqual(config.preview_target_organisation, "my-org")
 
-    def test_team_config_org_missing(self):
+    def test_deployment_config_org_missing(self):
         del self.yaml["deploymentConfig"]["org"]
         self.assert_load_error("Key 'deploymentConfig.org' not found in GitOps config!")
 
-    def test_team_config_org_not_a_string(self):
+    def test_deployment_config_org_not_a_string(self):
         self.yaml["deploymentConfig"]["org"] = True
         self.assert_load_error("Item 'deploymentConfig.org' should be a string in GitOps config!")
 
-    def test_team_config_repo(self):
+    def test_deployment_config_repo(self):
         config = self.load()
-        self.assertEqual(config.team_config_repo, "my-repo")
+        self.assertEqual(config.preview_template_repository, "my-repo")
+        self.assertEqual(config.preview_target_repository, "my-repo")
 
-    def test_team_config_repo_missing(self):
+    def test_deployment_config_repo_missing(self):
         del self.yaml["deploymentConfig"]["repository"]
         self.assert_load_error("Key 'deploymentConfig.repository' not found in GitOps config!")
 
-    def test_team_config_repo_not_a_string(self):
+    def test_deployment_config_repo_not_a_string(self):
         self.yaml["deploymentConfig"]["repository"] = []
         self.assert_load_error("Item 'deploymentConfig.repository' should be a string in GitOps config!")
 
     def test_route_host_template(self):
         config = self.load()
-        self.assertEqual(config.route_host_template, "my-host-template")
+        self.assertEqual(config.preview_host_template, "my-host-template")
 
     def test_route_missing(self):
         del self.yaml["previewConfig"]["route"]
