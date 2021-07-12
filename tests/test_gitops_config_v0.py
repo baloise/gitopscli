@@ -97,7 +97,7 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
     def test_namespace_template(self):
         config = self.load()
-        self.assertEqual(config.preview_target_namespace_template, "my-app-{PREVIEW_ID_HASH}-preview")
+        self.assertEqual(config.preview_target_namespace_template, "{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview")
 
     def test_namespace(self):
         config = self.load()
@@ -127,7 +127,7 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
     def test_replacements_invalid_list(self):
         self.yaml["previewConfig"]["replace"] = ["foo"]
-        self.assert_load_error("Item 'previewConfig.replace.[0]' should be a object in GitOps config!")
+        self.assert_load_error("Item 'previewConfig.replace.[0]' should be an object in GitOps config!")
 
     def test_replacements_invalid_list_items_missing_path(self):
         del self.yaml["previewConfig"]["replace"][1]["path"]
