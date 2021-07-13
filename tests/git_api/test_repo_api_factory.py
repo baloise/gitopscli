@@ -70,3 +70,59 @@ class GitRepoApiFactoryTest(unittest.TestCase):
             self.fail("Expected a GitOpsException")
         except GitOpsException as ex:
             self.assertEqual("Please provide url for Bitbucket!", str(ex))
+
+    @patch("gitopscli.git_api.git_repo_api_factory.GitRepoApiLoggingProxy")
+    @patch("gitopscli.git_api.git_repo_api_factory.GitlabGitRepoApiAdapter")
+    def test_create_gitlab(self, mock_gitlab_adapter_constructor, mock_logging_proxy_constructor):
+        mock_gitlab_adapter = MagicMock()
+        mock_gitlab_adapter_constructor.return_value = mock_gitlab_adapter
+
+        mock_logging_proxy = MagicMock()
+        mock_logging_proxy_constructor.return_value = mock_logging_proxy
+
+        git_repo_api = GitRepoApiFactory.create(
+            config=GitApiConfig(
+                username="USER", password="PASS", git_provider=GitProvider.GITLAB, git_provider_url="PROVIDER_URL",
+            ),
+            organisation="ORG",
+            repository_name="REPO",
+        )
+
+        self.assertEqual(git_repo_api, mock_logging_proxy)
+
+        mock_gitlab_adapter_constructor.assert_called_with(
+            git_provider_url="PROVIDER_URL",
+            username="USER",
+            password="PASS",
+            organisation="ORG",
+            repository_name="REPO",
+        )
+        mock_logging_proxy_constructor.assert_called_with(mock_gitlab_adapter)
+
+    @patch("gitopscli.git_api.git_repo_api_factory.GitRepoApiLoggingProxy")
+    @patch("gitopscli.git_api.git_repo_api_factory.GitlabGitRepoApiAdapter")
+    def test_create_gitlab_default_provider_url(self, mock_gitlab_adapter_constructor, mock_logging_proxy_constructor):
+        mock_gitlab_adapter = MagicMock()
+        mock_gitlab_adapter_constructor.return_value = mock_gitlab_adapter
+
+        mock_logging_proxy = MagicMock()
+        mock_logging_proxy_constructor.return_value = mock_logging_proxy
+
+        git_repo_api = GitRepoApiFactory.create(
+            config=GitApiConfig(
+                username="USER", password="PASS", git_provider=GitProvider.GITLAB, git_provider_url=None,
+            ),
+            organisation="ORG",
+            repository_name="REPO",
+        )
+
+        self.assertEqual(git_repo_api, mock_logging_proxy)
+
+        mock_gitlab_adapter_constructor.assert_called_with(
+            git_provider_url="https://www.gitlab.com",
+            username="USER",
+            password="PASS",
+            organisation="ORG",
+            repository_name="REPO",
+        )
+        mock_logging_proxy_constructor.assert_called_with(mock_gitlab_adapter)

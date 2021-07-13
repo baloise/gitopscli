@@ -1102,8 +1102,8 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
-                "--git-provider",
-                "GitHub",
+                "--git-provider-url",
+                "https://www.gitlab.com/",
                 "--organisation",
                 "ORG",
                 "--repository-name",
@@ -1125,7 +1125,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.root_organisation, "ROOT_ORGA")
         self.assertEqual(args.root_repository_name, "ROOT_REPO")
 
-        self.assertIsNone(args.git_provider_url)
+        self.assertEqual(args.git_provider, GitProvider.GITLAB)
+        self.assertEqual(args.git_provider_url, "https://www.gitlab.com/")
         self.assertFalse(verbose)
 
     def test_sync_apps_all_args(self):
