@@ -30,7 +30,7 @@ class DeletePreviewCommand(Command):
 
         preview_target_git_repo_api = self.__create_preview_target_git_repo_api(gitops_config)
         with GitRepo(preview_target_git_repo_api) as preview_target_git_repo:
-            preview_target_git_repo.clone()
+            preview_target_git_repo.clone(gitops_config.preview_target_branch)
 
             preview_namespace = gitops_config.get_preview_namespace(preview_id)
             logging.info("Preview folder name: %s", preview_namespace)
