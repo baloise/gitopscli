@@ -227,6 +227,18 @@ class GitOpsConfigV1Test(unittest.TestCase):
             config.get_preview_namespace("preview-1")
         self.assertEqual("Invalid character in preview namespace: '*'", str(ex.value))
 
+    def test_preview_target_namespace_too_long(self):
+        self.yaml["previewConfig"]["target"][
+            "namespace"
+        ] = "veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long-{PREVIEW_ID}-{PREVIEW_ID_HASH}"
+        config = self.load()
+        with pytest.raises(GitOpsException) as ex:
+            config.get_preview_namespace("x")
+        self.assertEqual(
+            "Preview namespace is too long (max 63 chars): veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long--2d711642 (68 chars)",
+            str(ex.value),
+        )
+
     def test_preview_target_namespace_contains_invalid_variable(self):
         self.yaml["previewConfig"]["target"]["namespace"] = "{FOO}-bar"
         self.assert_load_error("GitOps config template '{FOO}-bar' contains invalid variable: FOO")

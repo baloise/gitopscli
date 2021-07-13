@@ -111,6 +111,14 @@ class GitOpsConfig:
 
         current_length = len(preview_namespace) - len("{PREVIEW_ID}")
         remaining_length = _MAX_NAMESPACE_LENGTH - current_length
+
+        if remaining_length < 1:
+            preview_namespace = preview_namespace.replace("{PREVIEW_ID}", "")
+            raise GitOpsException(
+                f"Preview namespace is too long (max {_MAX_NAMESPACE_LENGTH} chars): "
+                f"{preview_namespace} ({len(preview_namespace)} chars)"
+            )
+
         sanitized_preview_id = self.__sanitize(preview_id, remaining_length)
 
         preview_namespace = preview_namespace.replace("{PREVIEW_ID}", sanitized_preview_id)
