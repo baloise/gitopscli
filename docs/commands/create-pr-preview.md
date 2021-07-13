@@ -7,56 +7,66 @@ You need to provide some additional configuration files in your repositories for
 ## Configuration
 ### Preview Templates
 
-Your *deployment config repository* needs to contain a `.preview-templates` folder with the deployment configuration templates for every application you want to use this command for.
-
-For example you have to provide `.preview-templates/app-xy` for your app `app-xy`. The `create-pr-preview` command simply copies this directory to the root of the repository. Only image tag and route host will be replaced in the preview version of the deployment.
+You have to provide a folder with the deployment configuration templates for every application you want to use this command for. By default it is assumed that this folder is located in your *deployment config repository* under the top-level folder `.preview-templates`. For example `.preview-templates/app-xy` for your app `app-xy`. The `create-preview` command simply copies this directory to the root of your *deployment config repository* and replaces e.g. image tag and route host which are specific to this preview.
 
 ```
 deployment-config-repo/
 ├── .preview-templates
-│   └── app-xy
+│   └── app-xy                        <- Can contain any files and folders
 │       ├── values.yaml
 │       └── some-more-config-files-or-folders
 ├── app-xy-production
 ├── app-xy-staging
 ├── app-xy-test
-└── app-xy-c7003101-preview  <- This is how a created preview looks like
-    ├── values.yaml          <- image tag and route host are replaced in this one
+└── app-xy-my-branch-c7003101-preview  <- This is how a created preview looks by default
+    ├── values.yaml                    <- e.g. image tag and route host are replaced in this one
     └── some-more-config-files-or-folders
 ```
-
-!!! info "Currently you have to specify image tag and route host in a `values.yaml` file. We are working on making this configurable in the future."
 
 ### .gitops.config.yaml
 
 Make sure that your *app repository* contains a `.gitops.config.yaml` file. This file provides all information to 
 
-1. find the *deployment config repository*
-2. locate the preview template for your app
-3. replace image tag and route host in the template
+1. find repository, branch, and folder containing the template
+2. templates for host and namespace name
+3. replacements in template files
+4. find repository and branch where the preview should be created (i.e. your *deployment config repository*)
 
 ```yaml
-deploymentConfig:
-  # The organisation name of your deployment repo
-  org: deployments
-  # The repostiory name of your deployment repo
-  repository: deployment-config-repo
-  # The name of the application (name of the folder in `.preview-templates`)
-  applicationName: app-xy
-
+apiVersion: v1
+applicationName: app-xy
 previewConfig:
-  route:
-    host:
-      # Your router host
-      # {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your feature branch name
-      template: app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld
+  host: {PREVIEW_NAMESPACE}.example.tld
+# template:                              # optional section
+#   organisation: templates              # optional (default: target.organisation)
+#   repository: template-repo            # optional (default: target.repository)
+#   branch: master                       # optional (default: target.branch)
+#   path: custom/{APPLICATION_NAME}      # optional (default: '.preview-templates/{APPLICATION_NAME}')
+  target:
+    organisation: deployments
+    repository: deployment-config-repo
+#   branch: master                       # optional (defaults to repo's default branch)
+    namespace: {APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview  # optional (default: '{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview',
+                                                             #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be
+                                                             #           truncated if max namespace length exceeds 63 chars.)
   replace:
-    # Paths that should be replaced in the `values.yaml`
-    - path: image.tag
-      variable: GIT_COMMIT # this is the latest git hash of the pull request branch
-    - path: route.host
-      variable: ROUTE_HOST # this is the resolved host.template from above
+    Chart.yaml:
+      - path: name
+        value: {PREVIEW_NAMESPACE}
+    values.yaml:
+      - path: app.image
+        value: registry.example.tld/my-app:{GIT_HASH}
+      - path: route.host
+        value: {PREVIEW_HOST}
 ```
+
+#### Variables
+- `APPLICATION_NAME`: value from `applicationName`
+- `GIT_HASH`: The git hash of the *app repository* commit that will be deployed
+- `PREVIEW_ID`: The branch name in the *app repository*
+- `PREVIEW_ID_HASH`: The first 8 characters of the SHA256 hash of `PREVIEW_ID`
+- `PREVIEW_NAMESPACE`: The resulting value of `previewConfig.target.namespace`
+- `PREVIEW_HOST`: The resulting value of `previewConfig.host`
 
 ## Example
 
