@@ -388,6 +388,19 @@
     .gitops.config.yaml
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -580,6 +593,19 @@
     .gitops.config.yaml
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -632,53 +658,64 @@
 <p>You need to provide some additional configuration files in your repositories for this command to work. </p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <h3 id="preview-templates">Preview Templates<a class="headerlink" href="#preview-templates" title="Permanent link">&para;</a></h3>
-<p>Your <em>deployment config repository</em> needs to contain a <code>.preview-templates</code> folder with the deployment configuration templates for every application you want to use this command for.</p>
-<p>For example you have to provide <code>.preview-templates/app-xy</code> for your app <code>app-xy</code>. The <code>create-preview</code> command simply copies this directory to the root of the repository. Only image tag and route host will be replaced in the preview version of the deployment.</p>
+<p>You have to provide a folder with the deployment configuration templates for every application you want to use this command for. By default it is assumed that this folder is located in your <em>deployment config repository</em> under the top-level folder <code>.preview-templates</code>. For example <code>.preview-templates/app-xy</code> for your app <code>app-xy</code>. The <code>create-preview</code> command simply copies this directory to the root of your <em>deployment config repository</em> and replaces e.g. image tag and route host which are specific to this preview.</p>
 <div class="codehilite"><pre><span></span><code>deployment-config-repo/
 ├── .preview-templates
-│   └── app-xy
+│   └── app-xy                        &lt;- Can contain any files and folders
 │       ├── values.yaml
 │       └── some-more-config-files-or-folders
 ├── app-xy-production
 ├── app-xy-staging
 ├── app-xy-test
-└── app-xy-c7003101-preview  &lt;- This is how a created preview looks like
-    ├── values.yaml          &lt;- image tag and route host are replaced in this one
+└── app-xy-my-branch-c7003101-preview  &lt;- This is how a created preview looks by default
+    ├── values.yaml                    &lt;- e.g. image tag and route host are replaced in this one
     └── some-more-config-files-or-folders
 </code></pre></div>
 
-<div class="admonition info">
-<p class="admonition-title">Currently you have to specify image tag and route host in a <code>values.yaml</code> file. We are working on making this configurable in the future.</p>
-</div>
 <h3 id="gitopsconfigyaml">.gitops.config.yaml<a class="headerlink" href="#gitopsconfigyaml" title="Permanent link">&para;</a></h3>
 <p>Make sure that your <em>app repository</em> contains a <code>.gitops.config.yaml</code> file. This file provides all information to </p>
 <ol>
-<li>find the <em>deployment config repository</em></li>
-<li>locate the preview template for your app</li>
-<li>replace image tag and route host in the template</li>
+<li>find repository, branch, and folder containing the template</li>
+<li>templates for host and namespace name</li>
+<li>replace values in template files</li>
+<li>find repository and branch where the preview should be created (i.e. your <em>deployment config repository</em>)</li>
 </ol>
-<div class="codehilite"><pre><span></span><code><span class="nt">deploymentConfig</span><span class="p">:</span>
-  <span class="c1"># The organisation name of your deployment repo</span>
-  <span class="nt">org</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
-  <span class="c1"># The repostiory name of your deployment repo</span>
-  <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
-  <span class="c1"># The name of the application (name of the folder in `.preview-templates`)</span>
-  <span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
-
+<div class="codehilite"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
 <span class="nt">previewConfig</span><span class="p">:</span>
-  <span class="nt">route</span><span class="p">:</span>
-    <span class="nt">host</span><span class="p">:</span>
-      <span class="c1"># Your router host</span>
-      <span class="c1"># {SHA256_8CHAR_BRANCH_HASH} gets replaced by a shortened hash of your preview_id</span>
-      <span class="nt">template</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app.xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld</span>
+  <span class="nt">host</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">PREVIEW_NAMESPACE</span><span class="p p-Indicator">}</span><span class="l l-Scalar l-Scalar-Plain">.example.tld</span>
+<span class="c1"># template:                              # optional section</span>
+<span class="c1">#   organisation: templates              # optional (default: target.organisation)</span>
+<span class="c1">#   repository: template-repo            # optional (default: target.repository)</span>
+<span class="c1">#   branch: master                       # optional (default: target.branch)</span>
+<span class="c1">#   path: custom/{APPLICATION_NAME}      # optional (default: &#39;.preview-templates/{APPLICATION_NAME}&#39;)</span>
+  <span class="nt">target</span><span class="p">:</span>
+    <span class="nt">organisation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
+    <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
+<span class="c1">#   branch: master                       # optional (defaults to repo&#39;s default branch)</span>
+    <span class="nt">namespace</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">APPLICATION_NAME</span><span class="p p-Indicator">}</span><span class="l l-Scalar l-Scalar-Plain">-{PREVIEW_ID_HASH}-preview</span>  <span class="c1"># optional (default: &#39;{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview&#39;,</span>
+                                                             <span class="c1">#           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be</span>
+                                                             <span class="c1">#           truncated if max namespace length exceeds 63 chars.)</span>
   <span class="nt">replace</span><span class="p">:</span>
-    <span class="c1"># Paths that should be replaced in the `values.yaml`</span>
-    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">image.tag</span>
-      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span> <span class="c1"># this is the git hash of your app repo</span>
-    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
-      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span> <span class="c1"># this is the resolved host.template from above</span>
+    <span class="nt">Chart.yaml</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+        <span class="nt">value</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">PREVIEW_NAMESPACE</span><span class="p p-Indicator">}</span>
+    <span class="nt">values.yaml</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app.image</span>
+        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">registry.example.tld/my-app:{GIT_HASH}</span>
+      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
+        <span class="nt">value</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">PREVIEW_HOST</span><span class="p p-Indicator">}</span>
 </code></pre></div>
 
+<h4 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>APPLICATION_NAME</code>: value from <code>applicationName</code></li>
+<li><code>GIT_HASH</code>: The CLI provided <code>--git-hash</code></li>
+<li><code>PREVIEW_ID</code>: The CLI provided <code>--preview-id</code></li>
+<li><code>PREVIEW_ID_HASH</code>: The first 8 characters of the SHA256 hash of <code>PREVIEW_ID</code></li>
+<li><code>PREVIEW_NAMESPACE</code>: The resulting value of <code>previewConfig.target.namespace</code></li>
+<li><code>PREVIEW_HOST</code>: The resulting value of <code>previewConfig.host</code></li>
+</ul>
 <h2 id="returned-information">Returned Information<a class="headerlink" href="#returned-information" title="Permanent link">&para;</a></h2>
 <p>After running this command you'll find a YAML file at <code>/tmp/gitopscli-preview-info.yaml</code>. It contains generated information about your preview environment:</p>
 <div class="codehilite"><pre><span></span><code><span class="nt">previewId</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PREVIEW_ID</span>
