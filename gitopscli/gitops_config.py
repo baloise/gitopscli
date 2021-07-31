@@ -13,12 +13,12 @@ _VARIABLE_REGEX = re.compile(r"{(\w+)}")
 class GitOpsConfig:
     class Replacement:
         @dataclass(frozen=True)
-        class Context:
+        class PreviewContext:
             gitops_config: "GitOpsConfig"
             preview_id: str
             git_hash: str
 
-        __VARIABLE_MAPPERS: Dict[str, Callable[["GitOpsConfig.Replacement.Context"], str]] = {
+        __VARIABLE_MAPPERS: Dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]] = {
             "GIT_HASH": lambda context: context.git_hash,
             "PREVIEW_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
             "PREVIEW_NAMESPACE": lambda context: context.gitops_config.get_preview_namespace(context.preview_id),
@@ -41,7 +41,7 @@ class GitOpsConfig:
                         f"contains invalid variable: {var}"
                     )
 
-        def get_value(self, context: Context) -> str:
+        def get_value(self, context: PreviewContext) -> str:
             val = self.value_template
             for variable, value_func in self.__VARIABLE_MAPPERS.items():
                 val = val.replace(f"{{{variable}}}", value_func(context))

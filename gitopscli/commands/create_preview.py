@@ -118,7 +118,7 @@ class CreatePreviewCommand(Command):
     def __replace_values(self, git_repo: GitRepo, gitops_config: GitOpsConfig) -> bool:
         preview_id = self.__args.preview_id
         preview_folder_name = gitops_config.get_preview_namespace(self.__args.preview_id)
-        context = GitOpsConfig.Replacement.Context(gitops_config, preview_id, self.__args.git_hash)
+        context = GitOpsConfig.Replacement.PreviewContext(gitops_config, preview_id, self.__args.git_hash)
         any_value_replaced = False
         for file, replacements in gitops_config.replacements.items():
             for replacement in replacements:
