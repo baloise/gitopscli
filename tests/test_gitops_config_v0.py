@@ -5,12 +5,12 @@ from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 
 
-class GitOpsConfigTest(unittest.TestCase):
+class GitOpsConfigV0Test(unittest.TestCase):
     def setUp(self):
         self.yaml = {
             "deploymentConfig": {"applicationName": "my-app", "org": "my-org", "repository": "my-repo"},
             "previewConfig": {
-                "route": {"host": {"template": "my-host-template"}},
+                "route": {"host": {"template": "my-{SHA256_8CHAR_BRANCH_HASH}-host-template"}},
                 "replace": [{"path": "a.b", "variable": "ROUTE_HOST"}, {"path": "c.d", "variable": "GIT_COMMIT"}],
             },
         }
@@ -37,31 +37,47 @@ class GitOpsConfigTest(unittest.TestCase):
 
     def test_team_config_org(self):
         config = self.load()
-        self.assertEqual(config.team_config_org, "my-org")
+        self.assertEqual(config.preview_template_organisation, "my-org")
+        self.assertEqual(config.preview_target_organisation, "my-org")
+        self.assertTrue(config.is_preview_template_equal_target())
 
-    def test_team_config_org_missing(self):
+    def test_deployment_config_org_missing(self):
         del self.yaml["deploymentConfig"]["org"]
         self.assert_load_error("Key 'deploymentConfig.org' not found in GitOps config!")
 
-    def test_team_config_org_not_a_string(self):
+    def test_deployment_config_org_not_a_string(self):
         self.yaml["deploymentConfig"]["org"] = True
         self.assert_load_error("Item 'deploymentConfig.org' should be a string in GitOps config!")
 
-    def test_team_config_repo(self):
+    def test_deployment_config_repo(self):
         config = self.load()
-        self.assertEqual(config.team_config_repo, "my-repo")
+        self.assertEqual(config.preview_template_repository, "my-repo")
+        self.assertEqual(config.preview_target_repository, "my-repo")
+        self.assertTrue(config.is_preview_template_equal_target())
 
-    def test_team_config_repo_missing(self):
+    def test_deployment_config_repo_missing(self):
         del self.yaml["deploymentConfig"]["repository"]
         self.assert_load_error("Key 'deploymentConfig.repository' not found in GitOps config!")
 
-    def test_team_config_repo_not_a_string(self):
+    def test_deployment_config_repo_not_a_string(self):
         self.yaml["deploymentConfig"]["repository"] = []
         self.assert_load_error("Item 'deploymentConfig.repository' should be a string in GitOps config!")
 
+    def test_preview_template_branch_is_none(self):
+        config = self.load()
+        self.assertIsNone(config.preview_template_branch)
+
+    def test_preview_target_branch_is_none(self):
+        config = self.load()
+        self.assertIsNone(config.preview_target_branch)
+
     def test_route_host_template(self):
         config = self.load()
-        self.assertEqual(config.route_host_template, "my-host-template")
+        self.assertEqual(config.preview_host_template, "my-{PREVIEW_ID_HASH}-host-template")
+
+    def test_route_host(self):
+        config = self.load()
+        self.assertEqual(config.get_preview_host("preview-1"), "my-3e355b4a-host-template")
 
     def test_route_missing(self):
         del self.yaml["previewConfig"]["route"]
@@ -79,15 +95,27 @@ class GitOpsConfigTest(unittest.TestCase):
         self.yaml["previewConfig"]["route"]["host"]["template"] = []
         self.assert_load_error("Item 'previewConfig.route.host.template' should be a string in GitOps config!")
 
+    def test_namespace_template(self):
+        config = self.load()
+        self.assertEqual(config.preview_target_namespace_template, "{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview")
+
+    def test_namespace(self):
+        config = self.load()
+        self.assertEqual(config.get_preview_namespace("preview-1"), "my-app-3e355b4a-preview")
+
     def test_replacements(self):
         config = self.load()
-        self.assertEqual(
-            config.replacements,
-            [
-                GitOpsConfig.Replacement(path="a.b", variable=GitOpsConfig.Replacement.Variable.ROUTE_HOST),
-                GitOpsConfig.Replacement(path="c.d", variable=GitOpsConfig.Replacement.Variable.GIT_COMMIT),
-            ],
-        )
+        self.assertEqual(config.replacements.keys(), {"Chart.yaml", "values.yaml"})
+
+        self.assertEqual(len(config.replacements["Chart.yaml"]), 1)
+        self.assertEqual(config.replacements["Chart.yaml"][0].path, "name")
+        self.assertEqual(config.replacements["Chart.yaml"][0].value_template, "{PREVIEW_NAMESPACE}")
+
+        self.assertEqual(len(config.replacements["values.yaml"]), 2)
+        self.assertEqual(config.replacements["values.yaml"][0].path, "a.b")
+        self.assertEqual(config.replacements["values.yaml"][0].value_template, "{PREVIEW_HOST}")
+        self.assertEqual(config.replacements["values.yaml"][1].path, "c.d")
+        self.assertEqual(config.replacements["values.yaml"][1].value_template, "{GIT_HASH}")
 
     def test_replacements_missing(self):
         del self.yaml["previewConfig"]["replace"]
@@ -99,7 +127,7 @@ class GitOpsConfigTest(unittest.TestCase):
 
     def test_replacements_invalid_list(self):
         self.yaml["previewConfig"]["replace"] = ["foo"]
-        self.assert_load_error("Item 'previewConfig.replace.[0]' should be a object in GitOps config!")
+        self.assert_load_error("Item 'previewConfig.replace.[0]' should be an object in GitOps config!")
 
     def test_replacements_invalid_list_items_missing_path(self):
         del self.yaml["previewConfig"]["replace"][1]["path"]
@@ -119,6 +147,8 @@ class GitOpsConfigTest(unittest.TestCase):
 
     def test_replacements_invalid_list_items_unknown_variable(self):
         self.yaml["previewConfig"]["replace"][0]["variable"] = "FOO"
-        self.assert_load_error(
-            "Item 'previewConfig.replace.[0].variable' should be one of the following values in GitOps config: GIT_COMMIT, ROUTE_HOST"
-        )
+        self.assert_load_error("Replacement value '{FOO}' for path 'a.b' contains invalid variable: FOO")
+
+    def test_replacements_invalid_list_items_invalid_variable(self):
+        self.yaml["previewConfig"]["replace"][0]["variable"] = "{FOO"
+        self.assert_load_error("Item 'previewConfig.replace.[0].variable' must not contain '{' or '}'!")

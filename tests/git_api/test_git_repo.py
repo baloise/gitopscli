@@ -80,6 +80,49 @@ class GitRepoTest(unittest.TestCase):
         self.assertFalse(path.exists(tmp_dir))
 
     @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone()
+
+            tmp_dir = testee.get_full_file_path("..")
+            self.assertTrue(path.exists(tmp_dir))
+
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("master branch readme", readme)
+
+        self.assertFalse(path.exists(tmp_dir))
+        logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_branch(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("xyz")
+
+            tmp_dir = testee.get_full_file_path("..")
+            self.assertTrue(path.exists(tmp_dir))
+
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("xyz branch readme", readme)
+
+        self.assertFalse(path.exists(tmp_dir))
+        logging_mock.info.assert_called_once_with(
+            "Cloning repository: %s (branch: %s)", self.__mock_repo_api.get_clone_url(), "xyz"
+        )
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_unknown_branch(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            with pytest.raises(GitOpsException) as ex:
+                testee.clone("unknown")
+            self.assertEqual(
+                f"Error cloning branch 'unknown' of '{self.__mock_repo_api.get_clone_url()}'", str(ex.value)
+            )
+
+        logging_mock.info.assert_called_once_with(
+            "Cloning repository: %s (branch: %s)", self.__mock_repo_api.get_clone_url(), "unknown"
+        )
+
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_clone_without_credentials(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()

@@ -26,11 +26,18 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
 
         self.load_gitops_config_mock = self.monkey_patch(load_gitops_config)
         self.load_gitops_config_mock.return_value = GitOpsConfig(
+            api_version=0,
             application_name="APP",
-            team_config_org="TEAM_CONFIG_ORG",
-            team_config_repo="TEAM_CONFIG_REPO",
-            route_host_template="www.foo.bar",
-            replacements=[],
+            preview_host_template="www.foo.bar",
+            preview_template_organisation="PREVIEW_TEMPLATE_ORG",
+            preview_template_repository="PREVIEW_TEMPLATE_REPO",
+            preview_template_path_template=".preview-templates/my-app",
+            preview_template_branch="template-branch",
+            preview_target_organisation="PREVIEW_TARGET_ORG",
+            preview_target_repository="PREVIEW_TARGET_REPO",
+            preview_target_branch="target-branch",
+            preview_target_namespace_template=f"APP-{{PREVIEW_ID_HASH}}-preview",
+            replacements={},
         )
 
         self.git_repo_api_mock = self.create_mock(GitRepoApi)
@@ -68,13 +75,13 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         DeletePreviewCommand(args).execute()
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
+            call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.clone(),
-            call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
-            call.GitRepo.get_full_file_path("APP-685912d3-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
-            call.shutil.rmtree("/tmp/created-tmp-dir/APP-685912d3-preview", ignore_errors=True),
+            call.GitRepo.clone("target-branch"),
+            call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
+            call.GitRepo.get_full_file_path("app-685912d3-preview"),
+            call.os.path.exists("/tmp/created-tmp-dir/app-685912d3-preview"),
+            call.shutil.rmtree("/tmp/created-tmp-dir/app-685912d3-preview", ignore_errors=True),
             call.GitRepo.commit(
                 "GIT_USER", "GIT_EMAIL", "Delete preview environment for 'APP' and preview id 'PREVIEW_ID'."
             ),
@@ -99,12 +106,12 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         DeletePreviewCommand(args).execute()
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
+            call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.clone(),
-            call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
-            call.GitRepo.get_full_file_path("APP-685912d3-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
+            call.GitRepo.clone("target-branch"),
+            call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
+            call.GitRepo.get_full_file_path("app-685912d3-preview"),
+            call.os.path.exists("/tmp/created-tmp-dir/app-685912d3-preview"),
             call.logging.info(
                 "No preview environment for '%s' and preview id '%s'. I'm done here.", "APP", "PREVIEW_ID"
             ),
@@ -127,16 +134,16 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         )
         with pytest.raises(GitOpsException) as ex:
             DeletePreviewCommand(args).execute()
-        self.assertEqual(str(ex.value), "There was no preview with name: APP-685912d3-preview")
+        self.assertEqual(str(ex.value), "There was no preview with name: app-685912d3-preview")
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
-            call.GitRepoApiFactory.create(args, "TEAM_CONFIG_ORG", "TEAM_CONFIG_REPO"),
+            call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
-            call.GitRepo.clone(),
-            call.logging.info("Preview folder name: %s", "APP-685912d3-preview"),
-            call.GitRepo.get_full_file_path("APP-685912d3-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/APP-685912d3-preview"),
+            call.GitRepo.clone("target-branch"),
+            call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
+            call.GitRepo.get_full_file_path("app-685912d3-preview"),
+            call.os.path.exists("/tmp/created-tmp-dir/app-685912d3-preview"),
         ]
 
     def test_missing_gitops_config_yaml_error(self):
