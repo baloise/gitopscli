@@ -13,7 +13,7 @@
         <meta name="description" content="A command line interface to perform operations on GitOps managed infrastructure repositories.">
       
       
-        <link rel="canonical" href="https://baloise.github.io/gitopscli/commands/create-preview/">
+        <link rel="canonical" href="https://baloise.github.io/gitopscli/includes/preview-configuration/">
       
       
       
@@ -40,7 +40,7 @@
     
     
       
-        <title>create-preview - GitOps CLI</title>
+        <title>Preview configuration - GitOps CLI</title>
       
     
     
@@ -91,7 +91,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#create-preview" tabindex="0" class="md-skip">
+      <a href="#configuration" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -117,7 +117,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                create-preview
+                Preview configuration
               
             </span>
           
@@ -185,16 +185,14 @@
       
         
 
-  
-
-<nav class="md-tabs md-tabs--active" data-md-component="tabs">
+<nav class="md-tabs" data-md-component="tabs">
   <div class="md-tabs__inner md-grid">
     <ul class="md-tabs__list">
       
         
   <li class="md-tabs__item">
     
-      <a href="../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link md-tabs__link--active">
         Home
       </a>
     
@@ -210,7 +208,7 @@
   
     <li class="md-tabs__item">
       
-        <a href="../add-pr-comment/" class="md-tabs__link md-tabs__link--active">
+        <a href="../../commands/add-pr-comment/" class="md-tabs__link">
           CLI Commands
         </a>
       
@@ -307,12 +305,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
     
     <label class="md-nav__link" for="nav-4">
       CLI Commands
@@ -330,7 +326,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../add-pr-comment/" title="add-pr-comment" class="md-nav__link">
+    <a href="../../commands/add-pr-comment/" title="add-pr-comment" class="md-nav__link">
       add-pr-comment
     </a>
   </li>
@@ -340,103 +336,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        create-preview
-      </label>
-    
-    <a href="./" title="create-preview" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../../commands/create-preview/" title="create-preview" class="md-nav__link">
       create-preview
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    Configuration
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#preview-templates" class="md-nav__link">
-    Preview Templates
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gitopsconfigyaml" class="md-nav__link">
-    .gitops.config.yaml
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#variables" class="md-nav__link">
-    Variables
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#returned-information" class="md-nav__link">
-    Returned Information
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -446,7 +350,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../create-pr-preview/" title="create-pr-preview" class="md-nav__link">
+    <a href="../../commands/create-pr-preview/" title="create-pr-preview" class="md-nav__link">
       create-pr-preview
     </a>
   </li>
@@ -458,7 +362,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../delete-preview/" title="delete-preview" class="md-nav__link">
+    <a href="../../commands/delete-preview/" title="delete-preview" class="md-nav__link">
       delete-preview
     </a>
   </li>
@@ -470,7 +374,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../delete-pr-preview/" title="delete-pr-preview" class="md-nav__link">
+    <a href="../../commands/delete-pr-preview/" title="delete-pr-preview" class="md-nav__link">
       delete-pr-preview
     </a>
   </li>
@@ -482,7 +386,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../deploy/" title="deploy" class="md-nav__link">
+    <a href="../../commands/deploy/" title="deploy" class="md-nav__link">
       deploy
     </a>
   </li>
@@ -494,7 +398,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../sync-apps/" title="sync-apps" class="md-nav__link">
+    <a href="../../commands/sync-apps/" title="sync-apps" class="md-nav__link">
       sync-apps
     </a>
   </li>
@@ -506,7 +410,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../version/" title="version" class="md-nav__link">
+    <a href="../../commands/version/" title="version" class="md-nav__link">
       version
     </a>
   </li>
@@ -567,8 +471,6 @@
 <nav class="md-nav md-nav--secondary">
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">Table of contents</label>
     <ul class="md-nav__list" data-md-scrollfix>
@@ -613,27 +515,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#returned-information" class="md-nav__link">
-    Returned Information
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
-  </a>
-  
-</li>
-      
       
       
       
@@ -650,13 +531,12 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/baloise/gitopscli/edit/master/docs/commands/create-preview.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/baloise/gitopscli/edit/master/docs/includes/preview-configuration.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="create-preview">create-preview<a class="headerlink" href="#create-preview" title="Permanent link">&para;</a></h1>
-<p>The <code>create-preview</code> command can be used to create a preview environment in your <em>deployment config repository</em> for a commit hash of your <em>app repository</em>. You can later easily delete this preview with the <a href="/gitopscli/commands/delete-preview/"><code>delete-preview</code> command</a>.</p>
-<p>You need to provide some additional configuration files in your repositories for this command to work. </p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+                  <h1>Preview configuration</h1>
+                
+                <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <h3 id="preview-templates">Preview Templates<a class="headerlink" href="#preview-templates" title="Permanent link">&para;</a></h3>
 <p>You have to provide a folder with the deployment configuration templates for every application you want to use this command for. By default it is assumed that this folder is located in your <em>deployment config repository</em> under the top-level folder <code>.preview-templates</code>. For example <code>.preview-templates/app-xy</code> for your app <code>app-xy</code>. The <code>create-preview</code> command simply copies this directory to the root of your <em>deployment config repository</em> and replaces e.g. image tag and route host which are specific to this preview.</p>
 <div class="codehilite"><pre><span></span><code>deployment-config-repo/
@@ -724,60 +604,6 @@
 <li><code>PREVIEW_NAMESPACE</code>: The resulting value of <code>previewConfig.target.namespace</code></li>
 <li><code>PREVIEW_HOST</code>: The resulting value of <code>previewConfig.host</code></li>
 </ul>
-<h2 id="returned-information">Returned Information<a class="headerlink" href="#returned-information" title="Permanent link">&para;</a></h2>
-<p>After running this command you'll find a YAML file at <code>/tmp/gitopscli-preview-info.yaml</code>. It contains generated information about your preview environment:</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">previewId</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PREVIEW_ID</span>
-<span class="nt">previewIdHash</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">685912d3</span>
-<span class="nt">routeHost</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app.xy-685912d3.example.tld</span>
-<span class="nt">namespace</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-app-685912d3-preview</span>
-</code></pre></div>
-
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>gitopscli create-preview <span class="se">\</span>
-  --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
-  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
-  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
-  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
-  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
-  --organisation <span class="s2">&quot;my-team&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;app-xy&quot;</span> <span class="se">\</span>
-  --git-hash <span class="s2">&quot;c0784a34e834117e1489973327ff4ff3c2582b94&quot;</span> <span class="se">\</span>
-  --preview-id <span class="s2">&quot;test-preview-id&quot;</span> <span class="se">\</span>
-</code></pre></div>
-
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
-                                [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                                --organisation ORGANISATION --repository-name
-                                REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL]
-                                --preview-id PREVIEW_ID
-                                [-v [VERBOSE]]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
-                        variable)
-  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
-                        env variable)
-  --git-user GIT_USER   Git Username
-  --git-email GIT_EMAIL
-                        Git User Email
-  --organisation ORGANISATION
-                        Apps Git organisation/projectKey
-  --repository-name REPOSITORY_NAME
-                        Git repository name (not the URL, e.g. my-repo)
-  --git-provider GIT_PROVIDER
-                        Git server provider
-  --git-provider-url GIT_PROVIDER_URL
-                        Git provider base API URL (e.g.
-                        https://bitbucket.example.tld)
-  --git-hash GIT_HASH   the git hash which should be deployed
-  --preview-id PREVIEW_ID
-                        The user-defined preview ID
-  -v [VERBOSE], --verbose [VERBOSE]
-                        Verbose exception logging
-</code></pre></div>
                 
                   
                 
@@ -795,41 +621,6 @@ optional arguments:
       
         
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../add-pr-comment/" title="add-pr-comment" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                add-pr-comment
-              </span>
-            </div>
-          </a>
-        
-        
-          <a href="../create-pr-preview/" title="create-pr-preview" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                create-pr-preview
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

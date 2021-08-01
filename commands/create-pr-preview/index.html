@@ -696,8 +696,16 @@
 <h4 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h4>
 <ul>
 <li><code>APPLICATION_NAME</code>: value from <code>applicationName</code></li>
-<li><code>GIT_HASH</code>: The git hash of the <em>app repository</em> commit that will be deployed</li>
-<li><code>PREVIEW_ID</code>: The branch name in the <em>app repository</em></li>
+<li><code>GIT_HASH</code>:<ul>
+<li><code>create-preview</code>: The CLI provided <code>--git-hash</code></li>
+<li><code>create-pr-preview</code>: The git hash of the <em>app repository</em> commit that will be deployed</li>
+</ul>
+</li>
+<li><code>PREVIEW_ID</code>:<ul>
+<li><code>create-preview</code>: The CLI provided <code>--preview-id</code></li>
+<li><code>create-pr-preview</code>: The branch name in the <em>app repository</em></li>
+</ul>
+</li>
 <li><code>PREVIEW_ID_HASH</code>: The first 8 characters of the SHA256 hash of <code>PREVIEW_ID</code></li>
 <li><code>PREVIEW_NAMESPACE</code>: The resulting value of <code>previewConfig.target.namespace</code></li>
 <li><code>PREVIEW_HOST</code>: The resulting value of <code>previewConfig.host</code></li>
