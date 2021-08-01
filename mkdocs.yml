@@ -53,3 +53,5 @@ markdown_extensions:
   - toc:
       permalink: true
   - pymdownx.emoji
+  - markdown_include.include:
+      base_path: docs/includes
