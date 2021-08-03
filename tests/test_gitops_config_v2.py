@@ -5,31 +5,31 @@ from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 
 
-class GitOpsConfigV1Test(unittest.TestCase):
+class GitOpsConfigV2Test(unittest.TestCase):
     def setUp(self):
         self.yaml = {
-            "apiVersion": "v1",
+            "apiVersion": "v2_beta",
             "applicationName": "my-app",
             "previewConfig": {
-                "host": "my-{PREVIEW_ID}-{PREVIEW_ID_HASH}-host-template",
+                "host": "my-${PREVIEW_ID}-${PREVIEW_ID_HASH}-host-template",
                 "template": {
                     "organisation": "my-template-org",
                     "repository": "my-template-repo",
                     "branch": "my-template-branch",
-                    "path": ".my-template-dir/{APPLICATION_NAME}",
+                    "path": ".my-template-dir/${APPLICATION_NAME}",
                 },
                 "target": {
                     "organisation": "my-target-org",
                     "repository": "my-target-repo",
                     "branch": "my-target-branch",
-                    "namespace": "{APPLICATION_NAME}-{PREVIEW_ID_HASH}-dev",
+                    "namespace": "${APPLICATION_NAME}-${PREVIEW_ID_HASH}-dev",
                 },
                 "replace": {
                     "file_1.yaml": [
-                        {"path": "a.b", "value": "{PREVIEW_HOST}-foo"},
-                        {"path": "c.d", "value": "bar-{PREVIEW_NAMESPACE}"},
+                        {"path": "a.b", "value": "${PREVIEW_HOST}-foo"},
+                        {"path": "c.d", "value": "bar-${PREVIEW_NAMESPACE}"},
                     ],
-                    "file_2.yaml": [{"path": "e.f", "value": "{GIT_HASH}"}],
+                    "file_2.yaml": [{"path": "e.f", "value": "${GIT_HASH}"}],
                 },
             },
         }
@@ -44,7 +44,7 @@ class GitOpsConfigV1Test(unittest.TestCase):
 
     def test_apiVersion(self):
         config = self.load()
-        self.assertEqual(config.api_version, 1)
+        self.assertEqual(config.api_version, 2)
 
     def test_invalid_apiVersion(self):
         self.yaml["apiVersion"] = "foo"
@@ -82,7 +82,7 @@ class GitOpsConfigV1Test(unittest.TestCase):
         self.assert_load_error("Item 'previewConfig.host' should be a string in GitOps config!")
 
     def test_preview_host_contains_invalid_variable(self):
-        self.yaml["previewConfig"]["host"] = "{FOO}-bar"
+        self.yaml["previewConfig"]["host"] = "${FOO}-bar"
         self.assert_load_error("GitOps config template '${FOO}-bar' contains invalid variable: FOO")
 
     def test_preview_template_organisation(self):
@@ -142,7 +142,7 @@ class GitOpsConfigV1Test(unittest.TestCase):
         self.assert_load_error("Item 'previewConfig.template.path' should be a string in GitOps config!")
 
     def test_preview_template_path_contains_invalid_variable(self):
-        self.yaml["previewConfig"]["template"]["path"] = "{FOO}-bar"
+        self.yaml["previewConfig"]["template"]["path"] = "${FOO}-bar"
         self.assert_load_error("GitOps config template '${FOO}-bar' contains invalid variable: FOO")
 
     def test_preview_target_organisation(self):
@@ -221,7 +221,7 @@ class GitOpsConfigV1Test(unittest.TestCase):
         self.assert_load_error("Item 'previewConfig.target.namespace' should be a string in GitOps config!")
 
     def test_preview_target_namespace_invalid_template(self):
-        self.yaml["previewConfig"]["target"]["namespace"] = "-*+§-weird chars-{PREVIEW_ID_HASH}"
+        self.yaml["previewConfig"]["target"]["namespace"] = "-*+§-weird chars-${PREVIEW_ID_HASH}"
         config = self.load()
         with pytest.raises(GitOpsException) as ex:
             config.get_preview_namespace("preview-1")
@@ -240,7 +240,7 @@ class GitOpsConfigV1Test(unittest.TestCase):
         )
 
     def test_preview_target_namespace_contains_invalid_variable(self):
-        self.yaml["previewConfig"]["target"]["namespace"] = "{FOO}-bar"
+        self.yaml["previewConfig"]["target"]["namespace"] = "${FOO}-bar"
         self.assert_load_error("GitOps config template '${FOO}-bar' contains invalid variable: FOO")
 
     def test_replacements(self):
@@ -294,5 +294,5 @@ class GitOpsConfigV1Test(unittest.TestCase):
         )
 
     def test_replacements_invalid_list_items_unknown_variable(self):
-        self.yaml["previewConfig"]["replace"]["file_2.yaml"][0]["value"] = "{FOO}bar"
+        self.yaml["previewConfig"]["replace"]["file_2.yaml"][0]["value"] = "${FOO}bar"
         self.assert_load_error("Replacement value '${FOO}bar' for path 'e.f' contains invalid variable: FOO")

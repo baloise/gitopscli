@@ -73,7 +73,7 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
     def test_route_host_template(self):
         config = self.load()
-        self.assertEqual(config.preview_host_template, "my-{PREVIEW_ID_HASH}-host-template")
+        self.assertEqual(config.preview_host_template, "my-${PREVIEW_ID_HASH}-host-template")
 
     def test_route_host(self):
         config = self.load()
@@ -97,7 +97,7 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
     def test_namespace_template(self):
         config = self.load()
-        self.assertEqual(config.preview_target_namespace_template, "{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview")
+        self.assertEqual(config.preview_target_namespace_template, "${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview")
 
     def test_namespace(self):
         config = self.load()
@@ -109,13 +109,13 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
         self.assertEqual(len(config.replacements["Chart.yaml"]), 1)
         self.assertEqual(config.replacements["Chart.yaml"][0].path, "name")
-        self.assertEqual(config.replacements["Chart.yaml"][0].value_template, "{PREVIEW_NAMESPACE}")
+        self.assertEqual(config.replacements["Chart.yaml"][0].value_template, "${PREVIEW_NAMESPACE}")
 
         self.assertEqual(len(config.replacements["values.yaml"]), 2)
         self.assertEqual(config.replacements["values.yaml"][0].path, "a.b")
-        self.assertEqual(config.replacements["values.yaml"][0].value_template, "{PREVIEW_HOST}")
+        self.assertEqual(config.replacements["values.yaml"][0].value_template, "${PREVIEW_HOST}")
         self.assertEqual(config.replacements["values.yaml"][1].path, "c.d")
-        self.assertEqual(config.replacements["values.yaml"][1].value_template, "{GIT_HASH}")
+        self.assertEqual(config.replacements["values.yaml"][1].value_template, "${GIT_HASH}")
 
     def test_replacements_missing(self):
         del self.yaml["previewConfig"]["replace"]
@@ -147,7 +147,7 @@ class GitOpsConfigV0Test(unittest.TestCase):
 
     def test_replacements_invalid_list_items_unknown_variable(self):
         self.yaml["previewConfig"]["replace"][0]["variable"] = "FOO"
-        self.assert_load_error("Replacement value '{FOO}' for path 'a.b' contains invalid variable: FOO")
+        self.assert_load_error("Replacement value '${FOO}' for path 'a.b' contains invalid variable: FOO")
 
     def test_replacements_invalid_list_items_invalid_variable(self):
         self.yaml["previewConfig"]["replace"][0]["variable"] = "{FOO"
