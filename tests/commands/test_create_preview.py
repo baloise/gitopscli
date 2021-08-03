@@ -54,9 +54,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         self.load_gitops_config_mock = self.monkey_patch(load_gitops_config)
         self.load_gitops_config_mock.return_value = GitOpsConfig(
-            api_version=1,
+            api_version=2,
             application_name="my-app",
-            preview_host_template="app.xy-{PREVIEW_ID_HASH}.example.tld",
+            preview_host_template="app.xy-${PREVIEW_ID_HASH}.example.tld",
             preview_template_organisation="PREVIEW_TEMPLATE_ORG",
             preview_template_repository="PREVIEW_TEMPLATE_REPO",
             preview_template_path_template=".preview-templates/my-app",
@@ -64,12 +64,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_organisation="PREVIEW_TARGET_ORG",
             preview_target_repository="PREVIEW_TARGET_REPO",
             preview_target_branch=None,
-            preview_target_namespace_template=f"my-app-{{PREVIEW_ID_HASH}}-preview",
+            preview_target_namespace_template="my-app-${PREVIEW_ID_HASH}-preview",
             replacements={
-                "Chart.yaml": [GitOpsConfig.Replacement(path="name", value_template="{PREVIEW_NAMESPACE}"),],
+                "Chart.yaml": [GitOpsConfig.Replacement(path="name", value_template="${PREVIEW_NAMESPACE}"),],
                 "values.yaml": [
-                    GitOpsConfig.Replacement(path="image.tag", value_template="{GIT_HASH}"),
-                    GitOpsConfig.Replacement(path="route.host", value_template="{PREVIEW_HOST}"),
+                    GitOpsConfig.Replacement(path="image.tag", value_template="${GIT_HASH}"),
+                    GitOpsConfig.Replacement(path="route.host", value_template="${PREVIEW_HOST}"),
                 ],
             },
         )

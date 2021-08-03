@@ -6,7 +6,7 @@ from typing import List, Any, Optional, Dict, Callable, Set
 from gitopscli.gitops_exception import GitOpsException
 
 _MAX_NAMESPACE_LENGTH = 63
-_VARIABLE_REGEX = re.compile(r"{(\w+)}")
+_VARIABLE_REGEX = re.compile(r"\${(\w+)}")
 
 
 @dataclass(frozen=True)
@@ -44,7 +44,7 @@ class GitOpsConfig:
         def get_value(self, context: PreviewContext) -> str:
             val = self.value_template
             for variable, value_func in self.__VARIABLE_MAPPERS.items():
-                val = val.replace(f"{{{variable}}}", value_func(context))
+                val = val.replace(f"${{{variable}}}", value_func(context))
             return val
 
     api_version: int
@@ -66,7 +66,7 @@ class GitOpsConfig:
 
     @property
     def preview_template_path(self) -> str:
-        return self.preview_template_path_template.replace("{APPLICATION_NAME}", self.application_name)
+        return self.preview_template_path_template.replace("${APPLICATION_NAME}", self.application_name)
 
     def __post_init__(self) -> None:
         assert isinstance(self.application_name, str), "application_name of wrong type!"
@@ -98,22 +98,22 @@ class GitOpsConfig:
 
     def get_preview_host(self, preview_id: str) -> str:
         preview_host = self.preview_host_template
-        preview_host = preview_host.replace("{APPLICATION_NAME}", self.application_name)
-        preview_host = preview_host.replace("{PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
-        preview_host = preview_host.replace("{PREVIEW_ID}", self.__sanitize(preview_id))
-        preview_host = preview_host.replace("{PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
+        preview_host = preview_host.replace("${APPLICATION_NAME}", self.application_name)
+        preview_host = preview_host.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
+        preview_host = preview_host.replace("${PREVIEW_ID}", self.__sanitize(preview_id))
+        preview_host = preview_host.replace("${PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
         return preview_host
 
     def get_preview_namespace(self, preview_id: str) -> str:
         preview_namespace = self.preview_target_namespace_template
-        preview_namespace = preview_namespace.replace("{APPLICATION_NAME}", self.application_name)
-        preview_namespace = preview_namespace.replace("{PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
+        preview_namespace = preview_namespace.replace("${APPLICATION_NAME}", self.application_name)
+        preview_namespace = preview_namespace.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
 
-        current_length = len(preview_namespace) - len("{PREVIEW_ID}")
+        current_length = len(preview_namespace) - len("${PREVIEW_ID}")
         remaining_length = _MAX_NAMESPACE_LENGTH - current_length
 
         if remaining_length < 1:
-            preview_namespace = preview_namespace.replace("{PREVIEW_ID}", "")
+            preview_namespace = preview_namespace.replace("${PREVIEW_ID}", "")
             raise GitOpsException(
                 f"Preview namespace is too long (max {_MAX_NAMESPACE_LENGTH} chars): "
                 f"{preview_namespace} ({len(preview_namespace)} chars)"
@@ -121,7 +121,7 @@ class GitOpsConfig:
 
         sanitized_preview_id = self.__sanitize(preview_id, remaining_length)
 
-        preview_namespace = preview_namespace.replace("{PREVIEW_ID}", sanitized_preview_id)
+        preview_namespace = preview_namespace.replace("${PREVIEW_ID}", sanitized_preview_id)
         preview_namespace = preview_namespace.lower()
 
         invalid_character = re.search(r"[^a-z0-9-]", preview_namespace)
@@ -216,11 +216,13 @@ class _GitOpsConfigYamlParser:
             return self.__parse_v0()
         if api_version == "v1":
             return self.__parse_v1()
+        if api_version == "v2_beta":
+            return self.__parse_v2()
         raise GitOpsException(f"GitOps config apiVersion '{api_version}' is not supported!")
 
     def __parse_v0(self) -> GitOpsConfig:
         replacements: Dict[str, List[GitOpsConfig.Replacement]] = {
-            "Chart.yaml": [GitOpsConfig.Replacement("name", "{PREVIEW_NAMESPACE}")],
+            "Chart.yaml": [GitOpsConfig.Replacement("name", "${PREVIEW_NAMESPACE}")],
             "values.yaml": [],
         }
         replacement_dicts = self.__get_list_value("previewConfig.replace")
@@ -247,7 +249,7 @@ class _GitOpsConfigYamlParser:
                 variable = "PREVIEW_HOST"  # backwards compatability
             if variable == "GIT_COMMIT":
                 variable = "GIT_HASH"  # backwards compatability
-            replacements["values.yaml"].append(GitOpsConfig.Replacement(path, f"{{{variable}}}"))
+            replacements["values.yaml"].append(GitOpsConfig.Replacement(path, f"${{{variable}}}"))
 
         preview_target_organisation = self.__get_string_value("deploymentConfig.org")
         preview_target_repository = self.__get_string_value("deploymentConfig.repository")
@@ -256,20 +258,44 @@ class _GitOpsConfigYamlParser:
             api_version=0,
             application_name=self.__get_string_value("deploymentConfig.applicationName"),
             preview_host_template=self.__get_string_value("previewConfig.route.host.template").replace(
-                "{SHA256_8CHAR_BRANCH_HASH}", "{PREVIEW_ID_HASH}"  # backwards compatibility
+                "{SHA256_8CHAR_BRANCH_HASH}", "${PREVIEW_ID_HASH}"  # backwards compatibility
             ),
             preview_template_organisation=preview_target_organisation,
             preview_template_repository=preview_target_repository,
-            preview_template_path_template=f".preview-templates/{{APPLICATION_NAME}}",
+            preview_template_path_template=".preview-templates/${APPLICATION_NAME}",
             preview_template_branch=None,  # use default branch
             preview_target_organisation=preview_target_organisation,
             preview_target_repository=preview_target_repository,
             preview_target_branch=None,  # use default branch
-            preview_target_namespace_template=f"{{APPLICATION_NAME}}-{{PREVIEW_ID_HASH}}-preview",
+            preview_target_namespace_template="${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview",
             replacements=replacements,
         )
 
     def __parse_v1(self) -> GitOpsConfig:
+        config = self.__parse_v2()
+        # add $ in front of variables for backwards compatability (e.g. ${FOO}):
+        add_var_dollar: Callable[[str], str] = lambda template: re.sub(r"(^|[^\$])({(\w+)})", r"\1$\2", template)
+        replacements: Dict[str, List[GitOpsConfig.Replacement]] = {}
+        for filename, file_replacements in config.replacements.items():
+            replacements[filename] = [
+                GitOpsConfig.Replacement(r.path, add_var_dollar(r.value_template)) for r in file_replacements
+            ]
+        return GitOpsConfig(
+            api_version=1,
+            application_name=config.application_name,
+            preview_host_template=add_var_dollar(config.preview_host_template),
+            preview_template_organisation=config.preview_template_organisation,
+            preview_template_repository=config.preview_template_repository,
+            preview_template_path_template=add_var_dollar(config.preview_template_path_template),
+            preview_template_branch=config.preview_template_branch,
+            preview_target_organisation=config.preview_target_organisation,
+            preview_target_repository=config.preview_target_repository,
+            preview_target_branch=config.preview_target_branch,
+            preview_target_namespace_template=add_var_dollar(config.preview_target_namespace_template),
+            replacements=replacements,
+        )
+
+    def __parse_v2(self) -> GitOpsConfig:
         preview_target_organisation = self.__get_string_value("previewConfig.target.organisation")
         preview_target_repository = self.__get_string_value("previewConfig.target.repository")
         preview_target_branch = self.__get_string_value_or_none("previewConfig.target.branch")
@@ -298,7 +324,7 @@ class _GitOpsConfigYamlParser:
                 replacements[filename].append(GitOpsConfig.Replacement(path, value))
 
         return GitOpsConfig(
-            api_version=1,
+            api_version=2,
             application_name=self.__get_string_value("applicationName"),
             preview_host_template=self.__get_string_value("previewConfig.host"),
             preview_template_organisation=self.__get_string_value_or_default(
@@ -308,7 +334,7 @@ class _GitOpsConfigYamlParser:
                 "previewConfig.template.repository", preview_target_repository
             ),
             preview_template_path_template=self.__get_string_value_or_default(
-                "previewConfig.template.path", f".preview-templates/{{APPLICATION_NAME}}"
+                "previewConfig.template.path", ".preview-templates/${APPLICATION_NAME}"
             ),
             preview_template_branch=self.__get_string_value_or_none("previewConfig.template.branch")
             or preview_target_branch,
@@ -316,7 +342,7 @@ class _GitOpsConfigYamlParser:
             preview_target_repository=preview_target_repository,
             preview_target_branch=preview_target_branch,
             preview_target_namespace_template=self.__get_string_value_or_default(
-                "previewConfig.target.namespace", f"{{APPLICATION_NAME}}-{{PREVIEW_ID}}-{{PREVIEW_ID_HASH}}-preview"
+                "previewConfig.target.namespace", "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH}-preview",
             ),
             replacements=replacements,
         )
