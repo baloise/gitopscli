@@ -209,12 +209,13 @@ class GitOpsConfigV2Test(unittest.TestCase):
         del self.yaml["previewConfig"]["target"]["namespace"]
         config = self.load()
         self.assertEqual(
-            config.preview_target_namespace_template, "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH}-preview"
+            config.preview_target_namespace_template,
+            "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview",
         )
         actual_namespace = config.get_preview_namespace(
             "Very long preview ID. It will be cut to have max 'maxNamespaceLength' chars of namespace in total!!"
         )
-        self.assertEqual(actual_namespace, "my-app-very-long-preview-id-it-wi-c9fdf802-preview")
+        self.assertEqual(actual_namespace, "my-app-very-long-preview-id-it-will-be-c9f-preview")
         self.assertTrue(len(actual_namespace) <= 50)
 
     def test_preview_target_namespace_not_a_string(self):

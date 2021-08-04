@@ -24,6 +24,7 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
             "APPLICATION_NAME": lambda context: context.gitops_config.application_name,
             "PREVIEW_ID": lambda context: context.preview_id,
             "PREVIEW_ID_HASH": lambda context: GitOpsConfig.create_preview_id_hash(context.preview_id),
+            "PREVIEW_ID_HASH_SHORT": lambda context: GitOpsConfig.create_preview_id_hash_short(context.preview_id),
         }
 
         def __init__(self, path: str, value_template: str):
@@ -72,7 +73,8 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
         assert isinstance(self.application_name, str), "application_name of wrong type!"
         assert isinstance(self.preview_host_template, str), "preview_host_template of wrong type!"
         self.__assert_variables(
-            self.preview_host_template, {"APPLICATION_NAME", "PREVIEW_ID_HASH", "PREVIEW_ID", "PREVIEW_NAMESPACE"}
+            self.preview_host_template,
+            {"APPLICATION_NAME", "PREVIEW_ID_HASH", "PREVIEW_ID_HASH_SHORT", "PREVIEW_ID", "PREVIEW_NAMESPACE"},
         )
         assert isinstance(self.preview_template_organisation, str), "preview_template_organisation of wrong type!"
         assert isinstance(self.preview_template_repository, str), "preview_template_repository of wrong type!"
@@ -88,7 +90,8 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
             self.preview_target_namespace_template, str
         ), "preview_target_namespace_template of wrong type!"
         self.__assert_variables(
-            self.preview_target_namespace_template, {"APPLICATION_NAME", "PREVIEW_ID_HASH", "PREVIEW_ID"}
+            self.preview_target_namespace_template,
+            {"APPLICATION_NAME", "PREVIEW_ID_HASH", "PREVIEW_ID_HASH_SHORT", "PREVIEW_ID"},
         )
         assert isinstance(
             self.preview_target_max_namespace_length, int
@@ -104,6 +107,7 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
         preview_host = self.preview_host_template
         preview_host = preview_host.replace("${APPLICATION_NAME}", self.application_name)
         preview_host = preview_host.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
+        preview_host = preview_host.replace("${PREVIEW_ID_HASH_SHORT}", self.create_preview_id_hash_short(preview_id))
         preview_host = preview_host.replace("${PREVIEW_ID}", self.__sanitize(preview_id))
         preview_host = preview_host.replace("${PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
         return preview_host
@@ -112,6 +116,9 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
         preview_namespace = self.preview_target_namespace_template
         preview_namespace = preview_namespace.replace("${APPLICATION_NAME}", self.application_name)
         preview_namespace = preview_namespace.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
+        preview_namespace = preview_namespace.replace(
+            "${PREVIEW_ID_HASH_SHORT}", self.create_preview_id_hash_short(preview_id)
+        )
 
         current_length = len(preview_namespace) - len("${PREVIEW_ID}")
         remaining_length = self.preview_target_max_namespace_length - current_length
@@ -159,6 +166,10 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def create_preview_id_hash(preview_id: str) -> str:
         return hashlib.sha256(preview_id.encode("utf-8")).hexdigest()[:8]
+
+    @staticmethod
+    def create_preview_id_hash_short(preview_id: str) -> str:
+        return GitOpsConfig.create_preview_id_hash(preview_id)[:3]
 
     @staticmethod
     def from_yaml(yaml: Any) -> "GitOpsConfig":
@@ -302,7 +313,11 @@ class _GitOpsConfigYamlParser:
             preview_target_organisation=config.preview_target_organisation,
             preview_target_repository=config.preview_target_repository,
             preview_target_branch=config.preview_target_branch,
-            preview_target_namespace_template=add_var_dollar(config.preview_target_namespace_template),
+            preview_target_namespace_template=add_var_dollar(
+                self.__get_string_value_or_default(
+                    "previewConfig.target.namespace", "{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview",
+                )
+            ),
             preview_target_max_namespace_length=63,
             replacements=replacements,
         )
@@ -359,7 +374,7 @@ class _GitOpsConfigYamlParser:
             preview_target_repository=preview_target_repository,
             preview_target_branch=preview_target_branch,
             preview_target_namespace_template=self.__get_string_value_or_default(
-                "previewConfig.target.namespace", "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH}-preview",
+                "previewConfig.target.namespace", "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview",
             ),
             preview_target_max_namespace_length=preview_target_max_namespace_length,
             replacements=replacements,
