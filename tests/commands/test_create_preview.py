@@ -65,6 +65,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_repository="PREVIEW_TARGET_REPO",
             preview_target_branch=None,
             preview_target_namespace_template="my-app-${PREVIEW_ID_HASH}-preview",
+            preview_target_max_namespace_length=50,
             replacements={
                 "Chart.yaml": [GitOpsConfig.Replacement(path="name", value_template="${PREVIEW_NAMESPACE}"),],
                 "values.yaml": [
@@ -208,6 +209,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_repository=gitops_config.preview_target_repository,
             preview_target_branch=gitops_config.preview_target_branch,
             preview_target_namespace_template=gitops_config.preview_target_namespace_template,
+            preview_target_max_namespace_length=gitops_config.preview_target_max_namespace_length,
             replacements=gitops_config.replacements,
         )
 

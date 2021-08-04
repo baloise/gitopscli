@@ -5,12 +5,11 @@ from typing import List, Any, Optional, Dict, Callable, Set
 
 from gitopscli.gitops_exception import GitOpsException
 
-_MAX_NAMESPACE_LENGTH = 63
 _VARIABLE_REGEX = re.compile(r"\${(\w+)}")
 
 
 @dataclass(frozen=True)
-class GitOpsConfig:
+class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
     class Replacement:
         @dataclass(frozen=True)
         class PreviewContext:
@@ -61,6 +60,7 @@ class GitOpsConfig:
     preview_target_repository: str
     preview_target_branch: Optional[str]
     preview_target_namespace_template: str
+    preview_target_max_namespace_length: int
 
     replacements: Dict[str, List[Replacement]]
 
@@ -90,6 +90,10 @@ class GitOpsConfig:
         self.__assert_variables(
             self.preview_target_namespace_template, {"APPLICATION_NAME", "PREVIEW_ID_HASH", "PREVIEW_ID"}
         )
+        assert isinstance(
+            self.preview_target_max_namespace_length, int
+        ), "preview_target_max_namespace_length of wrong type!"
+        assert self.preview_target_max_namespace_length >= 1, "preview_target_max_namespace_length is < 1!"
         assert isinstance(self.replacements, dict), "replacements of wrong type!"
         for file, replacements in self.replacements.items():
             assert isinstance(file, str), f"replacement file '{file}' of wrong type!"
@@ -110,12 +114,12 @@ class GitOpsConfig:
         preview_namespace = preview_namespace.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
 
         current_length = len(preview_namespace) - len("${PREVIEW_ID}")
-        remaining_length = _MAX_NAMESPACE_LENGTH - current_length
+        remaining_length = self.preview_target_max_namespace_length - current_length
 
         if remaining_length < 1:
             preview_namespace = preview_namespace.replace("${PREVIEW_ID}", "")
             raise GitOpsException(
-                f"Preview namespace is too long (max {_MAX_NAMESPACE_LENGTH} chars): "
+                f"Preview namespace is too long (max {self.preview_target_max_namespace_length} chars): "
                 f"{preview_namespace} ({len(preview_namespace)} chars)"
             )
 
@@ -198,6 +202,12 @@ class _GitOpsConfigYamlParser:
             raise GitOpsException(f"Item '{key}' should be a string in GitOps config!")
         return value
 
+    def __get_int_value_or_default(self, key: str, default: int) -> int:
+        value = self.__get_value_or_default(key, default)
+        if not isinstance(value, int):
+            raise GitOpsException(f"Item '{key}' should be an integer in GitOps config!")
+        return value
+
     def __get_list_value(self, key: str) -> List[Any]:
         value = self.__get_value(key)
         if not isinstance(value, list):
@@ -268,6 +278,7 @@ class _GitOpsConfigYamlParser:
             preview_target_repository=preview_target_repository,
             preview_target_branch=None,  # use default branch
             preview_target_namespace_template="${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview",
+            preview_target_max_namespace_length=63,
             replacements=replacements,
         )
 
@@ -292,6 +303,7 @@ class _GitOpsConfigYamlParser:
             preview_target_repository=config.preview_target_repository,
             preview_target_branch=config.preview_target_branch,
             preview_target_namespace_template=add_var_dollar(config.preview_target_namespace_template),
+            preview_target_max_namespace_length=63,
             replacements=replacements,
         )
 
@@ -299,6 +311,11 @@ class _GitOpsConfigYamlParser:
         preview_target_organisation = self.__get_string_value("previewConfig.target.organisation")
         preview_target_repository = self.__get_string_value("previewConfig.target.repository")
         preview_target_branch = self.__get_string_value_or_none("previewConfig.target.branch")
+        preview_target_max_namespace_length = self.__get_int_value_or_default(
+            "previewConfig.target.maxNamespaceLength", 53
+        )
+        if preview_target_max_namespace_length < 1:
+            raise GitOpsException("Value 'maxNamespaceLength' should be at least 1 in GitOps config!")
 
         replacements: Dict[str, List[GitOpsConfig.Replacement]] = {}
         for filename, file_replacements in self.__get_dict_value("previewConfig.replace").items():
@@ -344,5 +361,6 @@ class _GitOpsConfigYamlParser:
             preview_target_namespace_template=self.__get_string_value_or_default(
                 "previewConfig.target.namespace", "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH}-preview",
             ),
+            preview_target_max_namespace_length=preview_target_max_namespace_length,
             replacements=replacements,
         )

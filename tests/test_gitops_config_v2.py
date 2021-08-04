@@ -23,6 +23,7 @@ class GitOpsConfigV2Test(unittest.TestCase):
                     "repository": "my-target-repo",
                     "branch": "my-target-branch",
                     "namespace": "${APPLICATION_NAME}-${PREVIEW_ID_HASH}-dev",
+                    "maxNamespaceLength": 50,
                 },
                 "replace": {
                     "file_1.yaml": [
@@ -211,10 +212,10 @@ class GitOpsConfigV2Test(unittest.TestCase):
             config.preview_target_namespace_template, "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH}-preview"
         )
         actual_namespace = config.get_preview_namespace(
-            "Very long preview ID. It will be cut to have max 63 chars of namespace in total!!"
+            "Very long preview ID. It will be cut to have max 'maxNamespaceLength' chars of namespace in total!!"
         )
-        self.assertEqual(actual_namespace, "my-app-very-long-preview-id-it-will-be-cut-to-05d9825a-preview")
-        self.assertTrue(len(actual_namespace) <= 63)
+        self.assertEqual(actual_namespace, "my-app-very-long-preview-id-it-wi-c9fdf802-preview")
+        self.assertTrue(len(actual_namespace) <= 50)
 
     def test_preview_target_namespace_not_a_string(self):
         self.yaml["previewConfig"]["target"]["namespace"] = []
@@ -230,18 +231,40 @@ class GitOpsConfigV2Test(unittest.TestCase):
     def test_preview_target_namespace_too_long(self):
         self.yaml["previewConfig"]["target"][
             "namespace"
-        ] = "veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long-${PREVIEW_ID}-${PREVIEW_ID_HASH}"
+        ] = "veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long-${PREVIEW_ID}-${PREVIEW_ID_HASH}"
         config = self.load()
         with pytest.raises(GitOpsException) as ex:
             config.get_preview_namespace("x")
         self.assertEqual(
-            "Preview namespace is too long (max 63 chars): veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long--2d711642 (68 chars)",
+            "Preview namespace is too long (max 50 chars): veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long--2d711642 (55 chars)",
             str(ex.value),
         )
 
     def test_preview_target_namespace_contains_invalid_variable(self):
         self.yaml["previewConfig"]["target"]["namespace"] = "${FOO}-bar"
         self.assert_load_error("GitOps config template '${FOO}-bar' contains invalid variable: FOO")
+
+    def test_preview_target_namespace_max_length(self):
+        self.yaml["previewConfig"]["target"]["maxNamespaceLength"] = 50
+        config = self.load()
+        self.assertEqual(config.preview_target_max_namespace_length, 50)
+
+        self.yaml["previewConfig"]["target"]["maxNamespaceLength"] = 256
+        config = self.load()
+        self.assertEqual(config.preview_target_max_namespace_length, 256)
+
+    def test_preview_target_namespace_max_length_default(self):
+        del self.yaml["previewConfig"]["target"]["maxNamespaceLength"]
+        config = self.load()
+        self.assertEqual(config.preview_target_max_namespace_length, 53)
+
+    def test_preview_target_namespace_max_length_not_an_integer(self):
+        self.yaml["previewConfig"]["target"]["maxNamespaceLength"] = "50"
+        self.assert_load_error("Item 'previewConfig.target.maxNamespaceLength' should be an integer in GitOps config!")
+
+    def test_preview_target_namespace_max_length_less_than_one(self):
+        self.yaml["previewConfig"]["target"]["maxNamespaceLength"] = 0
+        self.assert_load_error("Value 'maxNamespaceLength' should be at least 1 in GitOps config!")
 
     def test_replacements(self):
         config = self.load()
