@@ -8,7 +8,7 @@ from gitopscli.gitops_exception import GitOpsException
 class GitOpsConfigV2Test(unittest.TestCase):
     def setUp(self):
         self.yaml = {
-            "apiVersion": "v2_beta",
+            "apiVersion": "v2",
             "applicationName": "my-app",
             "previewConfig": {
                 "host": "my-${PREVIEW_ID}-${PREVIEW_ID_HASH}-host-template",

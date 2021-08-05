@@ -237,7 +237,7 @@ class _GitOpsConfigYamlParser:
             return self.__parse_v0()
         if api_version == "v1":
             return self.__parse_v1()
-        if api_version == "v2_beta":
+        if api_version == "v2":
             return self.__parse_v2()
         raise GitOpsException(f"GitOps config apiVersion '{api_version}' is not supported!")
 

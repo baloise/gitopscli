@@ -27,7 +27,7 @@ Make sure that your *app repository* contains a `.gitops.config.yaml` file. This
 4. find repository and branch where the preview should be created (i.e. your *deployment config repository*)
 
 ```yaml
-apiVersion: v1
+apiVersion: v2
 applicationName: app-xy
 previewConfig:
   host: '{PREVIEW_NAMESPACE}.example.tld'
@@ -40,9 +40,10 @@ previewConfig:
     organisation: deployments
     repository: deployment-config-repo
 #   branch: master                       # optional (defaults to repo's default branch)
-    namespace: '{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview'  # optional (default: '{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview',
+    namespace: '{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview'  # optional (default: '{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH_SHORT}-preview',
                                                                #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be
-                                                               #           truncated if max namespace length exceeds 63 chars.)
+                                                               #           truncated if max namespace length exceeds `maxNamespaceLength` chars.)
+#   maxNamespaceLength: 63               # optional (default: 53)
   replace:
     Chart.yaml:
       - path: name
@@ -53,6 +54,52 @@ previewConfig:
       - path: route.host
         value: '{PREVIEW_HOST}'
 ```
+
+!!! info
+    If you currently use the _old_ `.gitops.config.yaml` format (_v0_) you may find this [online converter](https://christiansiegel.github.io/gitopscli-config-converter/) helpful to transition to the current `apiVersion v2`.
+
+    !!! warning
+        The _old_ (_v0_) version and `apiVersion v1` are marked deprecated and will be removed in `gitopscli` version 6.0.0.
+
+    Equivalent example:
+
+    ```yaml
+    # old 'v0' format
+    deploymentConfig:
+      org: deployments
+      repository: deployment-config-repo
+      applicationName: app-xy
+    previewConfig:
+      route:
+        host:
+          template: app-xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld
+      replace:
+        - path: image.tag
+          variable: GIT_COMMIT
+        - path: route.host
+          variable: ROUTE_HOST
+    ```
+
+    ```yaml
+    # v2 format
+    apiVersion: v2
+    applicationName: app-xy
+    previewConfig:
+      host: ${PREVIEW_NAMESPACE}.example.tld
+      target:
+        organisation: deployments
+        repository: deployment-config-repo
+        namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview
+      replace:
+        Chart.yaml:
+          - path: name
+            value: ${PREVIEW_NAMESPACE}
+        values.yaml:
+          - path: image.tag
+            value: ${GIT_HASH}
+          - path: route.host
+            value: ${PREVIEW_HOST}
+    ```
 
 #### Variables
 - `APPLICATION_NAME`: value from `applicationName`
