@@ -645,7 +645,7 @@
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <h3 id="preview-templates">Preview Templates<a class="headerlink" href="#preview-templates" title="Permanent link">&para;</a></h3>
 <p>You have to provide a folder with the deployment configuration templates for every application you want to use this command for. By default it is assumed that this folder is located in your <em>deployment config repository</em> under the top-level folder <code>.preview-templates</code>. For example <code>.preview-templates/app-xy</code> for your app <code>app-xy</code>. The <code>create-preview</code> command simply copies this directory to the root of your <em>deployment config repository</em> and replaces e.g. image tag and route host which are specific to this preview.</p>
-<div class="codehilite"><pre><span></span><code>deployment-config-repo/
+<div class="highlight"><pre><span></span><code>deployment-config-repo/
 ├── .preview-templates
 │   └── app-xy                        &lt;- Can contain any files and folders
 │       ├── values.yaml
@@ -657,7 +657,6 @@
     ├── values.yaml                    &lt;- e.g. image tag and route host are replaced in this one
     └── some-more-config-files-or-folders
 </code></pre></div>
-
 <h3 id="gitopsconfigyaml">.gitops.config.yaml<a class="headerlink" href="#gitopsconfigyaml" title="Permanent link">&para;</a></h3>
 <p>Make sure that your <em>app repository</em> contains a <code>.gitops.config.yaml</code> file. This file provides all information to </p>
 <ol>
@@ -666,7 +665,7 @@
 <li>replace values in template files</li>
 <li>find repository and branch where the preview should be created (i.e. your <em>deployment config repository</em>)</li>
 </ol>
-<div class="codehilite"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v1</span>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v2</span>
 <span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
 <span class="nt">previewConfig</span><span class="p">:</span>
   <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;{PREVIEW_NAMESPACE}.example.tld&#39;</span>
@@ -679,9 +678,10 @@
     <span class="nt">organisation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
     <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
 <span class="c1">#   branch: master                       # optional (defaults to repo&#39;s default branch)</span>
-    <span class="nt">namespace</span><span class="p">:</span> <span class="s">&#39;{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview&#39;</span>  <span class="c1"># optional (default: &#39;{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview&#39;,</span>
+    <span class="nt">namespace</span><span class="p">:</span> <span class="s">&#39;{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview&#39;</span>  <span class="c1"># optional (default: &#39;{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH_SHORT}-preview&#39;,</span>
                                                                <span class="c1">#           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be</span>
-                                                               <span class="c1">#           truncated if max namespace length exceeds 63 chars.)</span>
+                                                               <span class="c1">#           truncated if max namespace length exceeds `maxNamespaceLength` chars.)</span>
+<span class="c1">#   maxNamespaceLength: 63               # optional (default: 53)</span>
   <span class="nt">replace</span><span class="p">:</span>
     <span class="nt">Chart.yaml</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
@@ -692,7 +692,49 @@
       <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
         <span class="nt">value</span><span class="p">:</span> <span class="s">&#39;{PREVIEW_HOST}&#39;</span>
 </code></pre></div>
-
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>If you currently use the <em>old</em> <code>.gitops.config.yaml</code> format (<em>v0</em>) you may find this <a href="https://christiansiegel.github.io/gitopscli-config-converter/">online converter</a> helpful to transition to the current <code>apiVersion v2</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <em>old</em> (<em>v0</em>) version and <code>apiVersion v1</code> are marked deprecated and will be removed in <code>gitopscli</code> version 6.0.0.</p>
+</div>
+<p>Equivalent example:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># old &#39;v0&#39; format</span>
+<span class="nt">deploymentConfig</span><span class="p">:</span>
+  <span class="nt">org</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
+  <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
+  <span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
+<span class="nt">previewConfig</span><span class="p">:</span>
+  <span class="nt">route</span><span class="p">:</span>
+    <span class="nt">host</span><span class="p">:</span>
+      <span class="nt">template</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld</span>
+  <span class="nt">replace</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">image.tag</span>
+      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span>
+    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
+      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># v2 format</span>
+<span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v2</span>
+<span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
+<span class="nt">previewConfig</span><span class="p">:</span>
+  <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span>
+  <span class="nt">target</span><span class="p">:</span>
+    <span class="nt">organisation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
+    <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
+    <span class="nt">namespace</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview</span>
+  <span class="nt">replace</span><span class="p">:</span>
+    <span class="nt">Chart.yaml</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}</span>
+    <span class="nt">values.yaml</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">image.tag</span>
+        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${GIT_HASH}</span>
+      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
+        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_HOST}</span>
+</code></pre></div>
+</div>
 <h4 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h4>
 <ul>
 <li><code>APPLICATION_NAME</code>: value from <code>applicationName</code></li>
@@ -712,7 +754,7 @@
 <li><code>PREVIEW_HOST</code>: The resulting value of <code>previewConfig.host</code></li>
 </ul>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>gitopscli create-pr-preview <span class="se">\</span>
+<div class="highlight"><pre><span></span><code>gitopscli create-pr-preview <span class="se">\</span>
   --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
   --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
   --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
@@ -722,9 +764,8 @@
   --repository-name <span class="s2">&quot;app-xy&quot;</span> <span class="se">\</span>
   --pr-id <span class="m">4711</span>
 </code></pre></div>
-
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
+<div class="highlight"><pre><span></span><code>usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
