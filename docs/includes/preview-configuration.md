@@ -63,5 +63,6 @@ previewConfig:
     - `create-preview`: The CLI provided `--preview-id`
     - `create-pr-preview`: The branch name in the *app repository*
 - `PREVIEW_ID_HASH`: The first 8 characters of the SHA256 hash of `PREVIEW_ID`
+- `PREVIEW_ID_HASH_SHORT`: The first 3 characters of the SHA256 hash of `PREVIEW_ID`
 - `PREVIEW_NAMESPACE`: The resulting value of `previewConfig.target.namespace`
 - `PREVIEW_HOST`: The resulting value of `previewConfig.host`
