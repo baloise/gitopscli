@@ -30,29 +30,29 @@ Make sure that your *app repository* contains a `.gitops.config.yaml` file. This
 apiVersion: v2
 applicationName: app-xy
 previewConfig:
-  host: '{PREVIEW_NAMESPACE}.example.tld'
+  host: ${PREVIEW_NAMESPACE}.example.tld
 # template:                              # optional section
 #   organisation: templates              # optional (default: target.organisation)
 #   repository: template-repo            # optional (default: target.repository)
 #   branch: master                       # optional (default: target.branch)
-#   path: custom/{APPLICATION_NAME}      # optional (default: '.preview-templates/{APPLICATION_NAME}')
+#   path: custom/${APPLICATION_NAME}     # optional (default: '.preview-templates/${APPLICATION_NAME}')
   target:
     organisation: deployments
     repository: deployment-config-repo
 #   branch: master                       # optional (defaults to repo's default branch)
-    namespace: '{APPLICATION_NAME}-{PREVIEW_ID_HASH}-preview'  # optional (default: '{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH_SHORT}-preview',
-                                                               #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be
-                                                               #           truncated if max namespace length exceeds `maxNamespaceLength` chars.)
+    namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview'  # optional (default: '${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview',
+                                                                #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be
+                                                                #           truncated if max namespace length exceeds `maxNamespaceLength` chars.)
 #   maxNamespaceLength: 63               # optional (default: 53)
   replace:
     Chart.yaml:
       - path: name
-        value: '{PREVIEW_NAMESPACE}'
+        value: ${PREVIEW_NAMESPACE}
     values.yaml:
       - path: app.image
-        value: registry.example.tld/my-app:{GIT_HASH}
+        value: registry.example.tld/my-app:${GIT_HASH}
       - path: route.host
-        value: '{PREVIEW_HOST}'
+        value: ${PREVIEW_HOST}
 ```
 
 !!! info
