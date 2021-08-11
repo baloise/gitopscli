@@ -40,7 +40,7 @@ previewConfig:
     organisation: deployments
     repository: deployment-config-repo
 #   branch: master                       # optional (defaults to repo's default branch)
-    namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview'  # optional (default: '${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview',
+#   namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview'  # optional (default: '${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview',
                                                                 #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be
                                                                 #           truncated if max namespace length exceeds `maxNamespaceLength` chars.)
 #   maxNamespaceLength: 63               # optional (default: 53)
