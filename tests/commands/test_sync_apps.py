@@ -118,7 +118,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo_root.get_full_file_path("apps/other-team-non-prod.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/apps/other-team-non-prod.yaml"),
             call.logging.info("Sync applications in root repository's %s.", "apps/team-non-prod.yaml"),
-            call.merge_yaml_element("/tmp/root-config-repo/apps/team-non-prod.yaml", "applications", {"my-app": {}}),
+            call.merge_yaml_element("/tmp/root-config-repo/apps/team-non-prod.yaml", "config.applications", {"my-app": {}}),
             call.GitRepo_team.get_author_from_last_commit(),
             call.GitRepo_root.commit("GIT_USER", "GIT_EMAIL", "author updated apps/team-non-prod.yaml"),
             call.GitRepo_root.push(),
