@@ -74,12 +74,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             "/tmp/root-config-repo/apps/team-non-prod.yaml": {
                "config": { 
                 "repository": "https://team.config.repo.git",
-                "applications": {"some-other-app-0": None},
-               }
-            },
-            "/tmp/root-config-repo/apps/team-non-prod.yaml": {
-                "repository": "https://team.config.repo.git",
                 "applications": {"some-other-app-1": None},
+               }
             },
             "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
                 "repository": "https://other-team.config.repo.git",
