@@ -77,6 +77,8 @@ def __find_apps_config_from_repo(
             app_config_content = yaml_file_load(app_config_file)
         except FileNotFoundError as ex:
             raise GitOpsException(f"File '{app_file_name}' not found in root repository.") from ex
+        if "config" in app_config_content:
+            app_config_content = app_config_content["config"]
         if "repository" not in app_config_content:
             raise GitOpsException(f"Cannot find key 'repository' in '{app_file_name}'")
         if app_config_content["repository"] == team_config_git_repo_clone_url:
