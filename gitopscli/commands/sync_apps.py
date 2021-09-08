@@ -43,7 +43,8 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     logging.info("Found %s app(s) in apps repository: %s", len(repo_apps), ", ".join(repo_apps))
 
     logging.info("Searching apps repository in root repository's 'apps/' directory...")
-    apps_config_file, apps_config_file_name, current_repo_apps, apps_from_other_repos, found_apps_path = __find_apps_config_from_repo(
+    apps_config_file, apps_config_file_name, current_repo_apps, apps_from_other_repos, \
+    found_apps_path = __find_apps_config_from_repo(
         team_config_git_repo, root_config_git_repo
     )
 
@@ -94,7 +95,8 @@ def __find_apps_config_from_repo(
     if found_app_config_file is None or found_app_config_file_name is None:
         raise GitOpsException(f"Couldn't find config file for apps repository in root repository's 'apps/' directory")
 
-    return found_app_config_file, found_app_config_file_name, found_app_config_apps, apps_from_other_repos, found_apps_path
+    return found_app_config_file, found_app_config_file_name, found_app_config_apps, apps_from_other_repos, \
+    found_apps_path
 
 
 def __get_applications_from_app_config(app_config: Any) -> Set[str]:
