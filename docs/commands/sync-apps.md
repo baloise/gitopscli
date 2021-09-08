@@ -46,6 +46,18 @@ applications:
   app-xy-staging:
   app-xy-test:
 ```
+or
+
+```yaml
+config:
+  repository: https://github.com/company-deployments/team-1-app-config-repo.git # link to your apps root repository
+
+# The applications that are synced by the `sync-app` command:
+  applications:
+   app-xy-production: # <- every entry corresponds to a directory in the apps root repository
+   app-xy-staging:
+   app-xy-test:
+```
 
 ## Example
 
