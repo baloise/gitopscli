@@ -19,5 +19,9 @@ class AddPrCommentCommand(Command):
 
     def execute(self) -> None:
         args = self.__args
-        git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name,)
+        git_repo_api = GitRepoApiFactory.create(
+            args,
+            args.organisation,
+            args.repository_name,
+        )
         git_repo_api.add_pull_request_comment(args.pr_id, args.text, args.parent_id)
