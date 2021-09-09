@@ -646,7 +646,17 @@
   <span class="nt">app-xy-production</span><span class="p">:</span> <span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span>
   <span class="nt">app-xy-staging</span><span class="p">:</span>
   <span class="nt">app-xy-test</span><span class="p">:</span>
-</code></pre></div></p>
+</code></pre></div>
+or</p>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+  <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span> <span class="c1"># link to your apps root repository</span>
+
+<span class="c1"># The applications that are synced by the `sync-app` command:</span>
+  <span class="nt">applications</span><span class="p">:</span>
+   <span class="nt">app-xy-production</span><span class="p">:</span> <span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span>
+   <span class="nt">app-xy-staging</span><span class="p">:</span>
+   <span class="nt">app-xy-test</span><span class="p">:</span>
+</code></pre></div>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>gitopscli sync-apps <span class="se">\</span>
   --git-provider-url github <span class="se">\</span>
