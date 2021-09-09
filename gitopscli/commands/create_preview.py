@@ -39,9 +39,7 @@ class CreatePreviewCommand(Command):
         self.__deployment_updated_callback = deployment_updated_callback
         self.__deployment_created_callback = deployment_created_callback
 
-    def execute(
-        self,
-    ) -> None:
+    def execute(self,) -> None:
         gitops_config = self.__get_gitops_config()
         self.__create_preview_info_file(gitops_config)
         preview_host = gitops_config.get_preview_host(self.__args.preview_id)
@@ -113,8 +111,7 @@ class CreatePreviewCommand(Command):
             raise GitOpsException(f"The preview template folder does not exist: {gitops_config.preview_template_path}")
         logging.info("Using the preview template folder: %s", gitops_config.preview_template_path)
         shutil.copytree(
-            full_preview_template_folder_path,
-            full_preview_folder_path,
+            full_preview_template_folder_path, full_preview_folder_path,
         )
         return True
 
@@ -127,10 +124,7 @@ class CreatePreviewCommand(Command):
             for replacement in replacements:
                 replacement_value = replacement.get_value(context)
                 value_replaced = self.__update_yaml_file(
-                    git_repo,
-                    f"{preview_folder_name}/{file}",
-                    replacement.path,
-                    replacement_value,
+                    git_repo, f"{preview_folder_name}/{file}", replacement.path, replacement_value,
                 )
                 if value_replaced:
                     any_value_replaced = True

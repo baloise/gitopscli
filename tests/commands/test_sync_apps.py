@@ -72,10 +72,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                 "bootstrap": [{"name": "team-non-prod"}, {"name": "other-team-non-prod"}],
             },
             "/tmp/root-config-repo/apps/team-non-prod.yaml": {
-                "config": {
-                    "repository": "https://team.config.repo.git",
-                    "applications": {"some-other-app-1": None},
-                }
+                "config": {"repository": "https://team.config.repo.git", "applications": {"some-other-app-1": None},}
             },
             "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
                 "repository": "https://other-team.config.repo.git",
@@ -91,16 +88,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
     def test_sync_apps_happy_flow(self):
         SyncAppsCommand(ARGS).execute()
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "TEAM_ORGA",
-                "TEAM_REPO",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "ROOT_ORGA",
-                "ROOT_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "TEAM_ORGA", "TEAM_REPO",),
+            call.GitRepoApiFactory.create(ARGS, "ROOT_ORGA", "ROOT_REPO",),
             call.GitRepo(self.team_config_git_repo_api_mock),
             call.GitRepo(self.root_config_git_repo_api_mock),
             call.GitRepo_team.get_clone_url(),
@@ -151,16 +140,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
 
         SyncAppsCommand(ARGS).execute()
         assert self.mock_manager.method_calls == [
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "TEAM_ORGA",
-                "TEAM_REPO",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "ROOT_ORGA",
-                "ROOT_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "TEAM_ORGA", "TEAM_REPO",),
+            call.GitRepoApiFactory.create(ARGS, "ROOT_ORGA", "ROOT_REPO",),
             call.GitRepo(self.team_config_git_repo_api_mock),
             call.GitRepo(self.root_config_git_repo_api_mock),
             call.GitRepo_team.get_clone_url(),
@@ -253,9 +234,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
 
     def test_sync_apps_missing_repository_element_in_team_yaml(self):
         self.yaml_file_load_mock.side_effect = lambda file_path: {
-            "/tmp/root-config-repo/bootstrap/values.yaml": {
-                "bootstrap": [{"name": "team-non-prod"}],
-            },
+            "/tmp/root-config-repo/bootstrap/values.yaml": {"bootstrap": [{"name": "team-non-prod"}],},
             "/tmp/root-config-repo/apps/team-non-prod.yaml": {
                 # missing: "repository": "https://team.config.repo.git",
                 "applications": {},
@@ -270,9 +249,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
 
     def test_sync_apps_undefined_team_repo(self):
         self.yaml_file_load_mock.side_effect = lambda file_path: {
-            "/tmp/root-config-repo/bootstrap/values.yaml": {
-                "bootstrap": [{"name": "other-team-non-prod"}],
-            },
+            "/tmp/root-config-repo/bootstrap/values.yaml": {"bootstrap": [{"name": "other-team-non-prod"}],},
             "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
                 "repository": "https://other-team.config.repo.git",  # there is no repo matching the command's team repo
                 "applications": {},

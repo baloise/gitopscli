@@ -67,9 +67,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_namespace_template="my-app-${PREVIEW_ID_HASH}-preview",
             preview_target_max_namespace_length=50,
             replacements={
-                "Chart.yaml": [
-                    GitOpsConfig.Replacement(path="name", value_template="${PREVIEW_NAMESPACE}"),
-                ],
+                "Chart.yaml": [GitOpsConfig.Replacement(path="name", value_template="${PREVIEW_NAMESPACE}"),],
                 "values.yaml": [
                     GitOpsConfig.Replacement(path="image.tag", value_template="${GIT_HASH}"),
                     GitOpsConfig.Replacement(path="route.host", value_template="${PREVIEW_HOST}"),
@@ -135,11 +133,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         deployment_created_callback.assert_called_once_with("app.xy-685912d3.example.tld")
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.yaml_file_dump(
                 {
                     "previewId": "PREVIEW_ID",
@@ -149,18 +143,10 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 },
                 "/tmp/gitopscli-preview-info.yaml",
             ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
@@ -245,11 +231,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         deployment_created_callback.assert_called_once_with("app.xy-685912d3.example.tld")
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
             call.yaml_file_dump(
                 {
                     "previewId": "PREVIEW_ID",
@@ -260,9 +242,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "/tmp/gitopscli-preview-info.yaml",
             ),
             call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
+                ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",
             ),  # only clone once for template and target
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
@@ -330,27 +310,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         deployment_updated_callback.assert_called_once_with("app.xy-685912d3.example.tld")
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
-            call.yaml_file_dump(
-                INFO_YAML,
-                "/tmp/gitopscli-preview-info.yaml",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
@@ -413,27 +378,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         deployment_already_up_to_date_callback.assert_called_once_with("app.xy-685912d3.example.tld")
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
-            call.yaml_file_dump(
-                INFO_YAML,
-                "/tmp/gitopscli-preview-info.yaml",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
@@ -479,27 +429,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             self.assertEqual("The preview template folder does not exist: .preview-templates/my-app", str(ex))
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
-            call.yaml_file_dump(
-                INFO_YAML,
-                "/tmp/gitopscli-preview-info.yaml",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
@@ -519,27 +454,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             self.assertEqual("No such file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
-            call.yaml_file_dump(
-                INFO_YAML,
-                "/tmp/gitopscli-preview-info.yaml",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
@@ -547,9 +467,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
-                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml",
-                "name",
-                "my-app-685912d3-preview",
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview",
             ),
         ]
 
@@ -563,27 +481,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             self.assertEqual("Error loading file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
-            call.yaml_file_dump(
-                INFO_YAML,
-                "/tmp/gitopscli-preview-info.yaml",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
@@ -591,9 +494,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
-                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml",
-                "name",
-                "my-app-685912d3-preview",
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview",
             ),
         ]
 
@@ -607,27 +508,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             self.assertEqual("Key 'name' not found in file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
-            call.yaml_file_dump(
-                INFO_YAML,
-                "/tmp/gitopscli-preview-info.yaml",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
@@ -635,9 +521,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
-                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml",
-                "name",
-                "my-app-685912d3-preview",
+                "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview",
             ),
         ]
 
@@ -656,27 +540,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             self.assertEqual("Key 'name' not found in file: my-app-685912d3-preview/Chart.yaml", str(ex))
 
         assert self.mock_manager.method_calls == [
-            call.load_gitops_config(
-                ARGS,
-                "ORGA",
-                "REPO",
-            ),
-            call.yaml_file_dump(
-                INFO_YAML,
-                "/tmp/gitopscli-preview-info.yaml",
-            ),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TARGET_ORG",
-                "PREVIEW_TARGET_REPO",
-            ),
+            call.load_gitops_config(ARGS, "ORGA", "REPO",),
+            call.yaml_file_dump(INFO_YAML, "/tmp/gitopscli-preview-info.yaml",),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO",),
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
-            call.GitRepoApiFactory.create(
-                ARGS,
-                "PREVIEW_TEMPLATE_ORG",
-                "PREVIEW_TEMPLATE_REPO",
-            ),
+            call.GitRepoApiFactory.create(ARGS, "PREVIEW_TEMPLATE_ORG", "PREVIEW_TEMPLATE_REPO",),
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
