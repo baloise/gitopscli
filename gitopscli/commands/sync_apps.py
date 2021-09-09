@@ -43,9 +43,13 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     logging.info("Found %s app(s) in apps repository: %s", len(repo_apps), ", ".join(repo_apps))
 
     logging.info("Searching apps repository in root repository's 'apps/' directory...")
-    apps_config_file, apps_config_file_name, current_repo_apps, apps_from_other_repos = __find_apps_config_from_repo(
-        team_config_git_repo, root_config_git_repo
-    )
+    (
+        apps_config_file,
+        apps_config_file_name,
+        current_repo_apps,
+        apps_from_other_repos,
+        found_apps_path,
+    ) = __find_apps_config_from_repo(team_config_git_repo, root_config_git_repo)
 
     if current_repo_apps == repo_apps:
         logging.info("Root repository already up-to-date. I'm done here.")
@@ -54,16 +58,17 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     __check_if_app_already_exists(repo_apps, apps_from_other_repos)
 
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
-    merge_yaml_element(apps_config_file, "applications", {repo_app: {} for repo_app in repo_apps})
+    merge_yaml_element(apps_config_file, found_apps_path, {repo_app: {} for repo_app in repo_apps})
     __commit_and_push(team_config_git_repo, root_config_git_repo, git_user, git_email, apps_config_file_name)
 
 
 def __find_apps_config_from_repo(
     team_config_git_repo: GitRepo, root_config_git_repo: GitRepo
-) -> Tuple[str, str, Set[str], Set[str]]:
+) -> Tuple[str, str, Set[str], Set[str], str]:
     apps_from_other_repos: Set[str] = set()  # Set for all entries in .applications from each config repository
     found_app_config_file = None
     found_app_config_file_name = None
+    found_apps_path = "applications"
     found_app_config_apps: Set[str] = set()
     bootstrap_entries = __get_bootstrap_entries(root_config_git_repo)
     team_config_git_repo_clone_url = team_config_git_repo.get_clone_url()
@@ -77,6 +82,9 @@ def __find_apps_config_from_repo(
             app_config_content = yaml_file_load(app_config_file)
         except FileNotFoundError as ex:
             raise GitOpsException(f"File '{app_file_name}' not found in root repository.") from ex
+        if "config" in app_config_content:
+            app_config_content = app_config_content["config"]
+            found_apps_path = "config.applications"
         if "repository" not in app_config_content:
             raise GitOpsException(f"Cannot find key 'repository' in '{app_file_name}'")
         if app_config_content["repository"] == team_config_git_repo_clone_url:
@@ -90,7 +98,13 @@ def __find_apps_config_from_repo(
     if found_app_config_file is None or found_app_config_file_name is None:
         raise GitOpsException(f"Couldn't find config file for apps repository in root repository's 'apps/' directory")
 
-    return found_app_config_file, found_app_config_file_name, found_app_config_apps, apps_from_other_repos
+    return (
+        found_app_config_file,
+        found_app_config_file_name,
+        found_app_config_apps,
+        apps_from_other_repos,
+        found_apps_path,
+    )
 
 
 def __get_applications_from_app_config(app_config: Any) -> Set[str]:
