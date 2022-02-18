@@ -144,8 +144,8 @@ class GitRepoTest(unittest.TestCase):
             self.assertEqual(
                 """\
 #!/bin/sh
-echo username=User
-echo password=Pass
+echo username='User'
+echo password='Pass'
 """,
                 credentials_file,
             )

@@ -109,7 +109,7 @@ class GitRepo:
         file_path = f"{self.__tmp_dir}/credentials.sh"
         with open(file_path, "w") as text_file:
             text_file.write("#!/bin/sh\n")
-            text_file.write(f"echo username={username}\n")
-            text_file.write(f"echo password={password}\n")
+            text_file.write(f"echo username='{username}'\n")
+            text_file.write(f"echo password='{password}'\n")
         os.chmod(file_path, 0o700)
         return file_path
