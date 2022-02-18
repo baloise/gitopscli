@@ -665,32 +665,32 @@
 <li>replace values in template files</li>
 <li>find repository and branch where the preview should be created (i.e. your <em>deployment config repository</em>)</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v2</span>
-<span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
-<span class="nt">previewConfig</span><span class="p">:</span>
-  <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span>
-<span class="c1"># template:                              # optional section</span>
-<span class="c1">#   organisation: templates              # optional (default: target.organisation)</span>
-<span class="c1">#   repository: template-repo            # optional (default: target.repository)</span>
-<span class="c1">#   branch: master                       # optional (default: target.branch)</span>
-<span class="c1">#   path: custom/${APPLICATION_NAME}     # optional (default: &#39;.preview-templates/${APPLICATION_NAME}&#39;)</span>
-  <span class="nt">target</span><span class="p">:</span>
-    <span class="nt">organisation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
-    <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
-<span class="c1">#   branch: master                       # optional (defaults to repo&#39;s default branch)</span>
-<span class="c1">#   namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview&#39;  # optional (default: &#39;${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview&#39;,</span>
-                                                                <span class="c1">#           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be</span>
-                                                                <span class="c1">#           truncated if max namespace length exceeds `maxNamespaceLength` chars.)</span>
-<span class="c1">#   maxNamespaceLength: 63               # optional (default: 53)</span>
-  <span class="nt">replace</span><span class="p">:</span>
-    <span class="nt">Chart.yaml</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
-        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}</span>
-    <span class="nt">values.yaml</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app.image</span>
-        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">registry.example.tld/my-app:${GIT_HASH}</span>
-      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
-        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_HOST}</span>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span><span class="w"></span>
+<span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span><span class="w"></span>
+<span class="nt">previewConfig</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span><span class="w"></span>
+<span class="c1"># template:                              # optional section</span><span class="w"></span>
+<span class="c1">#   organisation: templates              # optional (default: target.organisation)</span><span class="w"></span>
+<span class="c1">#   repository: template-repo            # optional (default: target.repository)</span><span class="w"></span>
+<span class="c1">#   branch: master                       # optional (default: target.branch)</span><span class="w"></span>
+<span class="c1">#   path: custom/${APPLICATION_NAME}     # optional (default: &#39;.preview-templates/${APPLICATION_NAME}&#39;)</span><span class="w"></span>
+<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">organisation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span><span class="w"></span>
+<span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span><span class="w"></span>
+<span class="c1">#   branch: master                       # optional (defaults to repo&#39;s default branch)</span><span class="w"></span>
+<span class="c1">#   namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview&#39;  # optional (default: &#39;${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview&#39;,</span><span class="w"></span>
+<span class="w">                                                                </span><span class="c1">#           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be</span><span class="w"></span>
+<span class="w">                                                                </span><span class="c1">#           truncated if max namespace length exceeds `maxNamespaceLength` chars.)</span><span class="w"></span>
+<span class="c1">#   maxNamespaceLength: 63               # optional (default: 53)</span><span class="w"></span>
+<span class="w">  </span><span class="nt">replace</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">Chart.yaml</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}</span><span class="w"></span>
+<span class="w">    </span><span class="nt">values.yaml</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app.image</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.example.tld/my-app:${GIT_HASH}</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">route.host</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_HOST}</span><span class="w"></span>
 </code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -700,39 +700,39 @@
 <p>The <em>old</em> (<em>v0</em>) version and <code>apiVersion v1</code> are marked deprecated and will be removed in <code>gitopscli</code> version 6.0.0.</p>
 </div>
 <p>Equivalent example:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># old &#39;v0&#39; format</span>
-<span class="nt">deploymentConfig</span><span class="p">:</span>
-  <span class="nt">org</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
-  <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
-  <span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
-<span class="nt">previewConfig</span><span class="p">:</span>
-  <span class="nt">route</span><span class="p">:</span>
-    <span class="nt">host</span><span class="p">:</span>
-      <span class="nt">template</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld</span>
-  <span class="nt">replace</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">image.tag</span>
-      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span>
-    <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
-      <span class="nt">variable</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># old &#39;v0&#39; format</span><span class="w"></span>
+<span class="nt">deploymentConfig</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">org</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span><span class="w"></span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span><span class="w"></span>
+<span class="w">  </span><span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span><span class="w"></span>
+<span class="nt">previewConfig</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">route</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld</span><span class="w"></span>
+<span class="w">  </span><span class="nt">replace</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image.tag</span><span class="w"></span>
+<span class="w">      </span><span class="nt">variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">route.host</span><span class="w"></span>
+<span class="w">      </span><span class="nt">variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span><span class="w"></span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># v2 format</span>
-<span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v2</span>
-<span class="nt">applicationName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">app-xy</span>
-<span class="nt">previewConfig</span><span class="p">:</span>
-  <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span>
-  <span class="nt">target</span><span class="p">:</span>
-    <span class="nt">organisation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployments</span>
-    <span class="nt">repository</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
-    <span class="nt">namespace</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview</span>
-  <span class="nt">replace</span><span class="p">:</span>
-    <span class="nt">Chart.yaml</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
-        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}</span>
-    <span class="nt">values.yaml</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">image.tag</span>
-        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${GIT_HASH}</span>
-      <span class="p p-Indicator">-</span> <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route.host</span>
-        <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${PREVIEW_HOST}</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># v2 format</span><span class="w"></span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span><span class="w"></span>
+<span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span><span class="w"></span>
+<span class="nt">previewConfig</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span><span class="w"></span>
+<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">organisation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span><span class="w"></span>
+<span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span><span class="w"></span>
+<span class="w">    </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview</span><span class="w"></span>
+<span class="w">  </span><span class="nt">replace</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">Chart.yaml</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}</span><span class="w"></span>
+<span class="w">    </span><span class="nt">values.yaml</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image.tag</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${GIT_HASH}</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">route.host</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_HOST}</span><span class="w"></span>
 </code></pre></div>
 </div>
 <h4 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h4>
