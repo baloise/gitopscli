@@ -7,7 +7,7 @@ from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
-#array of allowed values for __clean_yaml function
+# array of allowed values for __clean_yaml function
 yaml_blacklist = []
 
 class SyncAppsCommand(Command):
@@ -65,12 +65,12 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 
 
 def __clean_yaml(values):
-    #storing yaml to allow deletion while iterating
+    # storing yaml to allow deletion while iterating
     yml_result = values.copy()
-    #iterating through yaml keys
+    # iterating through yaml keys
     for key in values.keys():
         logging.info(f'processing {key} ')
-        #checking if key is in whitelist
+        # checking if key is in whitelist
         if key in yaml_blacklist:
             logging.info(f"value {key} removed")
             del (yml_result[key])
@@ -79,6 +79,7 @@ def __clean_yaml(values):
             if isinstance(values[key], dict):
                 yml_result[key] = __clean_yaml(values[key].copy())
     return yml_result
+
 
 def __clean_repo_app(team_config_git_repo: GitRepo, app_name: str):
     app_spec_file = team_config_git_repo.get_full_file_path(f"{app_name}/values.yaml")
