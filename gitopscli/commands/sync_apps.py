@@ -70,7 +70,7 @@ def __clean_yaml(values):
     # iterating through yaml keys
     for key in values.keys():
         logging.info(f'processing {key} ')
-        # checking if key is in whitelist
+        # checking if key is in blacklist and remove it if necessary
         if key in yaml_blacklist:
             logging.info(f"value {key} removed")
             del (yml_result[key])
