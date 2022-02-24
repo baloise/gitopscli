@@ -7,7 +7,7 @@ from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
-# array of allowed values for __clean_yaml function
+
 YAML_BLACKLIST: List[str] = []
 
 
@@ -70,17 +70,13 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 
 
 def __clean_yaml(values: Dict[str, Any]) -> Any:
-    # storing yaml to allow deletion while iterating
     yml_result = values.copy()
-    # iterating through yaml keys
     for key in values.keys():
         logging.info("processing %s ", key)
-        # checking if key is in blacklist and remove it if necessary
         if key in YAML_BLACKLIST:
             logging.info("value %s removed", key)
             del yml_result[key]
         else:
-            # check if the key have a sub-level for recursive call
             if isinstance(values[key], dict):
                 yml_result[key] = __clean_yaml(values[key].copy())
     return yml_result
