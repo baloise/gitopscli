@@ -6,6 +6,7 @@ from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactor
 from gitopscli.commands.sync_apps import SyncAppsCommand
 from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException
+
 from .mock_mixin import MockMixin
 
 ARGS = SyncAppsCommand.Args(
@@ -78,6 +79,9 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                 "repository": "https://other-team.config.repo.git",
                 "applications": {"some-other-app-2": None},
             },
+            "/tmp/team-config-repo/my-app/values.yaml": {
+                "config": {"repository": "https://team.config.repo.git", "applications": {"some-other-app-1": None}}
+            },
         }[file_path]
 
         self.merge_yaml_element_mock = self.monkey_patch(merge_yaml_element)
@@ -115,8 +119,23 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo_root.get_full_file_path("apps/other-team-non-prod.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/apps/other-team-non-prod.yaml"),
             call.logging.info("Sync applications in root repository's %s.", "apps/team-non-prod.yaml"),
+            call.GitRepo_team.get_full_file_path("my-app/values.yaml"),
+            call.yaml_file_load("/tmp/team-config-repo/my-app/values.yaml"),
+            call.logging.info("processing %s ", "config"),
+            call.logging.info("processing %s ", "repository"),
+            call.logging.info("processing %s ", "applications"),
+            call.logging.info("processing %s ", "some-other-app-1"),
             call.merge_yaml_element(
-                "/tmp/root-config-repo/apps/team-non-prod.yaml", "config.applications", {"my-app": {}}
+                "/tmp/root-config-repo/apps/team-non-prod.yaml",
+                "config.applications",
+                {
+                    "my-app": {
+                        "config": {
+                            "repository": "https://team.config.repo.git",
+                            "applications": {"some-other-app-1": None},
+                        }
+                    }
+                },
             ),
             call.GitRepo_team.get_author_from_last_commit(),
             call.GitRepo_root.commit("GIT_USER", "GIT_EMAIL", "author updated apps/team-non-prod.yaml"),

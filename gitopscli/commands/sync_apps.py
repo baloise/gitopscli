@@ -1,14 +1,15 @@
 import logging
 import os
 from dataclasses import dataclass
-from typing import Any, Set, Tuple
+from typing import Any, Set, Tuple, List, Dict
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
 
 # array of allowed values for __clean_yaml function
-yaml_blacklist = []
+YAML_BLACKLIST: List[str] = []
+
 
 class SyncAppsCommand(Command):
     @dataclass(frozen=True)
@@ -60,20 +61,24 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     __check_if_app_already_exists(repo_apps, apps_from_other_repos)
 
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
-    merge_yaml_element(apps_config_file, found_apps_path, {repo_app: __clean_repo_app(team_config_git_repo,repo_app) for repo_app in repo_apps})
+    merge_yaml_element(
+        apps_config_file,
+        found_apps_path,
+        {repo_app: __clean_repo_app(team_config_git_repo, repo_app) for repo_app in repo_apps},
+    )
     __commit_and_push(team_config_git_repo, root_config_git_repo, git_user, git_email, apps_config_file_name)
 
 
-def __clean_yaml(values):
+def __clean_yaml(values: Dict[str, Any]) -> Any:
     # storing yaml to allow deletion while iterating
     yml_result = values.copy()
     # iterating through yaml keys
     for key in values.keys():
-        logging.info(f'processing {key} ')
+        logging.info("processing %s ", key)
         # checking if key is in blacklist and remove it if necessary
-        if key in yaml_blacklist:
-            logging.info(f"value {key} removed")
-            del (yml_result[key])
+        if key in YAML_BLACKLIST:
+            logging.info("value %s removed", key)
+            del yml_result[key]
         else:
             # check if the key have a sub-level for recursive call
             if isinstance(values[key], dict):
@@ -81,13 +86,13 @@ def __clean_yaml(values):
     return yml_result
 
 
-def __clean_repo_app(team_config_git_repo: GitRepo, app_name: str):
+def __clean_repo_app(team_config_git_repo: GitRepo, app_name: str) -> Any:
     app_spec_file = team_config_git_repo.get_full_file_path(f"{app_name}/values.yaml")
     try:
         app_config_content = yaml_file_load(app_spec_file)
         return __clean_yaml(app_config_content)
     except FileNotFoundError as ex:
-        logging.info(f"no specific app settings file found for {app_name}")
+        logging.exception("no specific app settings file found for %s", app_name, exc_info=ex)
         return {}
 
 
