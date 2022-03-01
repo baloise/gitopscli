@@ -72,7 +72,6 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 def __clean_yaml(values: Dict[str, Any]) -> Any:
     yml_result = values.copy()
     for key in values.keys():
-        logging.info("processing %s ", key)
         if key in YAML_BLACKLIST:
             logging.info("value %s removed", key)
             del yml_result[key]

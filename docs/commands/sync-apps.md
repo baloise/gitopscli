@@ -28,6 +28,8 @@ root-config-repo/
 └── bootstrap
     └── values.yaml
 ```
+### app specific values
+app specific values may be set using a values.yaml file directly in the app directory. gitopscli will process these values and remove key that would be blacklisted for security purpose and then store them in the result files under app key.
 
 **bootstrap/values.yaml**
 ```yaml
