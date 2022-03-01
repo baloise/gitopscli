@@ -121,10 +121,6 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Sync applications in root repository's %s.", "apps/team-non-prod.yaml"),
             call.GitRepo_team.get_full_file_path("my-app/values.yaml"),
             call.yaml_file_load("/tmp/team-config-repo/my-app/values.yaml"),
-            call.logging.info("processing %s ", "config"),
-            call.logging.info("processing %s ", "repository"),
-            call.logging.info("processing %s ", "applications"),
-            call.logging.info("processing %s ", "some-other-app-1"),
             call.merge_yaml_element(
                 "/tmp/root-config-repo/apps/team-non-prod.yaml",
                 "config.applications",
