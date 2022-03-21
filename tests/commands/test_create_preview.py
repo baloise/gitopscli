@@ -56,6 +56,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         self.load_gitops_config_mock.return_value = GitOpsConfig(
             api_version=2,
             application_name="my-app",
+            messages_created_template="created template ${PREVIEW_ID_HASH}",
+            messages_updated_template="updated template ${PREVIEW_ID_HASH}",
+            messages_uptodate_template="uptodate template ${PREVIEW_ID_HASH}",
             preview_host_template="app.xy-${PREVIEW_ID_HASH}.example.tld",
             preview_template_organisation="PREVIEW_TEMPLATE_ORG",
             preview_template_repository="PREVIEW_TEMPLATE_REPO",
@@ -130,7 +133,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         )
         command.execute()
 
-        deployment_created_callback.assert_called_once_with("app.xy-685912d3.example.tld")
+        deployment_created_callback.assert_called_once_with("created template 685912d3")
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
@@ -200,6 +203,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         self.load_gitops_config_mock.return_value = GitOpsConfig(
             api_version=gitops_config.api_version,
             application_name=gitops_config.application_name,
+            messages_created_template=gitops_config.messages_created_template,
+            messages_updated_template=gitops_config.messages_updated_template,
+            messages_uptodate_template=gitops_config.messages_uptodate_template,
             preview_host_template=gitops_config.preview_host_template,
             preview_template_organisation=gitops_config.preview_target_organisation,  # template = target
             preview_template_repository=gitops_config.preview_target_repository,  # template = target
@@ -228,7 +234,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         )
         command.execute()
 
-        deployment_created_callback.assert_called_once_with("app.xy-685912d3.example.tld")
+        deployment_created_callback.assert_called_once_with("created template 685912d3")
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
@@ -307,7 +313,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         )
         command.execute()
 
-        deployment_updated_callback.assert_called_once_with("app.xy-685912d3.example.tld")
+        deployment_updated_callback.assert_called_once_with("updated template 685912d3")
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),
@@ -375,7 +381,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         )
         command.execute()
 
-        deployment_already_up_to_date_callback.assert_called_once_with("app.xy-685912d3.example.tld")
+        deployment_already_up_to_date_callback.assert_called_once_with("uptodate template 685912d3")
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(ARGS, "ORGA", "REPO",),

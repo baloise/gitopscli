@@ -42,7 +42,6 @@ class CreatePreviewCommand(Command):
     def execute(self,) -> None:
         gitops_config = self.__get_gitops_config()
         self.__create_preview_info_file(gitops_config)
-        preview_host = gitops_config.get_preview_host(self.__args.preview_id)
 
         preview_target_git_repo_api = self.__create_preview_target_git_repo_api(gitops_config)
         with GitRepo(preview_target_git_repo_api) as preview_target_git_repo:
@@ -62,9 +61,12 @@ class CreatePreviewCommand(Command):
                     )
 
             any_values_replaced = self.__replace_values(preview_target_git_repo, gitops_config)
+            context = GitOpsConfig.Replacement.PreviewContext(
+                gitops_config, self.__args.preview_id, self.__args.git_hash
+            )
 
             if not created_new_preview and not any_values_replaced:
-                self.__deployment_already_up_to_date_callback(preview_host)
+                self.__deployment_already_up_to_date_callback(gitops_config.get_uptodate_message(context))
                 logging.info("The preview is already up-to-date. I'm done here.")
                 return
 
@@ -74,10 +76,10 @@ class CreatePreviewCommand(Command):
                 f"'{gitops_config.application_name}' and git hash '{self.__args.git_hash}'.",
             )
 
-        if created_new_preview:
-            self.__deployment_created_callback(preview_host)
-        else:
-            self.__deployment_updated_callback(preview_host)
+            if created_new_preview:
+                self.__deployment_created_callback(gitops_config.get_created_message(context))
+            else:
+                self.__deployment_updated_callback(gitops_config.get_updated_message(context))
 
     def __commit_and_push(self, git_repo: GitRepo, message: str) -> None:
         git_repo.commit(self.__args.git_user, self.__args.git_email, message)
