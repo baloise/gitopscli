@@ -303,18 +303,12 @@ class _GitOpsConfigYamlParser:
         return GitOpsConfig(
             api_version=0,
             application_name=self.__get_string_value("deploymentConfig.applicationName"),
-            messages_created_template=self.__get_string_value_or_default(
-                "messages.created",
+            messages_created_template=
                 "New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}",
-            ),
-            messages_updated_template=self.__get_string_value_or_default(
-                "messages.updated",
+            messages_updated_template=
                 "Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}",
-            ),
-            messages_uptodate_template=self.__get_string_value_or_default(
-                "messages.uptodate",
+            messages_uptodate_template=
                 "The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}",
-            ),
             preview_host_template=self.__get_string_value("previewConfig.route.host.template").replace(
                 "{SHA256_8CHAR_BRANCH_HASH}", "${PREVIEW_ID_HASH}"  # backwards compatibility
             ),
@@ -342,18 +336,12 @@ class _GitOpsConfigYamlParser:
         return GitOpsConfig(
             api_version=1,
             application_name=config.application_name,
-            messages_created_template=self.__get_string_value_or_default(
-                "messages.created",
+            messages_created_template=
                 "New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}",
-            ),
-            messages_updated_template=self.__get_string_value_or_default(
-                "messages.updated",
+            messages_updated_template=
                 "Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}",
-            ),
-            messages_uptodate_template=self.__get_string_value_or_default(
-                "messages.uptodate",
+            messages_uptodate_template=
                 "The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}",
-            ),
             preview_host_template=add_var_dollar(config.preview_host_template),
             preview_template_organisation=config.preview_template_organisation,
             preview_template_repository=config.preview_template_repository,
