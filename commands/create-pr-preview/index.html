@@ -664,9 +664,14 @@
 <li>templates for host and namespace name</li>
 <li>replace values in template files</li>
 <li>find repository and branch where the preview should be created (i.e. your <em>deployment config repository</em>)</li>
+<li>message templates used to comment your pull request</li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span><span class="w"></span>
 <span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span><span class="w"></span>
+<span class="c1"># messages:                              # optional section</span><span class="w"></span>
+<span class="c1">#   previewEnvCreated: &quot;Created preview at revision ${GIT-HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path&quot;    # optional (default: &quot;New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}&quot;)</span><span class="w"></span>
+<span class="c1">#   previewEnvUpdated: &quot;Updated preview to revision ${GIT-HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path&quot;    # optional (default: &quot;Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}&quot;)</span><span class="w"></span>
+<span class="c1">#   previewEnvAlreadyUpToDate: &quot;Your preview is already up-to-date with revision ${GIT-HASH}.&quot;                                       # optional (default: &quot;The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}&quot;)</span><span class="w"></span>
 <span class="nt">previewConfig</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span><span class="w"></span>
 <span class="c1"># template:                              # optional section</span><span class="w"></span>
