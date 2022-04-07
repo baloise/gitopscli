@@ -46,14 +46,8 @@ class CreatePrPreviewCommand(Command):
             ),
         )
         create_preview_command.register_callbacks(
-            deployment_already_up_to_date_callback=lambda preview_host: add_pr_comment(
-                f"The version `{git_hash}` has already been deployed. Access it here: https://{preview_host}",
-            ),
-            deployment_updated_callback=lambda preview_host: add_pr_comment(
-                f"Preview environment updated to version `{git_hash}`. Access it here: https://{preview_host}"
-            ),
-            deployment_created_callback=lambda preview_host: add_pr_comment(
-                f"New preview environment created for version `{git_hash}`. Access it here: https://{preview_host}"
-            ),
+            deployment_already_up_to_date_callback=add_pr_comment,
+            deployment_updated_callback=add_pr_comment,
+            deployment_created_callback=add_pr_comment,
         )
         create_preview_command.execute()

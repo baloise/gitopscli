@@ -2,6 +2,7 @@ import re
 import hashlib
 from dataclasses import dataclass
 from typing import List, Any, Optional, Dict, Callable, Set
+from string import Template
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -51,6 +52,10 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
     application_name: str
 
     preview_host_template: str
+
+    messages_created_template: str
+    messages_updated_template: str
+    messages_uptodate_template: str
 
     preview_template_organisation: str
     preview_template_repository: str
@@ -139,6 +144,26 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
         if invalid_character:
             raise GitOpsException(f"Invalid character in preview namespace: '{invalid_character[0]}'")
         return preview_namespace
+
+    def get_created_message(self, context: Replacement.PreviewContext) -> str:
+        return self.fill_template(self.messages_created_template, context)
+
+    def get_updated_message(self, context: Replacement.PreviewContext) -> str:
+        return self.fill_template(self.messages_updated_template, context)
+
+    def get_uptodate_message(self, context: Replacement.PreviewContext) -> str:
+        return self.fill_template(self.messages_uptodate_template, context)
+
+    def fill_template(self, template: str, context: Replacement.PreviewContext) -> str:
+        return Template(template).substitute(
+            APPLICATION_NAME=self.application_name,
+            PREVIEW_ID_HASH=self.create_preview_id_hash(context.preview_id),
+            PREVIEW_ID_HASH_SHORT=self.create_preview_id_hash_short(context.preview_id),
+            PREVIEW_ID=self.__sanitize(context.preview_id),
+            PREVIEW_NAMESPACE=self.get_preview_namespace(context.preview_id),
+            PREVIEW_HOST=self.get_preview_host(context.preview_id),
+            GIT_HASH=context.git_hash,
+        )
 
     @staticmethod
     def __assert_variables(template: str, variables: Set[str]) -> None:
@@ -278,6 +303,12 @@ class _GitOpsConfigYamlParser:
         return GitOpsConfig(
             api_version=0,
             application_name=self.__get_string_value("deploymentConfig.applicationName"),
+            messages_created_template="New preview environment created for version `${GIT_HASH}`. "
+            + "Access it here: https://${PREVIEW_HOST}",
+            messages_updated_template="Preview environment updated to version `${GIT_HASH}`. "
+            + "Access it here: https://${PREVIEW_HOST}",
+            messages_uptodate_template="The version `${GIT_HASH}` has already been deployed. "
+            + "Access it here: https://${PREVIEW_HOST}",
             preview_host_template=self.__get_string_value("previewConfig.route.host.template").replace(
                 "{SHA256_8CHAR_BRANCH_HASH}", "${PREVIEW_ID_HASH}"  # backwards compatibility
             ),
@@ -305,6 +336,12 @@ class _GitOpsConfigYamlParser:
         return GitOpsConfig(
             api_version=1,
             application_name=config.application_name,
+            messages_created_template="New preview environment created for version `${GIT_HASH}`. "
+            + "Access it here: https://${PREVIEW_HOST}",
+            messages_updated_template="Preview environment updated to version `${GIT_HASH}`. "
+            + "Access it here: https://${PREVIEW_HOST}",
+            messages_uptodate_template="The version `${GIT_HASH}` has already been deployed. "
+            + "Access it here: https://${PREVIEW_HOST}",
             preview_host_template=add_var_dollar(config.preview_host_template),
             preview_template_organisation=config.preview_template_organisation,
             preview_template_repository=config.preview_template_repository,
@@ -358,6 +395,18 @@ class _GitOpsConfigYamlParser:
         return GitOpsConfig(
             api_version=2,
             application_name=self.__get_string_value("applicationName"),
+            messages_created_template=self.__get_string_value_or_default(
+                "messages.previewEnvCreated",
+                "New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}",
+            ),
+            messages_updated_template=self.__get_string_value_or_default(
+                "messages.previewEnvUpdated",
+                "Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}",
+            ),
+            messages_uptodate_template=self.__get_string_value_or_default(
+                "messages.previewEnvAlreadyUpToDate",
+                "The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}",
+            ),
             preview_host_template=self.__get_string_value("previewConfig.host"),
             preview_template_organisation=self.__get_string_value_or_default(
                 "previewConfig.template.organisation", preview_target_organisation

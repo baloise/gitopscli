@@ -28,6 +28,9 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         self.load_gitops_config_mock.return_value = GitOpsConfig(
             api_version=0,
             application_name="APP",
+            messages_created_template="created template ${PREVIEW_ID_HASH}",
+            messages_updated_template="updated template ${PREVIEW_ID_HASH}",
+            messages_uptodate_template="uptodate template ${PREVIEW_ID_HASH}",
             preview_host_template="www.foo.bar",
             preview_template_organisation="PREVIEW_TEMPLATE_ORG",
             preview_template_repository="PREVIEW_TEMPLATE_REPO",

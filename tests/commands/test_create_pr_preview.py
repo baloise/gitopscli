@@ -74,7 +74,9 @@ class CreatePrPreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
         self.mock_manager.reset_mock()
-        deployment_already_up_to_date_callback("my-route.baloise.com")
+        deployment_already_up_to_date_callback(
+            "The version `5f65cfa04c66444fcb756d6d7f39304d1c18b199` has already been deployed. Access it here: https://my-route.baloise.com"
+        )
         assert self.mock_manager.method_calls == [
             call.GitRepoApi.add_pull_request_comment(
                 4711,
@@ -85,7 +87,9 @@ class CreatePrPreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
         self.mock_manager.reset_mock()
-        deployment_updated_callback("my-route.baloise.com")
+        deployment_updated_callback(
+            "Preview environment updated to version `5f65cfa04c66444fcb756d6d7f39304d1c18b199`. Access it here: https://my-route.baloise.com"
+        )
         assert self.mock_manager.method_calls == [
             call.GitRepoApi.add_pull_request_comment(
                 4711,
@@ -96,7 +100,9 @@ class CreatePrPreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
         self.mock_manager.reset_mock()
-        deployment_created_callback("my-route.baloise.com")
+        deployment_created_callback(
+            "New preview environment created for version `5f65cfa04c66444fcb756d6d7f39304d1c18b199`. Access it here: https://my-route.baloise.com"
+        )
         assert self.mock_manager.method_calls == [
             call.GitRepoApi.add_pull_request_comment(
                 4711,
