@@ -1269,7 +1269,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual("", stdout)
         last_stderr_line = stderr.splitlines()[-1]
         self.assertEqual(
-            "gitopscli deploy: error: argument --values: invalid YAML value: '{ INVALID YAML'", last_stderr_line,
+            "gitopscli deploy: error: argument --values: invalid YAML value: '{ INVALID YAML'", last_stderr_line
         )
 
     def test_invalid_git_provider(self):

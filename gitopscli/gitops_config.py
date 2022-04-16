@@ -352,7 +352,7 @@ class _GitOpsConfigYamlParser:
             preview_target_branch=config.preview_target_branch,
             preview_target_namespace_template=add_var_dollar(
                 self.__get_string_value_or_default(
-                    "previewConfig.target.namespace", "{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview",
+                    "previewConfig.target.namespace", "{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview"
                 )
             ),
             preview_target_max_namespace_length=63,
@@ -423,7 +423,7 @@ class _GitOpsConfigYamlParser:
             preview_target_repository=preview_target_repository,
             preview_target_branch=preview_target_branch,
             preview_target_namespace_template=self.__get_string_value_or_default(
-                "previewConfig.target.namespace", "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview",
+                "previewConfig.target.namespace", "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview"
             ),
             preview_target_max_namespace_length=preview_target_max_namespace_length,
             replacements=replacements,

@@ -11,7 +11,7 @@ from tests.commands.mock_mixin import MockMixin
 
 class GitOpsConfigLoaderTest(MockMixin, unittest.TestCase):
     git_api_config = GitApiConfig(
-        username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None,
+        username="USERNAME", password="PASSWORD", git_provider=GitProvider.GITHUB, git_provider_url=None
     )
 
     def setUp(self):

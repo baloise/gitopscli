@@ -51,7 +51,7 @@ class GitRepoApiLoggingProxyTest(unittest.TestCase):
             "<from branch>", "<to branch>", "<title>", "<description>"
         )
         logging_mock.info.assert_called_once_with(
-            "Creating pull request from '%s' to '%s' with title: %s", "<from branch>", "<to branch>", "<title>",
+            "Creating pull request from '%s' to '%s' with title: %s", "<from branch>", "<to branch>", "<title>"
         )
 
     @patch("gitopscli.git_api.git_repo_api_logging_proxy.logging")
@@ -68,40 +68,34 @@ class GitRepoApiLoggingProxyTest(unittest.TestCase):
             "<from branch>", "<title>", "<description>"
         )
         logging_mock.info.assert_called_once_with(
-            "Creating pull request from '%s' to default branch with title: %s", "<from branch>", "<title>",
+            "Creating pull request from '%s' to default branch with title: %s", "<from branch>", "<title>"
         )
 
     @patch("gitopscli.git_api.git_repo_api_logging_proxy.logging")
     def test_merge_pull_request(self, logging_mock):
         self.__testee.merge_pull_request(pr_id=42)
         self.__mock_repo_api.merge_pull_request.assert_called_once_with(42, merge_method="merge")
-        logging_mock.info.assert_called_once_with(
-            "Merging pull request %s", 42,
-        )
+        logging_mock.info.assert_called_once_with("Merging pull request %s", 42)
 
     @patch("gitopscli.git_api.git_repo_api_logging_proxy.logging")
     def test_add_pull_request_comment(self, logging_mock):
         self.__testee.add_pull_request_comment(pr_id=42, text="<text>", parent_id=4711)
         self.__mock_repo_api.add_pull_request_comment.assert_called_once_with(42, "<text>", 4711)
         logging_mock.info.assert_called_once_with(
-            "Creating comment for pull request %s as reply to comment %s with content: %s", 42, 4711, "<text>",
+            "Creating comment for pull request %s as reply to comment %s with content: %s", 42, 4711, "<text>"
         )
 
     @patch("gitopscli.git_api.git_repo_api_logging_proxy.logging")
     def test_add_pull_request_comment_without_parent_id(self, logging_mock):
         self.__testee.add_pull_request_comment(pr_id=42, text="<text>", parent_id=None)
         self.__mock_repo_api.add_pull_request_comment.assert_called_once_with(42, "<text>", None)
-        logging_mock.info.assert_called_once_with(
-            "Creating comment for pull request %s with content: %s", 42, "<text>",
-        )
+        logging_mock.info.assert_called_once_with("Creating comment for pull request %s with content: %s", 42, "<text>")
 
     @patch("gitopscli.git_api.git_repo_api_logging_proxy.logging")
     def test_delete_branch(self, logging_mock):
         self.__testee.delete_branch("<branch>")
         self.__mock_repo_api.delete_branch.assert_called_once_with("<branch>")
-        logging_mock.info.assert_called_once_with(
-            "Deleting branch '%s'", "<branch>",
-        )
+        logging_mock.info.assert_called_once_with("Deleting branch '%s'", "<branch>")
 
     def test_get_branch_head_hash(self):
         expected_return_value = "<hash>"
