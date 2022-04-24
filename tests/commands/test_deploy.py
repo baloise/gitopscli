@@ -405,7 +405,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
-        self.assertEqual(str(ex.value), "Key 'a.b.c' not found in file: test/file.yml")
+        self.assertEqual(str(ex.value), "'dummy key error'")
 
         assert self.mock_manager.method_calls == [
             call.GitRepoApiFactory.create(args, "ORGA", "REPO"),

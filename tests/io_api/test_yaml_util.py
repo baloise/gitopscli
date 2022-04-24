@@ -16,6 +16,8 @@ from gitopscli.io_api.yaml_util import (
 
 
 class YamlUtilTest(unittest.TestCase):
+    maxDiff = None
+
     @classmethod
     def setUpClass(cls):
         cls.tmp_dir = f"/tmp/gitopscli-test-{uuid.uuid4()}"
@@ -117,7 +119,15 @@ a: # comment 1
     g: 4 # comment 6
   - [hello, world] # comment 7
   - foo: # comment 8
-      bar # comment 9"""
+      bar # comment 9
+  - list: # comment 10
+    - key: k1 # comment 11
+      value: v1 # comment 12
+    - key: k2 # comment 13
+      value: v2 # comment 14
+    - {key: k3+4, value: v3} # comment 15
+    - key: k3+4 # comment 16
+      value: v4 # comment 17"""
         )
 
         self.assertTrue(update_yaml_file(test_file, "a.b.c", "2"))
@@ -132,6 +142,11 @@ a: # comment 1
         self.assertTrue(update_yaml_file(test_file, "a.e.[2]", "replaced object"))
         self.assertFalse(update_yaml_file(test_file, "a.e.[2]", "replaced object"))  # already updated
 
+        self.assertTrue(update_yaml_file(test_file, "a.e.[*].list[?key=='k3+4'].value", "replaced v3 and v4"))
+        self.assertFalse(
+            update_yaml_file(test_file, "a.e.[*].list[?key=='k3+4'].value", "replaced v3 and v4")
+        )  # already updated
+
         expected = """\
 a: # comment 1
 # comment 2
@@ -144,17 +159,25 @@ a: # comment 1
     g: 42 # comment 6
   - [hello, tester] # comment 7
   - replaced object
+  - list: # comment 10
+    - key: k1 # comment 11
+      value: v1 # comment 12
+    - key: k2 # comment 13
+      value: v2 # comment 14
+    - {key: k3+4, value: replaced v3 and v4} # comment 15
+    - key: k3+4 # comment 16
+      value: replaced v3 and v4 # comment 17
 """
         actual = self._read_file(test_file)
         self.assertEqual(expected, actual)
 
         with pytest.raises(KeyError) as ex:
             update_yaml_file(test_file, "x.y", "foo")
-        self.assertEqual("\"Key 'x' not found in YAML!\"", str(ex.value))
+        self.assertEqual("\"Key 'x.y' not found in YAML!\"", str(ex.value))
 
         with pytest.raises(KeyError) as ex:
             update_yaml_file(test_file, "[42].y", "foo")
-        self.assertEqual("\"Key '[42]' not found in YAML!\"", str(ex.value))
+        self.assertEqual("\"Key '[42].y' not found in YAML!\"", str(ex.value))
 
         with pytest.raises(KeyError) as ex:
             update_yaml_file(test_file, "a.x", "foo")
@@ -165,12 +188,25 @@ a: # comment 1
         self.assertEqual("\"Key 'a.[42]' not found in YAML!\"", str(ex.value))
 
         with pytest.raises(KeyError) as ex:
-            update_yaml_file(test_file, "a.e.[3]", "foo")
-        self.assertEqual("\"Key 'a.e.[3]' not found in YAML!\"", str(ex.value))
+            update_yaml_file(test_file, "a.e.[100]", "foo")
+        self.assertEqual("\"Key 'a.e.[100]' not found in YAML!\"", str(ex.value))
+
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "a.e.[*].list[?key=='foo'].value", "foo")
+        self.assertEqual("\"Key 'a.e.[*].list[?key=='foo'].value' not found in YAML!\"", str(ex.value))
 
         with pytest.raises(KeyError) as ex:
             update_yaml_file(test_file, "a.e.[2].[2]", "foo")
-        self.assertEqual("\"Key 'a.e.[2].[2]' not found in YAML!\"", str(ex.value))
+        self.assertEqual(
+            "\"Key 'a.e.[2].[2]' cannot be updated: 'str' object does not support item assignment!\"", str(ex.value)
+        )
+
+        with pytest.raises(KeyError) as ex:
+            update_yaml_file(test_file, "invalid JSONPath", "foo")
+        self.assertEqual(
+            "\"Key 'invalid JSONPath' is invalid JSONPath expression: Parse error at 1:8 near token JSONPath (ID)!\"",
+            str(ex.value),
+        )
 
         with pytest.raises(KeyError) as ex:
             update_yaml_file(test_file, "", "foo")

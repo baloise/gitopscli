@@ -15,10 +15,10 @@ backend:
   tag: 1.0.0 # <- and this one
   env:
   - name: TEST
-    value: foo # <- and even one in a list
+    value: foo # <- and this one in a list, selected via sibling value 'TEST'
 ```
 
-With the following command GitOps CLI will update both values to `1.1.0` on the default branch.
+With the following command GitOps CLI will update all values on the default branch.
 
 ```bash
 gitopscli deploy \
@@ -30,8 +30,10 @@ gitopscli deploy \
   --organisation "deployment" \
   --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env.[0].value': bar}"
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env[?name==''TEST''].value': bar}"
 ```
+
+You could also use the list index to replace the latter (`my-app.env.[0].value`). For more details on the underlying *JSONPath* syntax, please refer to the [documenatation of the used library *jsonpath-ng*](https://github.com/h2non/jsonpath-ng#jsonpath-syntax).
 
 ### Number Of Commits
 
@@ -42,7 +44,7 @@ commit 0dcaa136b4c5249576bb1f40b942bff6ac718144
 Author: GitOpsCLI <gitopscli@baloise.dev>
 Date:   Thu Mar 12 15:30:32 2020 +0100
 
-    changed 'backend.env.[0].value' to 'bar' in example/values.yaml
+    changed 'backend.env[?name=='TEST'].value' to 'bar' in example/values.yaml
 
 commit d98913ad8fecf571d5f8c3635f8070b05c43a9ca
 Author: GitOpsCLI <gitopscli@baloise.dev>
@@ -64,11 +66,11 @@ commit 3b96839e90c35b8decf89f34a65ab6d66c8bab28
 Author: GitOpsCLI <gitopscli@baloise.dev>
 Date:   Thu Mar 12 15:30:00 2020 +0100
 
-    updated 2 values in example/values.yaml
+    updated 3 values in example/values.yaml
 
     frontend.tag: '1.1.0'
     backend.tag: '1.1.0'
-    backend.env.[0].value: 'bar'
+    'backend.env[?name==''TEST''].value': 'bar'
 ```
 
 ### Specific Commit Message
@@ -88,7 +90,7 @@ gitopscli deploy \
   --repository-name "myapp-non-prod" \
   --commit-message "test commit message" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env.[0].value': bar}"
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env[?name==''TEST''].value': bar}"
 ```
 
 This will end up in one single commit with your specified commit-message.
@@ -107,7 +109,7 @@ gitopscli deploy \
   --organisation "deployment" \
   --repository-name "myapp-non-prod" \
   --file "example/values.yaml" \
-  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env.[0].value': bar}" \
+  --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env[?name==''TEST''].value': bar}" \
   --create-pr \
   --auto-merge
 ```

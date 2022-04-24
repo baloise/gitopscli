@@ -23,7 +23,7 @@ Make sure that your *app repository* contains a `.gitops.config.yaml` file. This
 
 1. find repository, branch, and folder containing the template
 2. templates for host and namespace name
-3. replace values in template files
+3. replace values in template files (see [`deploy` command](/gitopscli/commands/deploy/) for details on the key syntax)
 4. find repository and branch where the preview should be created (i.e. your *deployment config repository*)
 5. message templates used to comment your pull request
 
