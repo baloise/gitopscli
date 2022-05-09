@@ -400,37 +400,10 @@
     .gitops.config.yaml
   </a>
   
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#variables" class="md-nav__link">
-    Variables
-  </a>
-  
 </li>
         
       </ul>
     </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
-  </a>
   
 </li>
       
@@ -586,37 +559,10 @@
     .gitops.config.yaml
   </a>
   
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#variables" class="md-nav__link">
-    Variables
-  </a>
-  
 </li>
         
       </ul>
     </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
-  </a>
   
 </li>
       
@@ -645,7 +591,7 @@
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <h3 id="preview-templates">Preview Templates<a class="headerlink" href="#preview-templates" title="Permanent link">&para;</a></h3>
 <p>You have to provide a folder with the deployment configuration templates for every application you want to use this command for. By default it is assumed that this folder is located in your <em>deployment config repository</em> under the top-level folder <code>.preview-templates</code>. For example <code>.preview-templates/app-xy</code> for your app <code>app-xy</code>. The <code>create-preview</code> command simply copies this directory to the root of your <em>deployment config repository</em> and replaces e.g. image tag and route host which are specific to this preview.</p>
-<div class="highlight"><pre><span></span><code>deployment-config-repo/
+<p><code>deployment-config-repo/
 ├── .preview-templates
 │   └── app-xy                        &lt;- Can contain any files and folders
 │       ├── values.yaml
@@ -655,48 +601,50 @@
 ├── app-xy-test
 └── app-xy-my-branch-c7003101-preview  &lt;- This is how a created preview looks by default
     ├── values.yaml                    &lt;- e.g. image tag and route host are replaced in this one
-    └── some-more-config-files-or-folders
-</code></pre></div>
+    └── some-more-config-files-or-folders</code></p>
 <h3 id="gitopsconfigyaml">.gitops.config.yaml<a class="headerlink" href="#gitopsconfigyaml" title="Permanent link">&para;</a></h3>
 <p>Make sure that your <em>app repository</em> contains a <code>.gitops.config.yaml</code> file. This file provides all information to </p>
 <ol>
 <li>find repository, branch, and folder containing the template</li>
 <li>templates for host and namespace name</li>
-<li>replace values in template files</li>
+<li>replace values in template files (see <a href="/gitopscli/commands/deploy/"><code>deploy</code> command</a> for details on the key syntax)</li>
 <li>find repository and branch where the preview should be created (i.e. your <em>deployment config repository</em>)</li>
 <li>message templates used to comment your pull request</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span><span class="w"></span>
-<span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span><span class="w"></span>
-<span class="c1"># messages:                              # optional section</span><span class="w"></span>
-<span class="c1">#   previewEnvCreated: &quot;Created preview at revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path&quot;    # optional (default: &quot;New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}&quot;)</span><span class="w"></span>
-<span class="c1">#   previewEnvUpdated: &quot;Updated preview to revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path&quot;    # optional (default: &quot;Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}&quot;)</span><span class="w"></span>
-<span class="c1">#   previewEnvAlreadyUpToDate: &quot;Your preview is already up-to-date with revision ${GIT-HASH}.&quot;                                       # optional (default: &quot;The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}&quot;)</span><span class="w"></span>
-<span class="nt">previewConfig</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span><span class="w"></span>
-<span class="c1"># template:                              # optional section</span><span class="w"></span>
-<span class="c1">#   organisation: templates              # optional (default: target.organisation)</span><span class="w"></span>
-<span class="c1">#   repository: template-repo            # optional (default: target.repository)</span><span class="w"></span>
-<span class="c1">#   branch: master                       # optional (default: target.branch)</span><span class="w"></span>
-<span class="c1">#   path: custom/${APPLICATION_NAME}     # optional (default: &#39;.preview-templates/${APPLICATION_NAME}&#39;)</span><span class="w"></span>
-<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">organisation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span><span class="w"></span>
-<span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span><span class="w"></span>
-<span class="c1">#   branch: master                       # optional (defaults to repo&#39;s default branch)</span><span class="w"></span>
-<span class="c1">#   namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview&#39;  # optional (default: &#39;${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview&#39;,</span><span class="w"></span>
-<span class="w">                                                                </span><span class="c1">#           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be</span><span class="w"></span>
-<span class="w">                                                                </span><span class="c1">#           truncated if max namespace length exceeds `maxNamespaceLength` chars.)</span><span class="w"></span>
-<span class="c1">#   maxNamespaceLength: 63               # optional (default: 53)</span><span class="w"></span>
-<span class="w">  </span><span class="nt">replace</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">Chart.yaml</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="w"></span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}</span><span class="w"></span>
-<span class="w">    </span><span class="nt">values.yaml</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app.image</span><span class="w"></span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.example.tld/my-app:${GIT_HASH}</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">route.host</span><span class="w"></span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_HOST}</span><span class="w"></span>
+<p>```yaml
+apiVersion: v2
+applicationName: app-xy</p>
+<h1 id="messages-optional-section">messages:                              # optional section<a class="headerlink" href="#messages-optional-section" title="Permanent link">&para;</a></h1>
+<h1 id="previewenvcreated-created-preview-at-revision-git_hash-you-can-access-it-here-httpspreview_hostsome-fancy-path-optional-default-new-preview-environment-created-for-version-git_hash-access-it-here-httpspreview_host">previewEnvCreated: "Created preview at revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path"    # optional (default: "New preview environment created for version <code>${GIT_HASH}</code>. Access it here: https://${PREVIEW_HOST}")<a class="headerlink" href="#previewenvcreated-created-preview-at-revision-git_hash-you-can-access-it-here-httpspreview_hostsome-fancy-path-optional-default-new-preview-environment-created-for-version-git_hash-access-it-here-httpspreview_host" title="Permanent link">&para;</a></h1>
+<h1 id="previewenvupdated-updated-preview-to-revision-git_hash-you-can-access-it-here-httpspreview_hostsome-fancy-path-optional-default-preview-environment-updated-to-version-git_hash-access-it-here-httpspreview_host">previewEnvUpdated: "Updated preview to revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path"    # optional (default: "Preview environment updated to version <code>${GIT_HASH}</code>. Access it here: https://${PREVIEW_HOST}")<a class="headerlink" href="#previewenvupdated-updated-preview-to-revision-git_hash-you-can-access-it-here-httpspreview_hostsome-fancy-path-optional-default-preview-environment-updated-to-version-git_hash-access-it-here-httpspreview_host" title="Permanent link">&para;</a></h1>
+<h1 id="previewenvalreadyuptodate-your-preview-is-already-up-to-date-with-revision-git-hash-optional-default-the-version-git_hash-has-already-been-deployed-access-it-here-httpspreview_host">previewEnvAlreadyUpToDate: "Your preview is already up-to-date with revision ${GIT-HASH}."                                       # optional (default: "The version <code>${GIT_HASH}</code> has already been deployed. Access it here: https://${PREVIEW_HOST}")<a class="headerlink" href="#previewenvalreadyuptodate-your-preview-is-already-up-to-date-with-revision-git-hash-optional-default-the-version-git_hash-has-already-been-deployed-access-it-here-httpspreview_host" title="Permanent link">&para;</a></h1>
+<p>previewConfig:
+  host: ${PREVIEW_NAMESPACE}.example.tld</p>
+<h1 id="template-optional-section">template:                              # optional section<a class="headerlink" href="#template-optional-section" title="Permanent link">&para;</a></h1>
+<h1 id="organisation-templates-optional-default-targetorganisation">organisation: templates              # optional (default: target.organisation)<a class="headerlink" href="#organisation-templates-optional-default-targetorganisation" title="Permanent link">&para;</a></h1>
+<h1 id="repository-template-repo-optional-default-targetrepository">repository: template-repo            # optional (default: target.repository)<a class="headerlink" href="#repository-template-repo-optional-default-targetrepository" title="Permanent link">&para;</a></h1>
+<h1 id="branch-master-optional-default-targetbranch">branch: master                       # optional (default: target.branch)<a class="headerlink" href="#branch-master-optional-default-targetbranch" title="Permanent link">&para;</a></h1>
+<h1 id="path-customapplication_name-optional-default-preview-templatesapplication_name">path: custom/${APPLICATION_NAME}     # optional (default: '.preview-templates/${APPLICATION_NAME}')<a class="headerlink" href="#path-customapplication_name-optional-default-preview-templatesapplication_name" title="Permanent link">&para;</a></h1>
+<p>target:
+    organisation: deployments
+    repository: deployment-config-repo</p>
+<h1 id="branch-master-optional-defaults-to-repos-default-branch">branch: master                       # optional (defaults to repo's default branch)<a class="headerlink" href="#branch-master-optional-defaults-to-repos-default-branch" title="Permanent link">&para;</a></h1>
+<h1 id="namespace-application_name-preview_id_hash-preview-optional-default-application_name-preview_id-preview_id_hash_short-preview">namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview'  # optional (default: '${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview',<a class="headerlink" href="#namespace-application_name-preview_id_hash-preview-optional-default-application_name-preview_id-preview_id_hash_short-preview" title="Permanent link">&para;</a></h1>
+<div class="codehilite"><pre><span></span><code>                                                            #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be
+                                                            #           truncated if max namespace length exceeds `maxNamespaceLength` chars.)
 </code></pre></div>
+
+<h1 id="maxnamespacelength-63-optional-default-53">maxNamespaceLength: 63               # optional (default: 53)<a class="headerlink" href="#maxnamespacelength-63-optional-default-53" title="Permanent link">&para;</a></h1>
+<p>replace:
+    Chart.yaml:
+      - path: name
+        value: ${PREVIEW_NAMESPACE}
+    values.yaml:
+      - path: app.image
+        value: registry.example.tld/my-app:${GIT_HASH}
+      - path: route.host
+        value: ${PREVIEW_HOST}
+```</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>If you currently use the <em>old</em> <code>.gitops.config.yaml</code> format (<em>v0</em>) you may find this <a href="https://christiansiegel.github.io/gitopscli-config-converter/">online converter</a> helpful to transition to the current <code>apiVersion v2</code>.</p>
@@ -705,40 +653,42 @@
 <p>The <em>old</em> (<em>v0</em>) version and <code>apiVersion v1</code> are marked deprecated and will be removed in <code>gitopscli</code> version 6.0.0.</p>
 </div>
 <p>Equivalent example:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># old &#39;v0&#39; format</span><span class="w"></span>
-<span class="nt">deploymentConfig</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">org</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span><span class="w"></span>
-<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span><span class="w"></span>
-<span class="w">  </span><span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span><span class="w"></span>
-<span class="nt">previewConfig</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">route</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld</span><span class="w"></span>
-<span class="w">  </span><span class="nt">replace</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image.tag</span><span class="w"></span>
-<span class="w">      </span><span class="nt">variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GIT_COMMIT</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">route.host</span><span class="w"></span>
-<span class="w">      </span><span class="nt">variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ROUTE_HOST</span><span class="w"></span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># v2 format</span><span class="w"></span>
-<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span><span class="w"></span>
-<span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span><span class="w"></span>
-<span class="nt">previewConfig</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span><span class="w"></span>
-<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">organisation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span><span class="w"></span>
-<span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span><span class="w"></span>
-<span class="w">    </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview</span><span class="w"></span>
-<span class="w">  </span><span class="nt">replace</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">Chart.yaml</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="w"></span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}</span><span class="w"></span>
-<span class="w">    </span><span class="nt">values.yaml</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image.tag</span><span class="w"></span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${GIT_HASH}</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">route.host</span><span class="w"></span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_HOST}</span><span class="w"></span>
-</code></pre></div>
+<p>```yaml</p>
+<h1 id="old-v0-format">old 'v0' format<a class="headerlink" href="#old-v0-format" title="Permanent link">&para;</a></h1>
+<p>deploymentConfig:
+  org: deployments
+  repository: deployment-config-repo
+  applicationName: app-xy
+previewConfig:
+  route:
+    host:
+      template: app-xy-{SHA256_8CHAR_BRANCH_HASH}.example.tld
+  replace:
+    - path: image.tag
+      variable: GIT_COMMIT
+    - path: route.host
+      variable: ROUTE_HOST
+```</p>
+<p>```yaml</p>
+<h1 id="v2-format">v2 format<a class="headerlink" href="#v2-format" title="Permanent link">&para;</a></h1>
+<p>apiVersion: v2
+applicationName: app-xy
+previewConfig:
+  host: ${PREVIEW_NAMESPACE}.example.tld
+  target:
+    organisation: deployments
+    repository: deployment-config-repo
+    namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview
+  replace:
+    Chart.yaml:
+      - path: name
+        value: ${PREVIEW_NAMESPACE}
+    values.yaml:
+      - path: image.tag
+        value: ${GIT_HASH}
+      - path: route.host
+        value: ${PREVIEW_HOST}
+```</p>
 </div>
 <h4 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h4>
 <ul>
@@ -759,26 +709,26 @@
 <li><code>PREVIEW_HOST</code>: The resulting value of <code>previewConfig.host</code></li>
 </ul>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>gitopscli create-pr-preview <span class="se">\</span>
-  --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
-  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
-  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
-  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
-  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
-  --organisation <span class="s2">&quot;my-team&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;app-xy&quot;</span> <span class="se">\</span>
-  --pr-id <span class="m">4711</span>
-</code></pre></div>
+<p><code>bash
+gitopscli create-pr-preview \
+  --git-provider-url https://bitbucket.baloise.dev \
+  --username $GIT_USERNAME \
+  --password $GIT_PASSWORD \
+  --git-user "GitOps CLI" \
+  --git-email "gitopscli@baloise.dev" \
+  --organisation "my-team" \
+  --repository-name "app-xy" \
+  --pr-id 4711</code></p>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
+<p>```
+usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
                                 --pr-id PR_ID
-                                [--parent-id PARENT_ID] [-v [VERBOSE]]
-
-optional arguments:
+                                [--parent-id PARENT_ID] [-v [VERBOSE]]</p>
+<p>optional arguments:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -801,7 +751,7 @@ optional arguments:
                         the id of the parent comment, in case of a reply
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
-</code></pre></div>
+```</p>
                 
                   
                 

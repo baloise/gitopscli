@@ -559,22 +559,22 @@
 <p>Currently there are two different ways to setup and use the GitOps CLI.</p>
 <h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h2>
 <p>The official GitOps CLI Docker image comes with all dependencies pre-installed and ready-to-use. Pull it with:
-<div class="highlight"><pre><span></span><code>docker pull baloise/gitopscli
-</code></pre></div>
+<code>bash
+docker pull baloise/gitopscli</code>
 Start the CLI and the print the help page with:
-<div class="highlight"><pre><span></span><code>docker run --rm -it baloise/gitopscli --help
-</code></pre></div></p>
+<code>bash
+docker run --rm -it baloise/gitopscli --help</code></p>
 <h2 id="from-source">From Source<a class="headerlink" href="#from-source" title="Permanent link">&para;</a></h2>
 <p>Clone the repository and install the GitOps CLI on your machine:
-<div class="highlight"><pre><span></span><code>git clone https://github.com/baloise/gitopscli.git
-pip3 install gitopscli/
-</code></pre></div>
+<code>bash
+git clone https://github.com/baloise/gitopscli.git
+pip3 install gitopscli/</code>
 You can now use it from the command line:
-<div class="highlight"><pre><span></span><code>gitopscli --help
-</code></pre></div>
+<code>bash
+gitopscli --help</code>
 If you don't need the CLI anymore, you can uninstall it with
-<div class="highlight"><pre><span></span><code>pip3 uninstall gitopscli
-</code></pre></div></p>
+<code>bash
+pip3 uninstall gitopscli</code></p>
                 
                   
                 

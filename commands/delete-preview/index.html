@@ -562,27 +562,27 @@
                 <h1 id="delete-preview">delete-preview<a class="headerlink" href="#delete-preview" title="Permanent link">&para;</a></h1>
 <p>The <code>delete-preview</code> command can be used to delete a preview previously created with the <a href="/gitopscli/commands/create-preview/"><code>create-preview</code> command</a>. Please refer to <code>create-preview</code> documentation for the needed configuration files.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>gitopscli delete-preview <span class="se">\</span>
-  --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
-  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
-  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
-  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
-  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
-  --organisation <span class="s2">&quot;my-team&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;app-xy&quot;</span> <span class="se">\</span>
-  --preview-id <span class="s2">&quot;test123&quot;</span> <span class="se">\</span>
-</code></pre></div>
+<p><code>bash
+gitopscli delete-preview \
+  --git-provider-url https://bitbucket.baloise.dev \
+  --username $GIT_USERNAME \
+  --password $GIT_PASSWORD \
+  --git-user "GitOps CLI" \
+  --git-email "gitopscli@baloise.dev" \
+  --organisation "my-team" \
+  --repository-name "app-xy" \
+  --preview-id "test123" \</code></p>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
+<p>```
+usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
                                 --preview-id PREVIEW_ID
                                 [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
-                                [-v [VERBOSE]]
-
-optional arguments:
+                                [-v [VERBOSE]]</p>
+<p>optional arguments:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -606,7 +606,7 @@ optional arguments:
                         Fail if preview does not exist
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
-</code></pre></div>
+```</p>
                 
                   
                 
