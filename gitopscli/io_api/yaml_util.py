@@ -1,10 +1,8 @@
-import re
 from io import StringIO
 from typing import Any
 from ruamel.yaml import YAML, YAMLError
-
-
-_ARRAY_KEY_SEGMENT_PATTERN = re.compile(r"\[(\d+)\]")
+from jsonpath_ng.exceptions import JSONPathError
+from jsonpath_ng.ext import parse
 
 YAML_INSTANCE = YAML()
 YAML_INSTANCE.preserve_quotes = True  # type: ignore
@@ -41,30 +39,24 @@ def yaml_dump(yaml: Any) -> str:
 
 
 def update_yaml_file(file_path: str, key: str, value: Any) -> bool:
+    if not key:
+        raise KeyError("Empty key!")
     content = yaml_file_load(file_path)
-
-    key_segments = key.split(".") if key else []
-    current_key_segments = []
-    parent_item = content
-    for current_key_segment in key_segments:
-        current_key_segments.append(current_key_segment)
-        current_key = ".".join(current_key_segments)
-        is_array = _ARRAY_KEY_SEGMENT_PATTERN.match(current_key_segment)
-        if is_array:
-            current_array_index = int(is_array.group(1))
-            if not isinstance(parent_item, list) or current_array_index >= len(parent_item):
-                raise KeyError(f"Key '{current_key}' not found in YAML!")
-        else:
-            if not isinstance(parent_item, dict) or current_key_segment not in parent_item:
-                raise KeyError(f"Key '{current_key}' not found in YAML!")
-        if current_key == key:
-            if parent_item[current_array_index if is_array else current_key_segment] == value:
-                return False  # nothing to update
-            parent_item[current_array_index if is_array else current_key_segment] = value
-            yaml_file_dump(content, file_path)
-            return True
-        parent_item = parent_item[current_array_index if is_array else current_key_segment]
-    raise KeyError(f"Empty key!")
+    try:
+        jsonpath_expr = parse(key)
+    except JSONPathError as ex:
+        raise KeyError(f"Key '{key}' is invalid JSONPath expression: {ex}!") from ex
+    matches = jsonpath_expr.find(content)
+    if not matches:
+        raise KeyError(f"Key '{key}' not found in YAML!")
+    if all(match.value == value for match in matches):
+        return False  # nothing to update
+    try:
+        jsonpath_expr.update(content, value)
+    except TypeError as ex:
+        raise KeyError(f"Key '{key}' cannot be updated: {ex}!") from ex
+    yaml_file_dump(content, file_path)
+    return True
 
 
 def merge_yaml_element(file_path: str, element_path: str, desired_value: Any) -> None:

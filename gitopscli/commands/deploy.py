@@ -70,7 +70,7 @@ class DeployCommand(Command):
             except YAMLException as ex:
                 raise GitOpsException(f"Error loading file: {args.file}") from ex
             except KeyError as ex:
-                raise GitOpsException(f"Key '{key}' not found in file: {args.file}") from ex
+                raise GitOpsException(str(ex)) from ex
 
             if not updated_value:
                 logging.info("Yaml property %s already up-to-date", key)

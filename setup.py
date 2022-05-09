@@ -9,6 +9,7 @@ setup(
     install_requires=[
         "GitPython==3.0.6",
         "ruamel.yaml==0.16.5",
+        "jsonpath-ng==1.5.3",
         "atlassian-python-api==1.14.5",
         "PyGithub==1.53",
         "python-gitlab==2.6.0",
