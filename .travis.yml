@@ -5,6 +5,8 @@ language: shell
 env:
   global:
     - DOCKER_IMAGE: baloise/gitopscli
+    - DOCKER_BUILDKIT: '1' # use BuildKit backend (https://docs.docker.com/engine/reference/builder/#buildkit)
+    - BUILDKIT_PROGRESS: plain
     # DOCKER_USERNAME
     - secure: "Ecq9r+yXVc9gVdn1e4sDS/yegMKOyN3F6f4jxNSNl1pEkBZayVOvl6seh58sK+QzaIOLlrMYNlOzmWIKaekRuskYLJNYMUh67RJB24knOMSbA0hD3WPO8GbFY1Y/Xe1Gk5zKlLqFKe9OoCbM0ItGIXL2DrFPWl94F1YoZim2h7q6lFEo9NHvYSjreGMcqJujQKoN5/UkO76C3TEKNFXbyxev18nHwXQvqC2axbZONYEQuzYC7dDDAHRMxQ25t2qcWh19f/ssl0qR7VYheBY72Pypvl131+qIxaMl+r/7UeKHnhrM2/ineyo8VPfxhHwar31ldu0YyC0KtSYEMERASsKmJNyaP9d3mo6Vciws/8fGaU0FqlwfRPOhaa/ixMS43qJ4NS9vSogteQJVIIC4B9mHmFvzShDK5aDML+KJ0ehQnayS/30AywS80iSkSWdbkKPAdr+djVhUbey+LAWPVdmJOnIiBET4eSFqJ37dXmcKrhUcfrthL2SftkTGZ4Fm4gHPNYWXIej9N6kTwHlYzRkuJN3PNTLsqp9YE6dUYIUZEu0qkyX2IBljdOxLK5UTKzdkD+j8kLFEP2kN1ELbhP4qEBJj17swycTP9wR4RB+FfjsdeTXonaEOGq8z2CctnczJe87TJ1/GuRj5l/VXiK2ph25El/Axhg5Kv3lHxJw="
     # DOCKER_PASSWORD
@@ -17,12 +19,11 @@ jobs:
     - stage: test
       language: shell
       services: docker
-      script: docker build .
+      script: docker build --target=test .
     - stage: doc
-      language: python
-      python: 3.6
-      install: pip install -r requirements-dev.txt
-      script: mkdocs build
+      language: shell
+      services: docker
+      script: docker build --target=docs-site --output . .
       deploy:
         provider: pages
         strategy: git
