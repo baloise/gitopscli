@@ -1,26 +1,54 @@
-FROM python:3.8-alpine AS base-image
+# =========
+FROM python:3.8-alpine AS base
 
 ENV PATH="/opt/venv/bin:$PATH"
 RUN apk add --no-cache git
 
-FROM base-image AS build-image
+# =========
+FROM base AS dev
 
-RUN apk add --no-cache gcc linux-headers musl-dev \
- && python -m venv /opt/venv \
- && pip install --upgrade pip
 WORKDIR /workdir
+RUN apk add --no-cache gcc linux-headers musl-dev make
+RUN python -m venv /opt/venv
+RUN pip install --upgrade pip
+
+# =========
+FROM dev AS deps
+
+COPY setup.py .
+RUN pip install .
+
+# =========
+FROM deps AS test
+
+COPY requirements-test.txt .
+RUN pip install -r requirements-test.txt
+COPY . .
+RUN pip install .
+RUN make checks
+
+# =========
+FROM dev AS docs
+
+COPY requirements-docs.txt .
+RUN pip install -r requirements-docs.txt
+COPY docs ./docs
+COPY CONTRIBUTING.md mkdocs.yml ./
+RUN mkdocs build
+
+# =========
+FROM scratch AS docs-site
+
+COPY --from=docs /workdir/site /site
+
+# =========
+FROM deps AS install
+
 COPY . .
 RUN pip install .
 
-FROM build-image AS test-image
+# =========
+FROM base as final
 
-RUN pip install -r requirements-dev.txt
-RUN black --check -l 120 -t py37 gitopscli tests setup.py
-RUN pylint gitopscli
-RUN mypy .
-RUN python -m pytest -vv -s --typeguard-packages=gitopscli
-
-FROM base-image AS runtime-image
-
-COPY --from=build-image /opt/venv /opt/venv
+COPY --from=install /opt/venv /opt/venv
 ENTRYPOINT ["gitopscli"]

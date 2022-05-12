@@ -1,10 +1,14 @@
 *
+!docs
 !gitopscli/
 !tests/
 !.pylintrc
+!CONTRIBUTING.md
+!mkdocs.yml
+!Makefile
 !mypy.ini
-!requirements-dev.txt
-!requirements.txt
+!requirements-docs.txt
+!requirements-test.txt
 !setup.py
 
 **/__pycache__/

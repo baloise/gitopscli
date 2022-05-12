@@ -2,7 +2,8 @@ BLACK_ARGS = -l 120 -t py37 gitopscli tests setup.py
 
 init:
 	pip3 install --editable .
-	pip3 install -r requirements-dev.txt
+	pip3 install -r requirements-test.txt
+	pip3 install -r requirements-docs.txt
 	pre-commit install
 
 format:
@@ -28,7 +29,7 @@ coverage:
 checks: format-check lint mypy test
 
 image:
-	docker build -t gitopscli:latest .
+	DOCKER_BUILDKIT=1 docker build --progress=plain -t gitopscli:latest .
 
 docs:
 	mkdocs serve
