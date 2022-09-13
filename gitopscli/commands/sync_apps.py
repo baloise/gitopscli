@@ -1,12 +1,11 @@
 import logging
 import os
 from dataclasses import dataclass
-from typing import Any, Set, Tuple
+from typing import Any, Set, Tuple, Dict
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
-from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load
+from gitopscli.io_api.yaml_util import YAMLException, merge_yaml_element, yaml_file_load, yaml_load
 from gitopscli.gitops_exception import GitOpsException
 from .command import Command
-
 
 class SyncAppsCommand(Command):
     @dataclass(frozen=True)
@@ -50,16 +49,63 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
         apps_from_other_repos,
         found_apps_path,
     ) = __find_apps_config_from_repo(team_config_git_repo, root_config_git_repo)
-
-    if current_repo_apps == repo_apps:
-        logging.info("Root repository already up-to-date. I'm done here.")
-        return
+    
+    # TODO to be discussed - how to proceed with changes here, as adding additional custom_values will invalidate this check. 
+    # Based on the outcome - test test_sync_apps_already_up_to_date also needs to be modified.
+    # Options:
+    #   - remove this check
+    #   - add validation of customizationfile presence to __find_apps_config_from_repo
+    #   - move and modify this check to validate actual changes (get the applications list from resulting yaml and compare with current one)    
+    # if current_repo_apps == repo_apps:
+    #     logging.info("Root repository already up-to-date. I'm done here.")
+    #     return
 
     __check_if_app_already_exists(repo_apps, apps_from_other_repos)
 
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
-    merge_yaml_element(apps_config_file, found_apps_path, {repo_app: {} for repo_app in repo_apps})
+    
+    merge_yaml_element(
+        apps_config_file,
+        found_apps_path,
+        {repo_app: __clean_repo_app(root_config_git_repo, team_config_git_repo, repo_app) for repo_app in repo_apps},
+    )
     __commit_and_push(team_config_git_repo, root_config_git_repo, git_user, git_email, apps_config_file_name)
+
+
+def __clean_yaml(values: Dict[str, Any], whitelist: Dict[str, Any], app_name: str) -> Any:
+
+    whitelisted_yml = {k:v for k,v in values.items() if k in whitelist.keys()}
+    missing = set(values).difference(whitelisted_yml)
+    logging.info("Keys removed from %s custom_values.yaml %s", app_name, missing)
+    return whitelisted_yml
+
+
+def __clean_repo_app(root_config_git_repo: GitRepo, team_config_git_repo: GitRepo, app_name: str) -> Any:
+    app_spec_file = team_config_git_repo.get_full_file_path(f"{app_name}/custom_values.yaml")
+    app_spec_whitelist_file = root_config_git_repo.get_full_file_path(f"whitelist.yaml")
+    try:
+        app_config_content = yaml_file_load(app_spec_file) 
+    except FileNotFoundError as ex:
+        logging.warning("no specific app settings file found for %s", app_name)
+        return {}
+    except YAMLException as yex:
+        logging.error("Unable to load %s/custom_values.yaml from app repository, please validate if this is a correct YAML file" , exc_info=yex)
+        return {}
+    #TODO: should sync fail or skip adding custom values (return {})
+    #TODO: which errors should be raised as GitOpsException
+    try: 
+        whitelist_config_content = yaml_file_load(app_spec_whitelist_file) 
+    except FileNotFoundError as ex:
+        logging.warning("no whitelist app settings file found in root repo, by default allowing teamcode only")
+        whitelist_yaml_string = """\
+            teamcode: null
+        """
+        whitelist_config_content = yaml_load(whitelist_yaml_string)
+    except YAMLException as yex:
+        logging.error("Unable to load whitelist.yaml from root repository, please validate if this is a correct YAML file" , exc_info=yex)
+        return {}
+    #TODO: should sync fail, assume default whitelist or skip adding custom values (return {})
+    return __clean_yaml(app_config_content, whitelist_config_content, app_name)
 
 
 def __find_apps_config_from_repo(
