@@ -106,7 +106,9 @@ class GitRepoTest(unittest.TestCase):
 
         self.assertFalse(path.exists(tmp_dir))
         logging_mock.info.assert_called_once_with(
-            "Cloning repository: %s (branch: %s)", self.__mock_repo_api.get_clone_url(), "xyz"
+            "Cloning repository: %s (branch: %s)",
+            self.__mock_repo_api.get_clone_url(),
+            "xyz",
         )
 
     @patch("gitopscli.git_api.git_repo.logging")
@@ -115,11 +117,14 @@ class GitRepoTest(unittest.TestCase):
             with pytest.raises(GitOpsException) as ex:
                 testee.clone("unknown")
             self.assertEqual(
-                f"Error cloning branch 'unknown' of '{self.__mock_repo_api.get_clone_url()}'", str(ex.value)
+                f"Error cloning branch 'unknown' of '{self.__mock_repo_api.get_clone_url()}'",
+                str(ex.value),
             )
 
         logging_mock.info.assert_called_once_with(
-            "Cloning repository: %s (branch: %s)", self.__mock_repo_api.get_clone_url(), "unknown"
+            "Cloning repository: %s (branch: %s)",
+            self.__mock_repo_api.get_clone_url(),
+            "unknown",
         )
 
     @patch("gitopscli.git_api.git_repo.logging")
@@ -163,7 +168,10 @@ echo password='Pass'
     def test_get_full_file_path(self):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
-            self.assertRegex(testee.get_full_file_path("foo.bar"), r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$")
+            self.assertRegex(
+                testee.get_full_file_path("foo.bar"),
+                r"^/tmp/gitopscli/[0-9a-f\-]+/repo/foo\.bar$",
+            )
 
     @patch("gitopscli.git_api.git_repo.logging")
     def test_new_branch(self, logging_mock):
@@ -199,10 +207,13 @@ echo password='Pass'
                 outfile.write("new file")
             with open(testee.get_full_file_path("README.md"), "w") as outfile:
                 outfile.write("new content")
-            testee.commit(git_user="john doe", git_email="john@doe.com", message="new commit")
 
+            commit_hash = testee.commit(git_user="john doe", git_email="john@doe.com", message="new commit")
             repo = Repo(testee.get_full_file_path("."))
             commits = list(repo.iter_commits("master"))
+
+            self.assertIsNotNone(commit_hash)
+            self.assertRegex(commit_hash, "^[a-f0-9]{40}$", "Not a long commit hash")
             self.assertEqual(2, len(commits))
             self.assertEqual("new commit\n", commits[0].message)
             self.assertEqual("john doe", commits[0].author.name)
@@ -217,10 +228,11 @@ echo password='Pass'
             testee.clone()
             logging_mock.reset_mock()
 
-            testee.commit(git_user="john doe", git_email="john@doe.com", message="empty commit")
-
+            commit_hash = testee.commit(git_user="john doe", git_email="john@doe.com", message="empty commit")
             repo = Repo(testee.get_full_file_path("."))
             commits = list(repo.iter_commits("master"))
+
+            self.assertIsNone(commit_hash)
             self.assertEqual(1, len(commits))
             self.assertEqual("initial commit\n", commits[0].message)
         logging_mock.assert_not_called()
@@ -281,7 +293,10 @@ echo password='Pass'
         repo_dir = self.__origin.working_dir
         with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:
             pre_receive_hook.write('echo >&2 "we reject this push"; exit 1')
-        chmod(f"{repo_dir}/.git/hooks/pre-receive", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        chmod(
+            f"{repo_dir}/.git/hooks/pre-receive",
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
+        )
 
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()

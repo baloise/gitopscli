@@ -1,8 +1,11 @@
+from io import StringIO
 import logging
+from textwrap import dedent
 import uuid
 import unittest
-from uuid import UUID
+from unittest import mock
 from unittest.mock import call
+from uuid import UUID
 import pytest
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.commands.deploy import DeployCommand
@@ -40,13 +43,15 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.__exit__.return_value = False
         self.git_repo_mock.clone.return_value = None
         self.git_repo_mock.new_branch.return_value = None
-        self.git_repo_mock.commit.return_value = None
+        self.example_commit_hash = "5f3a443e7ecb3723c1a71b9744e2993c0b6dfc00"
+        self.git_repo_mock.commit.return_value = self.example_commit_hash
         self.git_repo_mock.push.return_value = None
         self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
 
         self.seal_mocks()
 
-    def test_happy_flow(self):
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_happy_flow(self, mock_print):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo", "a.b.d": "bar"},
@@ -62,6 +67,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         DeployCommand(args).execute()
 
@@ -79,7 +85,11 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.push(),
         ]
 
-    def test_create_pr_single_value_change_happy_flow(self):
+        no_output = ""
+        self.assertMultiLineEqual(mock_print.getvalue(), no_output)
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_create_pr_single_value_change_happy_flow_with_output(self, mock_print):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo"},
@@ -95,6 +105,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=True,
         )
         DeployCommand(args).execute()
 
@@ -116,7 +127,19 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             ),
         ]
 
-    def test_create_pr_multiple_value_changes_happy_flow(self):
+        expected_output = f"""\
+            {{
+                "commits": [
+                    {{
+                        "hash": "{self.example_commit_hash}"
+                    }}
+                ]
+            }}
+            """
+        self.assertMultiLineEqual(mock_print.getvalue(), dedent(expected_output))
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_create_pr_multiple_value_changes_happy_flow_with_output(self, mock_print):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo", "a.b.d": "bar"},
@@ -132,6 +155,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=True,
         )
         DeployCommand(args).execute()
 
@@ -156,7 +180,22 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             ),
         ]
 
-    def test_create_pr_and_merge_happy_flow(self):
+        expected_output = f"""\
+            {{
+                "commits": [
+                    {{
+                        "hash": "{self.example_commit_hash}"
+                    }},
+                    {{
+                        "hash": "{self.example_commit_hash}"
+                    }}
+                ]
+            }}
+            """
+        self.assertMultiLineEqual(mock_print.getvalue(), dedent(expected_output))
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_create_pr_and_merge_happy_flow(self, mock_print):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo", "a.b.d": "bar"},
@@ -172,6 +211,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         DeployCommand(args).execute()
 
@@ -198,7 +238,11 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApi.delete_branch("gitopscli-deploy-b973b5bb"),
         ]
 
-    def test_single_commit_happy_flow(self):
+        no_output = ""
+        self.assertMultiLineEqual(mock_print.getvalue(), no_output)
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_single_commit_happy_flow(self, mock_print):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo", "a.b.d": "bar"},
@@ -214,6 +258,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         DeployCommand(args).execute()
 
@@ -226,11 +271,19 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
-            call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "updated 2 values in test/file.yml\n\na.b.c: foo\na.b.d: bar"),
+            call.GitRepo.commit(
+                "GIT_USER",
+                "GIT_EMAIL",
+                "updated 2 values in test/file.yml\n\na.b.c: foo\na.b.d: bar",
+            ),
             call.GitRepo.push(),
         ]
 
-    def test_single_commit_single_value_change_happy_flow(self):
+        no_output = ""
+        self.assertMultiLineEqual(mock_print.getvalue(), no_output)
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_single_commit_single_value_change_happy_flow(self, mock_print):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo"},
@@ -246,6 +299,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         DeployCommand(args).execute()
 
@@ -260,7 +314,11 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.push(),
         ]
 
-    def test_commit_message_multiple_value_changes_happy_flow(self):
+        no_output = ""
+        self.assertMultiLineEqual(mock_print.getvalue(), no_output)
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_commit_message_multiple_value_changes_happy_flow(self, mock_print):
         args = DeployCommand.Args(
             file="test/file.yml",
             values={"a.b.c": "foo", "a.b.d": "bar"},
@@ -276,6 +334,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message="testcommit",
+            json=False,
         )
         DeployCommand(args).execute()
 
@@ -291,6 +350,9 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", "testcommit"),
             call.GitRepo.push(),
         ]
+
+        no_output = ""
+        self.assertEqual(mock_print.getvalue(), no_output)
 
     def test_clone_error(self):
         clone_exception = GitOpsException("dummy clone error")
@@ -311,6 +373,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -340,6 +403,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -371,6 +435,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -402,6 +467,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -433,6 +499,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider=GitProvider.GITHUB,
             git_provider_url=None,
             commit_message=None,
+            json=False,
         )
         DeployCommand(args).execute()
 
