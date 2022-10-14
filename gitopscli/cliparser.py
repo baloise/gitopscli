@@ -105,6 +105,13 @@ def __create_deploy_parser() -> ArgumentParser:
         type=str,
         default="merge",
     )
+    parser.add_argument(
+        "--json",
+        help="Print a JSON object containing deployment information",
+        nargs="?",
+        type=__parse_bool,
+        default=False,
+    )
     __add_verbose_arg(parser)
     return parser
 

@@ -67,7 +67,7 @@ class GitRepo:
         except GitError as ex:
             raise GitOpsException(f"Error creating new branch '{branch}'.") from ex
 
-    def commit(self, git_user: str, git_email: str, message: str) -> None:
+    def commit(self, git_user: str, git_email: str, message: str) -> Optional[str]:
         repo = self.__get_repo()
         try:
             repo.git.add("--all")
@@ -76,8 +76,10 @@ class GitRepo:
                 repo.config_writer().set_value("user", "name", git_user).release()
                 repo.config_writer().set_value("user", "email", git_email).release()
                 repo.git.commit("-m", message, "--author", f"{git_user} <{git_email}>")
+                return str(repo.head.commit.hexsha)
         except GitError as ex:
             raise GitOpsException(f"Error creating commit.") from ex
+        return None
 
     def push(self, branch: Optional[str] = None) -> None:
         repo = self.__get_repo()

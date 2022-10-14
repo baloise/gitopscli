@@ -165,6 +165,8 @@ optional arguments:
   --merge-method MERGE_METHOD
                         Merge Method (e.g., 'squash', 'rebase', 'merge')
                         (default: merge)
+  --json
+                        Print a JSON object containing deployment information
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 ```

@@ -1,7 +1,8 @@
+import json
 import logging
 import uuid
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, Literal
+from typing import Any, Dict, Optional, Tuple, Literal, List
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.io_api.yaml_util import update_yaml_file, yaml_dump, YAMLException
 from gitopscli.gitops_exception import GitOpsException
@@ -25,10 +26,13 @@ class DeployCommand(Command):
 
         create_pr: bool
         auto_merge: bool
+        json: bool
+
         merge_method: Literal["squash", "rebase", "merge"] = "merge"
 
     def __init__(self, args: Args) -> None:
         self.__args = args
+        self.__commit_hashes: List[str] = []
 
     def execute(self) -> None:
         git_repo_api = self.__create_git_repo_api()
@@ -53,6 +57,9 @@ class DeployCommand(Command):
             if self.__args.auto_merge:
                 git_repo_api.merge_pull_request(pr_id, self.__args.merge_method)
                 git_repo_api.delete_branch(pr_branch)
+
+        if self.__args.json:
+            print(json.dumps({"commits": [{"hash": h} for h in self.__commit_hashes]}, indent=4))
 
     def __create_git_repo_api(self) -> GitRepoApi:
         return GitRepoApiFactory.create(self.__args, self.__args.organisation, self.__args.repository_name)
@@ -106,4 +113,6 @@ class DeployCommand(Command):
         return title, description
 
     def __commit(self, git_repo: GitRepo, message: str) -> None:
-        git_repo.commit(self.__args.git_user, self.__args.git_email, message)
+        commit_hash = git_repo.commit(self.__args.git_user, self.__args.git_email, message)
+        if commit_hash:
+            self.__commit_hashes.append(commit_hash)
