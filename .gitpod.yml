@@ -1,2 +1,3 @@
+image: gitpod/workspace-python-3.10:2022-10-17-21-33-26
 tasks:
-  - init: pyenv global 3.10.8 && make init && export COLUMNS=80 && gitopscli --help
+  - init: make init && export COLUMNS=80 && gitopscli --help
