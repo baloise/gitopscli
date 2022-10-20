@@ -12,6 +12,6 @@ gitopscli version
 ```
 usage: gitopscli version [-h]
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 ```

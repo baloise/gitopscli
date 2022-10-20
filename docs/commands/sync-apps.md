@@ -85,7 +85,7 @@ usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            ROOT_ORGANISATION --root-repository-name
                            ROOT_REPOSITORY_NAME
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)

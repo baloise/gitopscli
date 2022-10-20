@@ -30,7 +30,7 @@ usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
                                 --pr-id PR_ID
                                 [--parent-id PARENT_ID] [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)

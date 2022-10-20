@@ -96,7 +96,7 @@ def __find_apps_config_from_repo(
             apps_from_other_repos.update(__get_applications_from_app_config(app_config_content))
 
     if found_app_config_file is None or found_app_config_file_name is None:
-        raise GitOpsException(f"Couldn't find config file for apps repository in root repository's 'apps/' directory")
+        raise GitOpsException("Couldn't find config file for apps repository in root repository's 'apps/' directory")
 
     return (
         found_app_config_file,

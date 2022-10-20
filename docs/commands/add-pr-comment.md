@@ -23,7 +23,7 @@ usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
                                 PR_ID [--parent-id PARENT_ID] [-v [VERBOSE]]
                                 --text TEXT
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)

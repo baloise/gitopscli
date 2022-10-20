@@ -1,5 +1,5 @@
 # =========
-FROM python:3.8-alpine AS base
+FROM python:3.10-alpine AS base
 
 ENV PATH="/opt/venv/bin:$PATH"
 RUN apk add --no-cache git

@@ -1,4 +1,4 @@
-BLACK_ARGS = -l 120 -t py37 gitopscli tests setup.py
+BLACK_ARGS = -l 120 -t py310 gitopscli tests setup.py
 
 init:
 	pip3 install --editable .
@@ -16,7 +16,7 @@ lint:
 	pylint gitopscli
 
 mypy:
-	python3 -m mypy .
+	python3 -m mypy --install-types --non-interactive .
 
 test:
 	python3 -m pytest -vv -s --typeguard-packages=gitopscli

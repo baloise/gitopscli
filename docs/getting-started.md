@@ -9,7 +9,7 @@ usage: gitopscli [-h]
 
 GitOps CLI
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
 
 commands:

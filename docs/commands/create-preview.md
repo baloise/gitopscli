@@ -42,7 +42,7 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --preview-id PREVIEW_ID
                                 [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)

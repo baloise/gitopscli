@@ -78,7 +78,7 @@ class GitRepo:
                 repo.git.commit("-m", message, "--author", f"{git_user} <{git_email}>")
                 return str(repo.head.commit.hexsha)
         except GitError as ex:
-            raise GitOpsException(f"Error creating commit.") from ex
+            raise GitOpsException("Error creating commit.") from ex
         return None
 
     def push(self, branch: Optional[str] = None) -> None:
