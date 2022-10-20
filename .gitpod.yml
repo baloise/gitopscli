@@ -1,2 +1,2 @@
 tasks:
-  - init: make init && export COLUMNS=80 && gitopscli --help
+  - init: pyenv global 3.10.8 && make init && export COLUMNS=80 && gitopscli --help
