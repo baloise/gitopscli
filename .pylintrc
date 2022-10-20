@@ -66,7 +66,7 @@ disable=bad-continuation,
         missing-class-docstring,
         too-many-arguments,
         too-many-locals,
-        duplicate-code
+        duplicate-code #check introduced in pylint 2.7.1, seem to usually show false-positives. There is a value in it - but not in automated pipeline usage.
 
 
 # Enable the message, report, category or checker with the given id(s). You can
