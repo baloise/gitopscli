@@ -29,7 +29,7 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                    [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)

@@ -26,11 +26,11 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         except requests.exceptions.ConnectionError as ex:
             raise GitOpsException(f"Error connecting to '{git_provider_url}''") from ex
         except gitlab.exceptions.GitlabAuthenticationError as ex:
-            raise GitOpsException("Bad Personal Access Token")
+            raise GitOpsException("Bad Personal Access Token") from ex
         except gitlab.exceptions.GitlabGetError as ex:
             if ex.response_code == 404:
-                raise GitOpsException(f"Repository '{organisation}/{repository_name}' does not exist")
-            raise GitOpsException(f"Error getting repository: '{ex.error_message}'")
+                raise GitOpsException(f"Repository '{organisation}/{repository_name}' does not exist") from ex
+            raise GitOpsException(f"Error getting repository: '{ex.error_message}'") from ex
 
         self.__token_name = username
         self.__access_token = password
@@ -100,5 +100,5 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         branches = self.__project.branches.list()
         default_branch = next(filter(lambda x: x.default, branches), None)
         if default_branch is None:
-            raise GitOpsException(f"Default branch does not exist")
+            raise GitOpsException("Default branch does not exist")
         return str(default_branch.name)

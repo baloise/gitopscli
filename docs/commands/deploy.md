@@ -132,7 +132,7 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
                         [--merge-method MERGE_METHOD] [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --file FILE           YAML file path
   --values VALUES       YAML/JSON object with the YAML path as key and the

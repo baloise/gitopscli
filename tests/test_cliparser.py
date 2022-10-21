@@ -25,7 +25,7 @@ usage: gitopscli [-h]
 
 GitOps CLI
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
 
 commands:
@@ -59,7 +59,7 @@ usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
                                 PR_ID [--parent-id PARENT_ID] [-v [VERBOSE]]
                                 --text TEXT
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -114,7 +114,7 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --git-hash GIT_HASH --preview-id PREVIEW_ID
                                 [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -150,7 +150,7 @@ usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    --pr-id PR_ID [--parent-id PARENT_ID]
                                    [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -211,7 +211,7 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                 [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -249,7 +249,7 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                    [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -302,7 +302,7 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--merge-method MERGE_METHOD] [--json [JSON]]
                         [-v [VERBOSE]]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --file FILE           YAML file path
   --values VALUES       YAML/JSON object with the YAML path as key and the
@@ -362,7 +362,7 @@ usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            ROOT_ORGANISATION --root-repository-name
                            ROOT_REPOSITORY_NAME
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -391,7 +391,7 @@ optional arguments:
 EXPECTED_VERSION_HELP = """\
 usage: gitopscli version [-h]
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 """
 
