@@ -38,9 +38,10 @@ class AppTenantConfig:
     file_path: str
     file_name: str
     config_api_version: tuple
+    
 
     def __init__(
-        self, config_type, config_source_repository=None, data=None, name=None, file_path=None, file_name=None
+        self, config_type, config_source_repository=None, data=None, name=None, file_path=None, file_name=None, found_apps_path=None
     ):
         self.config_type = config_type
         self.config_source_repository = config_source_repository
@@ -53,6 +54,7 @@ class AppTenantConfig:
             self.data = self.generate_config_from_team_repo()
         self.config_api_version = self.__get_config_api_version()
         self.name = name
+        self.found_apps_path = found_apps_path
 
     def __get_config_api_version(self):
         # maybe count the keys?
@@ -166,8 +168,10 @@ class RootRepo:
             except FileNotFoundError as ex:
                 raise GitOpsException(f"File '{tenant_apps_config_file_name}' not found in root repository.") from ex
             # TODO exception handling for malformed yaml
+            found_apps_path = "applications"
             if "config" in tenant_apps_config_content:
                 tenant_apps_config_content = tenant_apps_config_content["config"]
+                found_apps_path = "config.applications"
             if "repository" not in tenant_apps_config_content:
                 raise GitOpsException(f"Cannot find key 'repository' in '{tenant_apps_config_file_name}'")
             # if "config" in tenant_apps_config_content:
@@ -178,6 +182,7 @@ class RootRepo:
                 config_type="root",
                 file_path=tenant_apps_config_file,
                 file_name=tenant_apps_config_file_name,
+                found_apps_path=found_apps_path
             )
             tenant_app_dict.update({bootstrap_entry["name"]: atc})
         return tenant_app_dict
@@ -252,9 +257,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     logging.info("Searching apps repository in root repository's 'apps/' directory...")
 
     apps_config_file = root_repo.tenant_list[team_config_app_name].file_path
-    apps_config_file_name = root_repo.tenant_list[team_config_app_name].file_name
-    # TODO FIX VALUE TO DIFFER BETWEEN OLD/NEW STYLE
-    found_apps_path = "config.applications"
+    apps_config_file_name = root_repo.tenant_list[team_config_app_name].file_name 
 
     # removing all keys not being current app repo in order to compare app lists
     # excluding keys added by root repo administrator,
@@ -271,7 +274,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
     merge_yaml_element(
         apps_config_file,
-        found_apps_path,
+        root_repo.tenant_list[team_config_app_name].found_apps_path,
         {
             repo_app: traverse_config(tenant_config_team_repo.data, tenant_config_team_repo.config_api_version).get(
                 repo_app, "{}"
