@@ -22,49 +22,10 @@ from gitopscli.appconfig_api.traverse_config import traverse_config
 from gitopscli.io_api.yaml_util import yaml_file_load, yaml_load
 
 
-@dataclass
-class AppTenantConfig:
-    # TODO: rethink objects and class initialization methods
-    config_type: str  # is instance initialized as config located in root/team repo
-    data: YAML
-    # schema important fields
-    # config - entrypoint
-    # config.repository - tenant repository url
-    # config.applications - tenant applications list
-    # config.applications.{}.userconfig - user configuration
-    name: str  # tenant name
-    config_source_repository: str  # team tenant repository url
-    # user_config: dict #contents of custom_tenant_config.yaml in team repository
-    file_path: str
-    file_name: str
-    config_api_version: tuple
-    
-
-    def __init__(
-        self, config_type, config_source_repository=None, data=None, name=None, file_path=None, file_name=None, found_apps_path=None
-    ):
-        self.config_type = config_type
-        self.config_source_repository = config_source_repository
-        if self.config_type == "root":
-            self.data = data
-            self.file_path = file_path
-            self.file_name = file_name
-        elif self.config_type == "team":
-            self.config_source_repository.clone()
-            self.data = self.generate_config_from_team_repo()
-        self.config_api_version = self.__get_config_api_version()
-        self.name = name
-        self.found_apps_path = found_apps_path
-
-    def __get_config_api_version(self):
-        # maybe count the keys?
-        if "config" in self.data.keys():
-            return ("v2", ("config", "applications"))
-        return ("v1", ("applications",))
-
-    def generate_config_from_team_repo(self):
-        # recognize type of repo
-        team_config_git_repo = self.config_source_repository
+class AppTenantConfigFactory:
+    def generate_config_from_team_repo(
+        self, team_config_git_repo: GitRepo
+    ) -> Any:  # TODO: supposed to be ordereddict than Any
         repo_dir = team_config_git_repo.get_full_file_path(".")
         applist = {
             name
@@ -75,8 +36,8 @@ class AppTenantConfig:
         # Currently this is the easiest method, although it can be better
         template_yaml = """
         config: 
-          repository: {}
-          applications: {{}}
+            repository: {}
+            applications: {{}}
         """.format(
             team_config_git_repo.get_clone_url()
         )
@@ -87,18 +48,17 @@ class AppTenantConfig:
             """.format(
                 app
             )
-            customconfig = self.get_custom_config(app)
+            customconfig = self.get_custom_config(app, team_config_git_repo)
             app_as_yaml_object = yaml_load(template_yaml)
             # dict path hardcoded as object generated will always be in v2 or later
             data["config"]["applications"].update(app_as_yaml_object)
             data["config"]["applications"][app].insert(1, "customAppConfig", customconfig)
-
         return data
 
-    # TODO: rewrite! as config should be inside of the app folder
     # TODO: method should contain all aps, not only one, requires rewriting of merging during root repo init
-    def get_custom_config(self, appname):
-        team_config_git_repo = self.config_source_repository
+    def get_custom_config(self, appname, team_config_git_repo ) -> str | None:
+        team_config_git_repo = team_config_git_repo
+
         #        try:
         custom_config_file = team_config_git_repo.get_full_file_path(f"{appname}/app_value_file.yaml")
         #        except Exception as ex:
@@ -113,38 +73,62 @@ class AppTenantConfig:
             return custom_config_content
         return None
 
-    def list_apps(self):
+    def create(
+        self,
+        config_type: str,
+        name: str,
+        data: str = None,
+        file_path: str = None,
+        file_name: str = None,
+        config_source_repository: GitRepo = None,
+        found_apps_path: str = None
+    ):
+        if config_type == "root":
+            return AppTenantConfig(config_type, data, name, file_path, file_name, found_apps_path=found_apps_path)
+
+        elif config_type == "team":
+            config_source_repository.clone()
+            data = self.generate_config_from_team_repo(config_source_repository)
+            return AppTenantConfig(config_type, data, name, config_source_repository=config_source_repository.get_clone_url())
+
+
+@dataclass
+class AppTenantConfig:
+    config_type: str  # is instance initialized as config located in root/team repo
+    data: Any  # TODO: supposed to be ordereddict from ruamel
+    name: str  # tenant name
+    file_path: str = None
+    file_name: str = None
+    config_source_repository: str = None  # team tenant repository url
+    config_api_version: tuple[Any, ...] = None
+    found_apps_path: str = None
+
+    def __post_init__(self):
+        self.config_api_version = self.__get_config_api_version()
+
+    def __get_config_api_version(self) -> tuple[Any, ...]:
+        #NOT WORKING AS SHOULD, SHOILD REPLACE MANUAL FOUND_APPS_PATH maybe count the keys?
+        if "config" in self.data.keys():
+            return ("v2", ("config", "applications"))
+        return ("v1", ("applications",))
+
+    def list_apps(self) -> None:
         return traverse_config(self.data, self.config_api_version)
 
-    def add_app(self):
+    def add_app(self) -> None:
         # adds app to the app tenant config
         pass
 
-    def modify_app(self):
+    def modify_app(self) -> None:
         # modifies existing app in tenant config
         pass
 
-    def delete_app(self):
+    def delete_app(self) -> None:
         # deletes app from tenant config
         pass
 
 
-@dataclass
-class RootRepo:
-    name: str  # root repository name
-    tenant_list: dict  # TODO of AppTenantConfig #list of the tenant configs in the root repository (in apps folder)
-    bootstrap: set  # list of tenants to be bootstrapped, derived form values.yaml in bootstrap root repo dict
-    app_list: set  # llist of apps without custormer separation
-
-    def __init__(self, root_config_git_repo: GitRepo):
-        repo_clone_url = root_config_git_repo.get_clone_url()
-        root_config_git_repo.clone()
-        bootstrap_values_file = root_config_git_repo.get_full_file_path("bootstrap/values.yaml")
-        self.bootstrap = self.__get_bootstrap_entries(bootstrap_values_file)
-        self.name = repo_clone_url.split("/")[-1].removesuffix(".git")
-        self.tenant_list = self.__generate_tenant_app_dict(root_config_git_repo)
-        self.app_list = self.__get_all_apps_list()
-
+class RootRepoFactory:
     def __get_bootstrap_entries(self, bootstrap_values_file: str) -> Any:
         try:
             bootstrap_yaml = yaml_file_load(bootstrap_values_file)
@@ -157,9 +141,9 @@ class RootRepo:
                 raise GitOpsException("Every bootstrap entry must have a 'name' property.")
         return bootstrap_yaml["bootstrap"]
 
-    def __generate_tenant_app_dict(self, root_config_git_repo: GitRepo):
+    def __generate_tenant_app_dict_from_root_repo(self, root_config_git_repo: GitRepo, bootstrap: Any):
         tenant_app_dict = {}
-        for bootstrap_entry in self.bootstrap:
+        for bootstrap_entry in bootstrap:
             tenant_apps_config_file_name = "apps/" + bootstrap_entry["name"] + ".yaml"
             logging.info("Analyzing %s in root repository", tenant_apps_config_file_name)
             tenant_apps_config_file = root_config_git_repo.get_full_file_path(tenant_apps_config_file_name)
@@ -174,9 +158,8 @@ class RootRepo:
                 found_apps_path = "config.applications"
             if "repository" not in tenant_apps_config_content:
                 raise GitOpsException(f"Cannot find key 'repository' in '{tenant_apps_config_file_name}'")
-            # if "config" in tenant_apps_config_content:
             logging.info("adding {}".format(bootstrap_entry["name"]))
-            atc = AppTenantConfig(
+            atc = AppTenantConfigFactory().create(
                 data=tenant_apps_config_content,
                 name=bootstrap_entry["name"],
                 config_type="root",
@@ -187,12 +170,31 @@ class RootRepo:
             tenant_app_dict.update({bootstrap_entry["name"]: atc})
         return tenant_app_dict
 
-    def __get_all_apps_list(self):
+    # TODO SHOULD THIS FULL METHOD INSTEAD OF POPULATING
+    def __get_all_apps_list(self, tenant_dict: Any):
         all_apps_list = dict()
-        for tenant in self.tenant_list:
-            value = traverse_config(self.tenant_list[tenant].data, self.tenant_list[tenant].config_api_version)
+        for tenant in tenant_dict:
+            value = traverse_config(tenant_dict[tenant].data, tenant_dict[tenant].config_api_version)
             all_apps_list.update({tenant: list((dict(value).keys()))})
         return all_apps_list
+
+    def create(self, root_repo: GitRepo):
+        name = root_repo.get_clone_url().split("/")[-1].removesuffix(".git")
+        root_repo.clone()
+        bootstrap_values_file = root_repo.get_full_file_path("bootstrap/values.yaml")
+        bootstrap = self.__get_bootstrap_entries(bootstrap_values_file)
+        tenant_dict = self.__generate_tenant_app_dict_from_root_repo(root_repo, bootstrap)
+        
+        all_app_list = self.__get_all_apps_list(tenant_dict)
+        return RootRepo(name, tenant_dict, bootstrap, all_app_list)
+
+
+@dataclass
+class RootRepo:
+    name: str  # root repository name
+    tenant_dict: dict  # TODO of AppTenantConfig #list of the tenant configs in the root repository (in apps folder)
+    bootstrap: set  # list of tenants to be bootstrapped, derived form values.yaml in bootstrap root repo dict
+    all_app_list: set  # list of apps without custormer separation
 
 
 def traverse_config(data, configver):
@@ -234,17 +236,21 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
 def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str) -> None:
     logging.info("Team config repository: %s", team_config_git_repo.get_clone_url())
     logging.info("Root config repository: %s", root_config_git_repo.get_clone_url())
+
+    root_repo = RootRepoFactory().create(root_repo=root_config_git_repo)
     team_config_app_name = team_config_git_repo.get_clone_url().split("/")[-1].removesuffix(".git")
-    root_repo = RootRepo(root_config_git_repo)
-    tenant_config_team_repo = AppTenantConfig("team", config_source_repository=team_config_git_repo)
+    tenant_config_team_repo = AppTenantConfigFactory().create(
+        config_type="team", name=team_config_app_name, config_source_repository=team_config_git_repo
+    )
 
     # dict conversion causes YAML object to be unordered
     tenant_config_repo_apps = dict(tenant_config_team_repo.list_apps())
-    if not team_config_app_name in list(root_repo.tenant_list.keys()):
+    
+    if not team_config_app_name in list(root_repo.tenant_dict.keys()):
         raise GitOpsException("Couldn't find config file for apps repository in root repository's 'apps/' directory")
-    current_repo_apps = dict(root_repo.tenant_list[team_config_app_name].list_apps())
+    current_repo_apps = dict(root_repo.tenant_dict[team_config_app_name].list_apps())
 
-    apps_from_other_repos = root_repo.app_list.copy()
+    apps_from_other_repos = root_repo.all_app_list.copy()
     apps_from_other_repos.pop(team_config_app_name)
     for app in list(tenant_config_repo_apps.keys()):
         for tenant in apps_from_other_repos.values():
@@ -256,8 +262,8 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     )
     logging.info("Searching apps repository in root repository's 'apps/' directory...")
 
-    apps_config_file = root_repo.tenant_list[team_config_app_name].file_path
-    apps_config_file_name = root_repo.tenant_list[team_config_app_name].file_name 
+    apps_config_file = root_repo.tenant_dict[team_config_app_name].file_path
+    apps_config_file_name = root_repo.tenant_dict[team_config_app_name].file_name
 
     # removing all keys not being current app repo in order to compare app lists
     # excluding keys added by root repo administrator,
@@ -274,7 +280,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     logging.info("Sync applications in root repository's %s.", apps_config_file_name)
     merge_yaml_element(
         apps_config_file,
-        root_repo.tenant_list[team_config_app_name].found_apps_path,
+        root_repo.tenant_dict[team_config_app_name].found_apps_path,
         {
             repo_app: traverse_config(tenant_config_team_repo.data, tenant_config_team_repo.config_api_version).get(
                 repo_app, "{}"
