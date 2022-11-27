@@ -1,38 +1,26 @@
 import logging
+import os
+from typing import Any, Optional
 from dataclasses import dataclass
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io_api.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
-from .command import Command
-
-
-# from gitopscli.appconfig_api.app_tenant_config import AppTenantConfig
-# from gitopscli.appconfig_api.root_repo import RootRepo
-# from gitopscli.appconfig_api.traverse_config import traverse_config
-
-###########################################################################################
-######## TO BE REPLACED WITH IMPORT FROM appconfig_api
-# TODO: Custom config reader
-# TODO: Test custom config read, creation of objects AppTenantConfig and RootRepo
-import os
-from typing import Any
-from dataclasses import dataclass
-from ruamel.yaml import YAML
 from gitopscli.appconfig_api.traverse_config import traverse_config
 from gitopscli.io_api.yaml_util import yaml_file_load, yaml_load
+from .command import Command
 
 
 class AppTenantConfigFactory:
     def generate_config_from_team_repo(
         self, team_config_git_repo: GitRepo
-    ) -> Any:  # TODO: supposed to be ordereddict than Any
+    ) -> Any:  # TODO: supposed to be ordereddict than Any  pylint: disable=fixme
         repo_dir = team_config_git_repo.get_full_file_path(".")
         applist = {
             name
             for name in os.listdir(repo_dir)
             if os.path.isdir(os.path.join(repo_dir, name)) and not name.startswith(".")
         }
-        # TODO: Create YAML() object without writing template strings
+        # TODO: Create YAML() object without writing template strings  pylint: disable=fixme
         # Currently this is the easiest method, although it can be better
         template_yaml = """
         config: 
@@ -55,10 +43,11 @@ class AppTenantConfigFactory:
             data["config"]["applications"][app].insert(1, "customAppConfig", customconfig)
         return data
 
-    # TODO: method should contain all aps, not only one, requires rewriting of merging during root repo init
-    def get_custom_config(self, appname, team_config_git_repo ) -> str | None:
-        team_config_git_repo = team_config_git_repo
-
+    # TODO: method should contain all aps, not only one, requires rewriting of merging during root repo init  pylint: disable=fixme
+    @staticmethod
+    def get_custom_config(
+        appname: str, team_config_git_repo: GitRepo
+    ) -> Any | None:  # TODO: supposed to be ordereddict instead of Any from ruamel pylint: disable=fixme
         #        try:
         custom_config_file = team_config_git_repo.get_full_file_path(f"{appname}/app_value_file.yaml")
         #        except Exception as ex:
@@ -66,8 +55,8 @@ class AppTenantConfigFactory:
         # handle broken file/nod adhering to allowed
         #            return ex
         # sanitize
-        # TODO: how to keep whole content with comments
-        # TODO: handling generic values for all apps
+        # TODO: how to keep whole content with comments  pylint: disable=fixme
+        # TODO: handling generic values for all apps  pylint: disable=fixme
         if os.path.exists(custom_config_file):
             custom_config_content = yaml_file_load(custom_config_file)
             return custom_config_content
@@ -81,33 +70,35 @@ class AppTenantConfigFactory:
         file_path: str = None,
         file_name: str = None,
         config_source_repository: GitRepo = None,
-        found_apps_path: str = None
-    ):
-        if config_type == "root":
+        found_apps_path: str = None,
+    ) -> "AppTenantConfig":
+        if config_type == "root":  # pylint: disable=no-else-return
             return AppTenantConfig(config_type, data, name, file_path, file_name, found_apps_path=found_apps_path)
-
         elif config_type == "team":
             config_source_repository.clone()
             data = self.generate_config_from_team_repo(config_source_repository)
-            return AppTenantConfig(config_type, data, name, config_source_repository=config_source_repository.get_clone_url())
+            return AppTenantConfig(
+                config_type, data, name, config_source_repository=config_source_repository.get_clone_url()
+            )
+        raise GitOpsException("wrong config_type called")
 
 
 @dataclass
 class AppTenantConfig:
     config_type: str  # is instance initialized as config located in root/team repo
-    data: Any  # TODO: supposed to be ordereddict from ruamel
+    data: Any  # TODO: supposed to be ordereddict from ruamel pylint: disable=fixme
     name: str  # tenant name
-    file_path: str = None
-    file_name: str = None
-    config_source_repository: str = None  # team tenant repository url
-    config_api_version: tuple[Any, ...] = None
-    found_apps_path: str = None
+    file_path: Optional[str] = None
+    file_name: Optional[str] = None
+    config_source_repository: Optional[str] = None  # team tenant repository url
+    config_api_version: Optional[tuple[Any, ...]] = None
+    found_apps_path: Optional[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.config_api_version = self.__get_config_api_version()
 
     def __get_config_api_version(self) -> tuple[Any, ...]:
-        #NOT WORKING AS SHOULD, SHOILD REPLACE MANUAL FOUND_APPS_PATH maybe count the keys?
+        # NOT WORKING AS SHOULD, SHOILD REPLACE MANUAL FOUND_APPS_PATH maybe count the keys?
         if "config" in self.data.keys():
             return ("v2", ("config", "applications"))
         return ("v1", ("applications",))
@@ -129,7 +120,8 @@ class AppTenantConfig:
 
 
 class RootRepoFactory:
-    def __get_bootstrap_entries(self, bootstrap_values_file: str) -> Any:
+    @staticmethod
+    def __get_bootstrap_entries(bootstrap_values_file: str) -> Any:
         try:
             bootstrap_yaml = yaml_file_load(bootstrap_values_file)
         except FileNotFoundError as ex:
@@ -141,7 +133,10 @@ class RootRepoFactory:
                 raise GitOpsException("Every bootstrap entry must have a 'name' property.")
         return bootstrap_yaml["bootstrap"]
 
-    def __generate_tenant_app_dict_from_root_repo(self, root_config_git_repo: GitRepo, bootstrap: Any):
+    @staticmethod
+    def __generate_tenant_app_dict_from_root_repo(
+        root_config_git_repo: GitRepo, bootstrap: Any
+    ) -> dict[str, "AppTenantConfig"]:
         tenant_app_dict = {}
         for bootstrap_entry in bootstrap:
             tenant_apps_config_file_name = "apps/" + bootstrap_entry["name"] + ".yaml"
@@ -151,27 +146,28 @@ class RootRepoFactory:
                 tenant_apps_config_content = yaml_file_load(tenant_apps_config_file)
             except FileNotFoundError as ex:
                 raise GitOpsException(f"File '{tenant_apps_config_file_name}' not found in root repository.") from ex
-            # TODO exception handling for malformed yaml
+            # TODO exception handling for malformed yaml pylint: disable=fixme
             found_apps_path = "applications"
             if "config" in tenant_apps_config_content:
                 tenant_apps_config_content = tenant_apps_config_content["config"]
                 found_apps_path = "config.applications"
             if "repository" not in tenant_apps_config_content:
                 raise GitOpsException(f"Cannot find key 'repository' in '{tenant_apps_config_file_name}'")
-            logging.info("adding {}".format(bootstrap_entry["name"]))
+            logging.info("adding %s", (bootstrap_entry["name"]))
             atc = AppTenantConfigFactory().create(
                 data=tenant_apps_config_content,
                 name=bootstrap_entry["name"],
                 config_type="root",
                 file_path=tenant_apps_config_file,
                 file_name=tenant_apps_config_file_name,
-                found_apps_path=found_apps_path
+                found_apps_path=found_apps_path,
             )
             tenant_app_dict.update({bootstrap_entry["name"]: atc})
         return tenant_app_dict
 
-    # TODO SHOULD THIS FULL METHOD INSTEAD OF POPULATING
-    def __get_all_apps_list(self, tenant_dict: Any):
+    # TODO SHOULD THIS FULL METHOD INSTEAD OF POPULATING  pylint: disable=fixme
+    @staticmethod
+    def __get_all_apps_list(tenant_dict: Any) -> dict[str, list]:
         all_apps_list = dict()
         for tenant in tenant_dict:
             value = traverse_config(tenant_dict[tenant].data, tenant_dict[tenant].config_api_version)
@@ -184,7 +180,6 @@ class RootRepoFactory:
         bootstrap_values_file = root_repo.get_full_file_path("bootstrap/values.yaml")
         bootstrap = self.__get_bootstrap_entries(bootstrap_values_file)
         tenant_dict = self.__generate_tenant_app_dict_from_root_repo(root_repo, bootstrap)
-        
         all_app_list = self.__get_all_apps_list(tenant_dict)
         return RootRepo(name, tenant_dict, bootstrap, all_app_list)
 
@@ -192,17 +187,19 @@ class RootRepoFactory:
 @dataclass
 class RootRepo:
     name: str  # root repository name
-    tenant_dict: dict  # TODO of AppTenantConfig #list of the tenant configs in the root repository (in apps folder)
-    bootstrap: set  # list of tenants to be bootstrapped, derived form values.yaml in bootstrap root repo dict
-    all_app_list: set  # list of apps without custormer separation
+    tenant_dict: dict[
+        str, "AppTenantConfig"
+    ]  # TODO of AppTenantConfig #list of the tenant configs in the root repository (in apps folder)  pylint: disable=fixme
+    bootstrap: set[Any]  # list of tenants to be bootstrapped, derived form values.yaml in bootstrap root repo dict
+    all_app_list: set[str]  # list of apps without custormer separation
 
 
-def traverse_config(data, configver):
-    path = configver[1]
-    lookup = data
-    for key in path:
-        lookup = lookup[key]
-    return lookup
+# def traverse_config(data, configver):
+#    path = configver[1]
+#    lookup = data
+#    for key in path:
+#        lookup = lookup[key]
+#    return lookup
 
 
 #################################################################################################
@@ -245,7 +242,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 
     # dict conversion causes YAML object to be unordered
     tenant_config_repo_apps = dict(tenant_config_team_repo.list_apps())
-    
+
     if not team_config_app_name in list(root_repo.tenant_dict.keys()):
         raise GitOpsException("Couldn't find config file for apps repository in root repository's 'apps/' directory")
     current_repo_apps = dict(root_repo.tenant_dict[team_config_app_name].list_apps())
@@ -267,7 +264,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 
     # removing all keys not being current app repo in order to compare app lists
     # excluding keys added by root repo administrator,
-    # TODO: figure out how to handle that better
+    # TODO: figure out how to handle that better  pylint: disable=fixme
     for app in list(current_repo_apps.keys()):
         if current_repo_apps.get(app, dict()) is not None:
             for key in list(current_repo_apps.get(app, dict())):

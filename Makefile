@@ -25,9 +25,9 @@ coverage:
 	coverage run -m pytest
 	coverage html
 	coverage report
-
-#checks: format-check lint mypy test
-checks: format-check test
+#temporary mypy test lock
+#checks: format-check lint mypy test 
+checks: format-check lint test
 
 image:
 	DOCKER_BUILDKIT=1 docker build --progress=plain -t gitopscli:latest .
