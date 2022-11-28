@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Any, Optional
 from dataclasses import dataclass
+from ruamel.yaml.comments import CommentedMap
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.io_api.yaml_util import merge_yaml_element
 from gitopscli.gitops_exception import GitOpsException
@@ -13,7 +14,7 @@ from .command import Command
 class AppTenantConfigFactory:
     def generate_config_from_team_repo(
         self, team_config_git_repo: GitRepo
-    ) -> Any:  # TODO: supposed to be ordereddict than Any  pylint: disable=fixme
+    ) -> Any:  # TODO: supposed to be ordereddic00t than Any  pylint: disable=fixme
         repo_dir = team_config_git_repo.get_full_file_path(".")
         applist = {
             name
@@ -66,14 +67,14 @@ class AppTenantConfigFactory:
         self,
         config_type: str,
         name: str,
-        data: str = None,
-        file_path: str = None,
-        file_name: str = None,
-        config_source_repository: GitRepo = None,
-        found_apps_path: str = None,
+        data: CommentedMap | dict[Any, Any],
+        config_source_repository: GitRepo | None,
+        file_path: Optional[str] | None,
+        file_name: Optional[str] | None,
+        found_apps_path: Optional[str] | None,
     ) -> "AppTenantConfig":
         if config_type == "root":  # pylint: disable=no-else-return
-            return AppTenantConfig(config_type, data, name, file_path, file_name, found_apps_path=found_apps_path)
+            return AppTenantConfig(config_type, data, name, file_path, file_name, None, found_apps_path=found_apps_path)
         elif config_type == "team":
             config_source_repository.clone()
             data = self.generate_config_from_team_repo(config_source_repository)
@@ -86,11 +87,11 @@ class AppTenantConfigFactory:
 @dataclass
 class AppTenantConfig:
     config_type: str  # is instance initialized as config located in root/team repo
-    data: Any  # TODO: supposed to be ordereddict from ruamel pylint: disable=fixme
+    data: CommentedMap | dict  # TODO: supposed to be ordereddict from ruamel pylint: disable=fixme
     name: str  # tenant name
+    config_source_repository: str | None
     file_path: Optional[str] = None
-    file_name: Optional[str] = None
-    config_source_repository: Optional[str] = None  # team tenant repository url
+    file_name: Optional[str] = None  # team tenant repository url
     config_api_version: Optional[tuple[Any, ...]] = None
     found_apps_path: Optional[str] = None
 
@@ -103,7 +104,7 @@ class AppTenantConfig:
             return ("v2", ("config", "applications"))
         return ("v1", ("applications",))
 
-    def list_apps(self) -> None:
+    def list_apps(self) -> CommentedMap | dict:
         return traverse_config(self.data, self.config_api_version)
 
     def add_app(self) -> None:
@@ -161,6 +162,7 @@ class RootRepoFactory:
                 file_path=tenant_apps_config_file,
                 file_name=tenant_apps_config_file_name,
                 found_apps_path=found_apps_path,
+                config_source_repository=None
             )
             tenant_app_dict.update({bootstrap_entry["name"]: atc})
         return tenant_app_dict
@@ -174,7 +176,7 @@ class RootRepoFactory:
             all_apps_list.update({tenant: list((dict(value).keys()))})
         return all_apps_list
 
-    def create(self, root_repo: GitRepo):
+    def create(self, root_repo: GitRepo) -> 'RootRepo':
         name = root_repo.get_clone_url().split("/")[-1].removesuffix(".git")
         root_repo.clone()
         bootstrap_values_file = root_repo.get_full_file_path("bootstrap/values.yaml")
@@ -237,7 +239,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     root_repo = RootRepoFactory().create(root_repo=root_config_git_repo)
     team_config_app_name = team_config_git_repo.get_clone_url().split("/")[-1].removesuffix(".git")
     tenant_config_team_repo = AppTenantConfigFactory().create(
-        config_type="team", name=team_config_app_name, config_source_repository=team_config_git_repo
+        config_type="team", data=dict(), name=team_config_app_name, config_source_repository=team_config_git_repo
     )
 
     # dict conversion causes YAML object to be unordered
@@ -290,7 +292,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 
 
 def __commit_and_push(
-    team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str, app_file_name: str
+    team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str, app_file_name: optional[str]
 ) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
     root_config_git_repo.commit(git_user, git_email, f"{author} updated " + app_file_name)
