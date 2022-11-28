@@ -129,9 +129,11 @@ def __get_bootstrap_entries(root_config_git_repo: GitRepo) -> Any:
         bootstrap_yaml = yaml_file_load(bootstrap_values_file)
     except FileNotFoundError as ex:
         raise GitOpsException("File 'bootstrap/values.yaml' not found in root repository.") from ex
-    if "bootstrap" not in bootstrap_yaml:
-        raise GitOpsException("Cannot find key 'bootstrap' in 'bootstrap/values.yaml'")
-    return bootstrap_yaml["bootstrap"]
+    if "bootstrap" in bootstrap_yaml:
+        return bootstrap_yaml["bootstrap"]
+    if "config" in bootstrap_yaml and "bootstrap" in bootstrap_yaml["config"]:
+        return bootstrap_yaml["config"]["bootstrap"]
+    raise GitOpsException("Cannot find key 'bootstrap' or 'config.bootstrap' in 'bootstrap/values.yaml'")
 
 
 def __get_repo_apps(team_config_git_repo: GitRepo) -> Set[str]:

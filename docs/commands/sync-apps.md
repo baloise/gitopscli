@@ -35,6 +35,13 @@ bootstrap:
   - name: team-a # <- every entry links to a YAML file in the `apps/` directory
   - name: team-b
 ```
+Alternative, when using a Chart as dependency with an alias 'config':
+```yaml
+config:
+  bootstrap:
+   - name: team-a # <- every entry links to a YAML file in the `apps/` directory
+   - name: team-b
+```
 
 **apps/team-a.yaml**
 ```yaml
