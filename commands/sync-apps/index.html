@@ -624,6 +624,12 @@
 <div class="highlight"><pre><span></span><code><span class="nt">bootstrap</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span><span class="w"></span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span><span class="w"></span>
+</code></pre></div>
+Alternative, when using a Chart as dependency with an alias 'config':
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">bootstrap</span><span class="p">:</span><span class="w"></span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span><span class="w"></span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span><span class="w"></span>
 </code></pre></div></p>
 <p><strong>apps/team-a.yaml</strong>
 <div class="highlight"><pre><span></span><code><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span><span class="w"> </span><span class="c1"># link to your apps root repository</span><span class="w"></span>
