@@ -68,18 +68,25 @@ class AppTenantConfigFactory:
         config_type: str,
         name: str,
         data: CommentedMap | dict[Any, Any],
-        config_source_repository: GitRepo | None,
-        file_path: Optional[str] | None,
-        file_name: Optional[str] | None,
-        found_apps_path: Optional[str] | None,
+        config_source_repository: Any,
+        file_path: str = "",
+        file_name: str = "",
+        found_apps_path: str = "config.applications",
     ) -> "AppTenantConfig":
         if config_type == "root":  # pylint: disable=no-else-return
-            return AppTenantConfig(config_type, data, name, file_path, file_name, None, found_apps_path=found_apps_path)
+            return AppTenantConfig(
+                config_type=config_type,
+                data=data,
+                name=name,
+                file_name=file_name,
+                file_path=file_path,
+                found_apps_path=found_apps_path,
+            )
         elif config_type == "team":
             config_source_repository.clone()
             data = self.generate_config_from_team_repo(config_source_repository)
             return AppTenantConfig(
-                config_type, data, name, config_source_repository=config_source_repository.get_clone_url()
+                config_type, data, name, config_source_repository.get_clone_url(), file_name, file_path
             )
         raise GitOpsException("wrong config_type called")
 
@@ -87,13 +94,13 @@ class AppTenantConfigFactory:
 @dataclass
 class AppTenantConfig:
     config_type: str  # is instance initialized as config located in root/team repo
-    data: CommentedMap | dict  # TODO: supposed to be ordereddict from ruamel pylint: disable=fixme
+    data: CommentedMap | dict[Any, Any]  # TODO: supposed to be ordereddict from ruamel pylint: disable=fixme
     name: str  # tenant name
-    config_source_repository: str | None
-    file_path: Optional[str] = None
-    file_name: Optional[str] = None  # team tenant repository url
+    config_source_repository: str = ""
+    file_name: str = ""
+    found_apps_path: str = ""
+    file_path: str = ""  # team tenant repository url
     config_api_version: Optional[tuple[Any, ...]] = None
-    found_apps_path: Optional[str] = None
 
     def __post_init__(self) -> None:
         self.config_api_version = self.__get_config_api_version()
@@ -104,7 +111,7 @@ class AppTenantConfig:
             return ("v2", ("config", "applications"))
         return ("v1", ("applications",))
 
-    def list_apps(self) -> CommentedMap | dict:
+    def list_apps(self) -> Any:
         return traverse_config(self.data, self.config_api_version)
 
     def add_app(self) -> None:
@@ -122,17 +129,23 @@ class AppTenantConfig:
 
 class RootRepoFactory:
     @staticmethod
-    def __get_bootstrap_entries(bootstrap_values_file: str) -> Any:
+    def __get_bootstrap_entries(bootstrap_values_file: str) -> list[Any]:
         try:
             bootstrap_yaml = yaml_file_load(bootstrap_values_file)
         except FileNotFoundError as ex:
             raise GitOpsException("File 'bootstrap/values.yaml' not found in root repository.") from ex
-        if "bootstrap" not in bootstrap_yaml:
-            raise GitOpsException("Cannot find key 'bootstrap' in 'bootstrap/values.yaml'")
-        for bootstrap_entry in bootstrap_yaml["bootstrap"]:
+        if "bootstrap" in bootstrap_yaml:
+            return RootRepoFactory.bootstrap_name_validator(bootstrap_yaml["bootstrap"])
+        if "config" in bootstrap_yaml and "bootstrap" in bootstrap_yaml["config"]:
+            return RootRepoFactory.bootstrap_name_validator(bootstrap_yaml["config"]["bootstrap"])
+        raise GitOpsException("Cannot find key 'bootstrap' or 'config.bootstrap' in 'bootstrap/values.yaml'")
+
+    @staticmethod
+    def bootstrap_name_validator(bootstrap_entries: list[Any]) -> list[Any]:
+        for bootstrap_entry in bootstrap_entries:
             if "name" not in bootstrap_entry:
                 raise GitOpsException("Every bootstrap entry must have a 'name' property.")
-        return bootstrap_yaml["bootstrap"]
+        return bootstrap_entries
 
     @staticmethod
     def __generate_tenant_app_dict_from_root_repo(
@@ -162,21 +175,21 @@ class RootRepoFactory:
                 file_path=tenant_apps_config_file,
                 file_name=tenant_apps_config_file_name,
                 found_apps_path=found_apps_path,
-                config_source_repository=None
+                config_source_repository=None,
             )
             tenant_app_dict.update({bootstrap_entry["name"]: atc})
         return tenant_app_dict
 
     # TODO SHOULD THIS FULL METHOD INSTEAD OF POPULATING  pylint: disable=fixme
     @staticmethod
-    def __get_all_apps_list(tenant_dict: Any) -> dict[str, list]:
+    def __get_all_apps_list(tenant_dict: Any) -> dict[str, list[Any]]:
         all_apps_list = dict()
         for tenant in tenant_dict:
             value = traverse_config(tenant_dict[tenant].data, tenant_dict[tenant].config_api_version)
             all_apps_list.update({tenant: list((dict(value).keys()))})
         return all_apps_list
 
-    def create(self, root_repo: GitRepo) -> 'RootRepo':
+    def create(self, root_repo: GitRepo) -> "RootRepo":
         name = root_repo.get_clone_url().split("/")[-1].removesuffix(".git")
         root_repo.clone()
         bootstrap_values_file = root_repo.get_full_file_path("bootstrap/values.yaml")
@@ -192,19 +205,10 @@ class RootRepo:
     tenant_dict: dict[
         str, "AppTenantConfig"
     ]  # TODO of AppTenantConfig #list of the tenant configs in the root repository (in apps folder)  pylint: disable=fixme
-    bootstrap: set[Any]  # list of tenants to be bootstrapped, derived form values.yaml in bootstrap root repo dict
-    all_app_list: set[str]  # list of apps without custormer separation
+    bootstrap: list[Any]  # list of tenants to be bootstrapped, derived form values.yaml in bootstrap root repo dict
+    all_app_list: dict[str, list[Any]]  # list of apps without custormer separation
 
 
-# def traverse_config(data, configver):
-#    path = configver[1]
-#    lookup = data
-#    for key in path:
-#        lookup = lookup[key]
-#    return lookup
-
-
-#################################################################################################
 class SyncAppsCommand(Command):
     @dataclass(frozen=True)
     class Args(GitApiConfig):
@@ -292,7 +296,7 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
 
 
 def __commit_and_push(
-    team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str, app_file_name: optional[str]
+    team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str, app_file_name: str
 ) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
     root_config_git_repo.commit(git_user, git_email, f"{author} updated " + app_file_name)

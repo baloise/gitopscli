@@ -7,13 +7,13 @@ init:
 	pre-commit install
 
 format:
-	black $(BLACK_ARGS)
+	python3 -m black $(BLACK_ARGS)
 
 format-check:
-	black $(BLACK_ARGS) --check
+	python3 -m black $(BLACK_ARGS) --check
 
 lint:
-	pylint gitopscli
+	python3 -m pylint gitopscli
 
 mypy:
 	python3 -m mypy --install-types --non-interactive .
@@ -25,9 +25,8 @@ coverage:
 	coverage run -m pytest
 	coverage html
 	coverage report
-#temporary mypy test lock
-#checks: format-check lint mypy test 
-checks: format-check lint test
+
+checks: format-check lint mypy test
 
 image:
 	DOCKER_BUILDKIT=1 docker build --progress=plain -t gitopscli:latest .

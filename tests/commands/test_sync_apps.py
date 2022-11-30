@@ -7,8 +7,6 @@ from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactor
 from gitopscli.commands.sync_apps import SyncAppsCommand
 from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load
 from gitopscli.gitops_exception import GitOpsException
-
-# from collections import OrderedDict as ordereddict
 from ruamel.yaml.compat import ordereddict
 from .mock_mixin import MockMixin
 
@@ -191,6 +189,27 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Root repository already up-to-date. I'm done here."),
         ]
 
+    def test_sync_apps_bootstrap_chart(self):
+        self.yaml_file_load_mock.side_effect = lambda file_path: {
+            "/tmp/root-config-repo/bootstrap/values.yaml": {
+                "config": {
+                    "bootstrap": [{"name": "team-non-prod"}, {"name": "other-team-non-prod"}],
+                }
+            },
+            "/tmp/root-config-repo/apps/team-non-prod.yaml": {
+                "repository": "https://team.config.repo.git",
+                "applications": {"my-app": None},  # my-app already exists
+            },
+            "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
+                "repository": "https://other-team.config.repo.git",
+                "applications": {},
+            },
+        }[file_path]
+        try:
+            SyncAppsCommand(ARGS).execute()
+        except GitOpsException:
+            self.fail("'config.bootstrap' should be read correctly'")
+
     def test_sync_apps_bootstrap_yaml_not_found(self):
         self.yaml_file_load_mock.side_effect = FileNotFoundError()
 
@@ -221,7 +240,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             SyncAppsCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("Cannot find key 'bootstrap' in 'bootstrap/values.yaml'", str(ex))
+            self.assertEqual("Cannot find key 'bootstrap' or 'config.bootstrap' in 'bootstrap/values.yaml'", str(ex))
 
     def test_sync_apps_invalid_bootstrap_entry_in_bootstrap_yaml(self):
         self.yaml_file_load_mock.side_effect = lambda file_path: {
