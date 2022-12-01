@@ -66,6 +66,41 @@ config:
    app-xy-test:
 ```
 
+## Passing additional custom keys from App Config to Root Config repositories
+
+```
+Section to be discussed, proposal only.
+```
+
+If App Team wants to pass additional parameters to the root repository - it may be done using additional custom_values.yaml located in the app_folder. Keys in this file will be validated against whitelist located in the root repository. 
+If whitelist.yaml is missing - by default only key teamcode is allowed.
+
+### Files used during process
+
+**root_repo/whitelist.yaml**
+```yaml
+teamcode: null
+keyallowed: null
+```
+**app_repo/app-xy-test/custom_values.yaml**
+```yaml
+teamcode: team-xy
+keydisallowed: security-breach
+```
+### Resulting file
+**root_repo/apps/team-a.yaml**
+```yaml
+repository: https://github.com/company-deployments/team-1-app-config-repo.git # link to your apps root repository
+
+# The applications that are synced by the `sync-app` command:
+applications:
+  app-xy-production: # <- every entry corresponds to a directory in the apps root repository
+  app-xy-staging:
+    teamcode: team-xy
+  app-xy-test:
+```
+
+
 ## Example
 
 ```bash
