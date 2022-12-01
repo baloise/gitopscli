@@ -236,6 +236,16 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
             __sync_apps(team_config_git_repo, root_config_git_repo, args.git_user, args.git_email)
 
 
+def __check_app_other_tenant(
+    apps_from_other_repos: dict[Any, Any], team_config_app_name: str, tenant_config_repo_apps: Any
+) -> None:
+    apps_from_other_repos.pop(team_config_app_name)
+    for app in list(tenant_config_repo_apps.keys()):
+        for tenant in apps_from_other_repos.values():
+            if app in tenant:
+                raise GitOpsException(f"Application '{app}' already exists in a different repository")
+
+
 def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str) -> None:
     logging.info("Team config repository: %s", team_config_git_repo.get_clone_url())
     logging.info("Root config repository: %s", root_config_git_repo.get_clone_url())
@@ -249,13 +259,8 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     # dict conversion causes YAML object to be unordered
     if not team_config_app_name in list(root_repo.tenant_dict.keys()):
         raise GitOpsException("Couldn't find config file for apps repository in root repository's 'apps/' directory")
-    apps_from_other_repos = root_repo.all_app_list.copy()
-    apps_from_other_repos.pop(team_config_app_name)
     tenant_config_repo_apps = dict(tenant_config_team_repo.list_apps())
-    for app in list(tenant_config_repo_apps.keys()):
-        for tenant in apps_from_other_repos.values():
-            if app in tenant:
-                raise GitOpsException(f"Application '{app}' already exists in a different repository")
+    __check_app_other_tenant(root_repo.all_app_list.copy(), team_config_app_name, tenant_config_repo_apps)
 
     logging.info(
         "Found %s app(s) in apps repository: %s", len(tenant_config_repo_apps), ", ".join(tenant_config_repo_apps)
