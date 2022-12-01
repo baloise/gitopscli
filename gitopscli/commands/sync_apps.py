@@ -247,14 +247,11 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     )
 
     # dict conversion causes YAML object to be unordered
-    tenant_config_repo_apps = dict(tenant_config_team_repo.list_apps())
-
     if not team_config_app_name in list(root_repo.tenant_dict.keys()):
         raise GitOpsException("Couldn't find config file for apps repository in root repository's 'apps/' directory")
-    current_repo_apps = dict(root_repo.tenant_dict[team_config_app_name].list_apps())
-
     apps_from_other_repos = root_repo.all_app_list.copy()
     apps_from_other_repos.pop(team_config_app_name)
+    tenant_config_repo_apps = dict(tenant_config_team_repo.list_apps())
     for app in list(tenant_config_repo_apps.keys()):
         for tenant in apps_from_other_repos.values():
             if app in tenant:
@@ -268,14 +265,14 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
     apps_config_file = root_repo.tenant_dict[team_config_app_name].file_path
     apps_config_file_name = root_repo.tenant_dict[team_config_app_name].file_name
 
-    # removing all keys not being current app repo in order to compare app lists
-    # excluding keys added by root repo administrator,
-    # TODO: figure out how to handle that better  pylint: disable=fixme
+    current_repo_apps = dict(root_repo.tenant_dict[team_config_app_name].list_apps())
     for app in list(current_repo_apps.keys()):
-        if current_repo_apps.get(app, dict()) is not None:
-            for key in list(current_repo_apps.get(app, dict())):
-                if key != "customAppConfig":
-                    del current_repo_apps[app][key]
+        if current_repo_apps.get(app) is not None:
+            app_properties = current_repo_apps[app]
+            custom_app_config_item = app_properties.get("customAppConfig", None)
+            current_repo_apps[app].clear()
+            current_repo_apps[app].insert(0, "customAppConfig", custom_app_config_item)
+
     if current_repo_apps == tenant_config_repo_apps:
         logging.info("Root repository already up-to-date. I'm done here.")
         return
