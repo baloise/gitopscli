@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 from dataclasses import dataclass
 from ruamel.yaml.comments import CommentedMap
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
@@ -9,6 +9,12 @@ from gitopscli.gitops_exception import GitOpsException
 from gitopscli.appconfig_api.traverse_config import traverse_config
 from gitopscli.io_api.yaml_util import yaml_file_load, yaml_load
 from .command import Command
+
+
+@dataclass
+class AppTenantConfigApiVersion:
+    version: str
+    path: tuple[str, ...]
 
 
 class AppTenantConfigFactory:
@@ -98,23 +104,22 @@ class AppTenantConfig:
     config_type: str  # is instance initialized as config located in root/team repo
     data: CommentedMap | dict[Any, Any]  # TODO: supposed to be ordereddict from ruamel pylint: disable=fixme
     name: str  # tenant name
+    config_api_version: AppTenantConfigApiVersion = AppTenantConfigApiVersion("v2", ("config", "applications"))
     config_source_repository: str = ""
     file_name: str = ""
     found_apps_path: str = ""
     file_path: str = ""  # team tenant repository url
-    config_api_version: Optional[tuple[Any, ...]] = None
 
     def __post_init__(self) -> None:
         self.config_api_version = self.__get_config_api_version()
 
-    def __get_config_api_version(self) -> tuple[Any, ...]:
-        # NOT WORKING AS SHOULD, SHOILD REPLACE MANUAL FOUND_APPS_PATH maybe count the keys?
+    def __get_config_api_version(self) -> AppTenantConfigApiVersion:
         if "config" in self.data.keys():
-            return ("v2", ("config", "applications"))
-        return ("v1", ("applications",))
+            return AppTenantConfigApiVersion("v2", ("config", "applications"))
+        return AppTenantConfigApiVersion("v1", ("applications",))
 
     def list_apps(self) -> Any:
-        return dict(traverse_config(self.data, self.config_api_version))
+        return dict(traverse_config(self.data, self.config_api_version.path))
 
     def add_app(self) -> None:
         # adds app to the app tenant config
@@ -189,7 +194,7 @@ class RootRepoFactory:
     def __get_all_apps_list(tenant_dict: Any) -> dict[str, list[Any]]:
         all_apps_list = dict()
         for tenant in tenant_dict:
-            value = traverse_config(tenant_dict[tenant].data, tenant_dict[tenant].config_api_version)
+            value = traverse_config(tenant_dict[tenant].data, tenant_dict[tenant].config_api_version.path)
             all_apps_list.update({tenant: list((dict(value).keys()))})
         return all_apps_list
 
@@ -278,13 +283,12 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
         if (
             current_repo_apps.get(app) is not None
         ):  # None is returend when application does not have any additional parameters
-            # app_properties = current_repo_apps[app]
             custom_app_config_item = current_repo_apps[app].get("customAppConfig")
-            # None is returend when application does not have custom configuration
             current_repo_apps[app].clear()
-            if custom_app_config_item is not None:
+            if (
+                custom_app_config_item is not None
+            ):  # None is returend when application does not have custom configuration
                 current_repo_apps[app]["customAppConfig"] = custom_app_config_item
-            # current_repo_apps[app].insert(0, "customAppConfig", custom_app_config_item)
 
     if current_repo_apps == tenant_config_repo_apps:
         logging.info("Root repository already up-to-date. I'm done here.")
@@ -297,9 +301,9 @@ def __sync_apps(team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, gi
         apps_config_file,
         root_repo.tenant_dict[team_config_app_name].found_apps_path,
         {
-            repo_app: traverse_config(tenant_config_team_repo.data, tenant_config_team_repo.config_api_version).get(
-                repo_app, "{}"
-            )
+            repo_app: traverse_config(
+                tenant_config_team_repo.data, tenant_config_team_repo.config_api_version.path
+            ).get(repo_app, "{}")
             for repo_app in tenant_config_repo_apps
         },
     )
