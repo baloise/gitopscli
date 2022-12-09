@@ -29,7 +29,21 @@ root-config-repo/
     └── values.yaml
 ```
 ### app specific values
-app specific values may be set using a values.yaml file directly in the app directory. gitopscli will process these values and remove key that would be blacklisted for security purpose and then store them in the result files under app key.
+app specific values may be set using a app_value_file.yaml file directly in the app directory. gitopscli will process these values and add them under customAppConfig parameter of application
+**tenantrepo.git/app1/app_value_file.yaml**
+```yaml
+customvalue: test
+```
+**rootrepo.git/apps/tenantrepo.yaml**
+```yaml
+config:
+  repository: https://tenantrepo.git
+  applications:
+    app1:
+      customAppConfig:
+        customvalue: test
+    app2: {}
+```
 
 **bootstrap/values.yaml**
 ```yaml

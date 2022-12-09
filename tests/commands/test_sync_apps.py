@@ -130,7 +130,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.merge_yaml_element(
                 "/tmp/root-config-repo/apps/team-non-prod.yaml",
                 "config.applications",
-                {"my-app": ordereddict([("customAppConfig", None)])},
+                {"my-app": {}},
             ),
             call.GitRepo_team.get_author_from_last_commit(),
             call.GitRepo_root.commit("GIT_USER", "GIT_EMAIL", "author updated apps/team-non-prod.yaml"),
@@ -144,7 +144,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             },
             "/tmp/root-config-repo/apps/team-non-prod.yaml": {
                 "repository": "https://repository.url/team/team-non-prod.git",
-                "applications": {"my-app": ordereddict([("customAppConfig", None)])},  # my-app already exists
+                "applications": {"my-app": {}},  # my-app already exists
             },
             "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
                 "repository": "https://repository.url/other-team/other-team-non-prod.git",
