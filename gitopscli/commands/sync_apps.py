@@ -37,7 +37,8 @@ class TenantAppTenantConfigFactory:
                 yaml["config"]["applications"][app_dir]["customAppConfig"] = custom_app_config
         return yaml
 
-    def __get_all_tenant_applications(self, tenant_repo):
+    @staticmethod
+    def __get_all_tenant_applications(tenant_repo):
         repo_dir = tenant_repo.get_full_file_path(".")
         applist = {
             name
@@ -97,7 +98,10 @@ class AppTenantConfig:
                         del existing_application_value["customAppConfig"]
                         self.__set_dirty()
                 else:
-                    if "customAppConfig" not in existing_application_value or existing_application_value["customAppConfig"] != desired_app_value["customAppConfig"]:
+                    if (
+                        "customAppConfig" not in existing_application_value
+                        or existing_application_value["customAppConfig"] != desired_app_value["customAppConfig"]
+                    ):
                         existing_application_value["customAppConfig"] = desired_app_value["customAppConfig"]
                         self.__set_dirty()
 
@@ -174,7 +178,7 @@ class RootRepo:
     tenants: dict[AppTenantConfig]
 
     def list_tenants(self) -> list[str]:
-        return list(self.tenant_dict.keys())
+        return list(self.tenants.keys())
 
     def get_tenant_by_repo_url(self, repo_url: str) -> AppTenantConfig:
         for tenant in self.tenants.values():
@@ -225,7 +229,7 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
             __sync_apps(team_config_git_repo, root_config_git_repo, args.git_user, args.git_email)
 
 
-# TODO: BETTER NAMES FOR STUFF HERE
+# TODO: BETTER NAMES FOR STUFF HERE pylint: disable=fixme
 def __sync_apps(tenant_git_repo: GitRepo, root_git_repo: GitRepo, git_user: str, git_email: str) -> None:
     logging.info("Team config repository: %s", tenant_git_repo.get_clone_url())
     logging.info("Root config repository: %s", root_git_repo.get_clone_url())
