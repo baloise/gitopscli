@@ -4,8 +4,8 @@ import os
 import unittest
 from unittest.mock import call
 from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.commands.sync_apps import SyncAppsCommand
-from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load
+from gitopscli.commands.sync_apps import SyncAppsCommand, AppTenantConfig
+from gitopscli.io_api.yaml_util import merge_yaml_element, yaml_file_load, yaml_file_dump
 from gitopscli.gitops_exception import GitOpsException
 from ruamel.yaml.compat import ordereddict
 from .mock_mixin import MockMixin
@@ -86,8 +86,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             },
         }[file_path]
 
-        self.merge_yaml_element_mock = self.monkey_patch(merge_yaml_element)
-        self.merge_yaml_element_mock.return_value = None
+        self.yaml_file_dump_mock = self.monkey_patch(yaml_file_dump)
+        self.yaml_file_dump_mock.return_value = None
 
         self.seal_mocks()
 
@@ -102,18 +102,13 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Team config repository: %s", "https://repository.url/team/team-non-prod.git"),
             call.GitRepo_root.get_clone_url(),
             call.logging.info("Root config repository: %s", "https://repository.url/root/root-config.git"),
-            call.GitRepo_root.get_clone_url(),
             call.GitRepo_root.clone(),
             call.GitRepo_root.get_full_file_path("bootstrap/values.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/bootstrap/values.yaml"),
-            call.logging.info("Analyzing %s in root repository", "apps/team-non-prod.yaml"),
             call.GitRepo_root.get_full_file_path("apps/team-non-prod.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/apps/team-non-prod.yaml"),
-            call.logging.info("adding %s", "team-non-prod"),
-            call.logging.info("Analyzing %s in root repository", "apps/other-team-non-prod.yaml"),
             call.GitRepo_root.get_full_file_path("apps/other-team-non-prod.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/apps/other-team-non-prod.yaml"),
-            call.logging.info("adding %s", "other-team-non-prod"),
             call.GitRepo_team.get_clone_url(),
             call.GitRepo_team.clone(),
             call.GitRepo_team.get_full_file_path("."),
@@ -121,19 +116,29 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.os.path.join("/tmp/team-config-repo/.", "my-app"),
             call.os.path.isdir("/tmp/team-config-repo/./my-app"),
             call.GitRepo_team.get_clone_url(),
-            call.GitRepo_team.get_full_file_path("my-app/app_value_file.yaml"),
-            call.os.path.exists("/tmp/team-config-repo/my-app/app_value_file.yaml"),
-            call.GitRepo_team.get_clone_url(),
+            call.GitRepo_team.get_full_file_path("my-app/.config.yaml"),
+            call.os.path.exists("/tmp/team-config-repo/my-app/.config.yaml"),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
-            call.logging.info("Searching apps repository in root repository's 'apps/' directory..."),
-            call.logging.info("Sync applications in root repository's %s.", "apps/team-non-prod.yaml"),
-            call.merge_yaml_element(
-                "/tmp/root-config-repo/apps/team-non-prod.yaml",
-                "config.applications",
-                {"my-app": {}},
+            call.logging.info(
+                "Removing % from %s applications", "some-other-app-1", "/tmp/root-config-repo/apps/team-non-prod.yaml"
             ),
+            call.logging.info("Adding % in %s applications", "my-app", "/tmp/root-config-repo/apps/team-non-prod.yaml"),
+            call.logging.info("Appling changes to: %s", "/tmp/root-config-repo/apps/team-non-prod.yaml"),
+            call.yaml_file_dump(
+                {
+                    "config": {
+                        "repository": "https://repository.url/team/team-non-prod.git",
+                        "applications": {"my-app": ordereddict()},
+                    }
+                },
+                "/tmp/root-config-repo/apps/team-non-prod.yaml",
+            ),
+            call.GitRepo_root.get_clone_url(),
+            call.logging.info("Commiting and pushing changes to %s", "https://repository.url/root/root-config.git"),
             call.GitRepo_team.get_author_from_last_commit(),
-            call.GitRepo_root.commit("GIT_USER", "GIT_EMAIL", "author updated apps/team-non-prod.yaml"),
+            call.GitRepo_root.commit(
+                "GIT_USER", "GIT_EMAIL", "author updated /tmp/root-config-repo/apps/team-non-prod.yaml"
+            ),
             call.GitRepo_root.push(),
         ]
 
@@ -162,18 +167,13 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Team config repository: %s", "https://repository.url/team/team-non-prod.git"),
             call.GitRepo_root.get_clone_url(),
             call.logging.info("Root config repository: %s", "https://repository.url/root/root-config.git"),
-            call.GitRepo_root.get_clone_url(),
             call.GitRepo_root.clone(),
             call.GitRepo_root.get_full_file_path("bootstrap/values.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/bootstrap/values.yaml"),
-            call.logging.info("Analyzing %s in root repository", "apps/team-non-prod.yaml"),
             call.GitRepo_root.get_full_file_path("apps/team-non-prod.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/apps/team-non-prod.yaml"),
-            call.logging.info("adding %s", "team-non-prod"),
-            call.logging.info("Analyzing %s in root repository", "apps/other-team-non-prod.yaml"),
             call.GitRepo_root.get_full_file_path("apps/other-team-non-prod.yaml"),
             call.yaml_file_load("/tmp/root-config-repo/apps/other-team-non-prod.yaml"),
-            call.logging.info("adding %s", "other-team-non-prod"),
             call.GitRepo_team.get_clone_url(),
             call.GitRepo_team.clone(),
             call.GitRepo_team.get_full_file_path("."),
@@ -181,12 +181,10 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.os.path.join("/tmp/team-config-repo/.", "my-app"),
             call.os.path.isdir("/tmp/team-config-repo/./my-app"),
             call.GitRepo_team.get_clone_url(),
-            call.GitRepo_team.get_full_file_path("my-app/app_value_file.yaml"),
-            call.os.path.exists("/tmp/team-config-repo/my-app/app_value_file.yaml"),
-            call.GitRepo_team.get_clone_url(),
+            call.GitRepo_team.get_full_file_path("my-app/.config.yaml"),
+            call.os.path.exists("/tmp/team-config-repo/my-app/.config.yaml"),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
-            call.logging.info("Searching apps repository in root repository's 'apps/' directory..."),
-            call.logging.info("Root repository already up-to-date. I'm done here."),
+            call.logging.info("No changes applied to %s", "/tmp/root-config-repo/apps/team-non-prod.yaml"),
         ]
 
     def test_sync_apps_bootstrap_chart(self):
@@ -197,17 +195,17 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                 }
             },
             "/tmp/root-config-repo/apps/team-non-prod.yaml": {
-                "repository": "https://team.config.repo.git",
+                "repository": "https://repository.url/team/team-non-prod.git",
                 "applications": {"my-app": None},  # my-app already exists
             },
             "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
-                "repository": "https://other-team.config.repo.git",
+                "repository": "https://repository.url/team/other-team-non-prod.git",
                 "applications": {},
             },
         }[file_path]
         try:
             SyncAppsCommand(ARGS).execute()
-        except GitOpsException:
+        except GitOpsException as ex:
             self.fail("'config.bootstrap' should be read correctly'")
 
     def test_sync_apps_bootstrap_yaml_not_found(self):
@@ -271,7 +269,9 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             SyncAppsCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("File 'apps/team-non-prod.yaml' not found in root repository.", str(ex))
+            self.assertEqual(
+                "File '/tmp/root-config-repo/apps/team-non-prod.yaml' not found in root repository.", str(ex)
+            )
 
     def test_sync_apps_missing_repository_element_in_team_yaml(self):
         self.yaml_file_load_mock.side_effect = lambda file_path: {
@@ -286,7 +286,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             SyncAppsCommand(ARGS).execute()
             self.fail()
         except GitOpsException as ex:
-            self.assertEqual("Cannot find key 'repository' in 'apps/team-non-prod.yaml'", str(ex))
+            self.assertEqual("Cannot find key 'repository' in /tmp/root-config-repo/apps/team-non-prod.yaml", str(ex))
 
     def test_sync_apps_undefined_team_repo(self):
         self.yaml_file_load_mock.side_effect = lambda file_path: {

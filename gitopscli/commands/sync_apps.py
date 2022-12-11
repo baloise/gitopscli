@@ -1,12 +1,10 @@
 import logging
 import os
-from typing import Any
-from dataclasses import dataclass
-from ruamel.yaml import YAML
-from ruamel.yaml.comments import CommentedMap
+from typing import Any, Optional, List
+from dataclasses import dataclass, field
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.io_api.yaml_util import yaml_file_load, yaml_load
+from gitopscli.io_api.yaml_util import yaml_file_load, yaml_load, yaml_file_dump
 from .command import Command
 
 
@@ -14,7 +12,7 @@ class TenantAppTenantConfigFactory:
     def __generate_config_from_tenant_repo(
         self, tenant_repo: GitRepo
     ) -> Any:  # TODO: supposed to be ruamel object than Any  pylint: disable=fixme
-        tenant_app_dirs = self.__get_all_tenant_applications(tenant_repo)
+        tenant_app_dirs = self.__get_all_tenant_applications_dirs(tenant_repo)
         tenant_config_template = """
         config: 
             repository: {}
@@ -38,7 +36,7 @@ class TenantAppTenantConfigFactory:
         return yaml
 
     @staticmethod
-    def __get_all_tenant_applications(tenant_repo):
+    def __get_all_tenant_applications_dirs(tenant_repo: GitRepo) -> set[str]:
         repo_dir = tenant_repo.get_full_file_path(".")
         applist = {
             name
@@ -66,21 +64,22 @@ class TenantAppTenantConfigFactory:
 
 @dataclass
 class AppTenantConfig:
-    yaml: CommentedMap | dict[Any, Any]  # TODO: supposed to be ordereddict from ruamel pylint: disable=fixme
-    tenant_config: CommentedMap = None | dict[Any, Any]
+    yaml: dict[str, dict[str, Any]]
+    tenant_config: dict[str, dict[str, Any]] = field(default_factory=dict)
     repo_url: str = ""
     file_path: str = ""
     dirty: bool = False
-    ruamel_yaml: YAML = YAML()
 
     def __post_init__(self) -> None:
         if "config" in self.yaml:
             self.tenant_config = self.yaml["config"]
         else:
             self.tenant_config = self.yaml
-        self.repo_url = self.tenant_config["repository"]
+        if "repository" not in self.tenant_config:
+            raise GitOpsException("Cannot find key 'repository' in " + self.file_path)
+        self.repo_url = str(self.tenant_config["repository"])
 
-    def list_apps(self) -> dict[dict[Any]]:
+    def list_apps(self) -> dict[str, dict[str, Any]]:
         return dict(self.tenant_config["applications"])
 
     def merge_applications(self, desired_tenant_config: "AppTenantConfig") -> None:
@@ -89,12 +88,17 @@ class AppTenantConfig:
         self.__add_new_applications(desired_apps)
         self.__update_custom_app_config(desired_apps)
 
-    def __update_custom_app_config(self, desired_apps):
+    def __update_custom_app_config(self, desired_apps: dict[str, dict[str, Any]]) -> None:
         for desired_app_name, desired_app_value in desired_apps.items():
-            if desired_app_name in self.list_apps().keys():
-                existing_application_value = self.list_apps().get(desired_app_name)
+            if desired_app_name in self.list_apps():
+                existing_application_value = self.list_apps()[desired_app_name]
                 if "customAppConfig" not in desired_app_value:
-                    if "customAppConfig" in existing_application_value:
+                    if existing_application_value and "customAppConfig" in existing_application_value:
+                        logging.info(
+                            "Removing customAppConfig in for %s in %s applications",
+                            existing_application_value,
+                            self.file_path,
+                        )
                         del existing_application_value["customAppConfig"]
                         self.__set_dirty()
                 else:
@@ -102,32 +106,35 @@ class AppTenantConfig:
                         "customAppConfig" not in existing_application_value
                         or existing_application_value["customAppConfig"] != desired_app_value["customAppConfig"]
                     ):
+                        logging.info(
+                            "Updating customAppConfig in for %s in %s applications",
+                            existing_application_value,
+                            self.file_path,
+                        )
                         existing_application_value["customAppConfig"] = desired_app_value["customAppConfig"]
                         self.__set_dirty()
 
-    def __add_new_applications(self, desired_apps):
+    def __add_new_applications(self, desired_apps: dict[str, Any]) -> None:
         for desired_app_name, desired_app_value in desired_apps.items():
             if desired_app_name not in self.list_apps().keys():
+                logging.info("Adding % in %s applications", desired_app_name, self.file_path)
                 self.tenant_config["applications"][desired_app_name] = desired_app_value
                 self.__set_dirty()
 
-    def __delete_removed_applications(self, desired_apps):
+    def __delete_removed_applications(self, desired_apps: dict[str, Any]) -> None:
         for current_app in self.list_apps().keys():
             if current_app not in desired_apps.keys():
+                logging.info("Removing % from %s applications", current_app, self.file_path)
                 del self.tenant_config["applications"][current_app]
                 self.__set_dirty()
 
     def __set_dirty(self) -> None:
         self.dirty = True
 
-    def dump(self) -> None:
-        with open(self.file_path, "w+") as stream:
-            self.ruamel_yaml.dump(self.yaml, stream)
-
 
 class RootRepoFactory:
     @staticmethod
-    def __load_tenants_from_bootstrap_values(root_repo: GitRepo) -> dict[AppTenantConfig]:
+    def __load_tenants_from_bootstrap_values(root_repo: GitRepo) -> dict[str, AppTenantConfig]:
         boostrap_tenant_list = RootRepoFactory.__get_bootstrap_tenant_list(root_repo)
         tenants = dict()
         for bootstrap_tenant in boostrap_tenant_list:
@@ -144,29 +151,28 @@ class RootRepoFactory:
         return tenants
 
     @staticmethod
-    def __get_bootstrap_tenant_list(root_repo) -> list[str]:
+    def __get_bootstrap_tenant_list(root_repo: GitRepo) -> List[Any]:
         root_repo.clone()
         try:
             boostrap_values_path = root_repo.get_full_file_path("bootstrap/values.yaml")
             bootstrap_yaml = yaml_file_load(boostrap_values_path)
         except FileNotFoundError as ex:
             raise GitOpsException("File 'bootstrap/values.yaml' not found in root repository.") from ex
-        bootstrap_tenants = None
+        bootstrap_tenants = []
         if "bootstrap" in bootstrap_yaml:
-            bootstrap_tenants = bootstrap_yaml["bootstrap"]
+            bootstrap_tenants = list(bootstrap_yaml["bootstrap"])
         if "config" in bootstrap_yaml and "bootstrap" in bootstrap_yaml["config"]:
-            bootstrap_tenants = bootstrap_yaml["config"]["bootstrap"]
+            bootstrap_tenants = list(bootstrap_yaml["config"]["bootstrap"])
         RootRepoFactory.validate_bootstrap_tenants(bootstrap_tenants)
         return bootstrap_tenants
 
     @staticmethod
-    def validate_bootstrap_tenants(bootstrap_entries: list[Any]) -> list[Any]:
-        if bootstrap_entries is None:
+    def validate_bootstrap_tenants(bootstrap_entries: Optional[List[Any]]) -> None:
+        if not bootstrap_entries:
             raise GitOpsException("Cannot find key 'bootstrap' or 'config.bootstrap' in 'bootstrap/values.yaml'")
         for bootstrap_entry in bootstrap_entries:
             if "name" not in bootstrap_entry:
                 raise GitOpsException("Every bootstrap entry must have a 'name' property.")
-        return bootstrap_entries
 
     def create(self, root_repo: GitRepo) -> "RootRepo":
         root_repo_tenants = self.__load_tenants_from_bootstrap_values(root_repo)
@@ -175,25 +181,25 @@ class RootRepoFactory:
 
 @dataclass
 class RootRepo:
-    tenants: dict[AppTenantConfig]
+    tenants: dict[str, AppTenantConfig]
 
     def list_tenants(self) -> list[str]:
         return list(self.tenants.keys())
 
-    def get_tenant_by_repo_url(self, repo_url: str) -> AppTenantConfig:
+    def get_tenant_by_repo_url(self, repo_url: str) -> Optional[AppTenantConfig]:
         for tenant in self.tenants.values():
             if tenant.repo_url == repo_url:
                 return tenant
         return None
 
     def get_all_applications(self) -> list[str]:
-        apps = list()
-        for tenant in self.tenants:
-            apps.extend(tenant.tenant_config["applications"].keys())
+        apps: list[str] = list()
+        for tenant in self.tenants.values():
+            apps.extend(tenant.list_apps().keys())
         return apps
 
-    def validate_tenant(self, tenant_config):
-        apps_from_other_tenants = list()
+    def validate_tenant(self, tenant_config: AppTenantConfig) -> None:
+        apps_from_other_tenants: list[str] = list()
         for tenant in self.tenants.values():
             if tenant.repo_url != tenant_config.repo_url:
                 apps_from_other_tenants.extend(tenant.list_apps().keys())
@@ -238,11 +244,20 @@ def __sync_apps(tenant_git_repo: GitRepo, root_git_repo: GitRepo, git_user: str,
     if root_repo_tenant is None:
         raise GitOpsException("Couldn't find config file for apps repository in root repository's 'apps/' directory")
     tenant_from_repo = TenantAppTenantConfigFactory().create(tenant_repo=tenant_git_repo)
+    logging.info(
+        "Found %s app(s) in apps repository: %s",
+        len(tenant_from_repo.list_apps().keys()),
+        ", ".join(tenant_from_repo.list_apps().keys()),
+    )
     root_repo.validate_tenant(tenant_from_repo)
     root_repo_tenant.merge_applications(tenant_from_repo)
     if root_repo_tenant.dirty:
-        root_repo_tenant.dump()
+        logging.info("Appling changes to: %s", root_repo_tenant.file_path)
+        yaml_file_dump(root_repo_tenant.yaml, root_repo_tenant.file_path)
+        logging.info("Commiting and pushing changes to %s", root_git_repo.get_clone_url())
         __commit_and_push(tenant_git_repo, root_git_repo, git_user, git_email, root_repo_tenant.file_path)
+    else:
+        logging.info("No changes applied to %s", root_repo_tenant.file_path)
 
 
 def __commit_and_push(
