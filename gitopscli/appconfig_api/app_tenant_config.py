@@ -71,7 +71,7 @@ class AppTenantConfig:
     def __delete_removed_applications(self, desired_apps: dict[str, Any]) -> None:
         for current_app in self.list_apps().keys():
             if current_app not in desired_apps.keys():
-                logging.info("Removing % from %s applications", current_app, self.file_path)
+                logging.info("Removing %s from %s applications", current_app, self.file_path)
                 del self.tenant_config["applications"][current_app]
                 self.__set_dirty()
 
