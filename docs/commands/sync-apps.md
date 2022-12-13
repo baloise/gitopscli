@@ -29,7 +29,7 @@ root-config-repo/
     └── values.yaml
 ```
 ### app specific values
-app specific values may be set using a app_value_file.yaml file directly in the app directory. gitopscli will process these values and add them under customAppConfig parameter of application
+app specific values may be set using a .config.yaml file directly in the app directory. gitopscli will process these values and add them under customAppConfig parameter of application
 **tenantrepo.git/app1/app_value_file.yaml**
 ```yaml
 customvalue: test
