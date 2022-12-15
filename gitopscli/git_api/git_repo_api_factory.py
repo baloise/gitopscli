@@ -3,6 +3,7 @@ from gitopscli.gitops_exception import GitOpsException
 from .git_repo_api import GitRepoApi
 from .github_git_repo_api_adapter import GithubGitRepoApiAdapter
 from .bitbucket_git_repo_api_adapter import BitbucketGitRepoApiAdapter
+from .bitbucket_cloud_git_repo_api_adapter import BitbucketCloudGitRepoApiAdapter
 from .gitlab_git_repo_api_adapter import GitlabGitRepoApiAdapter
 from .git_repo_api_logging_proxy import GitRepoApiLoggingProxy
 from .git_api_config import GitApiConfig
@@ -25,6 +26,13 @@ class GitRepoApiFactory:
                 raise GitOpsException("Please provide url for Bitbucket!")
             git_repo_api = BitbucketGitRepoApiAdapter(
                 git_provider_url=config.git_provider_url,
+                username=config.username,
+                password=config.password,
+                organisation=organisation,
+                repository_name=repository_name,
+            )
+        elif config.git_provider is GitProvider.BITBUCKET_CLOUD:
+            git_repo_api = BitbucketCloudGitRepoApiAdapter(
                 username=config.username,
                 password=config.password,
                 organisation=organisation,

@@ -10,7 +10,7 @@ setup(
         "GitPython==3.0.6",
         "ruamel.yaml==0.16.5",
         "jsonpath-ng==1.5.3",
-        "atlassian-python-api==1.14.5",
+        "atlassian-python-api==3.32.1",
         "PyGithub==1.53",
         "python-gitlab==2.6.0",
     ],

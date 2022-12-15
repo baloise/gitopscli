@@ -94,10 +94,11 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException(result["errors"][0]["message"])
 
     def get_branch_head_hash(self, branch: str) -> str:
-        branches = self.__bitbucket.get_branches(self.__organisation, self.__repository_name, filter=branch, limit=1)
-        if not branches:
-            raise GitOpsException(f"Branch '{branch}' not found'")
-        return str(branches[0]["latestCommit"])
+        for curr_branch in self.__bitbucket.get_branches(
+            self.__organisation, self.__repository_name, filter=branch, limit=1
+        ):
+            return str(curr_branch["latestCommit"])
+        raise GitOpsException(f"Branch '{branch}' not found'")
 
     def get_pull_request_branch(self, pr_id: int) -> str:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
