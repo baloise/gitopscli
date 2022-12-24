@@ -10,7 +10,7 @@ FROM base AS dev
 WORKDIR /workdir
 RUN apk add --no-cache gcc linux-headers musl-dev make
 RUN python -m venv /opt/venv
-RUN pip install --upgrade pip
+RUN python -m pip install --upgrade pip
 
 # =========
 FROM dev AS deps
