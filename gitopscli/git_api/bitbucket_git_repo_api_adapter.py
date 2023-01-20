@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Dict, Any, Optional, Literal
 import requests
 
 from atlassian import Bitbucket
@@ -108,3 +108,14 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
     def __get_default_branch(self) -> str:
         default_branch = self.__bitbucket.get_default_branch(self.__organisation, self.__repository_name)
         return str(default_branch["id"])
+
+    def merge_pull_request_with_parameters(
+        self,
+        pr_id: int,
+        gitlab_merge_parameters: Dict[str, Any],
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+    ) -> None:
+        pass
+
+    def add_pull_request_label(self, pr_id: int, pr_labels: Dict[str, Any]) -> None:
+        pass

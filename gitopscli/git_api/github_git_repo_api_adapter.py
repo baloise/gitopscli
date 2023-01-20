@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Any, Dict, Union, Optional, Literal
 
 from github import (
     Github,
@@ -88,3 +88,15 @@ class GithubGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException(
                 f"Repository '{self.__organisation}/{self.__repository_name}' does not exist."
             ) from ex
+
+    def add_pull_request_label(self, pr_id: int, pr_labels: Union[str, Any]) -> None:
+        pull_request = self.__get_pull_request(pr_id)
+        pull_request.set_labels(pr_labels)
+
+    def merge_pull_request_with_parameters(
+        self,
+        pr_id: int,
+        gitlab_merge_parameters: Dict[str, Any],
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+    ) -> None:
+        pass

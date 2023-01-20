@@ -285,6 +285,8 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
                         [--merge-method MERGE_METHOD] [--json [JSON]]
+                        [--pr-labels PR_LABELS]
+                        [--gitlab-merge-parameters GITLAB_MERGE_PARAMETERS]
                         [-v [VERBOSE]]
 gitopscli deploy: error: the following arguments are required: --file, --values, --username, --password, --organisation, --repository-name
 """
@@ -300,6 +302,8 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
                         [--merge-method MERGE_METHOD] [--json [JSON]]
+                        [--pr-labels PR_LABELS]
+                        [--gitlab-merge-parameters GITLAB_MERGE_PARAMETERS]
                         [-v [VERBOSE]]
 
 options:
@@ -336,6 +340,10 @@ options:
                         Merge Method (e.g., 'squash', 'rebase', 'merge')
                         (default: merge)
   --json [JSON]         Print a JSON object containing deployment information
+  --pr-labels PR_LABELS
+                        JSON object pr labels (Gitlab, Github supported)
+  --gitlab-merge-parameters GITLAB_MERGE_PARAMETERS
+                        JSON object pr parameters (only Gitlab supported)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
