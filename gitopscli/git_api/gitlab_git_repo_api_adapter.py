@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Literal
+from typing import Any, List, Dict, Optional, Literal
 import logging
 import time
 import requests
@@ -59,16 +59,21 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         )
         return GitRepoApi.PullRequestIdAndUrl(pr_id=merge_request.iid, url=merge_request.web_url)
 
-    def merge_pull_request(self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge") -> None:
+    def merge_pull_request(
+        self,
+        pr_id: int,
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+        merge_parameters: Dict[str, Any] = None,
+    ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
 
         max_retries = MAX_MERGE_RETRIES
         while max_retries > 0:
             try:
                 if merge_method == "rebase":
-                    merge_request.rebase()
+                    merge_request.rebase(merge_parameters)
                     return
-                merge_request.merge()
+                merge_request.merge(merge_parameters)
                 return
             except gitlab.exceptions.GitlabMRClosedError as ex:
                 # "Branch cannot be merged" error can occur if the server
@@ -103,34 +108,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException("Default branch does not exist")
         return str(default_branch.name)
 
-    def add_pull_request_label(self, pr_id: int, pr_labels: Dict[str, Any]) -> None:
+    def add_pull_request_label(self, pr_id: int, pr_labels: List[str]) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
         merge_request.labels = pr_labels
         merge_request.save()
-
-    def merge_pull_request_with_parameters(
-        self,
-        pr_id: int,
-        gitlab_merge_parameters: Dict[str, Any],
-        merge_method: Literal["squash", "rebase", "merge"] = "merge",
-    ) -> None:
-        merge_request = self.__project.mergerequests.get(pr_id)
-
-        max_retries = MAX_MERGE_RETRIES
-        while max_retries > 0:
-            try:
-                if merge_method == "rebase":
-                    merge_request.rebase(gitlab_merge_parameters)
-                    return
-                merge_request.merge(gitlab_merge_parameters)
-                return
-            except gitlab.exceptions.GitlabMRClosedError as ex:
-                # "Branch cannot be merged" error can occur if the server
-                # is still processing the merge request internally
-                max_retries -= 1
-                logging.warning(
-                    "Retry merging pull request. Attempts: (%s/%s)", MAX_MERGE_RETRIES - max_retries, MAX_MERGE_RETRIES
-                )
-                if max_retries == 0:
-                    raise GitOpsException("Error merging pull request: 'Branch cannot be merged'") from ex
-                time.sleep(2.5)

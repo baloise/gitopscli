@@ -25,7 +25,6 @@ def parse_args(raw_args: List[str]) -> Tuple[bool, CommandArgs]:
 
     args = vars(parser.parse_args(raw_args))
     args = __deduce_empty_git_provider_from_git_provider_url(args, parser.error)
-    __check_compatibility_args(args, parser.error)
 
     verbose = args.pop("verbose", False)
     command_args = __create_command_args(args)
@@ -114,10 +113,10 @@ def __create_deploy_parser() -> ArgumentParser:
         default=False,
     )
     parser.add_argument(
-        "--pr-labels", help="JSON object pr labels (Gitlab, Github supported)", type=__parse_yaml, default=None
+        "--pr-labels", help="JSON array pr labels (Gitlab, Github supported)", type=__parse_yaml, default=None
     )
     parser.add_argument(
-        "--gitlab-merge-parameters",
+        "--merge-parameters",
         help="JSON object pr parameters (only Gitlab supported)",
         type=__parse_yaml,
         default=None,
@@ -309,15 +308,6 @@ def __deduce_empty_git_provider_from_git_provider_url(
     else:
         error("Cannot deduce git provider from --git-provider-url. Please provide --git-provider")
     return updated_args
-
-
-def __check_compatibility_args(args: Dict[str, Any], error: Callable[[str], NoReturn]) -> None:
-    if "git_provider" not in args:
-        return
-    if args.get("pr_labels") and args["git_provider"] == GitProvider.BITBUCKET:
-        error("Cannot use --pr-labels with --git-provider bitbucket-server")
-    if args.get("gitlab_merge_parameters") and args["git_provider"] != GitProvider.GITLAB:
-        error("Can use --gitlab_merge_parameters only with --git-provider gitlab")
 
 
 def __create_command_args(args: Dict[str, Any]) -> CommandArgs:

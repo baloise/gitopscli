@@ -69,7 +69,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -109,7 +109,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=True,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -161,7 +161,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=True,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -219,7 +219,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -268,7 +268,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -311,7 +311,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -348,7 +348,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message="testcommit",
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -389,7 +389,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -421,7 +421,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -455,7 +455,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -489,7 +489,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -523,7 +523,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             commit_message=None,
             json=False,
             pr_labels=None,
-            gitlab_merge_parameters=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
