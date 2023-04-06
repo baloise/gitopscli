@@ -9,6 +9,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Build and test Docker image
         uses: docker/build-push-action@v2
         with:
@@ -19,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     if: "!startsWith(github.ref, 'refs/branches/v')"
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Build docs Docker image
         uses: docker/build-push-action@v2
         with:
