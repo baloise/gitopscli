@@ -1,0 +1,23 @@
+name: Test
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run tests
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          target: test
+      - name: Test doc build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          target: docs-site
