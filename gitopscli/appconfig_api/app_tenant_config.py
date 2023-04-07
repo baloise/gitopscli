@@ -83,20 +83,16 @@ def __generate_config_from_tenant_repo(
     tenant_repo: GitRepo,
 ) -> Any:  # TODO: supposed to be ruamel object than Any  pylint: disable=fixme
     tenant_app_dirs = __get_all_tenant_applications_dirs(tenant_repo)
-    tenant_config_template = """
+    tenant_config_template = f"""
     config: 
-        repository: {}
+        repository: {tenant_repo.get_clone_url()}
         applications: {{}}
-    """.format(
-        tenant_repo.get_clone_url()
-    )
+    """
     yaml = yaml_load(tenant_config_template)
     for app_dir in tenant_app_dirs:
-        tenant_application_template = """
-        {}: {{}}
-        """.format(
-            app_dir
-        )
+        tenant_application_template = f"""
+        {app_dir}: {{}}
+        """
         tenant_applications_yaml = yaml_load(tenant_application_template)
         # dict path hardcoded as object generated will always be in v2 or later
         yaml["config"]["applications"].update(tenant_applications_yaml)
@@ -121,7 +117,7 @@ def __get_custom_config(appname: str, tenant_config_git_repo: GitRepo) -> Any:
     if os.path.exists(custom_config_path):
         custom_config_content = yaml_file_load(custom_config_path)
         return custom_config_content
-    return dict()
+    return {}
 
 
 def create_app_tenant_config_from_repo(
