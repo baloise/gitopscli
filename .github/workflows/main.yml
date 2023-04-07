@@ -47,7 +47,9 @@ jobs:
       - name: Install dependencies
         run: npm install semantic-release @semantic-release/exec @google/semantic-release-replace-plugin conventional-changelog-conventionalcommits
       - name: Release
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
         run: npx semantic-release
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
