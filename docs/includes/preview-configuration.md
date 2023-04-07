@@ -33,7 +33,7 @@ applicationName: app-xy
 # messages:                              # optional section
 #   previewEnvCreated: "Created preview at revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path"    # optional (default: "New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}")
 #   previewEnvUpdated: "Updated preview to revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path"    # optional (default: "Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}")
-#   previewEnvAlreadyUpToDate: "Your preview is already up-to-date with revision ${GIT-HASH}."                                       # optional (default: "The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}")
+#   previewEnvAlreadyUpToDate: "Your preview is already up-to-date with revision ${GIT_HASH}."                                       # optional (default: "The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}")
 previewConfig:
   host: ${PREVIEW_NAMESPACE}.example.tld
 # template:                              # optional section
