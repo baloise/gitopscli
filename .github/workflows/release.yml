@@ -1,33 +1,24 @@
-name: CI
+name: Release
 
 on:
   push:
     branches:
-      - '**'
+      - '**' # TODO: master only
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: Build and test Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          target: test
-
   doc:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      - name: Build docs Docker image
+      - name: Build docs
         uses: docker/build-push-action@v4
         with:
           context: .
           target: docs-site
           outputs: type=local,dest=.
+      - name: log output
+        run: ls -la ./site
       - name: Deploy docs to GitHub Pages
         if: github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
@@ -38,8 +29,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
+      - name: Run tests
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          target: test
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
