@@ -32,7 +32,7 @@ class GitRepo:
 
     def get_full_file_path(self, relative_path: str) -> str:
         repo = self.__get_repo()
-        return os.path.join(repo.working_dir, relative_path)
+        return os.path.join(str(repo.working_dir), relative_path)
 
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
@@ -54,7 +54,9 @@ class GitRepo:
                 git_options.append(f"--config credential.helper={credentials_file}")
             if branch:
                 git_options.append(f"--branch {branch}")
-            self.__repo = Repo.clone_from(url=url, to_path=f"{self.__tmp_dir}/repo", multi_options=git_options)
+            self.__repo = Repo.clone_from(
+                url=url, to_path=f"{self.__tmp_dir}/repo", multi_options=git_options, allow_unsafe_options=True
+            )
         except GitError as ex:
             if branch:
                 raise GitOpsException(f"Error cloning branch '{branch}' of '{url}'") from ex
