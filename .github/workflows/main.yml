@@ -27,13 +27,13 @@ jobs:
         with:
           context: .
           target: docs-site
+          outputs: type=local,dest=.
       - name: Deploy docs to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
-
 
   release:
     runs-on: ubuntu-latest
