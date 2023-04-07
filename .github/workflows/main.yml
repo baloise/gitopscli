@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches-ignore:    
-      - 'v*.*.*'
+    branches:
+      - '*'
 
 jobs:
   test:
@@ -19,7 +19,6 @@ jobs:
 
   doc:
     runs-on: ubuntu-latest
-    if: "!startsWith(github.ref, 'refs/branches/v')"
     steps:
       - name: checkout
         uses: actions/checkout@v3
