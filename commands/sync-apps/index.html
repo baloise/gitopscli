@@ -422,6 +422,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app-specific-values" class="md-nav__link">
+    app specific values
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -563,6 +570,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app-specific-values" class="md-nav__link">
+    app specific values
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -620,47 +634,61 @@
 └── bootstrap
     └── values.yaml
 </code></pre></div>
+<h3 id="app-specific-values">app specific values<a class="headerlink" href="#app-specific-values" title="Permanent link">&para;</a></h3>
+<p>app specific values may be set using a .config.yaml file directly in the app directory. gitopscli will process these values and add them under customAppConfig parameter of application
+<strong>tenantrepo.git/app1/app_value_file.yaml</strong>
+<div class="highlight"><pre><span></span><code><span class="nt">customvalue</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+</code></pre></div>
+<strong>rootrepo.git/apps/tenantrepo.yaml</strong>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://tenantrepo.git</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app1</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">customAppConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">customvalue</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="w">    </span><span class="nt">app2</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+</code></pre></div></p>
 <p><strong>bootstrap/values.yaml</strong>
-<div class="highlight"><pre><span></span><code><span class="nt">bootstrap</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">bootstrap</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span>
 </code></pre></div>
 Alternative, when using a Chart as dependency with an alias 'config':
-<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">bootstrap</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span><span class="w"></span>
-<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">bootstrap</span><span class="p">:</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span>
 </code></pre></div></p>
 <p><strong>apps/team-a.yaml</strong>
-<div class="highlight"><pre><span></span><code><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span><span class="w"> </span><span class="c1"># link to your apps root repository</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span><span class="w"> </span><span class="c1"># link to your apps root repository</span>
 
-<span class="c1"># The applications that are synced by the `sync-app` command:</span><span class="w"></span>
-<span class="nt">applications</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">app-xy-production</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span><span class="w"></span>
-<span class="w">  </span><span class="nt">app-xy-staging</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">app-xy-test</span><span class="p">:</span><span class="w"></span>
+<span class="c1"># The applications that are synced by the `sync-app` command:</span>
+<span class="nt">applications</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">app-xy-production</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span>
+<span class="w">  </span><span class="nt">app-xy-staging</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">app-xy-test</span><span class="p">:</span>
 </code></pre></div>
 or</p>
-<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span><span class="w"> </span><span class="c1"># link to your apps root repository</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span><span class="w"> </span><span class="c1"># link to your apps root repository</span>
 
-<span class="c1"># The applications that are synced by the `sync-app` command:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">applications</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">app-xy-production</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span><span class="w"></span>
-<span class="w">   </span><span class="nt">app-xy-staging</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">app-xy-test</span><span class="p">:</span><span class="w"></span>
+<span class="c1"># The applications that are synced by the `sync-app` command:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">app-xy-production</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span>
+<span class="w">   </span><span class="nt">app-xy-staging</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">app-xy-test</span><span class="p">:</span>
 </code></pre></div>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>gitopscli sync-apps <span class="se">\</span>
-  --git-provider-url github <span class="se">\</span>
-  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
-  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
-  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
-  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
-  --organisation <span class="s2">&quot;company-deployments&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;team-1-app-config-repo&quot;</span> <span class="se">\</span>
-  --root-organisation <span class="s2">&quot;company-deployments&quot;</span> <span class="se">\</span>
-  --root-repository-name <span class="s2">&quot;root-config-repo&quot;</span>
+<div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>sync-apps<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-provider-url<span class="w"> </span>github<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;company-deployments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;team-1-app-config-repo&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--root-organisation<span class="w"> </span><span class="s2">&quot;company-deployments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--root-repository-name<span class="w"> </span><span class="s2">&quot;root-config-repo&quot;</span>
 </code></pre></div>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD

@@ -604,28 +604,28 @@
 <p>The <code>deploy</code> command can be used to deploy applications by updating the image tags in the YAML files of a config repository. Of course, you can also use it to update any YAML values in a git repository. However, only <em>one</em> YAML can be changed at a time.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
 <p>Let's assume you have a repository <code>deployment/myapp-non-prod</code> which contains your deployment configuration in the form of YAML files (e.g. <a href="https://helm.sh/">Helm</a> charts). To deploy a new version of your application you need to update some values in <code>example/values.yaml</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Example Helm values.yaml</span><span class="w"></span>
-<span class="nt">frontend</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-app/frontend</span><span class="w"></span>
-<span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span><span class="w"> </span><span class="c1"># &lt;- you want to change this value</span><span class="w"></span>
-<span class="nt">backend</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-app/backend</span><span class="w"></span>
-<span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span><span class="w"> </span><span class="c1"># &lt;- and this one</span><span class="w"></span>
-<span class="w">  </span><span class="nt">env</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TEST</span><span class="w"></span>
-<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"> </span><span class="c1"># &lt;- and this one in a list, selected via sibling value &#39;TEST&#39;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Example Helm values.yaml</span>
+<span class="nt">frontend</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-app/frontend</span>
+<span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span><span class="w"> </span><span class="c1"># &lt;- you want to change this value</span>
+<span class="nt">backend</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-app/backend</span>
+<span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span><span class="w"> </span><span class="c1"># &lt;- and this one</span>
+<span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TEST</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"> </span><span class="c1"># &lt;- and this one in a list, selected via sibling value &#39;TEST&#39;</span>
 </code></pre></div>
 <p>With the following command GitOps CLI will update all values on the default branch.</p>
-<div class="highlight"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
-  --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
-  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
-  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
-  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
-  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
-  --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
-  --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span>
+<div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>deploy<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;deployment&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;myapp-non-prod&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span><span class="s2">&quot;example/values.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--values<span class="w"> </span><span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span>
 </code></pre></div>
 <p>You could also use the list index to replace the latter (<code>my-app.env.[0].value</code>). For more details on the underlying <em>JSONPath</em> syntax, please refer to the <a href="https://github.com/h2non/jsonpath-ng#jsonpath-syntax">documenatation of the used library <em>jsonpath-ng</em></a>.</p>
 <h3 id="number-of-commits">Number Of Commits<a class="headerlink" href="#number-of-commits" title="Permanent link">&para;</a></h3>
@@ -662,33 +662,33 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 <h3 id="specific-commit-message">Specific Commit Message<a class="headerlink" href="#specific-commit-message" title="Permanent link">&para;</a></h3>
 <p>If you want to specify the commit message of the deployment then you can use the following param:</p>
 <p><code>--commit-message</code></p>
-<div class="highlight"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
-  --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
-  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
-  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
-  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
-  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
-  --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
-  --commit-message <span class="s2">&quot;test commit message&quot;</span> <span class="se">\</span>
-  --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span>
+<div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>deploy<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;deployment&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;myapp-non-prod&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--commit-message<span class="w"> </span><span class="s2">&quot;test commit message&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span><span class="s2">&quot;example/values.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--values<span class="w"> </span><span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span>
 </code></pre></div>
 <p>This will end up in one single commit with your specified commit-message.</p>
 <h3 id="create-pull-request">Create Pull Request<a class="headerlink" href="#create-pull-request" title="Permanent link">&para;</a></h3>
 <p>In some cases you might want to create a pull request for your updates. You can achieve this by adding <code>--create-pr</code> to the command. The pull request can be left open or merged directly with <code>--auto-merge</code>.</p>
-<div class="highlight"><pre><span></span><code>gitopscli deploy <span class="se">\</span>
-  --git-provider-url https://bitbucket.baloise.dev <span class="se">\</span>
-  --username <span class="nv">$GIT_USERNAME</span> <span class="se">\</span>
-  --password <span class="nv">$GIT_PASSWORD</span> <span class="se">\</span>
-  --git-user <span class="s2">&quot;GitOps CLI&quot;</span> <span class="se">\</span>
-  --git-email <span class="s2">&quot;gitopscli@baloise.dev&quot;</span> <span class="se">\</span>
-  --organisation <span class="s2">&quot;deployment&quot;</span> <span class="se">\</span>
-  --repository-name <span class="s2">&quot;myapp-non-prod&quot;</span> <span class="se">\</span>
-  --file <span class="s2">&quot;example/values.yaml&quot;</span> <span class="se">\</span>
-  --values <span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span> <span class="se">\</span>
-  --create-pr <span class="se">\</span>
-  --auto-merge
+<div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>deploy<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;deployment&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;myapp-non-prod&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span><span class="s2">&quot;example/values.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--values<span class="w"> </span><span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--create-pr<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--auto-merge
 </code></pre></div>
 <p><img alt="Example PR Overview" src="../../assets/images/screenshots/example-pr-overview.png?raw=true" title="Example of the created PR" />
 <img alt="Example PR Diff" src="../../assets/images/screenshots/example-pr-diff.png?raw=true" title="Example of the PR file diff" />
