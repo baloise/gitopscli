@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - '**' # TODO: master only
+      - master
 
 jobs:
   doc:
@@ -17,8 +17,6 @@ jobs:
           context: .
           target: docs-site
           outputs: type=local,dest=.
-      - name: log output
-        run: ls -la ./site
       - name: Deploy docs to GitHub Pages
         if: github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
