@@ -22,13 +22,13 @@ class RootRepo:
         return None
 
     def get_all_applications(self) -> list[str]:
-        apps: list[str] = list()
+        apps: list[str] = []
         for tenant in self.tenants.values():
             apps.extend(tenant.list_apps().keys())
         return apps
 
     def validate_tenant(self, tenant_config: AppTenantConfig) -> None:
-        apps_from_other_tenants: list[str] = list()
+        apps_from_other_tenants: list[str] = []
         for tenant in self.tenants.values():
             if tenant.repo_url != tenant_config.repo_url:
                 apps_from_other_tenants.extend(tenant.list_apps().keys())
@@ -39,7 +39,7 @@ class RootRepo:
 
 def __load_tenants_from_bootstrap_values(root_repo: GitRepo) -> dict[str, AppTenantConfig]:
     boostrap_tenant_list = __get_bootstrap_tenant_list(root_repo)
-    tenants = dict()
+    tenants = {}
     for bootstrap_tenant in boostrap_tenant_list:
         try:
             tenant_name = bootstrap_tenant["name"]

@@ -36,7 +36,8 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
             self.value_template = value_template
 
             for var in _VARIABLE_REGEX.findall(self.value_template):
-                if var not in self.__VARIABLE_MAPPERS.keys():
+                variables = self.__VARIABLE_MAPPERS.keys()
+                if var not in variables:
                     raise GitOpsException(
                         f"Replacement value '{self.value_template}' for path '{self.path}' "
                         f"contains invalid variable: {var}"

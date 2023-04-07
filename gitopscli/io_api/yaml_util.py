@@ -1,3 +1,4 @@
+import locale
 from io import StringIO
 from typing import Any
 from ruamel.yaml import YAML, YAMLError
@@ -13,7 +14,7 @@ class YAMLException(Exception):
 
 
 def yaml_file_load(file_path: str) -> Any:
-    with open(file_path, "r") as stream:
+    with open(file_path, "r", encoding=locale.getpreferredencoding(False)) as stream:
         try:
             return YAML_INSTANCE.load(stream)
         except YAMLError as ex:
@@ -21,7 +22,7 @@ def yaml_file_load(file_path: str) -> Any:
 
 
 def yaml_file_dump(yaml: Any, file_path: str) -> None:
-    with open(file_path, "w+") as stream:
+    with open(file_path, "w+", encoding=locale.getpreferredencoding(False)) as stream:
         YAML_INSTANCE.dump(yaml, stream)
 
 
