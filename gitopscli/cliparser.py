@@ -112,6 +112,15 @@ def __create_deploy_parser() -> ArgumentParser:
         type=__parse_bool,
         default=False,
     )
+    parser.add_argument(
+        "--pr-labels", help="JSON array pr labels (Gitlab, Github supported)", type=__parse_yaml, default=None
+    )
+    parser.add_argument(
+        "--merge-parameters",
+        help="JSON object pr parameters (only Gitlab supported)",
+        type=__parse_yaml,
+        default=None,
+    )
     __add_verbose_arg(parser)
     return parser
 

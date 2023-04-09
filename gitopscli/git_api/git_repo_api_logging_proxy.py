@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Literal
+from typing import Any, List, Dict, Optional, Literal
 from .git_repo_api import GitRepoApi
 
 
@@ -28,7 +28,12 @@ class GitRepoApiLoggingProxy(GitRepoApi):
         logging.info("Creating pull request from '%s' to '%s' with title: %s", from_branch, to_branch, title)
         return self.__api.create_pull_request(from_branch, to_branch, title, description)
 
-    def merge_pull_request(self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge") -> None:
+    def merge_pull_request(
+        self,
+        pr_id: int,
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+        merge_parameters: Dict[str, Any] = None,
+    ) -> None:
         logging.info("Merging pull request %s", pr_id)
         self.__api.merge_pull_request(pr_id, merge_method=merge_method)
 
@@ -50,3 +55,7 @@ class GitRepoApiLoggingProxy(GitRepoApi):
 
     def get_pull_request_branch(self, pr_id: int) -> str:
         return self.__api.get_pull_request_branch(pr_id)
+
+    def add_pull_request_label(self, pr_id: int, pr_labels: List[str]) -> None:
+        logging.info("Adding labels for pull request %s with content: %s", pr_id, pr_labels)
+        self.__api.add_pull_request_label(pr_id, pr_labels)

@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import List, Dict, Any, Optional, Literal
 import requests
 
 from atlassian import Bitbucket
@@ -74,7 +74,12 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException(pull_request["errors"][0]["message"])
         return GitRepoApi.PullRequestIdAndUrl(pr_id=pull_request["id"], url=pull_request["links"]["self"][0]["href"])
 
-    def merge_pull_request(self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge") -> None:
+    def merge_pull_request(
+        self,
+        pr_id: int,
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+        merge_parameters: Dict[str, Any] = None,
+    ) -> None:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(
             self.__organisation, self.__repository_name, pull_request["id"], pull_request["version"]
@@ -108,3 +113,6 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
     def __get_default_branch(self) -> str:
         default_branch = self.__bitbucket.get_default_branch(self.__organisation, self.__repository_name)
         return str(default_branch["id"])
+
+    def add_pull_request_label(self, pr_id: int, pr_labels: List[str]) -> None:
+        pass

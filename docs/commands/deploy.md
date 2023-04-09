@@ -135,16 +135,13 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
 options:
   -h, --help            show this help message and exit
   --file FILE           YAML file path
-  --values VALUES       YAML/JSON object with the YAML path as key and the
-                        desired value as value
+  --values VALUES       YAML/JSON object with the YAML path as key and the desired value as value
   --single-commit [SINGLE_COMMIT]
                         Create only single commit for all updates
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
-  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
-                        variable)
-  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
-                        env variable)
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
@@ -155,18 +152,19 @@ options:
   --git-provider GIT_PROVIDER
                         Git server provider
   --git-provider-url GIT_PROVIDER_URL
-                        Git provider base API URL (e.g.
-                        https://bitbucket.example.tld)
+                        Git provider base API URL (e.g. https://bitbucket.example.tld)
   --create-pr [CREATE_PR]
                         Creates a Pull Request
   --auto-merge [AUTO_MERGE]
-                        Automatically merge the created PR (only valid with
-                        --create-pr)
+                        Automatically merge the created PR (only valid with --create-pr)
   --merge-method MERGE_METHOD
-                        Merge Method (e.g., 'squash', 'rebase', 'merge')
-                        (default: merge)
-  --json
-                        Print a JSON object containing deployment information
+                        Merge Method (e.g., 'squash', 'rebase', 'merge') (default: merge)
+  --json [JSON]         Print a JSON object containing deployment information
+  --pr-labels PR_LABELS
+                        JSON array pr labels (Gitlab, Github supported)
+  --merge-parameters MERGE_PARAMETERS
+                        JSON object pr parameters (only Gitlab supported)
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
+
 ```

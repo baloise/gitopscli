@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import NamedTuple, Optional, Literal
+from typing import Any, List, Dict, NamedTuple, Optional, Literal
 
 
 class GitRepoApi(metaclass=ABCMeta):
@@ -32,7 +32,12 @@ class GitRepoApi(metaclass=ABCMeta):
         ...
 
     @abstractmethod
-    def merge_pull_request(self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge") -> None:
+    def merge_pull_request(
+        self,
+        pr_id: int,
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+        merge_parameters: Dict[str, Any] = None,
+    ) -> None:
         ...
 
     @abstractmethod
@@ -49,4 +54,8 @@ class GitRepoApi(metaclass=ABCMeta):
 
     @abstractmethod
     def get_pull_request_branch(self, pr_id: int) -> str:
+        ...
+
+    @abstractmethod
+    def add_pull_request_label(self, pr_id: int, pr_labels: List[str]) -> None:
         ...

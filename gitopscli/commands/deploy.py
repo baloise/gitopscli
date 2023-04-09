@@ -28,6 +28,8 @@ class DeployCommand(Command):
         auto_merge: bool
         json: bool
 
+        pr_labels: Optional[List[str]]
+        merge_parameters: Optional[Any]
         merge_method: Literal["squash", "rebase", "merge"] = "merge"
 
     def __init__(self, args: Args) -> None:
@@ -53,9 +55,13 @@ class DeployCommand(Command):
         if self.__args.create_pr:
             title, description = self.__create_pull_request_title_and_description(updated_values)
             pr_id = git_repo_api.create_pull_request_to_default_branch(pr_branch, title, description).pr_id
-
+            if self.__args.pr_labels:
+                git_repo_api.add_pull_request_label(pr_id, self.__args.pr_labels)
             if self.__args.auto_merge:
-                git_repo_api.merge_pull_request(pr_id, self.__args.merge_method)
+                if self.__args.merge_parameters:
+                    git_repo_api.merge_pull_request(pr_id, self.__args.merge_method, self.__args.merge_parameters)
+                else:
+                    git_repo_api.merge_pull_request(pr_id, self.__args.merge_method)
                 git_repo_api.delete_branch(pr_branch)
 
         if self.__args.json:

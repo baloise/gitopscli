@@ -68,6 +68,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -106,6 +108,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=True,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -156,6 +160,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=True,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -212,6 +218,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -259,6 +267,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -300,6 +310,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -335,6 +347,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message="testcommit",
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 
@@ -374,6 +388,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -404,6 +420,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -436,6 +454,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -468,6 +488,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         with pytest.raises(GitOpsException) as ex:
             DeployCommand(args).execute()
@@ -500,6 +522,8 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
             commit_message=None,
             json=False,
+            pr_labels=None,
+            merge_parameters=None,
         )
         DeployCommand(args).execute()
 

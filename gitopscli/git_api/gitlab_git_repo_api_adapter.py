@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Any, List, Dict, Optional, Literal
 import logging
 import time
 import requests
@@ -59,16 +59,21 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         )
         return GitRepoApi.PullRequestIdAndUrl(pr_id=merge_request.iid, url=merge_request.web_url)
 
-    def merge_pull_request(self, pr_id: int, merge_method: Literal["squash", "rebase", "merge"] = "merge") -> None:
+    def merge_pull_request(
+        self,
+        pr_id: int,
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+        merge_parameters: Dict[str, Any] = None,
+    ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
 
         max_retries = MAX_MERGE_RETRIES
         while max_retries > 0:
             try:
                 if merge_method == "rebase":
-                    merge_request.rebase()
+                    merge_request.rebase(merge_parameters)
                     return
-                merge_request.merge()
+                merge_request.merge(merge_parameters)
                 return
             except gitlab.exceptions.GitlabMRClosedError as ex:
                 # "Branch cannot be merged" error can occur if the server
@@ -97,8 +102,13 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         return str(merge_request.source_branch)
 
     def __get_default_branch(self) -> str:
-        branches = self.__project.branches.list()
+        branches = self.__project.branches.list(all=True)
         default_branch = next(filter(lambda x: x.default, branches), None)
         if default_branch is None:
             raise GitOpsException("Default branch does not exist")
         return str(default_branch.name)
+
+    def add_pull_request_label(self, pr_id: int, pr_labels: List[str]) -> None:
+        merge_request = self.__project.mergerequests.get(pr_id)
+        merge_request.labels = pr_labels
+        merge_request.save()
