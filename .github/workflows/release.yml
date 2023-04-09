@@ -47,4 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_IMAGE: baloise/gitopscli
+          DOCKER_BUILDKIT: '1' # use BuildKit backend (https://docs.docker.com/engine/reference/builder/#buildkit)
+          BUILDKIT_PROGRESS: plain
         run: npx semantic-release
