@@ -25,7 +25,7 @@ jobs:
           publish_dir: ./site
 
   release:
-    if: github.event.repository.fork == 'false'
+    if: github.repository == 'baloise/gitopscli'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
