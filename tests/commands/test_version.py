@@ -22,4 +22,4 @@ class VersionCommandTest(unittest.TestCase):
     def test_output(self):
         with captured_output() as stdout:
             VersionCommand(VersionCommand.Args()).execute()
-        assert re.match(r"^GitOps CLI version (?:\d+\.\d+\.\d+|UNRELEASED)\n$", stdout.getvalue())
+        assert re.match(r"^GitOps CLI version \d+\.\d+\.\d+\n$", stdout.getvalue())
