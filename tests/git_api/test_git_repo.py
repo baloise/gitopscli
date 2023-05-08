@@ -208,7 +208,13 @@ echo password='Pass'
             with open(testee.get_full_file_path("README.md"), "w") as outfile:
                 outfile.write("new content")
 
-            commit_hash = testee.commit(git_user="john doe", git_email="john@doe.com", message="new commit")
+            commit_hash = testee.commit(
+                git_user="john doe",
+                git_email="john@doe.com",
+                git_co_author_name=None,
+                git_co_author_email=None,
+                message="new commit",
+            )
             repo = Repo(testee.get_full_file_path("."))
             commits = list(repo.iter_commits("master"))
 
@@ -223,12 +229,49 @@ echo password='Pass'
         logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
 
     @patch("gitopscli.git_api.git_repo.logging")
+    def test_commit_with_co_author(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone()
+            logging_mock.reset_mock()
+
+            with open(testee.get_full_file_path("foo.md"), "w") as outfile:
+                outfile.write("new file")
+            with open(testee.get_full_file_path("README.md"), "w") as outfile:
+                outfile.write("new content")
+
+            commit_hash = testee.commit(
+                git_user="john doe",
+                git_email="john@doe.com",
+                git_co_author_name="co author",
+                git_co_author_email="co@author.com",
+                message="new commit",
+            )
+            repo = Repo(testee.get_full_file_path("."))
+            commits = list(repo.iter_commits("master"))
+
+            self.assertIsNotNone(commit_hash)
+            self.assertRegex(commit_hash, "^[a-f0-9]{40}$", "Not a long commit hash")
+            self.assertEqual(2, len(commits))
+            self.assertEqual("new commit\n\nCo-authored-by: co author <co@author.com>\n", commits[0].message)
+            self.assertEqual("john doe", commits[0].author.name)
+            self.assertEqual("john@doe.com", commits[0].author.email)
+            self.assertIn("foo.md", commits[0].stats.files)
+            self.assertIn("README.md", commits[0].stats.files)
+        logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
+
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_commit_nothing_to_commit(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
             logging_mock.reset_mock()
 
-            commit_hash = testee.commit(git_user="john doe", git_email="john@doe.com", message="empty commit")
+            commit_hash = testee.commit(
+                git_user="john doe",
+                git_email="john@doe.com",
+                git_co_author_name=None,
+                git_co_author_email=None,
+                message="empty commit",
+            )
             repo = Repo(testee.get_full_file_path("."))
             commits = list(repo.iter_commits("master"))
 

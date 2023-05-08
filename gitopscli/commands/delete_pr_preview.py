@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from gitopscli.git_api import GitApiConfig
 from .delete_preview import DeletePreviewCommand
 from .command import Command
@@ -9,6 +10,9 @@ class DeletePrPreviewCommand(Command):
     class Args(GitApiConfig):
         git_user: str
         git_email: str
+
+        git_co_author_name: Optional[str]
+        git_co_author_email: Optional[str]
 
         organisation: str
         repository_name: str
@@ -27,6 +31,8 @@ class DeletePrPreviewCommand(Command):
                 password=args.password,
                 git_user=args.git_user,
                 git_email=args.git_email,
+                git_co_author_name=args.git_co_author_name,
+                git_co_author_email=args.git_co_author_email,
                 organisation=args.organisation,
                 repository_name=args.repository_name,
                 git_provider=args.git_provider,

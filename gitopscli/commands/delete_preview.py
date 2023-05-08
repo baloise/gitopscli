@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from typing import Optional
 from dataclasses import dataclass
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory, GitRepoApi
 from gitopscli.gitops_config import GitOpsConfig
@@ -14,6 +15,9 @@ class DeletePreviewCommand(Command):
     class Args(GitApiConfig):
         git_user: str
         git_email: str
+
+        git_co_author_name: Optional[str]
+        git_co_author_email: Optional[str]
 
         organisation: str
         repository_name: str
@@ -60,7 +64,13 @@ class DeletePreviewCommand(Command):
         )
 
     def __commit_and_push(self, git_repo: GitRepo, message: str) -> None:
-        git_repo.commit(self.__args.git_user, self.__args.git_email, message)
+        git_repo.commit(
+            self.__args.git_user,
+            self.__args.git_email,
+            self.__args.git_co_author_name,
+            self.__args.git_co_author_email,
+            message,
+        )
         git_repo.push()
 
     @staticmethod

@@ -22,13 +22,17 @@ gitopscli create-pr-preview \
 
 ## Usage
 ```
-usage: gitopscli create-pr-preview [-h] --username USERNAME --password PASSWORD
-                                [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                                --organisation ORGANISATION --repository-name
-                                REPOSITORY_NAME [--git-provider GIT_PROVIDER]
-                                [--git-provider-url GIT_PROVIDER_URL]
-                                --pr-id PR_ID
-                                [--parent-id PARENT_ID] [-v [VERBOSE]]
+usage: gitopscli create-pr-preview [-h] --username USERNAME --password
+                                   PASSWORD [--git-user GIT_USER]
+                                   [--git-email GIT_EMAIL]
+                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   --organisation ORGANISATION
+                                   --repository-name REPOSITORY_NAME
+                                   [--git-provider GIT_PROVIDER]
+                                   [--git-provider-url GIT_PROVIDER_URL]
+                                   --pr-id PR_ID [--parent-id PARENT_ID]
+                                   [-v [VERBOSE]]
 
 options:
   -h, --help            show this help message and exit
@@ -39,6 +43,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME

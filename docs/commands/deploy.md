@@ -125,26 +125,37 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--single-commit [SINGLE_COMMIT]]
                         [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
-                        [--git-email GIT_EMAIL] --organisation ORGANISATION
-                        --repository-name REPOSITORY_NAME
-                        [--git-provider GIT_PROVIDER]
+                        [--git-email GIT_EMAIL]
+                        [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                        [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                        --organisation ORGANISATION --repository-name
+                        REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
-                        [--merge-method MERGE_METHOD] [-v [VERBOSE]]
+                        [--merge-method MERGE_METHOD] [--json [JSON]]
+                        [--pr-labels PR_LABELS]
+                        [--merge-parameters MERGE_PARAMETERS] [-v [VERBOSE]]
 
 options:
   -h, --help            show this help message and exit
   --file FILE           YAML file path
-  --values VALUES       YAML/JSON object with the YAML path as key and the desired value as value
+  --values VALUES       YAML/JSON object with the YAML path as key and the
+                        desired value as value
   --single-commit [SINGLE_COMMIT]
                         Create only single commit for all updates
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
-  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env variable)
-  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD env variable)
+  --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
+                        variable)
+  --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
+                        env variable)
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME

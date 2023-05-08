@@ -85,6 +85,8 @@ options:
 EXPECTED_CREATE_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
+                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -95,9 +97,11 @@ gitopscli create-preview: error: the following arguments are required: --usernam
 EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
-                                   [--git-email GIT_EMAIL] --organisation
-                                   ORGANISATION --repository-name
-                                   REPOSITORY_NAME
+                                   [--git-email GIT_EMAIL]
+                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   --organisation ORGANISATION
+                                   --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
                                    [--git-provider-url GIT_PROVIDER_URL]
                                    --pr-id PR_ID [--parent-id PARENT_ID]
@@ -108,6 +112,8 @@ gitopscli create-pr-preview: error: the following arguments are required: --user
 EXPECTED_CREATE_PREVIEW_HELP = """\
 usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
+                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -123,6 +129,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -142,9 +152,11 @@ options:
 EXPECTED_CREATE_PR_PREVIEW_HELP = """\
 usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
-                                   [--git-email GIT_EMAIL] --organisation
-                                   ORGANISATION --repository-name
-                                   REPOSITORY_NAME
+                                   [--git-email GIT_EMAIL]
+                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   --organisation ORGANISATION
+                                   --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
                                    [--git-provider-url GIT_PROVIDER_URL]
                                    --pr-id PR_ID [--parent-id PARENT_ID]
@@ -159,6 +171,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -178,6 +194,8 @@ options:
 EXPECTED_DELETE_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
+                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -190,9 +208,11 @@ gitopscli delete-preview: error: the following arguments are required: --usernam
 EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
-                                   [--git-email GIT_EMAIL] --organisation
-                                   ORGANISATION --repository-name
-                                   REPOSITORY_NAME
+                                   [--git-email GIT_EMAIL]
+                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   --organisation ORGANISATION
+                                   --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
                                    [--git-provider-url GIT_PROVIDER_URL]
                                    --branch BRANCH
@@ -204,6 +224,8 @@ gitopscli delete-pr-preview: error: the following arguments are required: --user
 EXPECTED_DELETE_PREVIEW_HELP = """\
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
+                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -220,6 +242,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -240,9 +266,11 @@ options:
 EXPECTED_DELETE_PR_PREVIEW_HELP = """\
 usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
-                                   [--git-email GIT_EMAIL] --organisation
-                                   ORGANISATION --repository-name
-                                   REPOSITORY_NAME
+                                   [--git-email GIT_EMAIL]
+                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   --organisation ORGANISATION
+                                   --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
                                    [--git-provider-url GIT_PROVIDER_URL]
                                    --branch BRANCH
@@ -258,6 +286,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -279,9 +311,11 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--single-commit [SINGLE_COMMIT]]
                         [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
-                        [--git-email GIT_EMAIL] --organisation ORGANISATION
-                        --repository-name REPOSITORY_NAME
-                        [--git-provider GIT_PROVIDER]
+                        [--git-email GIT_EMAIL]
+                        [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                        [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                        --organisation ORGANISATION --repository-name
+                        REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
                         [--merge-method MERGE_METHOD] [--json [JSON]]
@@ -295,9 +329,11 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--single-commit [SINGLE_COMMIT]]
                         [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
-                        [--git-email GIT_EMAIL] --organisation ORGANISATION
-                        --repository-name REPOSITORY_NAME
-                        [--git-provider GIT_PROVIDER]
+                        [--git-email GIT_EMAIL]
+                        [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                        [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                        --organisation ORGANISATION --repository-name
+                        REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
                         [--create-pr [CREATE_PR]] [--auto-merge [AUTO_MERGE]]
                         [--merge-method MERGE_METHOD] [--json [JSON]]
@@ -320,6 +356,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -349,6 +389,8 @@ options:
 EXPECTED_SYNC_APPS_NO_ARGS_ERROR = """\
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-user GIT_USER] [--git-email GIT_EMAIL]
+                           [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                           [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
                            --organisation ORGANISATION --repository-name
                            REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                            [--git-provider-url GIT_PROVIDER_URL]
@@ -361,6 +403,8 @@ gitopscli sync-apps: error: the following arguments are required: --username, --
 EXPECTED_SYNC_APPS_HELP = """\
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-user GIT_USER] [--git-email GIT_EMAIL]
+                           [--git-co-author-name GIT_CO_AUTHOR_NAME]
+                           [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
                            --organisation ORGANISATION --repository-name
                            REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                            [--git-provider-url GIT_PROVIDER_URL]
@@ -377,6 +421,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-co-author-name GIT_CO_AUTHOR_NAME
+                        Git Co-Author Name
+  --git-co-author-email GIT_CO_AUTHOR_EMAIL
+                        Git Co-Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -651,6 +699,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-co-author-name",
+                "GIT_CO_AUTHOR_NAME",
+                "--git-co-author-email",
+                "GIT_CO_AUTHOR_EMAIL",
                 "--git-provider",
                 "Bitbucket-Server",
                 "--git-provider-url",
@@ -672,6 +724,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
+        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
@@ -748,6 +802,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-co-author-name",
+                "GIT_CO_AUTHOR_NAME",
+                "--git-co-author-email",
+                "GIT_CO_AUTHOR_EMAIL",
                 "--git-provider",
                 "Github",
                 "--git-provider-url",
@@ -769,6 +827,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
+        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.pr_id, 4711)
@@ -845,6 +905,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-co-author-name",
+                "GIT_CO_AUTHOR_NAME",
+                "--git-co-author-email",
+                "GIT_CO_AUTHOR_EMAIL",
                 "--git-provider",
                 "bitbucket-server",
                 "--git-provider-url",
@@ -866,6 +930,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
+        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.preview_id, "abc123")
@@ -942,6 +1008,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-co-author-name",
+                "GIT_CO_AUTHOR_NAME",
+                "--git-co-author-email",
+                "GIT_CO_AUTHOR_EMAIL",
                 "--git-provider",
                 "github",
                 "--git-provider-url",
@@ -963,6 +1033,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
+        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.branch, "BRANCH")
@@ -1044,6 +1116,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-co-author-name",
+                "GIT_CO_AUTHOR_NAME",
+                "--git-co-author-email",
+                "GIT_CO_AUTHOR_EMAIL",
                 "--git-provider",
                 "Bitbucket-Server",
                 "--git-provider-url",
@@ -1069,6 +1145,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
+        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.file, "FILE")
@@ -1150,6 +1228,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
+                "--git-co-author-name",
+                "GIT_CO_AUTHOR_NAME",
+                "--git-co-author-email",
+                "GIT_CO_AUTHOR_EMAIL",
                 "--git-provider",
                 "GitHub",
                 "--git-provider-url",
@@ -1172,6 +1254,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
+        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
+        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.root_organisation, "ROOT_ORGA")

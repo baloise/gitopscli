@@ -70,7 +70,14 @@ class GitRepo:
         except GitError as ex:
             raise GitOpsException(f"Error creating new branch '{branch}'.") from ex
 
-    def commit(self, git_user: str, git_email: str, message: str) -> Optional[str]:
+    def commit(
+        self,
+        git_user: str,
+        git_email: str,
+        git_co_author_name: Optional[str],
+        git_co_author_email: Optional[str],
+        message: str,
+    ) -> Optional[str]:
         repo = self.__get_repo()
         try:
             repo.git.add("--all")
@@ -78,6 +85,8 @@ class GitRepo:
                 logging.info("Creating commit with message: %s", message)
                 repo.config_writer().set_value("user", "name", git_user).release()
                 repo.config_writer().set_value("user", "email", git_email).release()
+                if git_co_author_name and git_co_author_email:
+                    message += f"\n\nCo-authored-by: {git_co_author_name} <{git_co_author_email}>"
                 repo.git.commit("-m", message, "--author", f"{git_user} <{git_email}>")
                 return str(repo.head.commit.hexsha)
         except GitError as ex:

@@ -10,10 +10,14 @@ from .command import Command
 
 
 class DeployCommand(Command):
+    # pylint: disable=too-many-instance-attributes
     @dataclass(frozen=True)
     class Args(GitApiConfig):
         git_user: str
         git_email: str
+
+        git_co_author_name: Optional[str]
+        git_co_author_email: Optional[str]
 
         organisation: str
         repository_name: str
@@ -119,6 +123,12 @@ class DeployCommand(Command):
         return title, description
 
     def __commit(self, git_repo: GitRepo, message: str) -> None:
-        commit_hash = git_repo.commit(self.__args.git_user, self.__args.git_email, message)
+        commit_hash = git_repo.commit(
+            self.__args.git_user,
+            self.__args.git_email,
+            self.__args.git_co_author_name,
+            self.__args.git_co_author_email,
+            message,
+        )
         if commit_hash:
             self.__commit_hashes.append(commit_hash)
