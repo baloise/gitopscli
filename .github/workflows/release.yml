@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: 'lts/*'
       - name: Install dependencies
-        run: npm install semantic-release @semantic-release/exec @google/semantic-release-replace-plugin conventional-changelog-conventionalcommits
+        run: npm install semantic-release @semantic-release/exec semantic-release-replace-plugin conventional-changelog-conventionalcommits
       - name: Release
         if: github.ref == 'refs/heads/master'
         env:
