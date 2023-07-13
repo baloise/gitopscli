@@ -4,7 +4,7 @@ tagFormat: "v${version}"
 plugins:
 - "@semantic-release/commit-analyzer"
 - "@semantic-release/release-notes-generator"
-- - "@google/semantic-release-replace-plugin"
+- - "semantic-release-replace-plugin"
   - replacements:
     - files: [ "setup.py "]
       from: "version=\"0.0.0\""
