@@ -16,8 +16,8 @@ class DeletePreviewCommand(Command):
         git_user: str
         git_email: str
 
-        git_co_author_name: Optional[str]
-        git_co_author_email: Optional[str]
+        git_author_name: Optional[str]
+        git_author_email: Optional[str]
 
         organisation: str
         repository_name: str
@@ -67,8 +67,8 @@ class DeletePreviewCommand(Command):
         git_repo.commit(
             self.__args.git_user,
             self.__args.git_email,
-            self.__args.git_co_author_name,
-            self.__args.git_co_author_email,
+            self.__args.git_author_name,
+            self.__args.git_author_email,
             message,
         )
         git_repo.push()

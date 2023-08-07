@@ -21,8 +21,8 @@ gitopscli delete-pr-preview \
 usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
                                    [--git-email GIT_EMAIL]
-                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   [--git-author-name GIT_AUTHOR_NAME]
+                                   [--git-author-email GIT_AUTHOR_EMAIL]
                                    --organisation ORGANISATION
                                    --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
@@ -40,10 +40,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
-  --git-co-author-name GIT_CO_AUTHOR_NAME
-                        Git Co-Author Name
-  --git-co-author-email GIT_CO_AUTHOR_EMAIL
-                        Git Co-Author Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME

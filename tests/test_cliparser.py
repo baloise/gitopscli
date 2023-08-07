@@ -85,8 +85,8 @@ options:
 EXPECTED_CREATE_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                [--git-author-name GIT_AUTHOR_NAME]
+                                [--git-author-email GIT_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -98,8 +98,8 @@ EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
                                    [--git-email GIT_EMAIL]
-                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   [--git-author-name GIT_AUTHOR_NAME]
+                                   [--git-author-email GIT_AUTHOR_EMAIL]
                                    --organisation ORGANISATION
                                    --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
@@ -112,8 +112,8 @@ gitopscli create-pr-preview: error: the following arguments are required: --user
 EXPECTED_CREATE_PREVIEW_HELP = """\
 usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                [--git-author-name GIT_AUTHOR_NAME]
+                                [--git-author-email GIT_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -129,10 +129,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
-  --git-co-author-name GIT_CO_AUTHOR_NAME
-                        Git Co-Author Name
-  --git-co-author-email GIT_CO_AUTHOR_EMAIL
-                        Git Co-Author Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -153,8 +153,8 @@ EXPECTED_CREATE_PR_PREVIEW_HELP = """\
 usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
                                    [--git-email GIT_EMAIL]
-                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   [--git-author-name GIT_AUTHOR_NAME]
+                                   [--git-author-email GIT_AUTHOR_EMAIL]
                                    --organisation ORGANISATION
                                    --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
@@ -171,10 +171,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
-  --git-co-author-name GIT_CO_AUTHOR_NAME
-                        Git Co-Author Name
-  --git-co-author-email GIT_CO_AUTHOR_EMAIL
-                        Git Co-Author Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -194,8 +194,8 @@ options:
 EXPECTED_DELETE_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                [--git-author-name GIT_AUTHOR_NAME]
+                                [--git-author-email GIT_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -209,8 +209,8 @@ EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
                                    [--git-email GIT_EMAIL]
-                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   [--git-author-name GIT_AUTHOR_NAME]
+                                   [--git-author-email GIT_AUTHOR_EMAIL]
                                    --organisation ORGANISATION
                                    --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
@@ -224,8 +224,8 @@ gitopscli delete-pr-preview: error: the following arguments are required: --user
 EXPECTED_DELETE_PREVIEW_HELP = """\
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                                [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                [--git-author-name GIT_AUTHOR_NAME]
+                                [--git-author-email GIT_AUTHOR_EMAIL]
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL]
@@ -242,10 +242,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
-  --git-co-author-name GIT_CO_AUTHOR_NAME
-                        Git Co-Author Name
-  --git-co-author-email GIT_CO_AUTHOR_EMAIL
-                        Git Co-Author Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -267,8 +267,8 @@ EXPECTED_DELETE_PR_PREVIEW_HELP = """\
 usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
                                    [--git-email GIT_EMAIL]
-                                   [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                                   [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                                   [--git-author-name GIT_AUTHOR_NAME]
+                                   [--git-author-email GIT_AUTHOR_EMAIL]
                                    --organisation ORGANISATION
                                    --repository-name REPOSITORY_NAME
                                    [--git-provider GIT_PROVIDER]
@@ -286,10 +286,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
-  --git-co-author-name GIT_CO_AUTHOR_NAME
-                        Git Co-Author Name
-  --git-co-author-email GIT_CO_AUTHOR_EMAIL
-                        Git Co-Author Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -312,8 +312,8 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
                         [--git-email GIT_EMAIL]
-                        [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                        [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                        [--git-author-name GIT_AUTHOR_NAME]
+                        [--git-author-email GIT_AUTHOR_EMAIL]
                         --organisation ORGANISATION --repository-name
                         REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
@@ -330,8 +330,8 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--commit-message COMMIT_MESSAGE] --username USERNAME
                         --password PASSWORD [--git-user GIT_USER]
                         [--git-email GIT_EMAIL]
-                        [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                        [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                        [--git-author-name GIT_AUTHOR_NAME]
+                        [--git-author-email GIT_AUTHOR_EMAIL]
                         --organisation ORGANISATION --repository-name
                         REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                         [--git-provider-url GIT_PROVIDER_URL]
@@ -356,10 +356,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
-  --git-co-author-name GIT_CO_AUTHOR_NAME
-                        Git Co-Author Name
-  --git-co-author-email GIT_CO_AUTHOR_EMAIL
-                        Git Co-Author Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -389,8 +389,8 @@ options:
 EXPECTED_SYNC_APPS_NO_ARGS_ERROR = """\
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                           [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                           [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                           [--git-author-name GIT_AUTHOR_NAME]
+                           [--git-author-email GIT_AUTHOR_EMAIL]
                            --organisation ORGANISATION --repository-name
                            REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                            [--git-provider-url GIT_PROVIDER_URL]
@@ -403,8 +403,8 @@ gitopscli sync-apps: error: the following arguments are required: --username, --
 EXPECTED_SYNC_APPS_HELP = """\
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-user GIT_USER] [--git-email GIT_EMAIL]
-                           [--git-co-author-name GIT_CO_AUTHOR_NAME]
-                           [--git-co-author-email GIT_CO_AUTHOR_EMAIL]
+                           [--git-author-name GIT_AUTHOR_NAME]
+                           [--git-author-email GIT_AUTHOR_EMAIL]
                            --organisation ORGANISATION --repository-name
                            REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                            [--git-provider-url GIT_PROVIDER_URL]
@@ -421,10 +421,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
-  --git-co-author-name GIT_CO_AUTHOR_NAME
-                        Git Co-Author Name
-  --git-co-author-email GIT_CO_AUTHOR_EMAIL
-                        Git Co-Author Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
@@ -490,40 +490,46 @@ class CliParserTest(unittest.TestCase):
     def assertType(self, o: object, t: type):
         self.assertTrue(isinstance(o, t))
 
+    def assertEqualIgnoringWhitespaceAndNewlines(self, expected, actual):
+        def normalize_string(s):
+            return " ".join(s.split())
+
+        self.assertEqual(normalize_string(expected), normalize_string(actual))
+
     def test_no_args(self):
         exit_code, stdout, stderr = self._capture_parse_args([])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_GITOPSCLI_HELP, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_GITOPSCLI_HELP, stderr)
 
     def test_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_GITOPSCLI_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_GITOPSCLI_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["-h"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_GITOPSCLI_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_GITOPSCLI_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_no_args(self):
         exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_ADD_PR_COMMENT_NO_ARGS_ERROR, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_ADD_PR_COMMENT_NO_ARGS_ERROR, stderr)
 
     def test_add_pr_comment_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_required_args(self):
@@ -634,18 +640,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["create-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_CREATE_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_create_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_CREATE_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_CREATE_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_preview_required_args(self):
@@ -699,10 +705,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
-                "--git-co-author-name",
-                "GIT_CO_AUTHOR_NAME",
-                "--git-co-author-email",
-                "GIT_CO_AUTHOR_EMAIL",
+                "--git-author-name",
+                "GIT_AUTHOR_NAME",
+                "--git-author-email",
+                "GIT_AUTHOR_EMAIL",
                 "--git-provider",
                 "Bitbucket-Server",
                 "--git-provider-url",
@@ -724,8 +730,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
-        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
-        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
+        self.assertEqual(args.git_author_name, "GIT_AUTHOR_NAME")
+        self.assertEqual(args.git_author_email, "GIT_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.git_hash, "c0784a34e834117e1489973327ff4ff3c2582b94")
@@ -739,18 +745,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_create_pr_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_pr_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_pr_preview_required_args(self):
@@ -802,10 +808,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
-                "--git-co-author-name",
-                "GIT_CO_AUTHOR_NAME",
-                "--git-co-author-email",
-                "GIT_CO_AUTHOR_EMAIL",
+                "--git-author-name",
+                "GIT_AUTHOR_NAME",
+                "--git-author-email",
+                "GIT_AUTHOR_EMAIL",
                 "--git-provider",
                 "Github",
                 "--git-provider-url",
@@ -827,8 +833,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
-        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
-        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
+        self.assertEqual(args.git_author_name, "GIT_AUTHOR_NAME")
+        self.assertEqual(args.git_author_email, "GIT_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.pr_id, 4711)
@@ -842,18 +848,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_DELETE_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_delete_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_DELETE_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_DELETE_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_preview_required_args(self):
@@ -905,10 +911,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
-                "--git-co-author-name",
-                "GIT_CO_AUTHOR_NAME",
-                "--git-co-author-email",
-                "GIT_CO_AUTHOR_EMAIL",
+                "--git-author-name",
+                "GIT_AUTHOR_NAME",
+                "--git-author-email",
+                "GIT_AUTHOR_EMAIL",
                 "--git-provider",
                 "bitbucket-server",
                 "--git-provider-url",
@@ -930,8 +936,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
-        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
-        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
+        self.assertEqual(args.git_author_name, "GIT_AUTHOR_NAME")
+        self.assertEqual(args.git_author_email, "GIT_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.preview_id, "abc123")
@@ -945,18 +951,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_delete_pr_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_pr_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_pr_preview_required_args(self):
@@ -1008,10 +1014,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
-                "--git-co-author-name",
-                "GIT_CO_AUTHOR_NAME",
-                "--git-co-author-email",
-                "GIT_CO_AUTHOR_EMAIL",
+                "--git-author-name",
+                "GIT_AUTHOR_NAME",
+                "--git-author-email",
+                "GIT_AUTHOR_EMAIL",
                 "--git-provider",
                 "github",
                 "--git-provider-url",
@@ -1033,8 +1039,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
-        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
-        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
+        self.assertEqual(args.git_author_name, "GIT_AUTHOR_NAME")
+        self.assertEqual(args.git_author_email, "GIT_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.branch, "BRANCH")
@@ -1048,18 +1054,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["deploy"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_DEPLOY_NO_ARGS_ERROR, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DEPLOY_NO_ARGS_ERROR, stderr)
 
     def test_deploy_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["deploy", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_DEPLOY_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DEPLOY_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_deploy_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["deploy", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_DEPLOY_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DEPLOY_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_deploy_required_args(self):
@@ -1116,10 +1122,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
-                "--git-co-author-name",
-                "GIT_CO_AUTHOR_NAME",
-                "--git-co-author-email",
-                "GIT_CO_AUTHOR_EMAIL",
+                "--git-author-name",
+                "GIT_AUTHOR_NAME",
+                "--git-author-email",
+                "GIT_AUTHOR_EMAIL",
                 "--git-provider",
                 "Bitbucket-Server",
                 "--git-provider-url",
@@ -1145,8 +1151,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
-        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
-        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
+        self.assertEqual(args.git_author_name, "GIT_AUTHOR_NAME")
+        self.assertEqual(args.git_author_email, "GIT_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.file, "FILE")
@@ -1163,18 +1169,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["sync-apps"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqual(EXPECTED_SYNC_APPS_NO_ARGS_ERROR, stderr)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_SYNC_APPS_NO_ARGS_ERROR, stderr)
 
     def test_sync_apps_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["sync-apps", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_SYNC_APPS_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_SYNC_APPS_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_sync_apps_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["sync-apps", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_SYNC_APPS_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_SYNC_APPS_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_sync_apps_required_args(self):
@@ -1228,10 +1234,10 @@ class CliParserTest(unittest.TestCase):
                 "GIT_USER",
                 "--git-email",
                 "GIT_EMAIL",
-                "--git-co-author-name",
-                "GIT_CO_AUTHOR_NAME",
-                "--git-co-author-email",
-                "GIT_CO_AUTHOR_EMAIL",
+                "--git-author-name",
+                "GIT_AUTHOR_NAME",
+                "--git-author-email",
+                "GIT_AUTHOR_EMAIL",
                 "--git-provider",
                 "GitHub",
                 "--git-provider-url",
@@ -1254,8 +1260,8 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.password, "PASS")
         self.assertEqual(args.git_user, "GIT_USER")
         self.assertEqual(args.git_email, "GIT_EMAIL")
-        self.assertEqual(args.git_co_author_name, "GIT_CO_AUTHOR_NAME")
-        self.assertEqual(args.git_co_author_email, "GIT_CO_AUTHOR_EMAIL")
+        self.assertEqual(args.git_author_name, "GIT_AUTHOR_NAME")
+        self.assertEqual(args.git_author_email, "GIT_AUTHOR_EMAIL")
         self.assertEqual(args.organisation, "ORG")
         self.assertEqual(args.repository_name, "REPO")
         self.assertEqual(args.root_organisation, "ROOT_ORGA")
@@ -1272,7 +1278,7 @@ class CliParserTest(unittest.TestCase):
     def test_version_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["version", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqual(EXPECTED_VERSION_HELP, stdout)
+        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_VERSION_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_invalid_boolean(self):

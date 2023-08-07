@@ -74,10 +74,11 @@ class GitRepo:
         self,
         git_user: str,
         git_email: str,
-        git_co_author_name: Optional[str],
-        git_co_author_email: Optional[str],
+        git_author_name: Optional[str],
+        git_author_email: Optional[str],
         message: str,
     ) -> Optional[str]:
+        self.__validate_git_author(git_author_name, git_author_email)
         repo = self.__get_repo()
         try:
             repo.git.add("--all")
@@ -85,13 +86,18 @@ class GitRepo:
                 logging.info("Creating commit with message: %s", message)
                 repo.config_writer().set_value("user", "name", git_user).release()
                 repo.config_writer().set_value("user", "email", git_email).release()
-                if git_co_author_name and git_co_author_email:
-                    message += f"\n\nCo-authored-by: {git_co_author_name} <{git_co_author_email}>"
-                repo.git.commit("-m", message, "--author", f"{git_user} <{git_email}>")
+                if not git_author_name or not git_author_email:
+                    git_author_name = git_user
+                    git_author_email = git_email
+                repo.git.commit("-m", message, "--author", f"{git_author_name} <{git_author_email}>")
                 return str(repo.head.commit.hexsha)
         except GitError as ex:
             raise GitOpsException("Error creating commit.") from ex
         return None
+
+    def __validate_git_author(self, name: Optional[str], email: Optional[str]) -> None:
+        if (name and not email) or (not name and email):
+            raise GitOpsException("Please provide the name and email address of the Git author or provide neither!")
 
     def push(self, branch: Optional[str] = None) -> None:
         repo = self.__get_repo()

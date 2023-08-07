@@ -219,8 +219,8 @@ def __add_git_credentials_args(deploy_p: ArgumentParser) -> None:
 def __add_git_commit_user_args(deploy_p: ArgumentParser) -> None:
     deploy_p.add_argument("--git-user", help="Git Username", default="GitOpsCLI")
     deploy_p.add_argument("--git-email", help="Git User Email", default="gitopscli@baloise.dev")
-    deploy_p.add_argument("--git-co-author-name", help="Git Co-Author Name")
-    deploy_p.add_argument("--git-co-author-email", help="Git Co-Author Email")
+    deploy_p.add_argument("--git-author-name", help="Git Author Name")
+    deploy_p.add_argument("--git-author-email", help="Git Author Email")
 
 
 def __add_git_org_and_repo_args(deploy_p: ArgumentParser) -> None:

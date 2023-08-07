@@ -211,8 +211,8 @@ echo password='Pass'
             commit_hash = testee.commit(
                 git_user="john doe",
                 git_email="john@doe.com",
-                git_co_author_name=None,
-                git_co_author_email=None,
+                git_author_name=None,
+                git_author_email=None,
                 message="new commit",
             )
             repo = Repo(testee.get_full_file_path("."))
@@ -222,6 +222,8 @@ echo password='Pass'
             self.assertRegex(commit_hash, "^[a-f0-9]{40}$", "Not a long commit hash")
             self.assertEqual(2, len(commits))
             self.assertEqual("new commit\n", commits[0].message)
+            self.assertEqual("john doe", commits[0].committer.name)
+            self.assertEqual("john@doe.com", commits[0].committer.email)
             self.assertEqual("john doe", commits[0].author.name)
             self.assertEqual("john@doe.com", commits[0].author.email)
             self.assertIn("foo.md", commits[0].stats.files)
@@ -229,7 +231,7 @@ echo password='Pass'
         logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
 
     @patch("gitopscli.git_api.git_repo.logging")
-    def test_commit_with_co_author(self, logging_mock):
+    def test_commit_with_custom_author(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
             logging_mock.reset_mock()
@@ -242,8 +244,8 @@ echo password='Pass'
             commit_hash = testee.commit(
                 git_user="john doe",
                 git_email="john@doe.com",
-                git_co_author_name="co author",
-                git_co_author_email="co@author.com",
+                git_author_name="custom author",
+                git_author_email="custom@author.com",
                 message="new commit",
             )
             repo = Repo(testee.get_full_file_path("."))
@@ -252,12 +254,44 @@ echo password='Pass'
             self.assertIsNotNone(commit_hash)
             self.assertRegex(commit_hash, "^[a-f0-9]{40}$", "Not a long commit hash")
             self.assertEqual(2, len(commits))
-            self.assertEqual("new commit\n\nCo-authored-by: co author <co@author.com>\n", commits[0].message)
-            self.assertEqual("john doe", commits[0].author.name)
-            self.assertEqual("john@doe.com", commits[0].author.email)
+            self.assertEqual("new commit\n", commits[0].message)
+            self.assertEqual("john doe", commits[0].committer.name)
+            self.assertEqual("john@doe.com", commits[0].committer.email)
+            self.assertEqual("custom author", commits[0].author.name)
+            self.assertEqual("custom@author.com", commits[0].author.email)
             self.assertIn("foo.md", commits[0].stats.files)
             self.assertIn("README.md", commits[0].stats.files)
         logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_commit_with_custom_author_name_but_no_email_returns_validation_error(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            with pytest.raises(GitOpsException) as ex:
+                testee.commit(
+                    git_user="john doe",
+                    git_email="john@doe.com",
+                    git_author_name="custom author",
+                    git_author_email="",  # missing
+                    message="new commit",
+                )
+            assert str(ex.value).startswith(
+                "Please provide the name and email address of the Git author or provide neither!"
+            )
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_commit_with_custom_author_email_but_no_name_returns_validation_error(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            with pytest.raises(GitOpsException) as ex:
+                testee.commit(
+                    git_user="john doe",
+                    git_email="john@doe.com",
+                    git_author_name="",  # missing
+                    git_author_email="custom@author.com",
+                    message="new commit",
+                )
+            assert str(ex.value).startswith(
+                "Please provide the name and email address of the Git author or provide neither!"
+            )
 
     @patch("gitopscli.git_api.git_repo.logging")
     def test_commit_nothing_to_commit(self, logging_mock):
@@ -268,8 +302,8 @@ echo password='Pass'
             commit_hash = testee.commit(
                 git_user="john doe",
                 git_email="john@doe.com",
-                git_co_author_name=None,
-                git_co_author_email=None,
+                git_author_name=None,
+                git_author_email=None,
                 message="empty commit",
             )
             repo = Repo(testee.get_full_file_path("."))

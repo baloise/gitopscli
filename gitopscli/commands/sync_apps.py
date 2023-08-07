@@ -15,8 +15,8 @@ class SyncAppsCommand(Command):
         git_user: str
         git_email: str
 
-        git_co_author_name: Optional[str]
-        git_co_author_email: Optional[str]
+        git_author_name: Optional[str]
+        git_author_email: Optional[str]
 
         organisation: str
         repository_name: str
@@ -41,8 +41,8 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
                 root_config_git_repo,
                 args.git_user,
                 args.git_email,
-                args.git_co_author_name,
-                args.git_co_author_email,
+                args.git_author_name,
+                args.git_author_email,
             )
 
 
@@ -52,8 +52,8 @@ def __sync_apps(
     root_git_repo: GitRepo,
     git_user: str,
     git_email: str,
-    git_co_author_name: Optional[str],
-    git_co_author_email: Optional[str],
+    git_author_name: Optional[str],
+    git_author_email: Optional[str],
 ) -> None:
     logging.info("Team config repository: %s", tenant_git_repo.get_clone_url())
     logging.info("Root config repository: %s", root_git_repo.get_clone_url())
@@ -78,8 +78,8 @@ def __sync_apps(
             root_git_repo,
             git_user,
             git_email,
-            git_co_author_name,
-            git_co_author_email,
+            git_author_name,
+            git_author_email,
             root_repo_tenant.file_path,
         )
     else:
@@ -91,12 +91,12 @@ def __commit_and_push(
     root_config_git_repo: GitRepo,
     git_user: str,
     git_email: str,
-    git_co_author_name: Optional[str],
-    git_co_author_email: Optional[str],
+    git_author_name: Optional[str],
+    git_author_email: Optional[str],
     app_file_name: str,
 ) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
     root_config_git_repo.commit(
-        git_user, git_email, git_co_author_name, git_co_author_email, f"{author} updated " + app_file_name
+        git_user, git_email, git_author_name, git_author_email, f"{author} updated " + app_file_name
     )
     root_config_git_repo.push()

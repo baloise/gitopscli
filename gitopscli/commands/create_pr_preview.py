@@ -11,8 +11,8 @@ class CreatePrPreviewCommand(Command):
         git_user: str
         git_email: str
 
-        git_co_author_name: Optional[str]
-        git_co_author_email: Optional[str]
+        git_author_name: Optional[str]
+        git_author_email: Optional[str]
 
         organisation: str
         repository_name: str
@@ -40,8 +40,8 @@ class CreatePrPreviewCommand(Command):
                 password=args.password,
                 git_user=args.git_user,
                 git_email=args.git_email,
-                git_co_author_name=args.git_co_author_name,
-                git_co_author_email=args.git_co_author_email,
+                git_author_name=args.git_author_name,
+                git_author_email=args.git_author_email,
                 organisation=args.organisation,
                 repository_name=args.repository_name,
                 git_provider=args.git_provider,
