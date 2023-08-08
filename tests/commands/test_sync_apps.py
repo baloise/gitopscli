@@ -16,6 +16,8 @@ ARGS = SyncAppsCommand.Args(
     password="PASSWORD",
     git_user="GIT_USER",
     git_email="GIT_EMAIL",
+    git_author_name="GIT_AUTHOR_NAME",
+    git_author_email="GIT_AUTHOR_EMAIL",
     root_organisation="ROOT_ORGA",
     root_repository_name="ROOT_REPO",
     organisation="TEAM_ORGA",
@@ -143,7 +145,11 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.logging.info("Commiting and pushing changes to %s", "https://repository.url/root/root-config.git"),
             call.GitRepo_team.get_author_from_last_commit(),
             call.GitRepo_root.commit(
-                "GIT_USER", "GIT_EMAIL", "author updated /tmp/root-config-repo/apps/team-non-prod.yaml"
+                "GIT_USER",
+                "GIT_EMAIL",
+                "GIT_AUTHOR_NAME",
+                "GIT_AUTHOR_EMAIL",
+                "author updated /tmp/root-config-repo/apps/team-non-prod.yaml",
             ),
             call.GitRepo_root.push(),
         ]
@@ -233,6 +239,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             password="PASSWORD",
             git_user="GIT_USER",
             git_email="GIT_EMAIL",
+            git_author_name=None,
+            git_author_email=None,
             root_organisation="ROOT_ORGA",
             root_repository_name="ROOT_REPO",
             organisation="TEAM_ORGA",

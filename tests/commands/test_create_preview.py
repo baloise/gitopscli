@@ -17,6 +17,8 @@ ARGS = CreatePreviewCommand.Args(
     password="PASSWORD",
     git_user="GIT_USER",
     git_email="GIT_EMAIL",
+    git_author_name="GIT_AUTHOR_NAME",
+    git_author_email="GIT_AUTHOR_EMAIL",
     organisation="ORGA",
     repository_name="REPO",
     git_provider=GitProvider.GITHUB,
@@ -193,6 +195,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.commit(
                 "GIT_USER",
                 "GIT_EMAIL",
+                "GIT_AUTHOR_NAME",
+                "GIT_AUTHOR_EMAIL",
                 "Create new preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
             call.GitRepo.push(),
@@ -293,6 +297,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.commit(
                 "GIT_USER",
                 "GIT_EMAIL",
+                "GIT_AUTHOR_NAME",
+                "GIT_AUTHOR_EMAIL",
                 "Create new preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
             call.GitRepo.push(),
@@ -359,6 +365,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.commit(
                 "GIT_USER",
                 "GIT_EMAIL",
+                "GIT_AUTHOR_NAME",
+                "GIT_AUTHOR_EMAIL",
                 "Update preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
             call.GitRepo.push(),

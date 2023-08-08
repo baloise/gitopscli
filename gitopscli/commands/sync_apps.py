@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from dataclasses import dataclass
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
@@ -13,6 +14,9 @@ class SyncAppsCommand(Command):
     class Args(GitApiConfig):
         git_user: str
         git_email: str
+
+        git_author_name: Optional[str]
+        git_author_email: Optional[str]
 
         organisation: str
         repository_name: str
@@ -32,11 +36,25 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
     root_config_git_repo_api = GitRepoApiFactory.create(args, args.root_organisation, args.root_repository_name)
     with GitRepo(team_config_git_repo_api) as team_config_git_repo:
         with GitRepo(root_config_git_repo_api) as root_config_git_repo:
-            __sync_apps(team_config_git_repo, root_config_git_repo, args.git_user, args.git_email)
+            __sync_apps(
+                team_config_git_repo,
+                root_config_git_repo,
+                args.git_user,
+                args.git_email,
+                args.git_author_name,
+                args.git_author_email,
+            )
 
 
 # TODO: BETTER NAMES FOR STUFF HERE pylint: disable=fixme
-def __sync_apps(tenant_git_repo: GitRepo, root_git_repo: GitRepo, git_user: str, git_email: str) -> None:
+def __sync_apps(
+    tenant_git_repo: GitRepo,
+    root_git_repo: GitRepo,
+    git_user: str,
+    git_email: str,
+    git_author_name: Optional[str],
+    git_author_email: Optional[str],
+) -> None:
     logging.info("Team config repository: %s", tenant_git_repo.get_clone_url())
     logging.info("Root config repository: %s", root_git_repo.get_clone_url())
     root_repo = create_root_repo(root_repo=root_git_repo)
@@ -55,14 +73,30 @@ def __sync_apps(tenant_git_repo: GitRepo, root_git_repo: GitRepo, git_user: str,
         logging.info("Appling changes to: %s", root_repo_tenant.file_path)
         yaml_file_dump(root_repo_tenant.yaml, root_repo_tenant.file_path)
         logging.info("Commiting and pushing changes to %s", root_git_repo.get_clone_url())
-        __commit_and_push(tenant_git_repo, root_git_repo, git_user, git_email, root_repo_tenant.file_path)
+        __commit_and_push(
+            tenant_git_repo,
+            root_git_repo,
+            git_user,
+            git_email,
+            git_author_name,
+            git_author_email,
+            root_repo_tenant.file_path,
+        )
     else:
         logging.info("No changes applied to %s", root_repo_tenant.file_path)
 
 
 def __commit_and_push(
-    team_config_git_repo: GitRepo, root_config_git_repo: GitRepo, git_user: str, git_email: str, app_file_name: str
+    team_config_git_repo: GitRepo,
+    root_config_git_repo: GitRepo,
+    git_user: str,
+    git_email: str,
+    git_author_name: Optional[str],
+    git_author_email: Optional[str],
+    app_file_name: str,
 ) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
-    root_config_git_repo.commit(git_user, git_email, f"{author} updated " + app_file_name)
+    root_config_git_repo.commit(
+        git_user, git_email, git_author_name, git_author_email, f"{author} updated " + app_file_name
+    )
     root_config_git_repo.push()

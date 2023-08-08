@@ -101,6 +101,8 @@ gitopscli sync-apps \
 ```
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-user GIT_USER] [--git-email GIT_EMAIL]
+                           [--git-author-name GIT_AUTHOR_NAME]
+                           [--git-author-email GIT_AUTHOR_EMAIL]
                            --organisation ORGANISATION --repository-name
                            REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                            [--git-provider-url GIT_PROVIDER_URL]
@@ -117,6 +119,10 @@ options:
   --git-user GIT_USER   Git Username
   --git-email GIT_EMAIL
                         Git User Email
+  --git-author-name GIT_AUTHOR_NAME
+                        Git Author Name
+  --git-author-email GIT_AUTHOR_EMAIL
+                        Git Author Email
   --organisation ORGANISATION
                         Apps Git organisation/projectKey
   --repository-name REPOSITORY_NAME
