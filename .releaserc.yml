@@ -6,7 +6,7 @@ plugins:
 - "@semantic-release/release-notes-generator"
 - - "semantic-release-replace-plugin"
   - replacements:
-    - files: [ "setup.py "]
+    - files: [ "setup.py" ]
       from: "version=\"0.0.0\""
       to: "version=\"${nextRelease.version}\""
       countMatches: true
