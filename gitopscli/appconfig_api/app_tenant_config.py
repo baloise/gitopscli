@@ -64,7 +64,7 @@ class AppTenantConfig:
     def __add_new_applications(self, desired_apps: dict[str, Any]) -> None:
         for desired_app_name, desired_app_value in desired_apps.items():
             if desired_app_name not in self.list_apps().keys():
-                logging.info("Adding % in %s applications", desired_app_name, self.file_path)
+                logging.info("Adding %s in %s applications", desired_app_name, self.file_path)
                 self.tenant_config["applications"][desired_app_name] = desired_app_value
                 self.__set_dirty()
 
