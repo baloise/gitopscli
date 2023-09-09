@@ -7,7 +7,7 @@ setup(
     entry_points={"console_scripts": ["gitopscli = gitopscli.__main__:main"]},
     setup_requires=["wheel"],
     install_requires=[
-        "GitPython==3.1.34",
+        "GitPython==3.1.35",
         "ruamel.yaml==0.16.5",
         "jsonpath-ng==1.5.3",
         "atlassian-python-api==1.14.5",
