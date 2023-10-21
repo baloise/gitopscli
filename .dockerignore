@@ -1,3 +1,4 @@
+
 *
 !docs
 !gitopscli/
@@ -7,8 +8,9 @@
 !mkdocs.yml
 !Makefile
 !mypy.ini
-!requirements-docs.txt
-!requirements-test.txt
-!setup.py
+!poetry.lock
+!poetry.toml
+!pyproject.toml
+!README.md
 
 **/__pycache__/

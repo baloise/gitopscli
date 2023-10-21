@@ -6,12 +6,12 @@ plugins:
 - "@semantic-release/release-notes-generator"
 - - "semantic-release-replace-plugin"
   - replacements:
-    - files: [ "setup.py" ]
+    - files: [ "pyproject.toml" ]
       from: "version=\"0.0.0\""
       to: "version=\"${nextRelease.version}\""
       countMatches: true
       results:
-        - file: "setup.py"
+        - file: "pyproject.toml"
           hasChanged: true
           numMatches: 1
           numReplacements: 1
