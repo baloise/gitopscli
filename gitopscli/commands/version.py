@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import pkg_resources
+import importlib.metadata
 from .command import Command
 
 
@@ -12,5 +12,9 @@ class VersionCommand(Command):
         pass
 
     def execute(self) -> None:
-        version = pkg_resources.require("gitopscli")[0].version
+        try:
+            version = importlib.metadata.version("gitopscli")
+        except importlib.metadata.PackageNotFoundError:
+            # Handle the case where "gitopscli" is not installed
+            version = None
         print(f"GitOps CLI version {version}")
