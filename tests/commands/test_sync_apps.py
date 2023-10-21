@@ -4,11 +4,11 @@ import os
 import unittest
 from unittest.mock import call, patch
 
+from ruamel.yaml.compat import ordereddict
 from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.commands.sync_apps import SyncAppsCommand
 from gitopscli.io_api.yaml_util import yaml_file_load, yaml_file_dump
 from gitopscli.gitops_exception import GitOpsException
-from ruamel.yaml.compat import ordereddict
 from .mock_mixin import MockMixin
 
 ARGS = SyncAppsCommand.Args(
@@ -217,7 +217,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         }[file_path]
         try:
             SyncAppsCommand(ARGS).execute()
-        except GitOpsException as ex:
+        except GitOpsException:
             self.fail("'config.bootstrap' should be read correctly'")
 
     def test_sync_apps_bootstrap_yaml_not_found(self):
@@ -249,7 +249,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             git_provider_url=None,
         )
         try:
-            SyncAppsCommand(ARGS).execute()
+            SyncAppsCommand(args).execute()
             self.fail()
         except GitOpsException as ex:
             self.assertEqual("Cannot find key 'bootstrap' or 'config.bootstrap' in 'bootstrap/values.yaml'", str(ex))

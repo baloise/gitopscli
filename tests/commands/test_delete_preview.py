@@ -2,7 +2,7 @@ import os
 import shutil
 import unittest
 import logging
-from unittest.mock import call, PropertyMock
+from unittest.mock import call
 import pytest
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
