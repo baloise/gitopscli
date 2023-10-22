@@ -19,13 +19,13 @@ pygithub = "==1.53"
 python-gitlab = "==2.6.0"
 
 [tool.poetry.group.test.dependencies]
-black = "==22.10.0"
-coverage = "==5.3"
-pylint = "==2.17.2"
-pytest = "==7.1.3"
-mypy = "==0.982"
-typeguard = "==2.13.3"
-pre-commit = "==2.20.0"
+black = "*"
+coverage = "*"
+pylint = "*"
+pytest = "*"
+mypy = "*"
+typeguard = "^2.13.3"
+pre-commit = "*"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "*"

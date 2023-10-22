@@ -63,7 +63,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Dict[str, Any] = None,
+        merge_parameters: Optional[Dict[str, Any]] = None,
     ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
 

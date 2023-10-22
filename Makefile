@@ -16,6 +16,7 @@ lint:
 mypy:
 	poetry run mypy --install-types --non-interactive .
 
+
 test:
 	poetry run pytest -vv -s --typeguard-packages=gitopscli
 
