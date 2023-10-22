@@ -6,7 +6,7 @@ from jsonpath_ng.exceptions import JSONPathError
 from jsonpath_ng.ext import parse
 
 YAML_INSTANCE = YAML()
-YAML_INSTANCE.preserve_quotes = True  # type: ignore
+YAML_INSTANCE.preserve_quotes = True
 
 
 class YAMLException(Exception):

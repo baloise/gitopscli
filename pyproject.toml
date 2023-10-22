@@ -11,12 +11,12 @@ gitopscli = "gitopscli.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-gitpython = "==3.1.37"
-"ruamel.yaml" = "==0.16.5"
-jsonpath-ng = "==1.5.3"
-atlassian-python-api = "==1.14.5"
-pygithub = "==1.53"
-python-gitlab = "==2.6.0"
+gitpython = "*"
+"ruamel.yaml" = "*"
+jsonpath-ng = "*"
+atlassian-python-api = "*"
+pygithub = "*"
+python-gitlab = "^2.6.0"
 
 [tool.poetry.group.test.dependencies]
 black = "*"
