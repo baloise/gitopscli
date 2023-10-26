@@ -34,13 +34,6 @@ markdown-include = "*"
 pymdown-extensions = "*"
 Markdown = "*"
 
-[tool.ruff]
-line-length = 120
-
-[tool.ruff.per-file-ignores]
-"**/__init__.py" = ["F401"]
-"tests/*.py" = ["E501"]
-
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
