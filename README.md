@@ -52,6 +52,7 @@ make coverage  # run unit tests and create coverage report
 make checks  # run all checks (format-check + lint + mypy + test)
 make image  # build docker image
 make docs  # serves web docs
+make update  # update package dependencies
 ```
 
 ## License
