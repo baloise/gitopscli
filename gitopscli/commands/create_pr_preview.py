@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Optional
 from gitopscli.git_api import GitApiConfig, GitRepoApiFactory
 from .create_preview import CreatePreviewCommand
 from .command import Command
@@ -30,9 +30,8 @@ class CreatePrPreviewCommand(Command):
         pr_branch = git_repo_api.get_pull_request_branch(args.pr_id)
         git_hash = git_repo_api.get_branch_head_hash(pr_branch)
 
-        add_pr_comment: Callable[[str], None] = lambda comment: git_repo_api.add_pull_request_comment(
-            args.pr_id, comment, args.parent_id
-        )
+        def add_pr_comment(comment: str) -> None:
+            return git_repo_api.add_pull_request_comment(args.pr_id, comment, args.parent_id)
 
         create_preview_command = CreatePreviewCommand(
             CreatePreviewCommand.Args(

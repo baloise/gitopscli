@@ -38,10 +38,7 @@ Currently, we support BitBucket Server, GitHub and Gitlab.
 ### Setup
 
 ```bash
-python3 -m venv venv  # create and activate virtual environment
-source venv/bin/activate  # enter virtual environment
 make init  # install dependencies, setup dev gitopscli, install pre-commit hooks, ...
-deactivate  # leave virtual environment (after development)
 ```
 
 ### Commands
@@ -55,6 +52,7 @@ make coverage  # run unit tests and create coverage report
 make checks  # run all checks (format-check + lint + mypy + test)
 make image  # build docker image
 make docs  # serves web docs
+make update  # update package dependencies
 ```
 
 ## License

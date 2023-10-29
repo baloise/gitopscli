@@ -78,7 +78,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Dict[str, Any] = None,
+        merge_parameters: Optional[Dict[str, Any]] = None,
     ) -> None:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(
@@ -99,7 +99,9 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException(result["errors"][0]["message"])
 
     def get_branch_head_hash(self, branch: str) -> str:
-        branches = self.__bitbucket.get_branches(self.__organisation, self.__repository_name, filter=branch, limit=1)
+        branches = list(
+            self.__bitbucket.get_branches(self.__organisation, self.__repository_name, filter=branch, limit=1)
+        )
         if not branches:
             raise GitOpsException(f"Branch '{branch}' not found'")
         return str(branches[0]["latestCommit"])

@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "gitopscli"
+version = "0.0.0"
+description = "GitOps CLI is a command line interface (CLI) to perform operations on GitOps managed infrastructure repositories, including updates in YAML files."
+authors = ["Christian Siegel <christian.siegel@gmx.net>"]
+readme = "README.md"
+repository = "https://github.com/baloise/gitopscli"
+
+[tool.poetry.scripts]
+gitopscli = "gitopscli.__main__:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+gitpython = "*"
+"ruamel.yaml" = "*"
+jsonpath-ng = "*"
+atlassian-python-api = "*"
+pygithub = "*"
+python-gitlab = "^2.6.0"
+
+[tool.poetry.group.test.dependencies]
+black = "*"
+coverage = "*"
+pylint = "*"
+pytest = "*"
+mypy = "*"
+typeguard = "^2.13.3"
+pre-commit = "*"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "*"
+mkdocs-material = "*"
+markdown-include = "*"
+pymdown-extensions = "*"
+Markdown = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[virtualenvs]
+in-project = true

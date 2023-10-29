@@ -2,8 +2,9 @@
 __pycache__
 .vscode
 .coverage
+dist/
 htmlcov/
-venv/
+.venv/
 testrepo/
 .idea
 *.iml

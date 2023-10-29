@@ -327,8 +327,11 @@ class _GitOpsConfigYamlParser:
 
     def __parse_v1(self) -> GitOpsConfig:
         config = self.__parse_v2()
+
         # add $ in front of variables for backwards compatability (e.g. ${FOO}):
-        add_var_dollar: Callable[[str], str] = lambda template: re.sub(r"(^|[^\$])({(\w+)})", r"\1$\2", template)
+        def add_var_dollar(template: str) -> str:
+            return re.sub("(^|[^\\$])({(\\w+)})", "\\1$\\2", template)
+
         replacements: Dict[str, List[GitOpsConfig.Replacement]] = {}
         for filename, file_replacements in config.replacements.items():
             replacements[filename] = [

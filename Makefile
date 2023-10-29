@@ -1,25 +1,24 @@
-BLACK_ARGS = -l 120 -t py310 gitopscli tests setup.py
+BLACK_ARGS = -l 120 -t py310 gitopscli tests
 
 init:
-	pip3 install --editable .
-	pip3 install -r requirements-test.txt
-	pip3 install -r requirements-docs.txt
+	poetry install
 	pre-commit install
 
 format:
-	python3 -m black $(BLACK_ARGS)
+	poetry run black $(BLACK_ARGS)
 
 format-check:
-	python3 -m black $(BLACK_ARGS) --check
+	poetry run black $(BLACK_ARGS) --check
 
 lint:
-	python3 -m pylint gitopscli
+	poetry run pylint gitopscli
 
 mypy:
-	python3 -m mypy --install-types --non-interactive .
+	poetry run mypy --install-types --non-interactive .
+
 
 test:
-	python3 -m pytest -vv -s --typeguard-packages=gitopscli
+	poetry run pytest -vv -s --typeguard-packages=gitopscli
 
 coverage:
 	coverage run -m pytest
@@ -34,4 +33,7 @@ image:
 docs:
 	mkdocs serve
 
-.PHONY: init format format-check lint mypy test coverage checks image docs
+update:
+	poetry lock
+
+.PHONY: init format format-check lint mypy test coverage checks image docs update

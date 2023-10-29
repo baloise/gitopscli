@@ -1,37 +1,38 @@
 # =========
-FROM python:3.10-alpine AS base
+FROM alpine:3.18 AS base
 
-ENV PATH="/opt/venv/bin:$PATH"
-RUN apk add --no-cache git
+ENV PATH="/app/.venv/bin:$PATH" \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random \
+    PYTHONUNBUFFERED=1
+RUN apk add --no-cache git python3
 
 # =========
 FROM base AS dev
 
-WORKDIR /workdir
-RUN apk add --no-cache gcc linux-headers musl-dev make
-RUN python -m venv /opt/venv
-RUN python -m pip install --upgrade pip
+WORKDIR /app
+RUN apk add --no-cache gcc linux-headers musl-dev make poetry python3-dev
+COPY pyproject.toml poetry.lock poetry.toml ./
 
 # =========
 FROM dev AS deps
 
-COPY setup.py .
-RUN pip install .
+RUN poetry install --only main
 
 # =========
 FROM deps AS test
 
-COPY requirements-test.txt .
-RUN pip install -r requirements-test.txt
+RUN poetry install --with test
 COPY . .
 RUN pip install .
 RUN make checks
 
 # =========
-FROM dev AS docs
+FROM deps AS docs
 
-COPY requirements-docs.txt .
-RUN pip install -r requirements-docs.txt
+RUN poetry install --with docs
 COPY docs ./docs
 COPY CONTRIBUTING.md mkdocs.yml ./
 RUN mkdocs build
@@ -39,16 +40,17 @@ RUN mkdocs build
 # =========
 FROM scratch AS docs-site
 
-COPY --from=docs /workdir/site /site
+COPY --from=docs /app/site /site
 
 # =========
 FROM deps AS install
 
 COPY . .
-RUN pip install .
+RUN poetry build
+RUN pip install dist/gitopscli-*.whl
 
 # =========
 FROM base as final
 
-COPY --from=install /opt/venv /opt/venv
+COPY --from=install /app/.venv /app/.venv
 ENTRYPOINT ["gitopscli"]
