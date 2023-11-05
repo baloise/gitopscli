@@ -100,19 +100,17 @@ def __generate_config_from_tenant_repo(
 
 def __get_all_tenant_applications_dirs(tenant_repo: GitRepo) -> set[str]:
     repo_dir = tenant_repo.get_full_file_path(".")
-    applist = {
+    return {
         name
         for name in os.listdir(repo_dir)
         if os.path.isdir(os.path.join(repo_dir, name)) and not name.startswith(".")
     }
-    return applist
 
 
 def __get_custom_config(appname: str, tenant_config_git_repo: GitRepo) -> Any:
     custom_config_path = tenant_config_git_repo.get_full_file_path(f"{appname}/.config.yaml")
     if os.path.exists(custom_config_path):
-        custom_config_content = yaml_file_load(custom_config_path)
-        return custom_config_content
+        return yaml_file_load(custom_config_path)
     return {}
 
 

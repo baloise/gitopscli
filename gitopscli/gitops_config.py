@@ -118,8 +118,7 @@ class GitOpsConfig:
         preview_host = preview_host.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
         preview_host = preview_host.replace("${PREVIEW_ID_HASH_SHORT}", self.create_preview_id_hash_short(preview_id))
         preview_host = preview_host.replace("${PREVIEW_ID}", self.__sanitize(preview_id))
-        preview_host = preview_host.replace("${PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
-        return preview_host
+        return preview_host.replace("${PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
 
     def get_preview_namespace(self, preview_id: str) -> str:
         preview_namespace = self.preview_target_namespace_template
@@ -183,8 +182,7 @@ class GitOpsConfig:
         sanitized_preview_id = re.sub(r"-+", "-", sanitized_preview_id)
         if max_length is not None:
             sanitized_preview_id = sanitized_preview_id[0:max_length]
-        sanitized_preview_id = re.sub(r"-$", "", sanitized_preview_id)
-        return sanitized_preview_id
+        return re.sub(r"-$", "", sanitized_preview_id)
 
     def is_preview_template_equal_target(self) -> bool:
         return (
