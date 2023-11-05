@@ -64,6 +64,6 @@ ignore = ["ANN101", "ANN401",
 "gitopscli/git_api/git_repo.py" = ["PTH101", "PTH118", "PTH123"]
 "gitopscli/io_api/tmp_dir.py" = ["PTH103"]
 "gitopscli/io_api/yaml_util.py" = ["PTH123"]
-"tests/git_api/test_git_repo.py" = ["PT018", "PTH101", "PTH103", "PTH110", "PTH123"]
+"tests/git_api/test_git_repo.py" = ["PTH101", "PTH103", "PTH110", "PTH123"]
 "tests/io_api/test_tmp_dir.py" = ["PTH103", "PTH112"]
 "tests/io_api/test_yaml_util.py" = ["PTH103", "PTH123"]

@@ -390,7 +390,8 @@ echo password='Pass'
 
             with pytest.raises(GitOpsException) as ex:
                 testee.push("master")
-            assert "pre-receive" in str(ex.value) and "we reject this push" in str(ex.value)
+            assert "pre-receive" in str(ex.value)
+            assert "we reject this push" in str(ex.value)
         logging_mock.info.assert_called_once_with("Pushing branch: %s", "master")
 
     def test_get_author_from_last_commit(self):
