@@ -10,7 +10,7 @@ YAML_INSTANCE = YAML()
 YAML_INSTANCE.preserve_quotes = True
 
 
-class YAMLException(Exception):
+class YAMLException(Exception):  # noqa: N818
     pass
 
 

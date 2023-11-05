@@ -1,2 +1,2 @@
-class GitOpsException(Exception):
+class GitOpsException(Exception):  # noqa: N818
     pass
