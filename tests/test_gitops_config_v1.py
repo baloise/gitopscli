@@ -184,10 +184,10 @@ class GitOpsConfigV1Test(unittest.TestCase):
         self.assert_load_error("Item 'previewConfig.target.branch' should be a string in GitOps config!")
 
     def test_is_preview_template_equal_target(self):
-        for x in {"organisation", "repository", "branch"}:
+        for x in ["organisation", "repository", "branch"]:
             self.yaml["previewConfig"]["template"][x] = self.yaml["previewConfig"]["target"][x]
 
-        for x in {"organisation", "repository", "branch"}:
+        for x in ["organisation", "repository", "branch"]:
             self.yaml["previewConfig"]["template"][x] = "custom-template-value"
             config = self.load()
             self.assertFalse(config.is_preview_template_equal_target(), x)
