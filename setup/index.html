@@ -298,8 +298,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#from-source" class="md-nav__link">
-    From Source
+  <a href="#from-source-with-virtualenv" class="md-nav__link">
+    From Source With Virtualenv
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-source-into-user-installation" class="md-nav__link">
+    From Source Into User Installation
   </a>
   
 </li>
@@ -625,8 +632,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#from-source" class="md-nav__link">
-    From Source
+  <a href="#from-source-with-virtualenv" class="md-nav__link">
+    From Source With Virtualenv
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-source-into-user-installation" class="md-nav__link">
+    From Source Into User Installation
   </a>
   
 </li>
@@ -658,7 +672,26 @@
 Start the CLI and the print the help page with:
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>baloise/gitopscli<span class="w"> </span>--help
 </code></pre></div></p>
-<h2 id="from-source">From Source<a class="headerlink" href="#from-source" title="Permanent link">&para;</a></h2>
+<h2 id="from-source-with-virtualenv">From Source With Virtualenv<a class="headerlink" href="#from-source-with-virtualenv" title="Permanent link">&para;</a></h2>
+<p>Use this for developement and if you want to prevent dependency clashes with other programs in a user installation.</p>
+<p>Clone the repository and install the GitOps CLI on your machine:
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/baloise/gitopscli.git
+<span class="nb">cd</span><span class="w"> </span>gitopscli/
+poetry<span class="w"> </span>install
+</code></pre></div>
+You can now use it from the command line:
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>run<span class="w"> </span>gitopscli<span class="w"> </span>--help
+</code></pre></div>
+If you don't need the CLI anymore, you can uninstall it with
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>env<span class="w"> </span>remove<span class="w"> </span>--all
+</code></pre></div></p>
+<p>Note: if your poetry is not up to date to handle the files you can use a locally updated version.
+Execute the following command in your cloned gitopscli directory to use an updated poetry without changing your system installation:
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+pip3<span class="w"> </span>install<span class="w"> </span>poetry<span class="w"> </span><span class="c1"># installs it in the venv</span>
+</code></pre></div></p>
+<h2 id="from-source-into-user-installation">From Source Into User Installation<a class="headerlink" href="#from-source-into-user-installation" title="Permanent link">&para;</a></h2>
 <p>Clone the repository and install the GitOps CLI on your machine:
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/baloise/gitopscli.git
 pip3<span class="w"> </span>install<span class="w"> </span>gitopscli/
