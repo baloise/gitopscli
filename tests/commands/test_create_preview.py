@@ -135,8 +135,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
-            deployment_already_up_to_date_callback=lambda route_host: self.fail("should not be called"),
-            deployment_updated_callback=lambda route_host: self.fail("should not be called"),
+            deployment_already_up_to_date_callback=lambda _: self.fail("should not be called"),
+            deployment_updated_callback=lambda _: self.fail("should not be called"),
             deployment_created_callback=deployment_created_callback,
         )
         command.execute()
@@ -238,8 +238,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
-            deployment_already_up_to_date_callback=lambda route_host: self.fail("should not be called"),
-            deployment_updated_callback=lambda route_host: self.fail("should not be called"),
+            deployment_already_up_to_date_callback=lambda _: self.fail("should not be called"),
+            deployment_updated_callback=lambda _: self.fail("should not be called"),
             deployment_created_callback=deployment_created_callback,
         )
         command.execute()
@@ -319,9 +319,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
-            deployment_already_up_to_date_callback=lambda route_host: self.fail("should not be called"),
+            deployment_already_up_to_date_callback=lambda _: self.fail("should not be called"),
             deployment_updated_callback=deployment_updated_callback,
-            deployment_created_callback=lambda route_host: self.fail("should not be called"),
+            deployment_created_callback=lambda _: self.fail("should not be called"),
         )
         command.execute()
 
@@ -390,8 +390,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
             deployment_already_up_to_date_callback=deployment_already_up_to_date_callback,
-            deployment_updated_callback=lambda route_host: self.fail("should not be called"),
-            deployment_created_callback=lambda route_host: self.fail("should not be called"),
+            deployment_updated_callback=lambda _: self.fail("should not be called"),
+            deployment_created_callback=lambda _: self.fail("should not be called"),
         )
         command.execute()
 

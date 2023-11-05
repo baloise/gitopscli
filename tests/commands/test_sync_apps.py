@@ -71,7 +71,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.root_config_git_repo_mock.push.return_value = None
 
         self.git_repo_api_factory_mock = self.monkey_patch(GitRepoApiFactory)
-        self.git_repo_api_factory_mock.create.side_effect = lambda config, org, repo: {
+        self.git_repo_api_factory_mock.create.side_effect = lambda _, org, repo: {
             ("TEAM_ORGA", "TEAM_REPO"): self.team_config_git_repo_api_mock,
             ("ROOT_ORGA", "ROOT_REPO"): self.root_config_git_repo_api_mock,
         }[(org, repo)]
