@@ -15,7 +15,7 @@ class YAMLException(Exception):  # noqa: N818
 
 
 def yaml_file_load(file_path: str) -> Any:
-    with open(file_path, "r", encoding=locale.getpreferredencoding(False)) as stream:
+    with open(file_path, encoding=locale.getpreferredencoding(False)) as stream:
         try:
             return YAML_INSTANCE.load(stream)
         except YAMLError as ex:

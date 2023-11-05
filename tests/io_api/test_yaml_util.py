@@ -38,7 +38,7 @@ class YamlUtilTest(unittest.TestCase):
         return path
 
     def _read_file(self, path):
-        with open(path, "r") as stream:
+        with open(path) as stream:
             return stream.read()
 
     def test_yaml_file_load(self):
