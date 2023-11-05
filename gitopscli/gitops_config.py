@@ -3,7 +3,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from string import Template
-from typing import Any, Optional
+from typing import Any
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -62,11 +62,11 @@ class GitOpsConfig:
     preview_template_organisation: str
     preview_template_repository: str
     preview_template_path_template: str
-    preview_template_branch: Optional[str]
+    preview_template_branch: str | None
 
     preview_target_organisation: str
     preview_target_repository: str
-    preview_target_branch: Optional[str]
+    preview_target_branch: str | None
     preview_target_namespace_template: str
     preview_target_max_namespace_length: int
 
@@ -177,7 +177,7 @@ class GitOpsConfig:
                 raise GitOpsException(f"GitOps config template '{template}' contains invalid variable: {var}")
 
     @staticmethod
-    def __sanitize(preview_id: str, max_length: Optional[int] = None) -> str:
+    def __sanitize(preview_id: str, max_length: int | None = None) -> str:
         sanitized_preview_id = preview_id.lower()
         sanitized_preview_id = re.sub(r"[^a-z0-9-]", "-", sanitized_preview_id)
         sanitized_preview_id = re.sub(r"-+", "-", sanitized_preview_id)
@@ -219,7 +219,7 @@ class _GitOpsConfigYamlParser:
             data = data[k]
         return data
 
-    def __get_value_or_default(self, key: str, default: Optional[Any]) -> Optional[Any]:
+    def __get_value_or_default(self, key: str, default: Any | None) -> Any | None:
         try:
             return self.__get_value(key)
         except GitOpsException:
@@ -237,7 +237,7 @@ class _GitOpsConfigYamlParser:
             raise GitOpsException(f"Item '{key}' should be a string in GitOps config!")
         return value
 
-    def __get_string_value_or_none(self, key: str) -> Optional[str]:
+    def __get_string_value_or_none(self, key: str) -> str | None:
         value = self.__get_value_or_default(key, None)
         if not isinstance(value, str) and value is not None:
             raise GitOpsException(f"Item '{key}' should be a string in GitOps config!")

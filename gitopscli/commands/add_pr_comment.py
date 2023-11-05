@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from gitopscli.git_api import GitApiConfig, GitRepoApiFactory
 
@@ -13,7 +12,7 @@ class AddPrCommentCommand(Command):
         repository_name: str
 
         pr_id: int
-        parent_id: Optional[int]
+        parent_id: int | None
         text: str
 
     def __init__(self, args: Args) -> None:

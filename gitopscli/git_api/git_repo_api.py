@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Literal, NamedTuple, Optional
+from typing import Any, Literal, NamedTuple
 
 
 class GitRepoApi(metaclass=ABCMeta):
@@ -8,11 +8,11 @@ class GitRepoApi(metaclass=ABCMeta):
         url: str
 
     @abstractmethod
-    def get_username(self) -> Optional[str]:
+    def get_username(self) -> str | None:
         ...
 
     @abstractmethod
-    def get_password(self) -> Optional[str]:
+    def get_password(self) -> str | None:
         ...
 
     @abstractmethod
@@ -43,12 +43,12 @@ class GitRepoApi(metaclass=ABCMeta):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[dict[str, Any]] = None,
+        merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         ...
 
     @abstractmethod
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
         ...
 
     @abstractmethod

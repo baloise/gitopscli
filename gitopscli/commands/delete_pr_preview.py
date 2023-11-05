@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from gitopscli.git_api import GitApiConfig
 
@@ -13,8 +12,8 @@ class DeletePrPreviewCommand(Command):
         git_user: str
         git_email: str
 
-        git_author_name: Optional[str]
-        git_author_email: Optional[str]
+        git_author_name: str | None
+        git_author_email: str | None
 
         organisation: str
         repository_name: str

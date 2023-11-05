@@ -1,5 +1,3 @@
-from typing import Optional
-
 from gitopscli.gitops_exception import GitOpsException
 
 from .bitbucket_git_repo_api_adapter import BitbucketGitRepoApiAdapter
@@ -14,7 +12,7 @@ from .gitlab_git_repo_api_adapter import GitlabGitRepoApiAdapter
 class GitRepoApiFactory:
     @staticmethod
     def create(config: GitApiConfig, organisation: str, repository_name: str) -> GitRepoApi:
-        git_repo_api: Optional[GitRepoApi]
+        git_repo_api: GitRepoApi | None
         if config.git_provider is GitProvider.GITHUB:
             git_repo_api = GithubGitRepoApiAdapter(
                 username=config.username,

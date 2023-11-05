@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from gitopscli.appconfig_api.app_tenant_config import AppTenantConfig
 from gitopscli.git_api import GitRepo
@@ -14,7 +14,7 @@ class RootRepo:
     def list_tenants(self) -> list[str]:
         return list(self.tenants.keys())
 
-    def get_tenant_by_repo_url(self, repo_url: str) -> Optional[AppTenantConfig]:
+    def get_tenant_by_repo_url(self, repo_url: str) -> AppTenantConfig | None:
         for tenant in self.tenants.values():
             if tenant.repo_url == repo_url:
                 return tenant
@@ -69,7 +69,7 @@ def __get_bootstrap_tenant_list(root_repo: GitRepo) -> list[Any]:
     return bootstrap_tenants
 
 
-def __validate_bootstrap_tenants(bootstrap_entries: Optional[list[Any]]) -> None:
+def __validate_bootstrap_tenants(bootstrap_entries: list[Any] | None) -> None:
     if not bootstrap_entries:
         raise GitOpsException("Cannot find key 'bootstrap' or 'config.bootstrap' in 'bootstrap/values.yaml'")
     for bootstrap_entry in bootstrap_entries:
