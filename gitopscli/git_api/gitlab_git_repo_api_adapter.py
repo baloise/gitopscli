@@ -96,7 +96,12 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                     raise GitOpsException("Error merging pull request: 'Branch cannot be merged'") from ex
                 time.sleep(2.5)
 
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
+    def add_pull_request_comment(
+        self,
+        pr_id: int,
+        text: str,
+        parent_id: int | None = None,  # noqa:ARG002
+    ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
         merge_request.notes.create({"body": text})
 
