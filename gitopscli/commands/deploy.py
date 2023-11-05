@@ -104,7 +104,7 @@ class DeployCommand(Command):
             if args.commit_message:
                 message = args.commit_message
             elif len(updated_values) == 1:
-                key, value = list(updated_values.items())[0]
+                key, value = next(iter(updated_values.items()))
                 message = f"changed '{key}' to '{value}' in {args.file}"
             else:
                 updates_count = len(updated_values)
