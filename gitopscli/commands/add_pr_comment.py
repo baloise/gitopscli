@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
+
 from gitopscli.git_api import GitApiConfig, GitRepoApiFactory
+
 from .command import Command
 
 

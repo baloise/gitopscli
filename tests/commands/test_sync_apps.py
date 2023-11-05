@@ -303,13 +303,15 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             self.assertEqual("Cannot find key 'repository' in /tmp/root-config-repo/apps/team-non-prod.yaml", str(ex))
 
     def test_sync_apps_undefined_team_repo(self):
-        self.yaml_file_load_mock.side_effect = lambda file_path: {
-            "/tmp/root-config-repo/bootstrap/values.yaml": {"bootstrap": [{"name": "other-team-non-prod"}]},
-            "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
-                "repository": "https://repository.url/other-team/other-team-non-prod.git",  # there is no repo matching the command's team repo
-                "applications": {},
-            },
-        }[file_path]
+        self.yaml_file_load_mock.side_effect = (
+            lambda file_path: {
+                "/tmp/root-config-repo/bootstrap/values.yaml": {"bootstrap": [{"name": "other-team-non-prod"}]},
+                "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
+                    "repository": "https://repository.url/other-team/other-team-non-prod.git",  # there is no repo matching the command's team repo
+                    "applications": {},
+                },
+            }[file_path]
+        )
 
         try:
             SyncAppsCommand(ARGS).execute()

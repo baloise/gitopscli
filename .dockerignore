@@ -3,7 +3,6 @@
 !docs
 !gitopscli/
 !tests/
-!.pylintrc
 !CONTRIBUTING.md
 !mkdocs.yml
 !Makefile

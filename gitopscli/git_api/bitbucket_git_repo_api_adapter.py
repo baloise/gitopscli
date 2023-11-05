@@ -1,7 +1,8 @@
-from typing import List, Dict, Any, Optional, Literal
-import requests
+from typing import Any, Literal, Optional
 
+import requests
 from atlassian import Bitbucket
+
 from gitopscli.gitops_exception import GitOpsException
 
 from .git_repo_api import GitRepoApi
@@ -52,13 +53,20 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         return str(repo_url)
 
     def create_pull_request_to_default_branch(
-        self, from_branch: str, title: str, description: str
+        self,
+        from_branch: str,
+        title: str,
+        description: str,
     ) -> GitRepoApi.PullRequestIdAndUrl:
         to_branch = self.__get_default_branch()
         return self.create_pull_request(from_branch, to_branch, title, description)
 
     def create_pull_request(
-        self, from_branch: str, to_branch: str, title: str, description: str
+        self,
+        from_branch: str,
+        to_branch: str,
+        title: str,
+        description: str,
     ) -> GitRepoApi.PullRequestIdAndUrl:
         pull_request = self.__bitbucket.open_pull_request(
             self.__organisation,
@@ -78,16 +86,23 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[Dict[str, Any]] = None,
+        merge_parameters: Optional[dict[str, Any]] = None,
     ) -> None:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(
-            self.__organisation, self.__repository_name, pull_request["id"], pull_request["version"]
+            self.__organisation,
+            self.__repository_name,
+            pull_request["id"],
+            pull_request["version"],
         )
 
     def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
         pull_request_comment = self.__bitbucket.add_pull_request_comment(
-            self.__organisation, self.__repository_name, pr_id, text, parent_id
+            self.__organisation,
+            self.__repository_name,
+            pr_id,
+            text,
+            parent_id,
         )
         if "errors" in pull_request_comment:
             raise GitOpsException(pull_request_comment["errors"][0]["message"])
@@ -100,7 +115,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
 
     def get_branch_head_hash(self, branch: str) -> str:
         branches = list(
-            self.__bitbucket.get_branches(self.__organisation, self.__repository_name, filter=branch, limit=1)
+            self.__bitbucket.get_branches(self.__organisation, self.__repository_name, filter=branch, limit=1),
         )
         if not branches:
             raise GitOpsException(f"Branch '{branch}' not found'")
@@ -116,5 +131,5 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         default_branch = self.__bitbucket.get_default_branch(self.__organisation, self.__repository_name)
         return str(default_branch["id"])
 
-    def add_pull_request_label(self, pr_id: int, pr_labels: List[str]) -> None:
+    def add_pull_request_label(self, pr_id: int, pr_labels: list[str]) -> None:
         pass

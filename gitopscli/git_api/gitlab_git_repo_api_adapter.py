@@ -1,9 +1,10 @@
-from typing import Any, List, Dict, Optional, Literal
 import logging
 import time
-import requests
+from typing import Any, Literal, Optional
 
 import gitlab
+import requests
+
 from gitopscli.gitops_exception import GitOpsException
 
 from .git_repo_api import GitRepoApi
@@ -46,16 +47,23 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         return str(self.__project.http_url_to_repo)
 
     def create_pull_request_to_default_branch(
-        self, from_branch: str, title: str, description: str
+        self,
+        from_branch: str,
+        title: str,
+        description: str,
     ) -> GitRepoApi.PullRequestIdAndUrl:
         to_branch = self.__get_default_branch()
         return self.create_pull_request(from_branch, to_branch, title, description)
 
     def create_pull_request(
-        self, from_branch: str, to_branch: str, title: str, description: str
+        self,
+        from_branch: str,
+        to_branch: str,
+        title: str,
+        description: str,
     ) -> GitRepoApi.PullRequestIdAndUrl:
         merge_request = self.__project.mergerequests.create(
-            {"source_branch": from_branch, "target_branch": to_branch, "title": title, "description": description}
+            {"source_branch": from_branch, "target_branch": to_branch, "title": title, "description": description},
         )
         return GitRepoApi.PullRequestIdAndUrl(pr_id=merge_request.iid, url=merge_request.web_url)
 
@@ -63,7 +71,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[Dict[str, Any]] = None,
+        merge_parameters: Optional[dict[str, Any]] = None,
     ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
 
@@ -80,7 +88,9 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                 # is still processing the merge request internally
                 max_retries -= 1
                 logging.warning(
-                    "Retry merging pull request. Attempts: (%s/%s)", MAX_MERGE_RETRIES - max_retries, MAX_MERGE_RETRIES
+                    "Retry merging pull request. Attempts: (%s/%s)",
+                    MAX_MERGE_RETRIES - max_retries,
+                    MAX_MERGE_RETRIES,
                 )
                 if max_retries == 0:
                     raise GitOpsException("Error merging pull request: 'Branch cannot be merged'") from ex
@@ -108,7 +118,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException("Default branch does not exist")
         return str(default_branch.name)
 
-    def add_pull_request_label(self, pr_id: int, pr_labels: List[str]) -> None:
+    def add_pull_request_label(self, pr_id: int, pr_labels: list[str]) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
         merge_request.labels = pr_labels
         merge_request.save()

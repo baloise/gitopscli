@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from typing import Optional
+
 from gitopscli.git_api import GitApiConfig
-from .delete_preview import DeletePreviewCommand
+
 from .command import Command
+from .delete_preview import DeletePreviewCommand
 
 
 class DeletePrPreviewCommand(Command):
@@ -39,5 +41,5 @@ class DeletePrPreviewCommand(Command):
                 git_provider_url=args.git_provider_url,
                 preview_id=args.branch,  # use branch as preview id
                 expect_preview_exists=args.expect_preview_exists,
-            )
+            ),
         ).execute()

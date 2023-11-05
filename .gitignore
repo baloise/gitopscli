@@ -12,3 +12,4 @@ testrepo/
 site/
 build/
 .mypy_cache
+.ruff_cache

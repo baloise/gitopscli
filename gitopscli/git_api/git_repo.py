@@ -1,11 +1,14 @@
-import os
-import logging
 import locale
+import logging
+import os
 from types import TracebackType
-from typing import Optional, Type, Literal
-from git import Repo, GitError, GitCommandError
+from typing import Literal, Optional
+
+from git import GitCommandError, GitError, Repo
+
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io_api.tmp_dir import create_tmp_dir, delete_tmp_dir
+
 from .git_repo_api import GitRepoApi
 
 
@@ -20,7 +23,7 @@ class GitRepo:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> Literal[False]:
@@ -55,7 +58,10 @@ class GitRepo:
             if branch:
                 git_options.append(f"--branch {branch}")
             self.__repo = Repo.clone_from(
-                url=url, to_path=f"{self.__tmp_dir}/repo", multi_options=git_options, allow_unsafe_options=True
+                url=url,
+                to_path=f"{self.__tmp_dir}/repo",
+                multi_options=git_options,
+                allow_unsafe_options=True,
             )
         except GitError as ex:
             if branch:

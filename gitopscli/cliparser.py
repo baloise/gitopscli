@@ -1,23 +1,25 @@
-from argparse import ArgumentParser, ArgumentTypeError
 import os
 import sys
-from typing import List, Tuple, Dict, Any, NoReturn, Callable
+from argparse import ArgumentParser, ArgumentTypeError
+from collections.abc import Callable
+from typing import Any, NoReturn
+
 from gitopscli.commands import (
-    CommandArgs,
-    DeployCommand,
-    SyncAppsCommand,
     AddPrCommentCommand,
+    CommandArgs,
     CreatePreviewCommand,
     CreatePrPreviewCommand,
     DeletePreviewCommand,
     DeletePrPreviewCommand,
+    DeployCommand,
+    SyncAppsCommand,
     VersionCommand,
 )
 from gitopscli.git_api import GitProvider
-from gitopscli.io_api.yaml_util import yaml_load, YAMLException
+from gitopscli.io_api.yaml_util import YAMLException, yaml_load
 
 
-def parse_args(raw_args: List[str]) -> Tuple[bool, CommandArgs]:
+def parse_args(raw_args: list[str]) -> tuple[bool, CommandArgs]:
     parser = __create_parser()
 
     if len(raw_args) == 0:
@@ -36,7 +38,9 @@ def __create_parser() -> ArgumentParser:
     parser = ArgumentParser(prog="gitopscli", description="GitOps CLI")
     subparsers = parser.add_subparsers(title="commands", dest="command")
     subparsers.add_parser(
-        "deploy", help="Trigger a new deployment by changing YAML values", parents=[__create_deploy_parser()]
+        "deploy",
+        help="Trigger a new deployment by changing YAML values",
+        parents=[__create_deploy_parser()],
     )
     subparsers.add_parser(
         "sync-apps",
@@ -44,22 +48,34 @@ def __create_parser() -> ArgumentParser:
         parents=[__create_sync_apps_parser()],
     )
     subparsers.add_parser(
-        "add-pr-comment", help="Create a comment on the pull request", parents=[__create_add_pr_comment_parser()]
+        "add-pr-comment",
+        help="Create a comment on the pull request",
+        parents=[__create_add_pr_comment_parser()],
     )
     subparsers.add_parser(
-        "create-preview", help="Create a preview environment", parents=[__create_create_preview_parser()]
+        "create-preview",
+        help="Create a preview environment",
+        parents=[__create_create_preview_parser()],
     )
     subparsers.add_parser(
-        "create-pr-preview", help="Create a preview environment", parents=[__create_create_pr_preview_parser()]
+        "create-pr-preview",
+        help="Create a preview environment",
+        parents=[__create_create_pr_preview_parser()],
     )
     subparsers.add_parser(
-        "delete-preview", help="Delete a preview environment", parents=[__create_delete_preview_parser()]
+        "delete-preview",
+        help="Delete a preview environment",
+        parents=[__create_delete_preview_parser()],
     )
     subparsers.add_parser(
-        "delete-pr-preview", help="Delete a pr preview environment", parents=[__create_delete_pr_preview_parser()]
+        "delete-pr-preview",
+        help="Delete a pr preview environment",
+        parents=[__create_delete_pr_preview_parser()],
     )
     subparsers.add_parser(
-        "version", help="Show the GitOps CLI version information", parents=[__create_version_parser()]
+        "version",
+        help="Show the GitOps CLI version information",
+        parents=[__create_version_parser()],
     )
     return parser
 
@@ -82,14 +98,22 @@ def __create_deploy_parser() -> ArgumentParser:
         default=False,
     )
     parser.add_argument(
-        "--commit-message", help="Specify exact commit message of deployment commit", type=str, default=None
+        "--commit-message",
+        help="Specify exact commit message of deployment commit",
+        type=str,
+        default=None,
     )
     __add_git_credentials_args(parser)
     __add_git_commit_user_args(parser)
     __add_git_org_and_repo_args(parser)
     __add_git_provider_args(parser)
     parser.add_argument(
-        "--create-pr", help="Creates a Pull Request", type=__parse_bool, nargs="?", const=True, default=False
+        "--create-pr",
+        help="Creates a Pull Request",
+        type=__parse_bool,
+        nargs="?",
+        const=True,
+        default=False,
     )
     parser.add_argument(
         "--auto-merge",
@@ -113,7 +137,10 @@ def __create_deploy_parser() -> ArgumentParser:
         default=False,
     )
     parser.add_argument(
-        "--pr-labels", help="JSON array pr labels (Gitlab, Github supported)", type=__parse_yaml, default=None
+        "--pr-labels",
+        help="JSON array pr labels (Gitlab, Github supported)",
+        type=__parse_yaml,
+        default=None,
     )
     parser.add_argument(
         "--merge-parameters",
@@ -258,7 +285,13 @@ def __add_expect_preview_exists_arg(parser: ArgumentParser) -> None:
 
 def __add_verbose_arg(parser: ArgumentParser) -> None:
     parser.add_argument(
-        "-v", "--verbose", help="Verbose exception logging", type=__parse_bool, nargs="?", const=True, default=False
+        "-v",
+        "--verbose",
+        help="Verbose exception logging",
+        type=__parse_bool,
+        nargs="?",
+        const=True,
+        default=False,
     )
 
 
@@ -293,8 +326,9 @@ def __print_help_and_exit(parser: ArgumentParser) -> NoReturn:
 
 
 def __deduce_empty_git_provider_from_git_provider_url(
-    args: Dict[str, Any], error: Callable[[str], NoReturn]
-) -> Dict[str, Any]:
+    args: dict[str, Any],
+    error: Callable[[str], NoReturn],
+) -> dict[str, Any]:
     if "git_provider" not in args or args["git_provider"] is not None:
         return args
     git_provider_url = args["git_provider_url"]
@@ -312,7 +346,7 @@ def __deduce_empty_git_provider_from_git_provider_url(
     return updated_args
 
 
-def __create_command_args(args: Dict[str, Any]) -> CommandArgs:
+def __create_command_args(args: dict[str, Any]) -> CommandArgs:
     args = dict(args)
     command = args.pop("command")
 

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
+
 from .git_provider import GitProvider
 
 

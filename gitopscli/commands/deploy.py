@@ -2,15 +2,16 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, Literal, List
+from typing import Any, Literal, Optional
+
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.io_api.yaml_util import update_yaml_file, yaml_dump, YAMLException
 from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io_api.yaml_util import YAMLException, update_yaml_file, yaml_dump
+
 from .command import Command
 
 
 class DeployCommand(Command):
-    # pylint: disable=too-many-instance-attributes
     @dataclass(frozen=True)
     class Args(GitApiConfig):
         git_user: str
@@ -32,13 +33,13 @@ class DeployCommand(Command):
         auto_merge: bool
         json: bool
 
-        pr_labels: Optional[List[str]]
+        pr_labels: Optional[list[str]]
         merge_parameters: Optional[Any]
         merge_method: Literal["squash", "rebase", "merge"] = "merge"
 
     def __init__(self, args: Args) -> None:
         self.__args = args
-        self.__commit_hashes: List[str] = []
+        self.__commit_hashes: list[str] = []
 
     def execute(self) -> None:
         git_repo_api = self.__create_git_repo_api()
@@ -74,7 +75,7 @@ class DeployCommand(Command):
     def __create_git_repo_api(self) -> GitRepoApi:
         return GitRepoApiFactory.create(self.__args, self.__args.organisation, self.__args.repository_name)
 
-    def __update_values(self, git_repo: GitRepo) -> Dict[str, Any]:
+    def __update_values(self, git_repo: GitRepo) -> dict[str, Any]:
         args = self.__args
         single_commit = args.single_commit or args.commit_message
         full_file_path = git_repo.get_full_file_path(args.file)
@@ -113,7 +114,7 @@ class DeployCommand(Command):
 
         return updated_values
 
-    def __create_pull_request_title_and_description(self, updated_values: Dict[str, Any]) -> Tuple[str, str]:
+    def __create_pull_request_title_and_description(self, updated_values: dict[str, Any]) -> tuple[str, str]:
         updated_file_name = self.__args.file
         updates_count = len(updated_values)
         value_or_values = "values" if updates_count > 1 else "value"

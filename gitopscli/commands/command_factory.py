@@ -1,10 +1,11 @@
-from typing import Union, Optional
-from .command import Command
+from typing import Optional, Union
+
 from .add_pr_comment import AddPrCommentCommand
-from .create_preview import CreatePreviewCommand
+from .command import Command
 from .create_pr_preview import CreatePrPreviewCommand
-from .delete_preview import DeletePreviewCommand
+from .create_preview import CreatePreviewCommand
 from .delete_pr_preview import DeletePrPreviewCommand
+from .delete_preview import DeletePreviewCommand
 from .deploy import DeployCommand
 from .sync_apps import SyncAppsCommand
 from .version import VersionCommand

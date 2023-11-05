@@ -1,13 +1,15 @@
 import logging
 import os
 import shutil
-from typing import Optional
 from dataclasses import dataclass
-from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory, GitRepoApi
+from typing import Optional
+
+from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
-from .common import load_gitops_config
+
 from .command import Command
+from .common import load_gitops_config
 
 
 class DeletePreviewCommand(Command):
@@ -60,7 +62,9 @@ class DeletePreviewCommand(Command):
 
     def __create_preview_target_git_repo_api(self, gitops_config: GitOpsConfig) -> GitRepoApi:
         return GitRepoApiFactory.create(
-            self.__args, gitops_config.preview_target_organisation, gitops_config.preview_target_repository
+            self.__args,
+            gitops_config.preview_target_organisation,
+            gitops_config.preview_target_repository,
         )
 
     def __commit_and_push(self, git_repo: GitRepo, message: str) -> None:

@@ -1,8 +1,9 @@
-import re
 import hashlib
+import re
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import List, Any, Optional, Dict, Callable, Set
 from string import Template
+from typing import Any, Optional
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -10,7 +11,7 @@ _VARIABLE_REGEX = re.compile(r"\${(\w+)}")
 
 
 @dataclass(frozen=True)
-class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
+class GitOpsConfig:
     class Replacement:
         @dataclass(frozen=True)
         class PreviewContext:
@@ -18,7 +19,7 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
             preview_id: str
             git_hash: str
 
-        __VARIABLE_MAPPERS: Dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]] = {
+        __VARIABLE_MAPPERS: dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]] = {
             "GIT_HASH": lambda context: context.git_hash,
             "PREVIEW_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
             "PREVIEW_NAMESPACE": lambda context: context.gitops_config.get_preview_namespace(context.preview_id),
@@ -40,7 +41,7 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
                 if var not in variables:
                     raise GitOpsException(
                         f"Replacement value '{self.value_template}' for path '{self.path}' "
-                        f"contains invalid variable: {var}"
+                        f"contains invalid variable: {var}",
                     )
 
         def get_value(self, context: PreviewContext) -> str:
@@ -69,7 +70,7 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
     preview_target_namespace_template: str
     preview_target_max_namespace_length: int
 
-    replacements: Dict[str, List[Replacement]]
+    replacements: dict[str, list[Replacement]]
 
     @property
     def preview_template_path(self) -> str:
@@ -93,14 +94,16 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
         if self.preview_target_branch is not None:
             assert isinstance(self.preview_target_branch, str), "preview_target_branch of wrong type!"
         assert isinstance(
-            self.preview_target_namespace_template, str
+            self.preview_target_namespace_template,
+            str,
         ), "preview_target_namespace_template of wrong type!"
         self.__assert_variables(
             self.preview_target_namespace_template,
             {"APPLICATION_NAME", "PREVIEW_ID_HASH", "PREVIEW_ID_HASH_SHORT", "PREVIEW_ID"},
         )
         assert isinstance(
-            self.preview_target_max_namespace_length, int
+            self.preview_target_max_namespace_length,
+            int,
         ), "preview_target_max_namespace_length of wrong type!"
         assert self.preview_target_max_namespace_length >= 1, "preview_target_max_namespace_length is < 1!"
         assert isinstance(self.replacements, dict), "replacements of wrong type!"
@@ -123,7 +126,8 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
         preview_namespace = preview_namespace.replace("${APPLICATION_NAME}", self.application_name)
         preview_namespace = preview_namespace.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
         preview_namespace = preview_namespace.replace(
-            "${PREVIEW_ID_HASH_SHORT}", self.create_preview_id_hash_short(preview_id)
+            "${PREVIEW_ID_HASH_SHORT}",
+            self.create_preview_id_hash_short(preview_id),
         )
 
         current_length = len(preview_namespace) - len("${PREVIEW_ID}")
@@ -133,7 +137,7 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
             preview_namespace = preview_namespace.replace("${PREVIEW_ID}", "")
             raise GitOpsException(
                 f"Preview namespace is too long (max {self.preview_target_max_namespace_length} chars): "
-                f"{preview_namespace} ({len(preview_namespace)} chars)"
+                f"{preview_namespace} ({len(preview_namespace)} chars)",
             )
 
         sanitized_preview_id = self.__sanitize(preview_id, remaining_length)
@@ -167,7 +171,7 @@ class GitOpsConfig:  # pylint: disable=too-many-instance-attributes
         )
 
     @staticmethod
-    def __assert_variables(template: str, variables: Set[str]) -> None:
+    def __assert_variables(template: str, variables: set[str]) -> None:
         for var in _VARIABLE_REGEX.findall(template):
             if var not in variables:
                 raise GitOpsException(f"GitOps config template '{template}' contains invalid variable: {var}")
@@ -245,13 +249,13 @@ class _GitOpsConfigYamlParser:
             raise GitOpsException(f"Item '{key}' should be an integer in GitOps config!")
         return value
 
-    def __get_list_value(self, key: str) -> List[Any]:
+    def __get_list_value(self, key: str) -> list[Any]:
         value = self.__get_value(key)
         if not isinstance(value, list):
             raise GitOpsException(f"Item '{key}' should be a list in GitOps config!")
         return value
 
-    def __get_dict_value(self, key: str) -> Dict[str, Any]:
+    def __get_dict_value(self, key: str) -> dict[str, Any]:
         value = self.__get_value(key)
         if not isinstance(value, dict):
             raise GitOpsException(f"Item '{key}' should be an object in GitOps config!")
@@ -268,7 +272,7 @@ class _GitOpsConfigYamlParser:
         raise GitOpsException(f"GitOps config apiVersion '{api_version}' is not supported!")
 
     def __parse_v0(self) -> GitOpsConfig:
-        replacements: Dict[str, List[GitOpsConfig.Replacement]] = {
+        replacements: dict[str, list[GitOpsConfig.Replacement]] = {
             "Chart.yaml": [GitOpsConfig.Replacement("name", "${PREVIEW_NAMESPACE}")],
             "values.yaml": [],
         }
@@ -284,11 +288,11 @@ class _GitOpsConfigYamlParser:
             variable = replacement_dict["variable"]
             if not isinstance(path, str):
                 raise GitOpsException(
-                    f"Item 'previewConfig.replace.[{index}].path' should be a string in GitOps config!"
+                    f"Item 'previewConfig.replace.[{index}].path' should be a string in GitOps config!",
                 )
             if not isinstance(variable, str):
                 raise GitOpsException(
-                    f"Item 'previewConfig.replace.[{index}].variable' should be a string in GitOps config!"
+                    f"Item 'previewConfig.replace.[{index}].variable' should be a string in GitOps config!",
                 )
             if "{" in variable or "}" in variable:
                 raise GitOpsException(f"Item 'previewConfig.replace.[{index}].variable' must not contain '{{' or '}}'!")
@@ -305,13 +309,14 @@ class _GitOpsConfigYamlParser:
             api_version=0,
             application_name=self.__get_string_value("deploymentConfig.applicationName"),
             messages_created_template="New preview environment created for version `${GIT_HASH}`. "
-            + "Access it here: https://${PREVIEW_HOST}",
+            "Access it here: https://${PREVIEW_HOST}",
             messages_updated_template="Preview environment updated to version `${GIT_HASH}`. "
-            + "Access it here: https://${PREVIEW_HOST}",
+            "Access it here: https://${PREVIEW_HOST}",
             messages_uptodate_template="The version `${GIT_HASH}` has already been deployed. "
-            + "Access it here: https://${PREVIEW_HOST}",
+            "Access it here: https://${PREVIEW_HOST}",
             preview_host_template=self.__get_string_value("previewConfig.route.host.template").replace(
-                "{SHA256_8CHAR_BRANCH_HASH}", "${PREVIEW_ID_HASH}"  # backwards compatibility
+                "{SHA256_8CHAR_BRANCH_HASH}",
+                "${PREVIEW_ID_HASH}",  # backwards compatibility
             ),
             preview_template_organisation=preview_target_organisation,
             preview_template_repository=preview_target_repository,
@@ -332,7 +337,7 @@ class _GitOpsConfigYamlParser:
         def add_var_dollar(template: str) -> str:
             return re.sub("(^|[^\\$])({(\\w+)})", "\\1$\\2", template)
 
-        replacements: Dict[str, List[GitOpsConfig.Replacement]] = {}
+        replacements: dict[str, list[GitOpsConfig.Replacement]] = {}
         for filename, file_replacements in config.replacements.items():
             replacements[filename] = [
                 GitOpsConfig.Replacement(r.path, add_var_dollar(r.value_template)) for r in file_replacements
@@ -341,11 +346,11 @@ class _GitOpsConfigYamlParser:
             api_version=1,
             application_name=config.application_name,
             messages_created_template="New preview environment created for version `${GIT_HASH}`. "
-            + "Access it here: https://${PREVIEW_HOST}",
+            "Access it here: https://${PREVIEW_HOST}",
             messages_updated_template="Preview environment updated to version `${GIT_HASH}`. "
-            + "Access it here: https://${PREVIEW_HOST}",
+            "Access it here: https://${PREVIEW_HOST}",
             messages_uptodate_template="The version `${GIT_HASH}` has already been deployed. "
-            + "Access it here: https://${PREVIEW_HOST}",
+            "Access it here: https://${PREVIEW_HOST}",
             preview_host_template=add_var_dollar(config.preview_host_template),
             preview_template_organisation=config.preview_template_organisation,
             preview_template_repository=config.preview_template_repository,
@@ -356,8 +361,9 @@ class _GitOpsConfigYamlParser:
             preview_target_branch=config.preview_target_branch,
             preview_target_namespace_template=add_var_dollar(
                 self.__get_string_value_or_default(
-                    "previewConfig.target.namespace", "{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview"
-                )
+                    "previewConfig.target.namespace",
+                    "{APPLICATION_NAME}-{PREVIEW_ID}-{PREVIEW_ID_HASH}-preview",
+                ),
             ),
             preview_target_max_namespace_length=63,
             replacements=replacements,
@@ -368,12 +374,13 @@ class _GitOpsConfigYamlParser:
         preview_target_repository = self.__get_string_value("previewConfig.target.repository")
         preview_target_branch = self.__get_string_value_or_none("previewConfig.target.branch")
         preview_target_max_namespace_length = self.__get_int_value_or_default(
-            "previewConfig.target.maxNamespaceLength", 53
+            "previewConfig.target.maxNamespaceLength",
+            53,
         )
         if preview_target_max_namespace_length < 1:
             raise GitOpsException("Value 'maxNamespaceLength' should be at least 1 in GitOps config!")
 
-        replacements: Dict[str, List[GitOpsConfig.Replacement]] = {}
+        replacements: dict[str, list[GitOpsConfig.Replacement]] = {}
         for filename, file_replacements in self.__get_dict_value("previewConfig.replace").items():
             replacements[filename] = []
             escaped_filename = filename.replace(".", "\\.")
@@ -413,13 +420,16 @@ class _GitOpsConfigYamlParser:
             ),
             preview_host_template=self.__get_string_value("previewConfig.host"),
             preview_template_organisation=self.__get_string_value_or_default(
-                "previewConfig.template.organisation", preview_target_organisation
+                "previewConfig.template.organisation",
+                preview_target_organisation,
             ),
             preview_template_repository=self.__get_string_value_or_default(
-                "previewConfig.template.repository", preview_target_repository
+                "previewConfig.template.repository",
+                preview_target_repository,
             ),
             preview_template_path_template=self.__get_string_value_or_default(
-                "previewConfig.template.path", ".preview-templates/${APPLICATION_NAME}"
+                "previewConfig.template.path",
+                ".preview-templates/${APPLICATION_NAME}",
             ),
             preview_template_branch=self.__get_string_value_or_none("previewConfig.template.branch")
             or preview_target_branch,
@@ -427,7 +437,8 @@ class _GitOpsConfigYamlParser:
             preview_target_repository=preview_target_repository,
             preview_target_branch=preview_target_branch,
             preview_target_namespace_template=self.__get_string_value_or_default(
-                "previewConfig.target.namespace", "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview"
+                "previewConfig.target.namespace",
+                "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview",
             ),
             preview_target_max_namespace_length=preview_target_max_namespace_length,
             replacements=replacements,

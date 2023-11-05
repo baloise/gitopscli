@@ -1,5 +1,6 @@
-from dataclasses import dataclass
 import importlib.metadata
+from dataclasses import dataclass
+
 from .command import Command
 
 

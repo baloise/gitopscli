@@ -1,12 +1,13 @@
 import logging
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
+
+from gitopscli.appconfig_api.app_tenant_config import create_app_tenant_config_from_repo
+from gitopscli.appconfig_api.root_repo import create_root_repo
+from gitopscli.commands.command import Command
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io_api.yaml_util import yaml_file_dump
-from gitopscli.commands.command import Command
-from gitopscli.appconfig_api.app_tenant_config import create_app_tenant_config_from_repo
-from gitopscli.appconfig_api.root_repo import create_root_repo
 
 
 class SyncAppsCommand(Command):
@@ -46,7 +47,7 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
             )
 
 
-# TODO: BETTER NAMES FOR STUFF HERE pylint: disable=fixme
+# TODO: BETTER NAMES FOR STUFF HERE
 def __sync_apps(
     tenant_git_repo: GitRepo,
     root_git_repo: GitRepo,
@@ -97,6 +98,10 @@ def __commit_and_push(
 ) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
     root_config_git_repo.commit(
-        git_user, git_email, git_author_name, git_author_email, f"{author} updated " + app_file_name
+        git_user,
+        git_email,
+        git_author_name,
+        git_author_email,
+        f"{author} updated " + app_file_name,
     )
     root_config_git_repo.push()

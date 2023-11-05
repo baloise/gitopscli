@@ -1,12 +1,14 @@
 from typing import Optional
+
 from gitopscli.gitops_exception import GitOpsException
-from .git_repo_api import GitRepoApi
-from .github_git_repo_api_adapter import GithubGitRepoApiAdapter
+
 from .bitbucket_git_repo_api_adapter import BitbucketGitRepoApiAdapter
-from .gitlab_git_repo_api_adapter import GitlabGitRepoApiAdapter
-from .git_repo_api_logging_proxy import GitRepoApiLoggingProxy
 from .git_api_config import GitApiConfig
 from .git_provider import GitProvider
+from .git_repo_api import GitRepoApi
+from .git_repo_api_logging_proxy import GitRepoApiLoggingProxy
+from .github_git_repo_api_adapter import GithubGitRepoApiAdapter
+from .gitlab_git_repo_api_adapter import GitlabGitRepoApiAdapter
 
 
 class GitRepoApiFactory:
