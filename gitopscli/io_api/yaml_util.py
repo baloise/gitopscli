@@ -80,7 +80,7 @@ def merge_yaml_element(file_path: str, element_path: str, desired_value: Any) ->
 
     # delete missing key:
     current = work_path.copy().items()
-    for key, value in current:
+    for key, _ in current:
         if key not in desired_value:
             del work_path[key]
 
