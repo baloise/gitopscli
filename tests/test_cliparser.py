@@ -569,7 +569,7 @@ class CliParserTest(unittest.TestCase):
 
     def test_add_pr_comment_required_args_and_credentials_env_vars(self):
         os.environ["GITOPSCLI_USERNAME"] = "ENV_USER"
-        os.environ["GITOPSCLI_PASSWORD"] = "ENV_PASS"
+        os.environ["GITOPSCLI_PASSWORD"] = "ENV_PASS"  # noqa: S105
         verbose, args = parse_args(
             [
                 "add-pr-comment",
