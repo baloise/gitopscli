@@ -1,14 +1,16 @@
-import posixpath
 import logging
 import os
+import posixpath
 import unittest
 from unittest.mock import call, patch
 
 from ruamel.yaml.compat import ordereddict
-from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
+
 from gitopscli.commands.sync_apps import SyncAppsCommand
-from gitopscli.io_api.yaml_util import yaml_file_load, yaml_file_dump
+from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io_api.yaml_util import yaml_file_dump, yaml_file_load
+
 from .mock_mixin import MockMixin
 
 ARGS = SyncAppsCommand.Args(

@@ -1,10 +1,11 @@
-from os import path, makedirs, chmod
 import stat
 import unittest
 import uuid
+from os import chmod, makedirs, path
 from unittest.mock import MagicMock, patch
-from git import Repo
+
 import pytest
+from git import Repo
 
 from gitopscli.git_api import GitRepo, GitRepoApi
 from gitopscli.gitops_exception import GitOpsException

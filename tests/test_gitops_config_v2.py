@@ -1,4 +1,5 @@
 import unittest
+
 import pytest
 
 from gitopscli.gitops_config import GitOpsConfig

@@ -1,13 +1,15 @@
-import os
-import unittest
-import shutil
 import logging
-from unittest.mock import call, Mock
-from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException, yaml_file_dump
-from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider, GitApiConfig
+import os
+import shutil
+import unittest
+from unittest.mock import Mock, call
+
+from gitopscli.commands.create_preview import CreatePreviewCommand, load_gitops_config
+from gitopscli.git_api import GitApiConfig, GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.create_preview import CreatePreviewCommand, load_gitops_config
+from gitopscli.io_api.yaml_util import YAMLException, update_yaml_file, yaml_file_dump
+
 from .mock_mixin import MockMixin
 
 DUMMY_GIT_HASH = "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"

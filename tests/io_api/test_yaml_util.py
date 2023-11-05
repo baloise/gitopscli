@@ -2,16 +2,17 @@ import os
 import shutil
 import unittest
 import uuid
+
 import pytest
 
 from gitopscli.io_api.yaml_util import (
-    yaml_file_load,
-    yaml_file_dump,
-    yaml_load,
-    yaml_dump,
     YAMLException,
-    update_yaml_file,
     merge_yaml_element,
+    update_yaml_file,
+    yaml_dump,
+    yaml_file_dump,
+    yaml_file_load,
+    yaml_load,
 )
 
 

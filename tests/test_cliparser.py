@@ -3,19 +3,20 @@ import sys
 import unittest
 from contextlib import contextmanager
 from io import StringIO
+
 import pytest
 
+from gitopscli.cliparser import parse_args
 from gitopscli.commands import (
-    DeployCommand,
-    SyncAppsCommand,
     AddPrCommentCommand,
     CreatePreviewCommand,
     CreatePrPreviewCommand,
     DeletePreviewCommand,
     DeletePrPreviewCommand,
+    DeployCommand,
+    SyncAppsCommand,
     VersionCommand,
 )
-from gitopscli.cliparser import parse_args
 from gitopscli.git_api import GitProvider
 
 EXPECTED_GITOPSCLI_HELP = """\
