@@ -80,7 +80,7 @@ class DeployCommand(Command):
         single_commit = args.single_commit or args.commit_message
         full_file_path = git_repo.get_full_file_path(args.file)
         updated_values = {}
-        for key, value in args.values.items():
+        for key, value in args.values.items():  # noqa: PD011
             try:
                 updated_value = update_yaml_file(full_file_path, key, value)
             except (FileNotFoundError, IsADirectoryError) as ex:
