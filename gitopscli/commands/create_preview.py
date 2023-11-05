@@ -175,7 +175,7 @@ class CreatePreviewCommand(Command):
                 "routeHost": gitops_config.get_preview_host(preview_id),
                 "namespace": gitops_config.get_preview_namespace(preview_id),
             },
-            "/tmp/gitopscli-preview-info.yaml",
+            "/tmp/gitopscli-preview-info.yaml",  # noqa: S108
         )
 
     @staticmethod

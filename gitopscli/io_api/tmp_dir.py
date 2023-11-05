@@ -4,7 +4,7 @@ import uuid
 
 
 def create_tmp_dir() -> str:
-    tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
+    tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"  # noqa: S108
     os.makedirs(tmp_dir)
     return tmp_dir
 
