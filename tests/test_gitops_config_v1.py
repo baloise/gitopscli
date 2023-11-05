@@ -7,6 +7,8 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 class GitOpsConfigV1Test(unittest.TestCase):
+    _max_namespace_length = 63
+
     def setUp(self):
         self.yaml = {
             "apiVersion": "v1",
@@ -215,7 +217,7 @@ class GitOpsConfigV1Test(unittest.TestCase):
             "Very long preview ID. It will be cut to have max 63 chars of namespace in total!!"
         )
         self.assertEqual(actual_namespace, "my-app-very-long-preview-id-it-will-be-cut-to-05d9825a-preview")
-        self.assertTrue(len(actual_namespace) <= 63)
+        self.assertTrue(len(actual_namespace) <= self._max_namespace_length)
 
     def test_preview_target_namespace_not_a_string(self):
         self.yaml["previewConfig"]["target"]["namespace"] = []
