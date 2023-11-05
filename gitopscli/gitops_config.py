@@ -29,7 +29,7 @@ class GitOpsConfig:
             "PREVIEW_ID_HASH_SHORT": lambda context: GitOpsConfig.create_preview_id_hash_short(context.preview_id),
         }
 
-        def __init__(self, path: str, value_template: str):
+        def __init__(self, path: str, value_template: str) -> None:
             assert isinstance(path, str), "path of wrong type!"
             assert isinstance(value_template, str), "value_template of wrong type!"
 
@@ -207,7 +207,7 @@ class GitOpsConfig:
 
 
 class _GitOpsConfigYamlParser:
-    def __init__(self, yaml: Any):
+    def __init__(self, yaml: Any) -> None:
         self.__yaml = yaml
 
     def __get_value(self, key: str) -> Any:
