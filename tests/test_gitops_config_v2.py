@@ -44,11 +44,11 @@ class GitOpsConfigV2Test(unittest.TestCase):
             self.load()
         self.assertEqual(error_msg, str(ex.value))
 
-    def test_apiVersion(self):
+    def test_api_version(self):
         config = self.load()
         self.assertEqual(config.api_version, 2)
 
-    def test_invalid_apiVersion(self):
+    def test_invalid_api_version(self):
         self.yaml["apiVersion"] = "foo"
         self.assert_load_error("GitOps config apiVersion 'foo' is not supported!")
 
