@@ -275,7 +275,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                     "bootstrap": [{"name": "team-non-prod"}],
                 }
             if file_path == "/tmp/root-config-repo/apps/team-non-prod.yaml":
-                raise FileNotFoundError()
+                raise FileNotFoundError
             raise Exception("test should not reach this")
 
         self.yaml_file_load_mock.side_effect = file_load_mock_side_effect
