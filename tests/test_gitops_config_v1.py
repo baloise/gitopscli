@@ -238,7 +238,8 @@ class GitOpsConfigV1Test(unittest.TestCase):
         with pytest.raises(GitOpsException) as ex:
             config.get_preview_namespace("x")
         self.assertEqual(
-            "Preview namespace is too long (max 63 chars): veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long--2d711642 (68 chars)",
+            "Preview namespace is too long (max 63 chars): "
+            "veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long--2d711642 (68 chars)",
             str(ex.value),
         )
 

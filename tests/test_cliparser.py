@@ -50,7 +50,7 @@ usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
                                 PR_ID [--parent-id PARENT_ID] [-v [VERBOSE]]
                                 --text TEXT
 gitopscli add-pr-comment: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id, --text
-"""
+"""  # noqa: E501
 
 EXPECTED_ADD_PR_COMMENT_HELP = """\
 usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
@@ -94,7 +94,7 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --git-hash GIT_HASH --preview-id PREVIEW_ID
                                 [-v [VERBOSE]]
 gitopscli create-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --git-hash, --preview-id
-"""
+"""  # noqa: E501
 EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
@@ -108,7 +108,7 @@ usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    --pr-id PR_ID [--parent-id PARENT_ID]
                                    [-v [VERBOSE]]
 gitopscli create-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id
-"""
+"""  # noqa: E501
 
 EXPECTED_CREATE_PREVIEW_HELP = """\
 usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
@@ -204,7 +204,7 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                 [-v [VERBOSE]]
 gitopscli delete-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --preview-id
-"""
+"""  # noqa: E501
 
 EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
@@ -220,7 +220,7 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                    [-v [VERBOSE]]
 gitopscli delete-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --branch
-"""
+"""  # noqa: E501
 
 EXPECTED_DELETE_PREVIEW_HELP = """\
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
@@ -323,7 +323,7 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--pr-labels PR_LABELS]
                         [--merge-parameters MERGE_PARAMETERS] [-v [VERBOSE]]
 gitopscli deploy: error: the following arguments are required: --file, --values, --username, --password, --organisation, --repository-name
-"""
+"""  # noqa: E501
 
 EXPECTED_DEPLOY_HELP = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
@@ -399,7 +399,7 @@ usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            ROOT_ORGANISATION --root-repository-name
                            ROOT_REPOSITORY_NAME
 gitopscli sync-apps: error: the following arguments are required: --username, --password, --organisation, --repository-name, --root-organisation, --root-repository-name
-"""
+"""  # noqa: E501
 
 EXPECTED_SYNC_APPS_HELP = """\
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
