@@ -82,7 +82,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                     merge_request.rebase(merge_parameters)
                     return
                 merge_request.merge(merge_parameters)
-                return
+                return  # noqa: TRY300
             except gitlab.exceptions.GitlabMRClosedError as ex:
                 # "Branch cannot be merged" error can occur if the server
                 # is still processing the merge request internally

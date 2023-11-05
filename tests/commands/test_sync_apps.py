@@ -29,6 +29,10 @@ ARGS = SyncAppsCommand.Args(
 )
 
 
+class UnreachableError(Exception):
+    pass
+
+
 class SyncAppsCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
         self.init_mock_manager(SyncAppsCommand)
@@ -276,7 +280,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                 }
             if file_path == "/tmp/root-config-repo/apps/team-non-prod.yaml":
                 raise FileNotFoundError
-            raise Exception("test should not reach this")
+            raise UnreachableError("test should not reach this")
 
         self.yaml_file_load_mock.side_effect = file_load_mock_side_effect
 

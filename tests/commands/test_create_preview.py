@@ -37,6 +37,10 @@ INFO_YAML = {
 }
 
 
+class UnreachableError(Exception):
+    pass
+
+
 class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
         self.init_mock_manager(CreatePreviewCommand)
@@ -92,7 +96,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 return self.template_git_repo_api_mock
             if "TARGET" in organisation and "TARGET" in repository_name:
                 return self.target_git_repo_api_mock
-            raise Exception(f"no mock for {organisation}/{repository_name}")
+            raise UnreachableError(f"no mock for {organisation}/{repository_name}")
 
         self.git_repo_api_factory_mock.create.side_effect = git_repo_api_factory_create_mock
 
@@ -115,7 +119,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 return self.template_git_repo_mock
             if git_repo_api == self.target_git_repo_api_mock:
                 return self.target_git_repo_mock
-            raise Exception(f"no mock for {git_repo_api}")
+            raise UnreachableError(f"no mock for {git_repo_api}")
 
         self.monkey_patch(GitRepo).side_effect = git_repo_constructor_mock
 
