@@ -46,7 +46,7 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
             )
 
 
-# TODO: BETTER NAMES FOR STUFF HERE
+# TODO: BETTER NAMES FOR STUFF HERE # noqa: FIX002
 def __sync_apps(
     tenant_git_repo: GitRepo,
     root_git_repo: GitRepo,

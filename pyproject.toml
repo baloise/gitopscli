@@ -57,13 +57,13 @@ ignore = ["ANN101", "ANN401",
 "**/__init__.py" = ["F401"]
 # the following exclusions have been introduced to prevent huge changes
 # feel free to remove them and fix the code
-"gitopscli/appconfig_api/app_tenant_config.py" = ["FIX002", "PLR5501", "PTH110", "PTH112", "PTH118", "RET504", "SIM118", "SIM401"]
+"gitopscli/appconfig_api/app_tenant_config.py" = ["PLR5501", "PTH110", "PTH112", "PTH118", "RET504", "SIM118", "SIM401"]
 "gitopscli/appconfig_api/root_repo.py" = ["SIM118"]
 "gitopscli/commands/command_factory.py" = ["PYI016"]
 "gitopscli/commands/create_preview.py" = ["PTH112", "S108"]
 "gitopscli/commands/delete_preview.py" = ["PTH110"]
 "gitopscli/commands/deploy.py" = ["PD011", "RUF015"]
-"gitopscli/commands/sync_apps.py" = ["FIX002", "SIM117"]
+"gitopscli/commands/sync_apps.py" = ["SIM117"]
 "gitopscli/git_api/bitbucket_git_repo_api_adapter.py" = ["ARG002"]
 "gitopscli/git_api/github_git_repo_api_adapter.py" = ["ARG002"]
 "gitopscli/git_api/gitlab_git_repo_api_adapter.py" = ["ARG002", "PLR2004", "TRY300"]
