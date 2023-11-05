@@ -31,7 +31,7 @@ class RootRepo:
         for tenant in self.tenants.values():
             if tenant.repo_url != tenant_config.repo_url:
                 apps_from_other_tenants.extend(tenant.list_apps().keys())
-        for app_name in tenant_config.list_apps().keys():
+        for app_name in tenant_config.list_apps():
             if app_name in apps_from_other_tenants:
                 raise GitOpsException(f"Application '{app_name}' already exists in a different repository")
 

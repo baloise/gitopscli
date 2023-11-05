@@ -73,9 +73,8 @@ def merge_yaml_element(file_path: str, element_path: str, desired_value: Any) ->
             work_path = work_path[key]
 
     for key, value in desired_value.items():
-        if key in work_path:
-            if work_path[key] is not None:
-                value = {**work_path[key], **value}
+        if key in work_path and work_path[key] is not None:
+            value = {**work_path[key], **value}
         work_path[key] = value
 
     # delete missing key:

@@ -399,7 +399,6 @@ echo password='Pass'
             self.assertEqual("unit tester <unit@tester.com>", testee.get_author_from_last_commit())
 
     def test_get_author_from_last_commit_not_cloned_yet(self):
-        with GitRepo(self.__mock_repo_api) as testee:
-            with pytest.raises(GitOpsException) as ex:
-                testee.get_author_from_last_commit()
+        with GitRepo(self.__mock_repo_api) as testee, pytest.raises(GitOpsException) as ex:
+            testee.get_author_from_last_commit()
         self.assertEqual("Repository not cloned yet!", str(ex.value))

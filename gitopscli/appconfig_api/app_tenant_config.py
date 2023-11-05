@@ -17,10 +17,7 @@ class AppTenantConfig:
     dirty: bool = False
 
     def __post_init__(self) -> None:
-        if "config" in self.yaml:
-            self.tenant_config = self.yaml["config"]
-        else:
-            self.tenant_config = self.yaml
+        self.tenant_config = self.yaml.get("config", self.yaml)
         if "repository" not in self.tenant_config:
             raise GitOpsException("Cannot find key 'repository' in " + self.file_path)
         self.repo_url = str(self.tenant_config["repository"])
@@ -62,14 +59,14 @@ class AppTenantConfig:
 
     def __add_new_applications(self, desired_apps: dict[str, Any]) -> None:
         for desired_app_name, desired_app_value in desired_apps.items():
-            if desired_app_name not in self.list_apps().keys():
+            if desired_app_name not in self.list_apps():
                 logging.info("Adding %s in %s applications", desired_app_name, self.file_path)
                 self.tenant_config["applications"][desired_app_name] = desired_app_value
                 self.__set_dirty()
 
     def __delete_removed_applications(self, desired_apps: dict[str, Any]) -> None:
-        for current_app in self.list_apps().keys():
-            if current_app not in desired_apps.keys():
+        for current_app in self.list_apps():
+            if current_app not in desired_apps:
                 logging.info("Removing %s from %s applications", current_app, self.file_path)
                 del self.tenant_config["applications"][current_app]
                 self.__set_dirty()
