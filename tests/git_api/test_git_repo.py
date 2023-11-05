@@ -32,7 +32,7 @@ class GitRepoTest(unittest.TestCase):
     def __create_origin(self):
         repo_dir = self.__create_tmp_dir()
 
-        repo = Repo.init(repo_dir)
+        repo = Repo.init(repo_dir, initial_branch="master")
         git_user = "unit tester"
         git_email = "unit@tester.com"
         repo.config_writer().set_value("user", "name", git_user).release()
