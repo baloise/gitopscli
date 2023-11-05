@@ -70,7 +70,7 @@ class DeployCommand(Command):
                 git_repo_api.delete_branch(pr_branch)
 
         if self.__args.json:
-            print(json.dumps({"commits": [{"hash": h} for h in self.__commit_hashes]}, indent=4))
+            print(json.dumps({"commits": [{"hash": h} for h in self.__commit_hashes]}, indent=4))  # noqa: T201
 
     def __create_git_repo_api(self) -> GitRepoApi:
         return GitRepoApiFactory.create(self.__args, self.__args.organisation, self.__args.repository_name)

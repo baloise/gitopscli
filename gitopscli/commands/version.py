@@ -18,4 +18,4 @@ class VersionCommand(Command):
         except importlib.metadata.PackageNotFoundError:
             # Handle the case where "gitopscli" is not installed
             version = None
-        print(f"GitOps CLI version {version}")
+        print(f"GitOps CLI version {version}")  # noqa: T201
