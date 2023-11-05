@@ -3,7 +3,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from string import Template
-from typing import Any
+from typing import Any, ClassVar
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -19,7 +19,7 @@ class GitOpsConfig:
             preview_id: str
             git_hash: str
 
-        __VARIABLE_MAPPERS: dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]] = {
+        __VARIABLE_MAPPERS: ClassVar[dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]]] = {
             "GIT_HASH": lambda context: context.git_hash,
             "PREVIEW_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
             "PREVIEW_NAMESPACE": lambda context: context.gitops_config.get_preview_namespace(context.preview_id),
