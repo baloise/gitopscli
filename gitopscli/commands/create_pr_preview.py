@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from typing import Optional
+
 from gitopscli.git_api import GitApiConfig, GitRepoApiFactory
-from .create_preview import CreatePreviewCommand
+
 from .command import Command
+from .create_preview import CreatePreviewCommand
 
 
 class CreatePrPreviewCommand(Command):

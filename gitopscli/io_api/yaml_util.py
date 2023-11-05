@@ -1,9 +1,10 @@
 import locale
 from io import StringIO
 from typing import Any
-from ruamel.yaml import YAML, YAMLError
+
 from jsonpath_ng.exceptions import JSONPathError
 from jsonpath_ng.ext import parse
+from ruamel.yaml import YAML, YAMLError
 
 YAML_INSTANCE = YAML()
 YAML_INSTANCE.preserve_quotes = True

@@ -1,21 +1,26 @@
-from typing import Any, Dict, Union, Optional, Literal
+from typing import Any, Literal, Optional, Union
 
 from github import (
-    Github,
-    UnknownObjectException,
     BadCredentialsException,
+    Github,
     GitRef,
     PullRequest,
     Repository,
+    UnknownObjectException,
 )
 
 from gitopscli.gitops_exception import GitOpsException
+
 from .git_repo_api import GitRepoApi
 
 
 class GithubGitRepoApiAdapter(GitRepoApi):
     def __init__(
-        self, username: Optional[str], password: Optional[str], organisation: str, repository_name: str
+        self,
+        username: Optional[str],
+        password: Optional[str],
+        organisation: str,
+        repository_name: str,
     ) -> None:
         self.__github = Github(username, password)
         self.__username = username
@@ -33,13 +38,20 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         return self.__get_repo().clone_url
 
     def create_pull_request_to_default_branch(
-        self, from_branch: str, title: str, description: str
+        self,
+        from_branch: str,
+        title: str,
+        description: str,
     ) -> GitRepoApi.PullRequestIdAndUrl:
         to_branch = self.__get_repo().default_branch
         return self.create_pull_request(from_branch, to_branch, title, description)
 
     def create_pull_request(
-        self, from_branch: str, to_branch: str, title: str, description: str
+        self,
+        from_branch: str,
+        to_branch: str,
+        title: str,
+        description: str,
     ) -> GitRepoApi.PullRequestIdAndUrl:
         repo = self.__get_repo()
         pull_request = repo.create_pull(title=title, body=description, head=from_branch, base=to_branch)
@@ -49,7 +61,7 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[Dict[str, Any]] = None,
+        merge_parameters: Optional[dict[str, Any]] = None,
     ) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.merge(merge_method=merge_method)
@@ -91,7 +103,7 @@ class GithubGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException("Bad credentials") from ex
         except UnknownObjectException as ex:
             raise GitOpsException(
-                f"Repository '{self.__organisation}/{self.__repository_name}' does not exist."
+                f"Repository '{self.__organisation}/{self.__repository_name}' does not exist.",
             ) from ex
 
     def add_pull_request_label(self, pr_id: int, pr_labels: Union[str, Any]) -> None:

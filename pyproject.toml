@@ -19,9 +19,8 @@ pygithub = "*"
 python-gitlab = "^2.6.0"
 
 [tool.poetry.group.test.dependencies]
-black = "*"
+ruff = "*"
 coverage = "*"
-pylint = "*"
 pytest = "*"
 mypy = "*"
 typeguard = "^2.13.3"
@@ -40,3 +39,60 @@ build-backend = "poetry.core.masonry.api"
 
 [virtualenvs]
 in-project = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["ANN101", "ANN401", 
+"C901", "PLR0913", # ignore complexity
+"D",
+"COM812", "ISC001",
+"EM101", "EM102", 
+"UP007", # Optional[T] is ok atm. later: move to T | None 
+ "S101", "TD", "TRY003"]
+
+[tool.ruff.per-file-ignores]
+"**/__init__.py" = ["F401"]
+# the following exclusions have been introduced to prevent huge changes
+# feel free to remove them and fix the code
+"gitopscli/appconfig_api/app_tenant_config.py" = ["FIX002", "PLR5501", "PTH110", "PTH112", "PTH118", "RET504", "SIM118", "SIM401"]
+"gitopscli/appconfig_api/root_repo.py" = ["SIM118"]
+"gitopscli/commands/command_factory.py" = ["PYI016"]
+"gitopscli/commands/create_preview.py" = ["PTH112", "S108"]
+"gitopscli/commands/delete_preview.py" = ["PTH110"]
+"gitopscli/commands/deploy.py" = ["PD011", "RUF015", "T201"]
+"gitopscli/commands/sync_apps.py" = ["FIX002", "SIM117"]
+"gitopscli/commands/version.py" = ["T201"]
+"gitopscli/git_api/bitbucket_git_repo_api_adapter.py" = ["ARG002"]
+"gitopscli/git_api/github_git_repo_api_adapter.py" = ["ARG002"]
+"gitopscli/git_api/gitlab_git_repo_api_adapter.py" = ["ARG002", "PLR2004", "TRY300"]
+"gitopscli/git_api/git_repo_api_logging_proxy.py" = ["ARG002"]
+"gitopscli/git_api/git_repo.py" = ["FBT003", "PTH101", "PTH118", "PTH123"]
+"gitopscli/gitops_config.py" = ["ANN204", "RET504", "RUF012"]
+"gitopscli/gitops_exception.py" = ["N818"]
+"gitopscli/io_api/tmp_dir.py" = ["PTH103", "S108"]
+"gitopscli/io_api/yaml_util.py" = ["B007", "FBT003", "N818", "PLW2901", "PTH123", "SIM102", "UP015"]
+"gitopscli/__main__.py" = ["TRY400", "TRY401"]
+"tests/commands/common/test_gitops_config_loader.py" = ["ANN201", "I001", "INP001", "PT009", "S106"]
+"tests/commands/mock_mixin.py" = ["B024", "I001"]
+"tests/commands/test_add_pr_comment.py" = ["ANN201", "I001", "S106"]
+"tests/commands/test_command_factory.py" = ["ANN201", "I001", "PT009"]
+"tests/commands/test_create_preview.py" = ["ANN201", "ARG005", "I001", "PT009", "S106", "S108", "TRY002"]
+"tests/commands/test_create_pr_preview.py" = ["ANN201", "I001", "S106"]
+"tests/commands/test_delete_preview.py" = ["ANN201", "I001", "PT009", "S106", "S108"]
+"tests/commands/test_delete_pr_preview.py" = ["ANN201", "I001", "S106"]
+"tests/commands/test_deploy.py" = ["ANN001", "ANN201", "I001", "PT009", "S106", "S108"]
+"tests/commands/test_sync_apps.py" = ["ANN001", "ANN201", "ANN202", "ARG005", "E501", "ERA001", "I001", "PT009", "RSE102", "S106", "S108", "TRY002"]
+"tests/commands/test_version.py" = ["ANN201"]
+"tests/git_api/test_git_repo_api_logging_proxy.py" = ["ANN001", "ANN201", "PT009"]
+"tests/git_api/test_git_repo.py" = ["ANN001", "ANN201", "ANN202", "ARG002", "I001", "PT009", "PT018", "PTH101", "PTH103", "PTH110", "PTH123", "S108", "SIM117"]
+"tests/git_api/test_repo_api_factory.py" = ["ANN001", "ANN201", "I001", "PT009", "S106"]
+"tests/io_api/test_tmp_dir.py" = ["ANN201", "PT009", "PTH103", "PTH112", "S108"]
+"tests/io_api/test_yaml_util.py" = ["ANN001", "ANN102", "ANN201", "ANN202", "ANN206", "I001", "PT009", "PTH103", "PTH123", "S108", "UP015"]
+"tests/test_cliparser.py" = ["ANN001", "ANN102", "ANN201", "ANN202", "ANN205", "ANN206", "E501", "I001", "N802", "PT009", "S105"]
+"tests/test_gitops_config_v0.py" = ["ANN201", "I001", "PT009"]
+"tests/test_gitops_config_v1.py" = ["ANN201", "E501", "I001", "N802", "PLC0208", "PLR2004", "PT009"]
+"tests/test_gitops_config_v2.py" = ["ANN201", "E501", "I001", "N802", "PLC0208", "PLR2004", "PT009"]

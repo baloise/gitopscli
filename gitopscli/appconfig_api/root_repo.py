@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import List, Any, Optional
-
-from gitopscli.git_api import GitRepo
-from gitopscli.io_api.yaml_util import yaml_file_load
+from typing import Any, Optional
 
 from gitopscli.appconfig_api.app_tenant_config import AppTenantConfig
+from gitopscli.git_api import GitRepo
 from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io_api.yaml_util import yaml_file_load
 
 
 @dataclass
@@ -54,7 +53,7 @@ def __load_tenants_from_bootstrap_values(root_repo: GitRepo) -> dict[str, AppTen
     return tenants
 
 
-def __get_bootstrap_tenant_list(root_repo: GitRepo) -> List[Any]:
+def __get_bootstrap_tenant_list(root_repo: GitRepo) -> list[Any]:
     root_repo.clone()
     try:
         boostrap_values_path = root_repo.get_full_file_path("bootstrap/values.yaml")
@@ -70,7 +69,7 @@ def __get_bootstrap_tenant_list(root_repo: GitRepo) -> List[Any]:
     return bootstrap_tenants
 
 
-def __validate_bootstrap_tenants(bootstrap_entries: Optional[List[Any]]) -> None:
+def __validate_bootstrap_tenants(bootstrap_entries: Optional[list[Any]]) -> None:
     if not bootstrap_entries:
         raise GitOpsException("Cannot find key 'bootstrap' or 'config.bootstrap' in 'bootstrap/values.yaml'")
     for bootstrap_entry in bootstrap_entries:

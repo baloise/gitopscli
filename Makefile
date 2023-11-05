@@ -1,17 +1,15 @@
-BLACK_ARGS = -l 120 -t py310 gitopscli tests
-
 init:
 	poetry install
 	pre-commit install
 
 format:
-	poetry run black $(BLACK_ARGS)
+	poetry run ruff format gitopscli tests
 
 format-check:
-	poetry run black $(BLACK_ARGS) --check
+	poetry run ruff format gitopscli tests --check
 
 lint:
-	poetry run pylint gitopscli
+	poetry run ruff gitopscli tests
 
 mypy:
 	poetry run mypy --install-types --non-interactive .

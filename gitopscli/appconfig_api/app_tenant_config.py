@@ -1,12 +1,11 @@
 import logging
-from dataclasses import dataclass, field
 import os
+from dataclasses import dataclass, field
 from typing import Any
 
 from gitopscli.git_api import GitRepo
-from gitopscli.io_api.yaml_util import yaml_load, yaml_file_load
-
 from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io_api.yaml_util import yaml_file_load, yaml_load
 
 
 @dataclass
@@ -81,10 +80,10 @@ class AppTenantConfig:
 
 def __generate_config_from_tenant_repo(
     tenant_repo: GitRepo,
-) -> Any:  # TODO: supposed to be ruamel object than Any  pylint: disable=fixme
+) -> Any:  # TODO: supposed to be ruamel object than Any
     tenant_app_dirs = __get_all_tenant_applications_dirs(tenant_repo)
     tenant_config_template = f"""
-    config: 
+    config:
         repository: {tenant_repo.get_clone_url()}
         applications: {{}}
     """

@@ -1,14 +1,17 @@
 import logging
 import os
 import shutil
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import Any, Optional
+
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException, yaml_file_dump
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
-from .common import load_gitops_config
+from gitopscli.io_api.yaml_util import YAMLException, update_yaml_file, yaml_file_dump
+
 from .command import Command
+from .common import load_gitops_config
 
 
 class CreatePreviewCommand(Command):
@@ -53,19 +56,25 @@ class CreatePreviewCommand(Command):
             if gitops_config.is_preview_template_equal_target():
                 preview_template_repo = preview_target_git_repo
                 created_new_preview = self.__create_preview_from_template_if_not_existing(
-                    preview_template_repo, preview_target_git_repo, gitops_config
+                    preview_template_repo,
+                    preview_target_git_repo,
+                    gitops_config,
                 )
             else:
                 preview_template_git_repo_api = self.__create_preview_template_git_repo_api(gitops_config)
                 with GitRepo(preview_template_git_repo_api) as preview_template_repo:
                     preview_template_repo.clone(gitops_config.preview_template_branch)
                     created_new_preview = self.__create_preview_from_template_if_not_existing(
-                        preview_template_repo, preview_target_git_repo, gitops_config
+                        preview_template_repo,
+                        preview_target_git_repo,
+                        gitops_config,
                     )
 
             any_values_replaced = self.__replace_values(preview_target_git_repo, gitops_config)
             context = GitOpsConfig.Replacement.PreviewContext(
-                gitops_config, self.__args.preview_id, self.__args.git_hash
+                gitops_config,
+                self.__args.preview_id,
+                self.__args.git_hash,
             )
 
             if not created_new_preview and not any_values_replaced:
@@ -99,16 +108,23 @@ class CreatePreviewCommand(Command):
 
     def __create_preview_template_git_repo_api(self, gitops_config: GitOpsConfig) -> GitRepoApi:
         return GitRepoApiFactory.create(
-            self.__args, gitops_config.preview_template_organisation, gitops_config.preview_template_repository
+            self.__args,
+            gitops_config.preview_template_organisation,
+            gitops_config.preview_template_repository,
         )
 
     def __create_preview_target_git_repo_api(self, gitops_config: GitOpsConfig) -> GitRepoApi:
         return GitRepoApiFactory.create(
-            self.__args, gitops_config.preview_target_organisation, gitops_config.preview_target_repository
+            self.__args,
+            gitops_config.preview_target_organisation,
+            gitops_config.preview_target_repository,
         )
 
     def __create_preview_from_template_if_not_existing(
-        self, template_git_repo: GitRepo, target_git_repo: GitRepo, gitops_config: GitOpsConfig
+        self,
+        template_git_repo: GitRepo,
+        target_git_repo: GitRepo,
+        gitops_config: GitOpsConfig,
     ) -> bool:
         preview_namespace = gitops_config.get_preview_namespace(self.__args.preview_id)
         full_preview_folder_path = target_git_repo.get_full_file_path(preview_namespace)
@@ -133,12 +149,18 @@ class CreatePreviewCommand(Command):
             for replacement in replacements:
                 replacement_value = replacement.get_value(context)
                 value_replaced = self.__update_yaml_file(
-                    git_repo, f"{preview_folder_name}/{file}", replacement.path, replacement_value
+                    git_repo,
+                    f"{preview_folder_name}/{file}",
+                    replacement.path,
+                    replacement_value,
                 )
                 if value_replaced:
                     any_value_replaced = True
                     logging.info(
-                        "Replaced property '%s' in '%s' with value: %s", replacement.path, file, replacement_value
+                        "Replaced property '%s' in '%s' with value: %s",
+                        replacement.path,
+                        file,
+                        replacement_value,
                     )
                 else:
                     logging.info("Keep property '%s' in '%s' value: %s", replacement.path, file, replacement_value)
