@@ -83,7 +83,6 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.yaml_file_load_mock = patcher.start()
         self.mock_manager.attach_mock(self.yaml_file_load_mock, "yaml_file_load")
 
-        # self.yaml_file_load_mock = self.monkey_patch(yaml_file_load)
         self.yaml_file_load_mock.side_effect = lambda file_path: {
             "/tmp/root-config-repo/bootstrap/values.yaml": {
                 "bootstrap": [{"name": "team-non-prod"}, {"name": "other-team-non-prod"}],
