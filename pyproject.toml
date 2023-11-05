@@ -58,7 +58,7 @@ ignore = ["ANN101", "ANN401",
 "tests/**/*.py" = ["S106", "S108", "ANN", "PT009"]
 # the following exclusions have been introduced to prevent huge changes
 # feel free to remove them and fix the code
-"gitopscli/appconfig_api/app_tenant_config.py" = ["PLR5501", "PTH110", "PTH112", "PTH118"]
+"gitopscli/appconfig_api/app_tenant_config.py" = ["PTH110", "PTH112", "PTH118"]
 "gitopscli/commands/command_factory.py" = ["PYI016"]
 "gitopscli/commands/create_preview.py" = ["PTH112"]
 "gitopscli/commands/delete_preview.py" = ["PTH110"]

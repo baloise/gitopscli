@@ -44,18 +44,17 @@ class AppTenantConfig:
                         )
                         del existing_application_value["customAppConfig"]
                         self.__set_dirty()
-                else:
-                    if (
-                        "customAppConfig" not in existing_application_value
-                        or existing_application_value["customAppConfig"] != desired_app_value["customAppConfig"]
-                    ):
-                        logging.info(
-                            "Updating customAppConfig in for %s in %s applications",
-                            existing_application_value,
-                            self.file_path,
-                        )
-                        existing_application_value["customAppConfig"] = desired_app_value["customAppConfig"]
-                        self.__set_dirty()
+                elif (
+                    "customAppConfig" not in existing_application_value
+                    or existing_application_value["customAppConfig"] != desired_app_value["customAppConfig"]
+                ):
+                    logging.info(
+                        "Updating customAppConfig in for %s in %s applications",
+                        existing_application_value,
+                        self.file_path,
+                    )
+                    existing_application_value["customAppConfig"] = desired_app_value["customAppConfig"]
+                    self.__set_dirty()
 
     def __add_new_applications(self, desired_apps: dict[str, Any]) -> None:
         for desired_app_name, desired_app_value in desired_apps.items():
