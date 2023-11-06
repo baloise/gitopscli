@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 import gitlab
 import requests
@@ -16,8 +16,8 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
     def __init__(
         self,
         git_provider_url: str,
-        username: Optional[str],
-        password: Optional[str],
+        username: str | None,
+        password: str | None,
         organisation: str,
         repository_name: str,
     ) -> None:
@@ -37,10 +37,10 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         self.__access_token = password
         self.__project = project
 
-    def get_username(self) -> Optional[str]:
+    def get_username(self) -> str | None:
         return self.__token_name
 
-    def get_password(self) -> Optional[str]:
+    def get_password(self) -> str | None:
         return self.__access_token
 
     def get_clone_url(self) -> str:
@@ -71,7 +71,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[dict[str, Any]] = None,
+        merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
 
@@ -96,7 +96,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                     raise GitOpsException("Error merging pull request: 'Branch cannot be merged'") from ex
                 time.sleep(2.5)
 
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
         merge_request.notes.create({"body": text})
 

@@ -2,7 +2,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
@@ -17,8 +17,8 @@ class DeployCommand(Command):
         git_user: str
         git_email: str
 
-        git_author_name: Optional[str]
-        git_author_email: Optional[str]
+        git_author_name: str | None
+        git_author_email: str | None
 
         organisation: str
         repository_name: str
@@ -27,14 +27,14 @@ class DeployCommand(Command):
         values: Any
 
         single_commit: bool
-        commit_message: Optional[str]
+        commit_message: str | None
 
         create_pr: bool
         auto_merge: bool
         json: bool
 
-        pr_labels: Optional[list[str]]
-        merge_parameters: Optional[Any]
+        pr_labels: list[str] | None
+        merge_parameters: Any | None
         merge_method: Literal["squash", "rebase", "merge"] = "merge"
 
     def __init__(self, args: Args) -> None:

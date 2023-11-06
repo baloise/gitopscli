@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from .add_pr_comment import AddPrCommentCommand
 from .command import Command
 from .create_pr_preview import CreatePrPreviewCommand
@@ -10,23 +8,23 @@ from .deploy import DeployCommand
 from .sync_apps import SyncAppsCommand
 from .version import VersionCommand
 
-CommandArgs = Union[
-    DeployCommand.Args,
-    DeployCommand.Args,
-    AddPrCommentCommand.Args,
-    CreatePreviewCommand.Args,
-    CreatePrPreviewCommand.Args,
-    DeletePreviewCommand.Args,
-    DeletePrPreviewCommand.Args,
-    SyncAppsCommand.Args,
-    VersionCommand.Args,
-]
+CommandArgs = (
+    DeployCommand.Args
+    | DeployCommand.Args
+    | AddPrCommentCommand.Args
+    | CreatePreviewCommand.Args
+    | CreatePrPreviewCommand.Args
+    | DeletePreviewCommand.Args
+    | DeletePrPreviewCommand.Args
+    | SyncAppsCommand.Args
+    | VersionCommand.Args
+)
 
 
 class CommandFactory:
     @staticmethod
     def create(args: CommandArgs) -> Command:
-        command: Optional[Command]
+        command: Command | None
         if isinstance(args, DeployCommand.Args):
             command = DeployCommand(args)
         elif isinstance(args, SyncAppsCommand.Args):

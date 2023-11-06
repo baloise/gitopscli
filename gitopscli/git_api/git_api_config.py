@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from .git_provider import GitProvider
 
@@ -9,4 +8,4 @@ class GitApiConfig:
     username: str
     password: str
     git_provider: GitProvider
-    git_provider_url: Optional[str]
+    git_provider_url: str | None

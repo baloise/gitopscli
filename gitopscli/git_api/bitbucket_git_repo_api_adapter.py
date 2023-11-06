@@ -1,4 +1,4 @@
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 import requests
 from atlassian import Bitbucket
@@ -12,8 +12,8 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
     def __init__(
         self,
         git_provider_url: str,
-        username: Optional[str],
-        password: Optional[str],
+        username: str | None,
+        password: str | None,
         organisation: str,
         repository_name: str,
     ) -> None:
@@ -22,10 +22,10 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         self.__organisation = organisation
         self.__repository_name = repository_name
 
-    def get_username(self) -> Optional[str]:
+    def get_username(self) -> str | None:
         return str(self.__bitbucket.username)
 
-    def get_password(self) -> Optional[str]:
+    def get_password(self) -> str | None:
         return str(self.__bitbucket.password)
 
     def get_clone_url(self) -> str:
@@ -86,7 +86,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[dict[str, Any]] = None,
+        merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(
@@ -96,7 +96,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             pull_request["version"],
         )
 
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
         pull_request_comment = self.__bitbucket.add_pull_request_comment(
             self.__organisation,
             self.__repository_name,

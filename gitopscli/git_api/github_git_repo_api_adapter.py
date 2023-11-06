@@ -1,4 +1,4 @@
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 from github import (
     BadCredentialsException,
@@ -17,8 +17,8 @@ from .git_repo_api import GitRepoApi
 class GithubGitRepoApiAdapter(GitRepoApi):
     def __init__(
         self,
-        username: Optional[str],
-        password: Optional[str],
+        username: str | None,
+        password: str | None,
         organisation: str,
         repository_name: str,
     ) -> None:
@@ -28,10 +28,10 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         self.__organisation = organisation
         self.__repository_name = repository_name
 
-    def get_username(self) -> Optional[str]:
+    def get_username(self) -> str | None:
         return self.__username
 
-    def get_password(self) -> Optional[str]:
+    def get_password(self) -> str | None:
         return self.__password
 
     def get_clone_url(self) -> str:
@@ -61,12 +61,12 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[dict[str, Any]] = None,
+        merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.merge(merge_method=merge_method)
 
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.create_issue_comment(text)
 
@@ -106,6 +106,6 @@ class GithubGitRepoApiAdapter(GitRepoApi):
                 f"Repository '{self.__organisation}/{self.__repository_name}' does not exist.",
             ) from ex
 
-    def add_pull_request_label(self, pr_id: int, pr_labels: Union[str, Any]) -> None:
+    def add_pull_request_label(self, pr_id: int, pr_labels: str | Any) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.set_labels(pr_labels)

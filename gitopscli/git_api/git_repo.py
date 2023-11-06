@@ -2,7 +2,7 @@ import locale
 import logging
 import os
 from types import TracebackType
-from typing import Literal, Optional
+from typing import Literal
 
 from git import GitCommandError, GitError, Repo
 
@@ -15,17 +15,17 @@ from .git_repo_api import GitRepoApi
 class GitRepo:
     def __init__(self, git_repo_api: GitRepoApi) -> None:
         self.__api = git_repo_api
-        self.__repo: Optional[Repo] = None
-        self.__tmp_dir: Optional[str] = None
+        self.__repo: Repo | None = None
+        self.__tmp_dir: str | None = None
 
     def __enter__(self) -> "GitRepo":
         return self
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> Literal[False]:
         self.finalize()
         return False
@@ -40,7 +40,7 @@ class GitRepo:
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
 
-    def clone(self, branch: Optional[str] = None) -> None:
+    def clone(self, branch: str | None = None) -> None:
         self.__delete_tmp_dir()
         self.__tmp_dir = create_tmp_dir()
         git_options = []
@@ -80,10 +80,10 @@ class GitRepo:
         self,
         git_user: str,
         git_email: str,
-        git_author_name: Optional[str],
-        git_author_email: Optional[str],
+        git_author_name: str | None,
+        git_author_email: str | None,
         message: str,
-    ) -> Optional[str]:
+    ) -> str | None:
         self.__validate_git_author(git_author_name, git_author_email)
         repo = self.__get_repo()
         try:
@@ -101,11 +101,11 @@ class GitRepo:
             raise GitOpsException("Error creating commit.") from ex
         return None
 
-    def __validate_git_author(self, name: Optional[str], email: Optional[str]) -> None:
+    def __validate_git_author(self, name: str | None, email: str | None) -> None:
         if (name and not email) or (not name and email):
             raise GitOpsException("Please provide the name and email address of the Git author or provide neither!")
 
-    def push(self, branch: Optional[str] = None) -> None:
+    def push(self, branch: str | None = None) -> None:
         repo = self.__get_repo()
         if not branch:
             branch = repo.git.branch("--show-current")

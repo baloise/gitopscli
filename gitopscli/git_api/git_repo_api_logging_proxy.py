@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from .git_repo_api import GitRepoApi
 
@@ -8,10 +8,10 @@ class GitRepoApiLoggingProxy(GitRepoApi):
     def __init__(self, git_repo_api: GitRepoApi) -> None:
         self.__api = git_repo_api
 
-    def get_username(self) -> Optional[str]:
+    def get_username(self) -> str | None:
         return self.__api.get_username()
 
-    def get_password(self) -> Optional[str]:
+    def get_password(self) -> str | None:
         return self.__api.get_password()
 
     def get_clone_url(self) -> str:
@@ -40,12 +40,12 @@ class GitRepoApiLoggingProxy(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: Optional[dict[str, Any]] = None,
+        merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         logging.info("Merging pull request %s", pr_id)
         self.__api.merge_pull_request(pr_id, merge_method=merge_method)
 
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: Optional[int] = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
         if parent_id:
             logging.info(
                 "Creating comment for pull request %s as reply to comment %s with content: %s",

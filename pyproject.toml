@@ -51,8 +51,7 @@ ignore = ["ANN101", "ANN401",
 "D",
 "COM812", "ISC001",
 "EM101", "EM102", 
-"UP007", # Optional[T] is ok atm. later: move to T | None 
- "S101", "TD", "TRY003"]
+"S101", "TD", "TRY003"]
 
 [tool.ruff.per-file-ignores]
 "**/__init__.py" = ["F401"]

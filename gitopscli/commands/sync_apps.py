@@ -1,6 +1,5 @@
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 from gitopscli.appconfig_api.app_tenant_config import create_app_tenant_config_from_repo
 from gitopscli.appconfig_api.root_repo import create_root_repo
@@ -16,8 +15,8 @@ class SyncAppsCommand(Command):
         git_user: str
         git_email: str
 
-        git_author_name: Optional[str]
-        git_author_email: Optional[str]
+        git_author_name: str | None
+        git_author_email: str | None
 
         organisation: str
         repository_name: str
@@ -53,8 +52,8 @@ def __sync_apps(
     root_git_repo: GitRepo,
     git_user: str,
     git_email: str,
-    git_author_name: Optional[str],
-    git_author_email: Optional[str],
+    git_author_name: str | None,
+    git_author_email: str | None,
 ) -> None:
     logging.info("Team config repository: %s", tenant_git_repo.get_clone_url())
     logging.info("Root config repository: %s", root_git_repo.get_clone_url())
@@ -92,8 +91,8 @@ def __commit_and_push(
     root_config_git_repo: GitRepo,
     git_user: str,
     git_email: str,
-    git_author_name: Optional[str],
-    git_author_email: Optional[str],
+    git_author_name: str | None,
+    git_author_email: str | None,
     app_file_name: str,
 ) -> None:
     author = team_config_git_repo.get_author_from_last_commit()
