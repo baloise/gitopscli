@@ -35,14 +35,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException(f"Error connecting to '{self.__git_provider_url}''") from ex
         if "errors" in repo:
             for error in repo["errors"]:
-                exception = error["exceptionName"]
-                if exception == "com.atlassian.bitbucket.auth.IncorrectPasswordAuthenticationException":
-                    raise GitOpsException("Bad credentials")
-                if exception == "com.atlassian.bitbucket.project.NoSuchProjectException":
-                    raise GitOpsException(f"Organisation '{self.__organisation}' does not exist")
-                if exception == "com.atlassian.bitbucket.repository.NoSuchRepositoryException":
-                    raise GitOpsException(f"Repository '{self.__organisation}/{self.__repository_name}' does not exist")
-                raise GitOpsException(error["message"])
+                raise self.__map_clone_error(error)
         if "links" not in repo:
             raise GitOpsException(f"Repository '{self.__organisation}/{self.__repository_name}' does not exist")
         for clone_link in repo["links"]["clone"]:
@@ -51,6 +44,16 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         if not repo_url:
             raise GitOpsException("Couldn't determine repository URL.")
         return str(repo_url)
+
+    def __map_clone_error(self, error: dict[str, str]) -> GitOpsException:
+        exception = error["exceptionName"]
+        if exception == "com.atlassian.bitbucket.auth.IncorrectPasswordAuthenticationException":
+            return GitOpsException("Bad credentials")
+        if exception == "com.atlassian.bitbucket.project.NoSuchProjectException":
+            return GitOpsException(f"Organisation '{self.__organisation}' does not exist")
+        if exception == "com.atlassian.bitbucket.repository.NoSuchRepositoryException":
+            return GitOpsException(f"Repository '{self.__organisation}/{self.__repository_name}' does not exist")
+        return GitOpsException(error["message"])
 
     def create_pull_request_to_default_branch(
         self,
