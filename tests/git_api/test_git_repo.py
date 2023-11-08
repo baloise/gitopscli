@@ -264,8 +264,7 @@ echo password='Pass'
             self.assertIn("README.md", commits[0].stats.files)
         logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
 
-    @patch("gitopscli.git_api.git_repo.logging")
-    def test_commit_with_custom_author_name_but_no_email_returns_validation_error(self, logging_mock):  # noqa: ARG002
+    def test_commit_with_custom_author_name_but_no_email_returns_validation_error(self):
         with GitRepo(self.__mock_repo_api) as testee:
             with pytest.raises(GitOpsException) as ex:
                 testee.commit(
@@ -279,8 +278,7 @@ echo password='Pass'
                 "Please provide the name and email address of the Git author or provide neither!"
             )
 
-    @patch("gitopscli.git_api.git_repo.logging")
-    def test_commit_with_custom_author_email_but_no_name_returns_validation_error(self, logging_mock):  # noqa: ARG002
+    def test_commit_with_custom_author_email_but_no_name_returns_validation_error(self):
         with GitRepo(self.__mock_repo_api) as testee:
             with pytest.raises(GitOpsException) as ex:
                 testee.commit(

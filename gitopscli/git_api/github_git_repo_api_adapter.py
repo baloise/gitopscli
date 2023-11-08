@@ -61,7 +61,7 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        merge_parameters: dict[str, Any] | None = None,  # noqa: ARG002
+        _merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.merge(merge_method=merge_method)
@@ -70,7 +70,7 @@ class GithubGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         text: str,
-        parent_id: int | None = None,  # noqa: ARG002
+        _parent_id: int | None = None,
     ) -> None:
         pull_request = self.__get_pull_request(pr_id)
         pull_request.create_issue_comment(text)
