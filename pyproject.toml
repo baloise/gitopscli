@@ -50,14 +50,12 @@ ignore = [
     "ANN101", # https://docs.astral.sh/ruff/rules/missing-type-self/
     "ANN401", # https://docs.astral.sh/ruff/rules/any-type/
     "C901", # https://docs.astral.sh/ruff/rules/complex-structure/
-    "PLR0913", # ignore complexity
-    "D",
-    "COM812",
-    "ISC001",
-    "EM101",
-    "EM102",
-    "S101",
-    "TD",
+    "PLR0913", # https://docs.astral.sh/ruff/rules/too-many-arguments/
+    "D", # https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    "COM812", # https://docs.astral.sh/ruff/rules/missing-trailing-comma/ (clashes with formatter)
+    "EM101", # https://docs.astral.sh/ruff/rules/raw-string-in-exception/
+    "EM102", # https://docs.astral.sh/ruff/rules/f-string-in-exception/
+    "S101", # https://docs.astral.sh/ruff/rules/assert/
     "TRY003",
     "PD", # false positives; not using Pandas
 ]

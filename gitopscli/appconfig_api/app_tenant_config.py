@@ -76,7 +76,7 @@ class AppTenantConfig:
 
 def __generate_config_from_tenant_repo(
     tenant_repo: GitRepo,
-) -> Any:  # TODO: supposed to be ruamel object than Any # noqa: FIX002
+) -> Any:
     tenant_app_dirs = __get_all_tenant_applications_dirs(tenant_repo)
     tenant_config_template = f"""
     config:
