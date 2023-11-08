@@ -3,19 +3,20 @@ import sys
 import unittest
 from contextlib import contextmanager
 from io import StringIO
+
 import pytest
 
+from gitopscli.cliparser import parse_args
 from gitopscli.commands import (
-    DeployCommand,
-    SyncAppsCommand,
     AddPrCommentCommand,
     CreatePreviewCommand,
     CreatePrPreviewCommand,
     DeletePreviewCommand,
     DeletePrPreviewCommand,
+    DeployCommand,
+    SyncAppsCommand,
     VersionCommand,
 )
-from gitopscli.cliparser import parse_args
 from gitopscli.git_api import GitProvider
 
 EXPECTED_GITOPSCLI_HELP = """\
@@ -49,7 +50,7 @@ usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
                                 PR_ID [--parent-id PARENT_ID] [-v [VERBOSE]]
                                 --text TEXT
 gitopscli add-pr-comment: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id, --text
-"""
+"""  # noqa: E501
 
 EXPECTED_ADD_PR_COMMENT_HELP = """\
 usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
@@ -93,7 +94,7 @@ usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
                                 --git-hash GIT_HASH --preview-id PREVIEW_ID
                                 [-v [VERBOSE]]
 gitopscli create-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --git-hash, --preview-id
-"""
+"""  # noqa: E501
 EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    PASSWORD [--git-user GIT_USER]
@@ -107,7 +108,7 @@ usage: gitopscli create-pr-preview [-h] --username USERNAME --password
                                    --pr-id PR_ID [--parent-id PARENT_ID]
                                    [-v [VERBOSE]]
 gitopscli create-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --pr-id
-"""
+"""  # noqa: E501
 
 EXPECTED_CREATE_PREVIEW_HELP = """\
 usage: gitopscli create-preview [-h] --username USERNAME --password PASSWORD
@@ -203,7 +204,7 @@ usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                 [-v [VERBOSE]]
 gitopscli delete-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --preview-id
-"""
+"""  # noqa: E501
 
 EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR = """\
 usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
@@ -219,7 +220,7 @@ usage: gitopscli delete-pr-preview [-h] --username USERNAME --password
                                    [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
                                    [-v [VERBOSE]]
 gitopscli delete-pr-preview: error: the following arguments are required: --username, --password, --organisation, --repository-name, --branch
-"""
+"""  # noqa: E501
 
 EXPECTED_DELETE_PREVIEW_HELP = """\
 usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
@@ -322,7 +323,7 @@ usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--pr-labels PR_LABELS]
                         [--merge-parameters MERGE_PARAMETERS] [-v [VERBOSE]]
 gitopscli deploy: error: the following arguments are required: --file, --values, --username, --password, --organisation, --repository-name
-"""
+"""  # noqa: E501
 
 EXPECTED_DEPLOY_HELP = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
@@ -398,7 +399,7 @@ usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            ROOT_ORGANISATION --root-repository-name
                            ROOT_REPOSITORY_NAME
 gitopscli sync-apps: error: the following arguments are required: --username, --password, --organisation, --repository-name, --root-organisation, --root-repository-name
-"""
+"""  # noqa: E501
 
 EXPECTED_SYNC_APPS_HELP = """\
 usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
@@ -487,10 +488,10 @@ class CliParserTest(unittest.TestCase):
             parse_args(args)
         return ex.value.code, stdout.getvalue(), stderr.getvalue()
 
-    def assertType(self, o: object, t: type):
+    def assert_type(self, o: object, t: type):
         self.assertTrue(isinstance(o, t))
 
-    def assertEqualIgnoringWhitespaceAndNewlines(self, expected, actual):
+    def assert_equal_ignoring_whitespace_and_newlines(self, expected, actual):
         def normalize_string(s):
             return " ".join(s.split())
 
@@ -500,36 +501,36 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args([])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_GITOPSCLI_HELP, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_GITOPSCLI_HELP, stderr)
 
     def test_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_GITOPSCLI_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_GITOPSCLI_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["-h"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_GITOPSCLI_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_GITOPSCLI_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_no_args(self):
         exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_ADD_PR_COMMENT_NO_ARGS_ERROR, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_ADD_PR_COMMENT_NO_ARGS_ERROR, stderr)
 
     def test_add_pr_comment_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["add-pr-comment", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_ADD_PR_COMMENT_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_add_pr_comment_required_args(self):
@@ -552,7 +553,7 @@ class CliParserTest(unittest.TestCase):
                 "TEXT",
             ]
         )
-        self.assertType(args, AddPrCommentCommand.Args)
+        self.assert_type(args, AddPrCommentCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -568,7 +569,7 @@ class CliParserTest(unittest.TestCase):
 
     def test_add_pr_comment_required_args_and_credentials_env_vars(self):
         os.environ["GITOPSCLI_USERNAME"] = "ENV_USER"
-        os.environ["GITOPSCLI_PASSWORD"] = "ENV_PASS"
+        os.environ["GITOPSCLI_PASSWORD"] = "ENV_PASS"  # noqa: S105
         verbose, args = parse_args(
             [
                 "add-pr-comment",
@@ -584,7 +585,7 @@ class CliParserTest(unittest.TestCase):
                 "TEXT",
             ]
         )
-        self.assertType(args, AddPrCommentCommand.Args)
+        self.assert_type(args, AddPrCommentCommand.Args)
 
         self.assertEqual(args.username, "ENV_USER")
         self.assertEqual(args.password, "ENV_PASS")
@@ -623,7 +624,7 @@ class CliParserTest(unittest.TestCase):
                 "--verbose",
             ]
         )
-        self.assertType(args, AddPrCommentCommand.Args)
+        self.assert_type(args, AddPrCommentCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -640,18 +641,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["create-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_CREATE_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_create_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_CREATE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_CREATE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_preview_required_args(self):
@@ -678,7 +679,7 @@ class CliParserTest(unittest.TestCase):
                 "abc123",
             ]
         )
-        self.assertType(args, CreatePreviewCommand.Args)
+        self.assert_type(args, CreatePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -724,7 +725,7 @@ class CliParserTest(unittest.TestCase):
                 "-v",
             ]
         )
-        self.assertType(args, CreatePreviewCommand.Args)
+        self.assert_type(args, CreatePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -745,18 +746,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_CREATE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_create_pr_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_pr_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["create-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_CREATE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_create_pr_preview_required_args(self):
@@ -781,7 +782,7 @@ class CliParserTest(unittest.TestCase):
                 "4711",
             ]
         )
-        self.assertType(args, CreatePrPreviewCommand.Args)
+        self.assert_type(args, CreatePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -827,7 +828,7 @@ class CliParserTest(unittest.TestCase):
                 "-v",
             ]
         )
-        self.assertType(args, CreatePrPreviewCommand.Args)
+        self.assert_type(args, CreatePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -848,18 +849,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DELETE_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_delete_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DELETE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DELETE_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_preview_required_args(self):
@@ -884,7 +885,7 @@ class CliParserTest(unittest.TestCase):
                 "abc123",
             ]
         )
-        self.assertType(args, DeletePreviewCommand.Args)
+        self.assert_type(args, DeletePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -930,7 +931,7 @@ class CliParserTest(unittest.TestCase):
                 "n",
             ]
         )
-        self.assertType(args, DeletePreviewCommand.Args)
+        self.assert_type(args, DeletePreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -951,18 +952,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DELETE_PR_PREVIEW_NO_ARGS_ERROR, stderr)
 
     def test_delete_pr_preview_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_pr_preview_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["delete-pr-preview", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DELETE_PR_PREVIEW_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_delete_pr_preview_required_args(self):
@@ -987,7 +988,7 @@ class CliParserTest(unittest.TestCase):
                 "BRANCH",
             ]
         )
-        self.assertType(args, DeletePrPreviewCommand.Args)
+        self.assert_type(args, DeletePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1033,7 +1034,7 @@ class CliParserTest(unittest.TestCase):
                 "n",
             ]
         )
-        self.assertType(args, DeletePrPreviewCommand.Args)
+        self.assert_type(args, DeletePrPreviewCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1054,18 +1055,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["deploy"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DEPLOY_NO_ARGS_ERROR, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DEPLOY_NO_ARGS_ERROR, stderr)
 
     def test_deploy_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["deploy", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DEPLOY_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DEPLOY_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_deploy_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["deploy", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_DEPLOY_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_DEPLOY_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_deploy_required_args(self):
@@ -1092,7 +1093,7 @@ class CliParserTest(unittest.TestCase):
                 '{"a.b": 42}',  # json
             ]
         )
-        self.assertType(args, DeployCommand.Args)
+        self.assert_type(args, DeployCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1145,7 +1146,7 @@ class CliParserTest(unittest.TestCase):
                 "yes",
             ]
         )
-        self.assertType(args, DeployCommand.Args)
+        self.assert_type(args, DeployCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1169,18 +1170,18 @@ class CliParserTest(unittest.TestCase):
         exit_code, stdout, stderr = self._capture_parse_args(["sync-apps"])
         self.assertEqual(exit_code, 2)
         self.assertEqual("", stdout)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_SYNC_APPS_NO_ARGS_ERROR, stderr)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_SYNC_APPS_NO_ARGS_ERROR, stderr)
 
     def test_sync_apps_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["sync-apps", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_SYNC_APPS_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_SYNC_APPS_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_sync_apps_help_shortcut(self):
         exit_code, stdout, stderr = self._capture_parse_args(["sync-apps", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_SYNC_APPS_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_SYNC_APPS_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_sync_apps_required_args(self):
@@ -1207,7 +1208,7 @@ class CliParserTest(unittest.TestCase):
                 "ROOT_REPO",
             ]
         )
-        self.assertType(args, SyncAppsCommand.Args)
+        self.assert_type(args, SyncAppsCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1254,7 +1255,7 @@ class CliParserTest(unittest.TestCase):
                 "false",
             ]
         )
-        self.assertType(args, SyncAppsCommand.Args)
+        self.assert_type(args, SyncAppsCommand.Args)
 
         self.assertEqual(args.username, "USER")
         self.assertEqual(args.password, "PASS")
@@ -1273,12 +1274,12 @@ class CliParserTest(unittest.TestCase):
 
     def test_version_args(self):
         _, args = parse_args(["version"])
-        self.assertType(args, VersionCommand.Args)
+        self.assert_type(args, VersionCommand.Args)
 
     def test_version_help(self):
         exit_code, stdout, stderr = self._capture_parse_args(["version", "--help"])
         self.assertEqual(exit_code, 0)
-        self.assertEqualIgnoringWhitespaceAndNewlines(EXPECTED_VERSION_HELP, stdout)
+        self.assert_equal_ignoring_whitespace_and_newlines(EXPECTED_VERSION_HELP, stdout)
         self.assertEqual("", stderr)
 
     def test_invalid_boolean(self):

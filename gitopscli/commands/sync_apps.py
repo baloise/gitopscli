@@ -34,19 +34,20 @@ class SyncAppsCommand(Command):
 def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
     team_config_git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name)
     root_config_git_repo_api = GitRepoApiFactory.create(args, args.root_organisation, args.root_repository_name)
-    with GitRepo(team_config_git_repo_api) as team_config_git_repo:
-        with GitRepo(root_config_git_repo_api) as root_config_git_repo:
-            __sync_apps(
-                team_config_git_repo,
-                root_config_git_repo,
-                args.git_user,
-                args.git_email,
-                args.git_author_name,
-                args.git_author_email,
-            )
+    with GitRepo(team_config_git_repo_api) as team_config_git_repo, GitRepo(
+        root_config_git_repo_api
+    ) as root_config_git_repo:
+        __sync_apps(
+            team_config_git_repo,
+            root_config_git_repo,
+            args.git_user,
+            args.git_email,
+            args.git_author_name,
+            args.git_author_email,
+        )
 
 
-# TODO: BETTER NAMES FOR STUFF HERE
+# TODO: BETTER NAMES FOR STUFF HERE # noqa: FIX002
 def __sync_apps(
     tenant_git_repo: GitRepo,
     root_git_repo: GitRepo,

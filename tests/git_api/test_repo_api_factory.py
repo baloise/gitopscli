@@ -1,8 +1,8 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
+from gitopscli.git_api import GitApiConfig, GitProvider, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.git_api import GitRepoApiFactory, GitApiConfig, GitProvider
 
 
 class GitRepoApiFactoryTest(unittest.TestCase):

@@ -3,7 +3,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from string import Template
-from typing import Any
+from typing import Any, ClassVar
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -19,7 +19,7 @@ class GitOpsConfig:
             preview_id: str
             git_hash: str
 
-        __VARIABLE_MAPPERS: dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]] = {
+        __VARIABLE_MAPPERS: ClassVar[dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]]] = {
             "GIT_HASH": lambda context: context.git_hash,
             "PREVIEW_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
             "PREVIEW_NAMESPACE": lambda context: context.gitops_config.get_preview_namespace(context.preview_id),
@@ -29,7 +29,7 @@ class GitOpsConfig:
             "PREVIEW_ID_HASH_SHORT": lambda context: GitOpsConfig.create_preview_id_hash_short(context.preview_id),
         }
 
-        def __init__(self, path: str, value_template: str):
+        def __init__(self, path: str, value_template: str) -> None:
             assert isinstance(path, str), "path of wrong type!"
             assert isinstance(value_template, str), "value_template of wrong type!"
 
@@ -118,8 +118,7 @@ class GitOpsConfig:
         preview_host = preview_host.replace("${PREVIEW_ID_HASH}", self.create_preview_id_hash(preview_id))
         preview_host = preview_host.replace("${PREVIEW_ID_HASH_SHORT}", self.create_preview_id_hash_short(preview_id))
         preview_host = preview_host.replace("${PREVIEW_ID}", self.__sanitize(preview_id))
-        preview_host = preview_host.replace("${PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
-        return preview_host
+        return preview_host.replace("${PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
 
     def get_preview_namespace(self, preview_id: str) -> str:
         preview_namespace = self.preview_target_namespace_template
@@ -183,8 +182,7 @@ class GitOpsConfig:
         sanitized_preview_id = re.sub(r"-+", "-", sanitized_preview_id)
         if max_length is not None:
             sanitized_preview_id = sanitized_preview_id[0:max_length]
-        sanitized_preview_id = re.sub(r"-$", "", sanitized_preview_id)
-        return sanitized_preview_id
+        return re.sub(r"-$", "", sanitized_preview_id)
 
     def is_preview_template_equal_target(self) -> bool:
         return (
@@ -207,7 +205,7 @@ class GitOpsConfig:
 
 
 class _GitOpsConfigYamlParser:
-    def __init__(self, yaml: Any):
+    def __init__(self, yaml: Any) -> None:
         self.__yaml = yaml
 
     def __get_value(self, key: str) -> Any:

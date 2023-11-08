@@ -1,16 +1,19 @@
-from io import StringIO
 import logging
-from textwrap import dedent
-import uuid
 import unittest
+import uuid
+from io import StringIO
+from textwrap import dedent
 from unittest import mock
 from unittest.mock import call
 from uuid import UUID
+
 import pytest
-from gitopscli.gitops_exception import GitOpsException
+
 from gitopscli.commands.deploy import DeployCommand
-from gitopscli.git_api import GitRepoApi, GitProvider, GitRepoApiFactory, GitRepo
-from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException
+from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
+from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io_api.yaml_util import YAMLException, update_yaml_file
+
 from .mock_mixin import MockMixin
 
 

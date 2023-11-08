@@ -1,14 +1,16 @@
-import posixpath
 import logging
 import os
+import posixpath
 import unittest
 from unittest.mock import call, patch
 
 from ruamel.yaml.compat import ordereddict
-from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
+
 from gitopscli.commands.sync_apps import SyncAppsCommand
-from gitopscli.io_api.yaml_util import yaml_file_load, yaml_file_dump
+from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io_api.yaml_util import yaml_file_dump, yaml_file_load
+
 from .mock_mixin import MockMixin
 
 ARGS = SyncAppsCommand.Args(
@@ -25,6 +27,10 @@ ARGS = SyncAppsCommand.Args(
     git_provider=GitProvider.GITHUB,
     git_provider_url=None,
 )
+
+
+class UnreachableError(Exception):
+    pass
 
 
 class SyncAppsCommandTest(MockMixin, unittest.TestCase):
@@ -65,7 +71,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.root_config_git_repo_mock.push.return_value = None
 
         self.git_repo_api_factory_mock = self.monkey_patch(GitRepoApiFactory)
-        self.git_repo_api_factory_mock.create.side_effect = lambda config, org, repo: {
+        self.git_repo_api_factory_mock.create.side_effect = lambda _, org, repo: {
             ("TEAM_ORGA", "TEAM_REPO"): self.team_config_git_repo_api_mock,
             ("ROOT_ORGA", "ROOT_REPO"): self.root_config_git_repo_api_mock,
         }[(org, repo)]
@@ -81,7 +87,6 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.yaml_file_load_mock = patcher.start()
         self.mock_manager.attach_mock(self.yaml_file_load_mock, "yaml_file_load")
 
-        # self.yaml_file_load_mock = self.monkey_patch(yaml_file_load)
         self.yaml_file_load_mock.side_effect = lambda file_path: {
             "/tmp/root-config-repo/bootstrap/values.yaml": {
                 "bootstrap": [{"name": "team-non-prod"}, {"name": "other-team-non-prod"}],
@@ -274,8 +279,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                     "bootstrap": [{"name": "team-non-prod"}],
                 }
             if file_path == "/tmp/root-config-repo/apps/team-non-prod.yaml":
-                raise FileNotFoundError()
-            raise Exception("test should not reach this")
+                raise FileNotFoundError
+            raise UnreachableError("test should not reach this")
 
         self.yaml_file_load_mock.side_effect = file_load_mock_side_effect
 
@@ -303,15 +308,14 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             self.assertEqual("Cannot find key 'repository' in /tmp/root-config-repo/apps/team-non-prod.yaml", str(ex))
 
     def test_sync_apps_undefined_team_repo(self):
-        self.yaml_file_load_mock.side_effect = (
-            lambda file_path: {
-                "/tmp/root-config-repo/bootstrap/values.yaml": {"bootstrap": [{"name": "other-team-non-prod"}]},
-                "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
-                    "repository": "https://repository.url/other-team/other-team-non-prod.git",  # there is no repo matching the command's team repo
-                    "applications": {},
-                },
-            }[file_path]
-        )
+        self.yaml_file_load_mock.side_effect = lambda file_path: {
+            "/tmp/root-config-repo/bootstrap/values.yaml": {"bootstrap": [{"name": "other-team-non-prod"}]},
+            "/tmp/root-config-repo/apps/other-team-non-prod.yaml": {
+                # there is no repo matching the command's team repo
+                "repository": "https://repository.url/other-team/other-team-non-prod.git",
+                "applications": {},
+            },
+        }[file_path]
 
         try:
             SyncAppsCommand(ARGS).execute()

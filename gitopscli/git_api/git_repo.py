@@ -133,7 +133,7 @@ class GitRepo:
 
     def __create_credentials_file(self, username: str, password: str) -> str:
         file_path = f"{self.__tmp_dir}/credentials.sh"
-        with open(file_path, "w", encoding=locale.getpreferredencoding(False)) as text_file:
+        with open(file_path, "w", encoding=locale.getpreferredencoding(do_setlocale=False)) as text_file:
             text_file.write("#!/bin/sh\n")
             text_file.write(f"echo username='{username}'\n")
             text_file.write(f"echo password='{password}'\n")

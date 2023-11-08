@@ -1,11 +1,12 @@
 import unittest
 from unittest.mock import Mock
-from gitopscli.commands.command_factory import CommandFactory
+
 from gitopscli.commands.add_pr_comment import AddPrCommentCommand
-from gitopscli.commands.create_preview import CreatePreviewCommand
+from gitopscli.commands.command_factory import CommandFactory
 from gitopscli.commands.create_pr_preview import CreatePrPreviewCommand
-from gitopscli.commands.delete_preview import DeletePreviewCommand
+from gitopscli.commands.create_preview import CreatePreviewCommand
 from gitopscli.commands.delete_pr_preview import DeletePrPreviewCommand
+from gitopscli.commands.delete_preview import DeletePreviewCommand
 from gitopscli.commands.deploy import DeployCommand
 from gitopscli.commands.sync_apps import SyncAppsCommand
 from gitopscli.commands.version import VersionCommand

@@ -1,13 +1,15 @@
-import os
-import unittest
-import shutil
 import logging
-from unittest.mock import call, Mock
-from gitopscli.io_api.yaml_util import update_yaml_file, YAMLException, yaml_file_dump
-from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider, GitApiConfig
+import os
+import shutil
+import unittest
+from unittest.mock import Mock, call
+
+from gitopscli.commands.create_preview import CreatePreviewCommand, load_gitops_config
+from gitopscli.git_api import GitApiConfig, GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
-from gitopscli.commands.create_preview import CreatePreviewCommand, load_gitops_config
+from gitopscli.io_api.yaml_util import YAMLException, update_yaml_file, yaml_file_dump
+
 from .mock_mixin import MockMixin
 
 DUMMY_GIT_HASH = "3361723dbd91fcfae7b5b8b8b7d462fbc14187a9"
@@ -33,6 +35,10 @@ INFO_YAML = {
     "routeHost": "app.xy-685912d3.example.tld",
     "namespace": "my-app-685912d3-preview",
 }
+
+
+class UnreachableError(Exception):
+    pass
 
 
 class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
@@ -90,7 +96,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 return self.template_git_repo_api_mock
             if "TARGET" in organisation and "TARGET" in repository_name:
                 return self.target_git_repo_api_mock
-            raise Exception(f"no mock for {organisation}/{repository_name}")
+            raise UnreachableError(f"no mock for {organisation}/{repository_name}")
 
         self.git_repo_api_factory_mock.create.side_effect = git_repo_api_factory_create_mock
 
@@ -113,7 +119,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 return self.template_git_repo_mock
             if git_repo_api == self.target_git_repo_api_mock:
                 return self.target_git_repo_mock
-            raise Exception(f"no mock for {git_repo_api}")
+            raise UnreachableError(f"no mock for {git_repo_api}")
 
         self.monkey_patch(GitRepo).side_effect = git_repo_constructor_mock
 
@@ -129,8 +135,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
-            deployment_already_up_to_date_callback=lambda route_host: self.fail("should not be called"),
-            deployment_updated_callback=lambda route_host: self.fail("should not be called"),
+            deployment_already_up_to_date_callback=lambda _: self.fail("should not be called"),
+            deployment_updated_callback=lambda _: self.fail("should not be called"),
             deployment_created_callback=deployment_created_callback,
         )
         command.execute()
@@ -232,8 +238,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
-            deployment_already_up_to_date_callback=lambda route_host: self.fail("should not be called"),
-            deployment_updated_callback=lambda route_host: self.fail("should not be called"),
+            deployment_already_up_to_date_callback=lambda _: self.fail("should not be called"),
+            deployment_updated_callback=lambda _: self.fail("should not be called"),
             deployment_created_callback=deployment_created_callback,
         )
         command.execute()
@@ -313,9 +319,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
 
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
-            deployment_already_up_to_date_callback=lambda route_host: self.fail("should not be called"),
+            deployment_already_up_to_date_callback=lambda _: self.fail("should not be called"),
             deployment_updated_callback=deployment_updated_callback,
-            deployment_created_callback=lambda route_host: self.fail("should not be called"),
+            deployment_created_callback=lambda _: self.fail("should not be called"),
         )
         command.execute()
 
@@ -384,8 +390,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         command = CreatePreviewCommand(ARGS)
         command.register_callbacks(
             deployment_already_up_to_date_callback=deployment_already_up_to_date_callback,
-            deployment_updated_callback=lambda route_host: self.fail("should not be called"),
-            deployment_created_callback=lambda route_host: self.fail("should not be called"),
+            deployment_updated_callback=lambda _: self.fail("should not be called"),
+            deployment_created_callback=lambda _: self.fail("should not be called"),
         )
         command.execute()
 

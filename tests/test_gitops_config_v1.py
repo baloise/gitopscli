@@ -1,4 +1,5 @@
 import unittest
+
 import pytest
 
 from gitopscli.gitops_config import GitOpsConfig
@@ -6,6 +7,8 @@ from gitopscli.gitops_exception import GitOpsException
 
 
 class GitOpsConfigV1Test(unittest.TestCase):
+    _max_namespace_length = 63
+
     def setUp(self):
         self.yaml = {
             "apiVersion": "v1",
@@ -42,11 +45,11 @@ class GitOpsConfigV1Test(unittest.TestCase):
             self.load()
         self.assertEqual(error_msg, str(ex.value))
 
-    def test_apiVersion(self):
+    def test_api_version(self):
         config = self.load()
         self.assertEqual(config.api_version, 1)
 
-    def test_invalid_apiVersion(self):
+    def test_invalid_api_version(self):
         self.yaml["apiVersion"] = "foo"
         self.assert_load_error("GitOps config apiVersion 'foo' is not supported!")
 
@@ -183,10 +186,10 @@ class GitOpsConfigV1Test(unittest.TestCase):
         self.assert_load_error("Item 'previewConfig.target.branch' should be a string in GitOps config!")
 
     def test_is_preview_template_equal_target(self):
-        for x in {"organisation", "repository", "branch"}:
+        for x in ["organisation", "repository", "branch"]:
             self.yaml["previewConfig"]["template"][x] = self.yaml["previewConfig"]["target"][x]
 
-        for x in {"organisation", "repository", "branch"}:
+        for x in ["organisation", "repository", "branch"]:
             self.yaml["previewConfig"]["template"][x] = "custom-template-value"
             config = self.load()
             self.assertFalse(config.is_preview_template_equal_target(), x)
@@ -214,7 +217,7 @@ class GitOpsConfigV1Test(unittest.TestCase):
             "Very long preview ID. It will be cut to have max 63 chars of namespace in total!!"
         )
         self.assertEqual(actual_namespace, "my-app-very-long-preview-id-it-will-be-cut-to-05d9825a-preview")
-        self.assertTrue(len(actual_namespace) <= 63)
+        self.assertTrue(len(actual_namespace) <= self._max_namespace_length)
 
     def test_preview_target_namespace_not_a_string(self):
         self.yaml["previewConfig"]["target"]["namespace"] = []
@@ -235,7 +238,8 @@ class GitOpsConfigV1Test(unittest.TestCase):
         with pytest.raises(GitOpsException) as ex:
             config.get_preview_namespace("x")
         self.assertEqual(
-            "Preview namespace is too long (max 63 chars): veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long--2d711642 (68 chars)",
+            "Preview namespace is too long (max 63 chars): "
+            "veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long--2d711642 (68 chars)",
             str(ex.value),
         )
 

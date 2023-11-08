@@ -70,7 +70,7 @@ class DeployCommand(Command):
                 git_repo_api.delete_branch(pr_branch)
 
         if self.__args.json:
-            print(json.dumps({"commits": [{"hash": h} for h in self.__commit_hashes]}, indent=4))
+            print(json.dumps({"commits": [{"hash": h} for h in self.__commit_hashes]}, indent=4))  # noqa: T201
 
     def __create_git_repo_api(self) -> GitRepoApi:
         return GitRepoApiFactory.create(self.__args, self.__args.organisation, self.__args.repository_name)
@@ -80,7 +80,7 @@ class DeployCommand(Command):
         single_commit = args.single_commit or args.commit_message
         full_file_path = git_repo.get_full_file_path(args.file)
         updated_values = {}
-        for key, value in args.values.items():
+        for key, value in args.values.items():  # noqa: PD011
             try:
                 updated_value = update_yaml_file(full_file_path, key, value)
             except (FileNotFoundError, IsADirectoryError) as ex:
@@ -104,7 +104,7 @@ class DeployCommand(Command):
             if args.commit_message:
                 message = args.commit_message
             elif len(updated_values) == 1:
-                key, value = list(updated_values.items())[0]
+                key, value = next(iter(updated_values.items()))
                 message = f"changed '{key}' to '{value}' in {args.file}"
             else:
                 updates_count = len(updated_values)

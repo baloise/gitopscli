@@ -10,12 +10,12 @@ YAML_INSTANCE = YAML()
 YAML_INSTANCE.preserve_quotes = True
 
 
-class YAMLException(Exception):
+class YAMLException(Exception):  # noqa: N818
     pass
 
 
 def yaml_file_load(file_path: str) -> Any:
-    with open(file_path, "r", encoding=locale.getpreferredencoding(False)) as stream:
+    with open(file_path, encoding=locale.getpreferredencoding(do_setlocale=False)) as stream:
         try:
             return YAML_INSTANCE.load(stream)
         except YAMLError as ex:
@@ -23,7 +23,7 @@ def yaml_file_load(file_path: str) -> Any:
 
 
 def yaml_file_dump(yaml: Any, file_path: str) -> None:
-    with open(file_path, "w+", encoding=locale.getpreferredencoding(False)) as stream:
+    with open(file_path, "w+", encoding=locale.getpreferredencoding(do_setlocale=False)) as stream:
         YAML_INSTANCE.dump(yaml, stream)
 
 
@@ -73,14 +73,13 @@ def merge_yaml_element(file_path: str, element_path: str, desired_value: Any) ->
             work_path = work_path[key]
 
     for key, value in desired_value.items():
-        if key in work_path:
-            if work_path[key] is not None:
-                value = {**work_path[key], **value}
+        if key in work_path and work_path[key] is not None:
+            value = {**work_path[key], **value}  # noqa: PLW2901
         work_path[key] = value
 
     # delete missing key:
     current = work_path.copy().items()
-    for key, value in current:
+    for key, _ in current:
         if key not in desired_value:
             del work_path[key]
 

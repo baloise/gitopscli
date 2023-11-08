@@ -1,7 +1,9 @@
 import unittest
 from unittest.mock import call
+
+from gitopscli.commands.create_pr_preview import CreatePreviewCommand, CreatePrPreviewCommand
 from gitopscli.git_api import GitProvider, GitRepoApi, GitRepoApiFactory
-from gitopscli.commands.create_pr_preview import CreatePrPreviewCommand, CreatePreviewCommand
+
 from .mock_mixin import MockMixin
 
 DUMMY_GIT_HASH = "5f65cfa04c66444fcb756d6d7f39304d1c18b199"

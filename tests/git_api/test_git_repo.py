@@ -1,10 +1,11 @@
-from os import path, makedirs, chmod
 import stat
 import unittest
 import uuid
+from os import chmod, makedirs, path
 from unittest.mock import MagicMock, patch
-from git import Repo
+
 import pytest
+from git import Repo
 
 from gitopscli.git_api import GitRepo, GitRepoApi
 from gitopscli.gitops_exception import GitOpsException
@@ -264,7 +265,7 @@ echo password='Pass'
         logging_mock.info.assert_called_once_with("Creating commit with message: %s", "new commit")
 
     @patch("gitopscli.git_api.git_repo.logging")
-    def test_commit_with_custom_author_name_but_no_email_returns_validation_error(self, logging_mock):
+    def test_commit_with_custom_author_name_but_no_email_returns_validation_error(self, logging_mock):  # noqa: ARG002
         with GitRepo(self.__mock_repo_api) as testee:
             with pytest.raises(GitOpsException) as ex:
                 testee.commit(
@@ -279,7 +280,7 @@ echo password='Pass'
             )
 
     @patch("gitopscli.git_api.git_repo.logging")
-    def test_commit_with_custom_author_email_but_no_name_returns_validation_error(self, logging_mock):
+    def test_commit_with_custom_author_email_but_no_name_returns_validation_error(self, logging_mock):  # noqa: ARG002
         with GitRepo(self.__mock_repo_api) as testee:
             with pytest.raises(GitOpsException) as ex:
                 testee.commit(
@@ -389,7 +390,8 @@ echo password='Pass'
 
             with pytest.raises(GitOpsException) as ex:
                 testee.push("master")
-            assert "pre-receive" in str(ex.value) and "we reject this push" in str(ex.value)
+            assert "pre-receive" in str(ex.value)
+            assert "we reject this push" in str(ex.value)
         logging_mock.info.assert_called_once_with("Pushing branch: %s", "master")
 
     def test_get_author_from_last_commit(self):
@@ -398,7 +400,6 @@ echo password='Pass'
             self.assertEqual("unit tester <unit@tester.com>", testee.get_author_from_last_commit())
 
     def test_get_author_from_last_commit_not_cloned_yet(self):
-        with GitRepo(self.__mock_repo_api) as testee:
-            with pytest.raises(GitOpsException) as ex:
-                testee.get_author_from_last_commit()
+        with GitRepo(self.__mock_repo_api) as testee, pytest.raises(GitOpsException) as ex:
+            testee.get_author_from_last_commit()
         self.assertEqual("Repository not cloned yet!", str(ex.value))

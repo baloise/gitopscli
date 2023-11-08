@@ -10,7 +10,6 @@ from .version import VersionCommand
 
 CommandArgs = (
     DeployCommand.Args
-    | DeployCommand.Args
     | AddPrCommentCommand.Args
     | CreatePreviewCommand.Args
     | CreatePrPreviewCommand.Args

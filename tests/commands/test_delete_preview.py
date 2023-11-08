@@ -1,13 +1,16 @@
+import logging
 import os
 import shutil
 import unittest
-import logging
 from unittest.mock import call
+
 import pytest
-from gitopscli.gitops_config import GitOpsConfig
-from gitopscli.git_api import GitRepo, GitRepoApi, GitRepoApiFactory, GitProvider
-from gitopscli.gitops_exception import GitOpsException
+
 from gitopscli.commands.delete_preview import DeletePreviewCommand, load_gitops_config
+from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
+from gitopscli.gitops_config import GitOpsConfig
+from gitopscli.gitops_exception import GitOpsException
+
 from .mock_mixin import MockMixin
 
 

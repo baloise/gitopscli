@@ -14,10 +14,10 @@ def main() -> None:
         command.execute()
     except GitOpsException as ex:
         if verbose:
-            logging.exception(ex)
+            logging.exception(ex)  # noqa: TRY401
         else:
-            logging.error(ex)
-            logging.error("Provide verbose flag '-v' for more error details...")
+            logging.error(ex)  # noqa: TRY400
+            logging.error("Provide verbose flag '-v' for more error details...")  # noqa: TRY400
         sys.exit(1)
 
 

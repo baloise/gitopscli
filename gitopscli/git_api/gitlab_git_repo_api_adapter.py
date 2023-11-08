@@ -29,7 +29,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         except gitlab.exceptions.GitlabAuthenticationError as ex:
             raise GitOpsException("Bad Personal Access Token") from ex
         except gitlab.exceptions.GitlabGetError as ex:
-            if ex.response_code == 404:
+            if ex.response_code == 404:  # noqa: PLR2004
                 raise GitOpsException(f"Repository '{organisation}/{repository_name}' does not exist") from ex
             raise GitOpsException(f"Error getting repository: '{ex.error_message}'") from ex
 
@@ -82,7 +82,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                     merge_request.rebase(merge_parameters)
                     return
                 merge_request.merge(merge_parameters)
-                return
+                return  # noqa: TRY300
             except gitlab.exceptions.GitlabMRClosedError as ex:
                 # "Branch cannot be merged" error can occur if the server
                 # is still processing the merge request internally
@@ -96,7 +96,12 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                     raise GitOpsException("Error merging pull request: 'Branch cannot be merged'") from ex
                 time.sleep(2.5)
 
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
+    def add_pull_request_comment(
+        self,
+        pr_id: int,
+        text: str,
+        parent_id: int | None = None,  # noqa:ARG002
+    ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
         merge_request.notes.create({"body": text})
 

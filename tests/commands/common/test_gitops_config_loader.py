@@ -1,11 +1,13 @@
 import unittest
 from unittest.mock import call
+
 import pytest
-from gitopscli.gitops_exception import GitOpsException
-from gitopscli.gitops_config import GitOpsConfig
-from gitopscli.io_api.yaml_util import yaml_file_load
-from gitopscli.git_api import GitApiConfig, GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
+
 from gitopscli.commands.common.gitops_config_loader import load_gitops_config
+from gitopscli.git_api import GitApiConfig, GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
+from gitopscli.gitops_config import GitOpsConfig
+from gitopscli.gitops_exception import GitOpsException
+from gitopscli.io_api.yaml_util import yaml_file_load
 from tests.commands.mock_mixin import MockMixin
 
 
