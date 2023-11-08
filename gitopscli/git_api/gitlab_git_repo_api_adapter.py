@@ -82,7 +82,6 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                     merge_request.rebase(merge_parameters)
                     return
                 merge_request.merge(merge_parameters)
-                return  # noqa: TRY300
             except gitlab.exceptions.GitlabMRClosedError as ex:
                 # "Branch cannot be merged" error can occur if the server
                 # is still processing the merge request internally
@@ -95,6 +94,8 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
                 if max_retries == 0:
                     raise GitOpsException("Error merging pull request: 'Branch cannot be merged'") from ex
                 time.sleep(2.5)
+            else:
+                return
 
     def add_pull_request_comment(
         self,
