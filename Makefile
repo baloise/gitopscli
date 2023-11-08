@@ -4,6 +4,7 @@ init:
 
 format:
 	poetry run ruff format gitopscli tests
+	poetry run ruff gitopscli tests --fix
 
 format-check:
 	poetry run ruff format gitopscli tests --check

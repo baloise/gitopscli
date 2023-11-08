@@ -1,5 +1,6 @@
 import logging
 import time
+from http import HTTPStatus
 from typing import Any, Literal
 
 import gitlab
@@ -29,7 +30,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         except gitlab.exceptions.GitlabAuthenticationError as ex:
             raise GitOpsException("Bad Personal Access Token") from ex
         except gitlab.exceptions.GitlabGetError as ex:
-            if ex.response_code == 404:  # noqa: PLR2004
+            if ex.response_code == HTTPStatus.NOT_FOUND:
                 raise GitOpsException(f"Repository '{organisation}/{repository_name}' does not exist") from ex
             raise GitOpsException(f"Error getting repository: '{ex.error_message}'") from ex
 
