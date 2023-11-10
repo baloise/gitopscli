@@ -1,8 +1,7 @@
-from abc import ABC
 from unittest.mock import MagicMock, patch, seal
 
 
-class MockMixin(ABC):  # noqa: B024
+class MockMixin:
     def init_mock_manager(self, command_class: type) -> None:
         self.command_class = command_class
         self.mock_manager = MagicMock()
