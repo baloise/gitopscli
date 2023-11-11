@@ -1,7 +1,7 @@
 import stat
 import unittest
 import uuid
-from os import chmod, path
+from os import path
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -370,8 +370,9 @@ echo password='Pass'
         repo_dir = self.__origin.working_dir
         with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:
             pre_receive_hook.write('echo >&2 "we reject this push"; exit 1')
-        chmod(
+        Path(
             f"{repo_dir}/.git/hooks/pre-receive",
+        ).chmod(
             stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
         )
 

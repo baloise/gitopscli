@@ -1,6 +1,7 @@
 import locale
 import logging
 import os
+from pathlib import Path
 from types import TracebackType
 from typing import Literal
 
@@ -137,5 +138,5 @@ class GitRepo:
             text_file.write("#!/bin/sh\n")
             text_file.write(f"echo username='{username}'\n")
             text_file.write(f"echo password='{password}'\n")
-        os.chmod(file_path, 0o700)
+        Path(file_path).chmod(0o700)
         return file_path
