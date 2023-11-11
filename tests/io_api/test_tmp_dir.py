@@ -2,6 +2,7 @@ import os
 import shutil
 import unittest
 import uuid
+from pathlib import Path
 
 from gitopscli.io_api.tmp_dir import create_tmp_dir, delete_tmp_dir
 
@@ -22,7 +23,7 @@ class TmpDirTest(unittest.TestCase):
 
     def test_delete_tmp_dir(self):
         self.tmp_dir = f"/tmp/gitopscli/{uuid.uuid4()}"
-        os.makedirs(self.tmp_dir)
+        Path(self.tmp_dir).mkdir(parents=True)
         self.assertTrue(os.path.isdir(self.tmp_dir))
         delete_tmp_dir(self.tmp_dir)
         self.assertFalse(os.path.isdir(self.tmp_dir))

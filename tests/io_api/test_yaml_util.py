@@ -1,7 +1,7 @@
-import os
 import shutil
 import unittest
 import uuid
+from pathlib import Path
 
 import pytest
 
@@ -22,7 +22,7 @@ class YamlUtilTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmp_dir = f"/tmp/gitopscli-test-{uuid.uuid4()}"
-        os.makedirs(cls.tmp_dir)
+        Path(cls.tmp_dir).mkdir(parents=True)
 
     @classmethod
     def tearDownClass(cls):

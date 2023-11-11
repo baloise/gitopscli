@@ -1,7 +1,8 @@
 import stat
 import unittest
 import uuid
-from os import chmod, makedirs, path
+from os import chmod, path
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -22,7 +23,7 @@ class GitRepoTest(unittest.TestCase):
 
     def __create_tmp_dir(self):
         tmp_dir_path = f"/tmp/gitopscli-test-{uuid.uuid4()}"
-        makedirs(tmp_dir_path)
+        Path(tmp_dir_path).mkdir(parents=True)
         return tmp_dir_path
 
     def __read_file(self, filename):
