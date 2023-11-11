@@ -1,6 +1,5 @@
 import logging
 import os
-import posixpath
 import unittest
 from pathlib import Path
 from unittest.mock import call, patch
@@ -41,7 +40,6 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.os_mock = patcher.start()
         self.mock_manager.attach_mock(self.os_mock, "os")
 
-        self.os_mock.path.join.side_effect = posixpath.join  # tests are designed to emulate posix env
         self.os_mock.listdir.return_value = ["my-app"]
 
         patcher_path = patch("gitopscli.appconfig_api.app_tenant_config.Path", spec_set=Path)

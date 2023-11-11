@@ -33,12 +33,12 @@ class YamlUtilTest(unittest.TestCase):
 
     def _create_file(self, content):
         path = self._create_tmp_file_path()
-        with open(path, "w") as stream:
+        with Path(path).open("w") as stream:
             stream.write(content)
         return path
 
     def _read_file(self, path):
-        with open(path) as stream:
+        with Path(path).open() as stream:
             return stream.read()
 
     def test_yaml_file_load(self):

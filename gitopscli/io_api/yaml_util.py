@@ -1,5 +1,6 @@
 import locale
 from io import StringIO
+from pathlib import Path
 from typing import Any
 
 from jsonpath_ng.exceptions import JSONPathError
@@ -15,7 +16,7 @@ class YAMLException(Exception):  # noqa: N818
 
 
 def yaml_file_load(file_path: str) -> Any:
-    with open(file_path, encoding=locale.getpreferredencoding(do_setlocale=False)) as stream:
+    with Path(file_path).open(encoding=locale.getpreferredencoding(do_setlocale=False)) as stream:
         try:
             return YAML_INSTANCE.load(stream)
         except YAMLError as ex:
@@ -23,7 +24,7 @@ def yaml_file_load(file_path: str) -> Any:
 
 
 def yaml_file_dump(yaml: Any, file_path: str) -> None:
-    with open(file_path, "w+", encoding=locale.getpreferredencoding(do_setlocale=False)) as stream:
+    with Path(file_path).open("w+", encoding=locale.getpreferredencoding(do_setlocale=False)) as stream:
         YAML_INSTANCE.dump(yaml, stream)
 
 

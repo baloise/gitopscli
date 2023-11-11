@@ -27,7 +27,7 @@ class GitRepoTest(unittest.TestCase):
 
     def __read_file(self, filename):
         self.assertTrue(filename)
-        with open(filename) as input_stream:
+        with Path(filename).open() as input_stream:
             return input_stream.read()
 
     def __create_origin(self):
@@ -39,14 +39,14 @@ class GitRepoTest(unittest.TestCase):
         repo.config_writer().set_value("user", "name", git_user).release()
         repo.config_writer().set_value("user", "email", git_email).release()
 
-        with open(f"{repo_dir}/README.md", "w") as readme:
+        with Path(f"{repo_dir}/README.md").open("w") as readme:
             readme.write("master branch readme")
         repo.git.add("--all")
         repo.git.commit("-m", "initial commit", "--author", f"{git_user} <{git_email}>")
 
         repo.create_head("xyz").checkout()
 
-        with open(f"{repo_dir}/README.md", "w") as readme:
+        with Path(f"{repo_dir}/README.md").open("w") as readme:
             readme.write("xyz branch readme")
         repo.git.add("--all")
         repo.git.commit("-m", "xyz brach commit", "--author", f"{git_user} <{git_email}>")
@@ -204,9 +204,9 @@ echo password='Pass'
             testee.clone()
             logging_mock.reset_mock()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as outfile:
                 outfile.write("new file")
-            with open(testee.get_full_file_path("README.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("README.md")).open("w") as outfile:
                 outfile.write("new content")
 
             commit_hash = testee.commit(
@@ -237,9 +237,9 @@ echo password='Pass'
             testee.clone()
             logging_mock.reset_mock()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as outfile:
                 outfile.write("new file")
-            with open(testee.get_full_file_path("README.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("README.md")).open("w") as outfile:
                 outfile.write("new content")
 
             commit_hash = testee.commit(
@@ -318,7 +318,7 @@ echo password='Pass'
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as readme:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as readme:
                 readme.write("new file")
             util_repo = Repo(testee.get_full_file_path("."))
             util_repo.git.add("--all")
@@ -367,7 +367,7 @@ echo password='Pass'
     @patch("gitopscli.git_api.git_repo.logging")
     def test_push_commit_hook_error_reason_is_shown(self, logging_mock):
         repo_dir = self.__origin.working_dir
-        with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:
+        with Path(f"{repo_dir}/.git/hooks/pre-receive").open("w") as pre_receive_hook:
             pre_receive_hook.write('echo >&2 "we reject this push"; exit 1')
         Path(
             f"{repo_dir}/.git/hooks/pre-receive",
@@ -378,7 +378,7 @@ echo password='Pass'
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as readme:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as readme:
                 readme.write("new file")
             util_repo = Repo(testee.get_full_file_path("."))
             util_repo.git.add("--all")

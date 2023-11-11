@@ -132,10 +132,10 @@ class GitRepo:
         raise GitOpsException("Repository not cloned yet!")
 
     def __create_credentials_file(self, username: str, password: str) -> str:
-        file_path = f"{self.__tmp_dir}/credentials.sh"
-        with open(file_path, "w", encoding=locale.getpreferredencoding(do_setlocale=False)) as text_file:
+        file_path = Path(f"{self.__tmp_dir}/credentials.sh")
+        with file_path.open("w", encoding=locale.getpreferredencoding(do_setlocale=False)) as text_file:
             text_file.write("#!/bin/sh\n")
             text_file.write(f"echo username='{username}'\n")
             text_file.write(f"echo password='{password}'\n")
-        Path(file_path).chmod(0o700)
-        return file_path
+        file_path.chmod(0o700)
+        return str(file_path)
