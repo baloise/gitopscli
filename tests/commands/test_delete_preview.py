@@ -1,7 +1,7 @@
 import logging
-import os
 import shutil
 import unittest
+from pathlib import Path
 from unittest.mock import call
 
 import pytest
@@ -18,8 +18,9 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
         self.init_mock_manager(DeletePreviewCommand)
 
-        self.os_mock = self.monkey_patch(os)
-        self.os_mock.path.exists.return_value = True
+        self.path_mock = self.monkey_patch(Path)
+        self.path_mock.return_value = self.path_mock
+        self.path_mock.exists.return_value = True
 
         self.shutil_mock = self.monkey_patch(shutil)
         self.shutil_mock.rmtree.return_value = None
@@ -89,7 +90,8 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.clone("target-branch"),
             call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/app-685912d3-preview"),
+            call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
+            call.Path.exists(),
             call.shutil.rmtree("/tmp/created-tmp-dir/app-685912d3-preview", ignore_errors=True),
             call.GitRepo.commit(
                 "GIT_USER",
@@ -102,7 +104,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
     def test_delete_missing_happy_flow(self):
-        self.os_mock.path.exists.return_value = False
+        self.path_mock.exists.return_value = False
 
         args = DeletePreviewCommand.Args(
             username="USERNAME",
@@ -126,14 +128,15 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.clone("target-branch"),
             call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/app-685912d3-preview"),
+            call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
+            call.Path.exists(),
             call.logging.info(
                 "No preview environment for '%s' and preview id '%s'. I'm done here.", "APP", "PREVIEW_ID"
             ),
         ]
 
     def test_delete_missing_but_expected_error(self):
-        self.os_mock.path.exists.return_value = False
+        self.path_mock.exists.return_value = False
 
         args = DeletePreviewCommand.Args(
             username="USERNAME",
@@ -160,7 +163,8 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.clone("target-branch"),
             call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
-            call.os.path.exists("/tmp/created-tmp-dir/app-685912d3-preview"),
+            call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
+            call.Path.exists(),
         ]
 
     def test_missing_gitops_config_yaml_error(self):

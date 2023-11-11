@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from pathlib import Path  # noqa: F401
 
 from gitopscli.appconfig_api.app_tenant_config import create_app_tenant_config_from_repo
 from gitopscli.appconfig_api.root_repo import create_root_repo

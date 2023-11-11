@@ -1,6 +1,7 @@
 import logging
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from gitopscli.git_api import GitRepo
@@ -108,7 +109,7 @@ def __get_all_tenant_applications_dirs(tenant_repo: GitRepo) -> set[str]:
 
 def __get_custom_config(appname: str, tenant_config_git_repo: GitRepo) -> Any:
     custom_config_path = tenant_config_git_repo.get_full_file_path(f"{appname}/.config.yaml")
-    if os.path.exists(custom_config_path):
+    if Path(custom_config_path).exists():
         return yaml_file_load(custom_config_path)
     return {}
 

@@ -2,6 +2,7 @@ import logging
 import os
 import posixpath
 import unittest
+from pathlib import Path
 from unittest.mock import call, patch
 
 from ruamel.yaml.compat import ordereddict
@@ -45,7 +46,13 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.os_mock.path.isdir.return_value = True
         self.os_mock.path.join.side_effect = posixpath.join  # tests are designed to emulate posix env
         self.os_mock.listdir.return_value = ["my-app"]
-        self.os_mock.path.exists.return_value = False
+
+        patcher = patch("gitopscli.appconfig_api.app_tenant_config.Path", spec_set=Path)
+        self.addCleanup(patcher.stop)
+        self.path_mock = patcher.start()
+        self.path_mock.return_value = self.path_mock
+        self.path_mock.exists.return_value = False
+        self.mock_manager.attach_mock(self.path_mock, "Path")
 
         self.logging_mock = self.monkey_patch(logging)
         self.logging_mock.info.return_value = None
@@ -134,7 +141,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.os.path.isdir("/tmp/team-config-repo/./my-app"),
             call.GitRepo_team.get_clone_url(),
             call.GitRepo_team.get_full_file_path("my-app/.config.yaml"),
-            call.os.path.exists("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path.exists(),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
             call.logging.info("Appling changes to: %s", "/tmp/root-config-repo/apps/team-non-prod.yaml"),
             call.yaml_file_dump(
@@ -199,7 +207,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.os.path.isdir("/tmp/team-config-repo/./my-app"),
             call.GitRepo_team.get_clone_url(),
             call.GitRepo_team.get_full_file_path("my-app/.config.yaml"),
-            call.os.path.exists("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path.exists(),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
             call.logging.info("No changes applied to %s", "/tmp/root-config-repo/apps/team-non-prod.yaml"),
         ]

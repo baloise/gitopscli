@@ -1,7 +1,6 @@
 import stat
 import unittest
 import uuid
-from os import path
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -63,10 +62,10 @@ class GitRepoTest(unittest.TestCase):
         testee.clone()
 
         tmp_dir = testee.get_full_file_path("..")
-        self.assertTrue(path.exists(tmp_dir))
+        self.assertTrue(Path(tmp_dir).exists())
 
         testee.finalize()
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
 
     def test_enter_and_exit_magic_methods(self):
         testee = GitRepo(self.__mock_repo_api)
@@ -76,10 +75,10 @@ class GitRepoTest(unittest.TestCase):
         testee.clone()
 
         tmp_dir = testee.get_full_file_path("..")
-        self.assertTrue(path.exists(tmp_dir))
+        self.assertTrue(Path(tmp_dir).exists())
 
         testee.__exit__(None, None, None)
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
 
     @patch("gitopscli.git_api.git_repo.logging")
     def test_clone(self, logging_mock):
@@ -87,12 +86,12 @@ class GitRepoTest(unittest.TestCase):
             testee.clone()
 
             tmp_dir = testee.get_full_file_path("..")
-            self.assertTrue(path.exists(tmp_dir))
+            self.assertTrue(Path(tmp_dir).exists())
 
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("master branch readme", readme)
 
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
         logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
 
     @patch("gitopscli.git_api.git_repo.logging")
@@ -101,12 +100,12 @@ class GitRepoTest(unittest.TestCase):
             testee.clone("xyz")
 
             tmp_dir = testee.get_full_file_path("..")
-            self.assertTrue(path.exists(tmp_dir))
+            self.assertTrue(Path(tmp_dir).exists())
 
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("xyz branch readme", readme)
 
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
         logging_mock.info.assert_called_once_with(
             "Cloning repository: %s (branch: %s)",
             self.__mock_repo_api.get_clone_url(),
@@ -137,7 +136,7 @@ class GitRepoTest(unittest.TestCase):
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("master branch readme", readme)
 
-            self.assertFalse(path.exists(testee.get_full_file_path("../credentials.sh")))
+            self.assertFalse(Path(testee.get_full_file_path("../credentials.sh")).exists())
         logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
 
     @patch("gitopscli.git_api.git_repo.logging")
