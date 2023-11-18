@@ -69,8 +69,7 @@ ignore = [
 ]
 # the following exclusions have been introduced to prevent huge changes
 # feel free to remove them and fix the code
-"gitopscli/appconfig_api/app_tenant_config.py" = ["PTH118"]
-"gitopscli/git_api/git_repo.py" = ["PTH118", "PTH123"]
+"gitopscli/git_api/git_repo.py" = ["PTH123"]
 "gitopscli/io_api/yaml_util.py" = ["PTH123"]
 "tests/git_api/test_git_repo.py" = ["PTH123"]
 "tests/io_api/test_yaml_util.py" = ["PTH123"]

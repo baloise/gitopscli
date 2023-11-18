@@ -100,11 +100,7 @@ def __generate_config_from_tenant_repo(
 
 def __get_all_tenant_applications_dirs(tenant_repo: GitRepo) -> set[str]:
     repo_dir = tenant_repo.get_full_file_path(".")
-    return {
-        name
-        for name in os.listdir(repo_dir)
-        if Path(os.path.join(repo_dir, name)).is_dir() and not name.startswith(".")
-    }
+    return {name for name in os.listdir(repo_dir) if (Path(repo_dir) / name).is_dir() and not name.startswith(".")}
 
 
 def __get_custom_config(appname: str, tenant_config_git_repo: GitRepo) -> Any:

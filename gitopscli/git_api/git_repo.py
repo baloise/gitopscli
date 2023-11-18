@@ -1,6 +1,5 @@
 import locale
 import logging
-import os
 from pathlib import Path
 from types import TracebackType
 from typing import Literal
@@ -36,7 +35,7 @@ class GitRepo:
 
     def get_full_file_path(self, relative_path: str) -> str:
         repo = self.__get_repo()
-        return os.path.join(str(repo.working_dir), relative_path)
+        return str(Path(repo.working_dir) / relative_path)
 
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
