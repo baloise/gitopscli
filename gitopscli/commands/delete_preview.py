@@ -1,7 +1,7 @@
 import logging
-import os
 import shutil
 from dataclasses import dataclass
+from pathlib import Path
 
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_config import GitOpsConfig
@@ -79,7 +79,7 @@ class DeletePreviewCommand(Command):
     @staticmethod
     def __delete_folder_if_exists(git_repo: GitRepo, folder_name: str) -> bool:
         folder_full_path = git_repo.get_full_file_path(folder_name)
-        if not os.path.exists(folder_full_path):
+        if not Path(folder_full_path).exists():
             return False
         shutil.rmtree(folder_full_path, ignore_errors=True)
         return True

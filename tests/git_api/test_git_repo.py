@@ -1,7 +1,7 @@
 import stat
 import unittest
 import uuid
-from os import chmod, makedirs, path
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -22,12 +22,12 @@ class GitRepoTest(unittest.TestCase):
 
     def __create_tmp_dir(self):
         tmp_dir_path = f"/tmp/gitopscli-test-{uuid.uuid4()}"
-        makedirs(tmp_dir_path)
+        Path(tmp_dir_path).mkdir(parents=True)
         return tmp_dir_path
 
     def __read_file(self, filename):
         self.assertTrue(filename)
-        with open(filename) as input_stream:
+        with Path(filename).open() as input_stream:
             return input_stream.read()
 
     def __create_origin(self):
@@ -39,14 +39,14 @@ class GitRepoTest(unittest.TestCase):
         repo.config_writer().set_value("user", "name", git_user).release()
         repo.config_writer().set_value("user", "email", git_email).release()
 
-        with open(f"{repo_dir}/README.md", "w") as readme:
+        with Path(f"{repo_dir}/README.md").open("w") as readme:
             readme.write("master branch readme")
         repo.git.add("--all")
         repo.git.commit("-m", "initial commit", "--author", f"{git_user} <{git_email}>")
 
         repo.create_head("xyz").checkout()
 
-        with open(f"{repo_dir}/README.md", "w") as readme:
+        with Path(f"{repo_dir}/README.md").open("w") as readme:
             readme.write("xyz branch readme")
         repo.git.add("--all")
         repo.git.commit("-m", "xyz brach commit", "--author", f"{git_user} <{git_email}>")
@@ -62,10 +62,10 @@ class GitRepoTest(unittest.TestCase):
         testee.clone()
 
         tmp_dir = testee.get_full_file_path("..")
-        self.assertTrue(path.exists(tmp_dir))
+        self.assertTrue(Path(tmp_dir).exists())
 
         testee.finalize()
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
 
     def test_enter_and_exit_magic_methods(self):
         testee = GitRepo(self.__mock_repo_api)
@@ -75,10 +75,10 @@ class GitRepoTest(unittest.TestCase):
         testee.clone()
 
         tmp_dir = testee.get_full_file_path("..")
-        self.assertTrue(path.exists(tmp_dir))
+        self.assertTrue(Path(tmp_dir).exists())
 
         testee.__exit__(None, None, None)
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
 
     @patch("gitopscli.git_api.git_repo.logging")
     def test_clone(self, logging_mock):
@@ -86,12 +86,12 @@ class GitRepoTest(unittest.TestCase):
             testee.clone()
 
             tmp_dir = testee.get_full_file_path("..")
-            self.assertTrue(path.exists(tmp_dir))
+            self.assertTrue(Path(tmp_dir).exists())
 
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("master branch readme", readme)
 
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
         logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
 
     @patch("gitopscli.git_api.git_repo.logging")
@@ -100,12 +100,12 @@ class GitRepoTest(unittest.TestCase):
             testee.clone("xyz")
 
             tmp_dir = testee.get_full_file_path("..")
-            self.assertTrue(path.exists(tmp_dir))
+            self.assertTrue(Path(tmp_dir).exists())
 
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("xyz branch readme", readme)
 
-        self.assertFalse(path.exists(tmp_dir))
+        self.assertFalse(Path(tmp_dir).exists())
         logging_mock.info.assert_called_once_with(
             "Cloning repository: %s (branch: %s)",
             self.__mock_repo_api.get_clone_url(),
@@ -136,7 +136,7 @@ class GitRepoTest(unittest.TestCase):
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("master branch readme", readme)
 
-            self.assertFalse(path.exists(testee.get_full_file_path("../credentials.sh")))
+            self.assertFalse(Path(testee.get_full_file_path("../credentials.sh")).exists())
         logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
 
     @patch("gitopscli.git_api.git_repo.logging")
@@ -204,9 +204,9 @@ echo password='Pass'
             testee.clone()
             logging_mock.reset_mock()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as outfile:
                 outfile.write("new file")
-            with open(testee.get_full_file_path("README.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("README.md")).open("w") as outfile:
                 outfile.write("new content")
 
             commit_hash = testee.commit(
@@ -237,9 +237,9 @@ echo password='Pass'
             testee.clone()
             logging_mock.reset_mock()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as outfile:
                 outfile.write("new file")
-            with open(testee.get_full_file_path("README.md"), "w") as outfile:
+            with Path(testee.get_full_file_path("README.md")).open("w") as outfile:
                 outfile.write("new content")
 
             commit_hash = testee.commit(
@@ -318,7 +318,7 @@ echo password='Pass'
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as readme:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as readme:
                 readme.write("new file")
             util_repo = Repo(testee.get_full_file_path("."))
             util_repo.git.add("--all")
@@ -367,17 +367,18 @@ echo password='Pass'
     @patch("gitopscli.git_api.git_repo.logging")
     def test_push_commit_hook_error_reason_is_shown(self, logging_mock):
         repo_dir = self.__origin.working_dir
-        with open(f"{repo_dir}/.git/hooks/pre-receive", "w") as pre_receive_hook:
+        with Path(f"{repo_dir}/.git/hooks/pre-receive").open("w") as pre_receive_hook:
             pre_receive_hook.write('echo >&2 "we reject this push"; exit 1')
-        chmod(
+        Path(
             f"{repo_dir}/.git/hooks/pre-receive",
+        ).chmod(
             stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
         )
 
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
 
-            with open(testee.get_full_file_path("foo.md"), "w") as readme:
+            with Path(testee.get_full_file_path("foo.md")).open("w") as readme:
                 readme.write("new file")
             util_repo = Repo(testee.get_full_file_path("."))
             util_repo.git.add("--all")

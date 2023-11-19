@@ -1,7 +1,7 @@
 import logging
-import os
 import shutil
 import unittest
+from pathlib import Path
 from unittest.mock import Mock, call
 
 from gitopscli.commands.create_preview import CreatePreviewCommand, load_gitops_config
@@ -45,8 +45,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
     def setUp(self):
         self.init_mock_manager(CreatePreviewCommand)
 
-        self.os_mock = self.monkey_patch(os)
-        self.os_mock.path.isdir.return_value = True
+        self.path_mock = self.monkey_patch(Path)
+        self.path_mock.return_value = self.path_mock
+        self.path_mock.is_dir.return_value = True
 
         self.shutil_mock = self.monkey_patch(shutil)
         self.shutil_mock.copytree.return_value = None
@@ -126,10 +127,10 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         self.seal_mocks()
 
     def test_create_new_preview(self):
-        self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/target-repo/my-app-685912d3-preview": False,  # doesn't exist yet -> expect create
-            "/tmp/template-repo/.preview-templates/my-app": True,
-        }[path]
+        self.path_mock.is_dir.side_effect = [
+            False,  # /tmp/target-repo/my-app-685912d3-preview, doesn't exist yet -> expect create
+            True,  # /tmp/template-repo/.preview-templates/my-app
+        ]
 
         deployment_created_callback = Mock(return_value=None)
 
@@ -161,10 +162,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/template-repo/.preview-templates/my-app"),
+            call.Path("/tmp/template-repo/.preview-templates/my-app"),
+            call.Path.is_dir(),
             call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.shutil.copytree(
                 "/tmp/template-repo/.preview-templates/my-app", "/tmp/target-repo/my-app-685912d3-preview"
@@ -229,10 +232,10 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             replacements=gitops_config.replacements,
         )
 
-        self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/target-repo/my-app-685912d3-preview": False,  # doesn't exist yet -> expect create
-            "/tmp/target-repo/.preview-templates/my-app": True,
-        }[path]
+        self.path_mock.is_dir.side_effect = [
+            False,  # /tmp/target-repo/my-app-685912d3-preview, doesn't exist yet -> expect create
+            True,  # /tmp/target-repo/.preview-templates/my-app
+        ]
 
         deployment_created_callback = Mock(return_value=None)
 
@@ -263,10 +266,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.target_git_repo_api_mock),
             call.GitRepo.clone(None),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/target-repo/.preview-templates/my-app"),
+            call.Path("/tmp/target-repo/.preview-templates/my-app"),
+            call.Path.is_dir(),
             call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.shutil.copytree(
                 "/tmp/target-repo/.preview-templates/my-app", "/tmp/target-repo/my-app-685912d3-preview"
@@ -311,9 +316,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
     def test_update_existing_preview(self):
-        self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/target-repo/my-app-685912d3-preview": True,  # already exists -> expect update
-        }[path]
+        self.path_mock.is_dir.side_effect = [
+            True,  # /tmp/target-repo/my-app-685912d3-preview, already exists -> expect update
+        ]
 
         deployment_updated_callback = Mock(return_value=None)
 
@@ -337,7 +342,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
@@ -379,9 +385,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
     def test_preview_already_up_to_date(self):
-        self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/target-repo/my-app-685912d3-preview": True,  # already exists -> expect update
-        }[path]
+        self.path_mock.is_dir.side_effect = [
+            True,  # /tmp/target-repo/my-app-685912d3-preview, already exists -> expect update
+        ]
 
         self.update_yaml_file_mock.return_value = False  # nothing updated -> expect already up to date
 
@@ -407,7 +413,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
@@ -437,10 +444,10 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
     def test_create_preview_for_unknown_template(self):
-        self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/target-repo/my-app-685912d3-preview": False,
-            "/tmp/template-repo/.preview-templates/my-app": False,  # preview template missing -> expect error
-        }[path]
+        self.path_mock.is_dir.side_effect = [
+            False,  # /tmp/target-repo/my-app-685912d3-preview
+            False,  # /tmp/template-repo/.preview-templates/my-app, preview template missing -> expect error
+        ]
 
         try:
             CreatePreviewCommand(ARGS).execute()
@@ -458,10 +465,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/template-repo/.preview-templates/my-app"),
+            call.Path("/tmp/template-repo/.preview-templates/my-app"),
+            call.Path.is_dir(),
         ]
 
     def test_create_preview_values_yaml_not_found(self):
@@ -483,7 +492,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
@@ -510,7 +520,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
@@ -537,7 +548,8 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
@@ -546,10 +558,10 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         ]
 
     def test_create_new_preview_invalid_chart_template(self):
-        self.os_mock.path.isdir.side_effect = lambda path: {
-            "/tmp/target-repo/my-app-685912d3-preview": False,  # doesn't exist yet -> expect create
-            "/tmp/template-repo/.preview-templates/my-app": True,
-        }[path]
+        self.path_mock.is_dir.side_effect = [
+            False,  # /tmp/target-repo/my-app-685912d3-preview doesn't exist yet -> expect create
+            True,  # /tmp/template-repo/.preview-templates/my-app
+        ]
 
         self.update_yaml_file_mock.side_effect = KeyError()
 
@@ -569,10 +581,12 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo(self.template_git_repo_api_mock),
             call.GitRepo.clone("template-branch"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
-            call.os.path.isdir("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path("/tmp/target-repo/my-app-685912d3-preview"),
+            call.Path.is_dir(),
             call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
-            call.os.path.isdir("/tmp/template-repo/.preview-templates/my-app"),
+            call.Path("/tmp/template-repo/.preview-templates/my-app"),
+            call.Path.is_dir(),
             call.logging.info("Using the preview template folder: %s", ".preview-templates/my-app"),
             call.shutil.copytree(
                 "/tmp/template-repo/.preview-templates/my-app", "/tmp/target-repo/my-app-685912d3-preview"

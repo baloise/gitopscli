@@ -1,6 +1,6 @@
 import locale
 import logging
-import os
+from pathlib import Path
 from types import TracebackType
 from typing import Literal
 
@@ -35,7 +35,7 @@ class GitRepo:
 
     def get_full_file_path(self, relative_path: str) -> str:
         repo = self.__get_repo()
-        return os.path.join(str(repo.working_dir), relative_path)
+        return str(Path(repo.working_dir) / relative_path)
 
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
@@ -132,10 +132,10 @@ class GitRepo:
         raise GitOpsException("Repository not cloned yet!")
 
     def __create_credentials_file(self, username: str, password: str) -> str:
-        file_path = f"{self.__tmp_dir}/credentials.sh"
-        with open(file_path, "w", encoding=locale.getpreferredencoding(do_setlocale=False)) as text_file:
+        file_path = Path(f"{self.__tmp_dir}/credentials.sh")
+        with file_path.open("w", encoding=locale.getpreferredencoding(do_setlocale=False)) as text_file:
             text_file.write("#!/bin/sh\n")
             text_file.write(f"echo username='{username}'\n")
             text_file.write(f"echo password='{password}'\n")
-        os.chmod(file_path, 0o700)
-        return file_path
+        file_path.chmod(0o700)
+        return str(file_path)

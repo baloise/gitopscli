@@ -1,10 +1,8 @@
 import logging
 import os
-import posixpath
 import unittest
+from pathlib import Path
 from unittest.mock import call, patch
-
-from ruamel.yaml.compat import ordereddict
 
 from gitopscli.commands.sync_apps import SyncAppsCommand
 from gitopscli.git_api import GitProvider, GitRepo, GitRepoApi, GitRepoApiFactory
@@ -42,10 +40,17 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.os_mock = patcher.start()
         self.mock_manager.attach_mock(self.os_mock, "os")
 
-        self.os_mock.path.isdir.return_value = True
-        self.os_mock.path.join.side_effect = posixpath.join  # tests are designed to emulate posix env
         self.os_mock.listdir.return_value = ["my-app"]
-        self.os_mock.path.exists.return_value = False
+
+        patcher_path = patch("gitopscli.appconfig_api.app_tenant_config.Path", spec_set=Path)
+        self.addCleanup(patcher_path.stop)
+        self.path_mock = patcher_path.start()
+        self.mock_manager.attach_mock(self.path_mock, "Path")
+
+        self.path_mock.return_value = self.path_mock
+        self.path_mock.__truediv__.return_value = self.path_mock
+        self.path_mock.exists.return_value = False
+        self.path_mock.is_dir.return_value = True
 
         self.logging_mock = self.monkey_patch(logging)
         self.logging_mock.info.return_value = None
@@ -110,11 +115,14 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
 
     def test_sync_apps_happy_flow(self):
         SyncAppsCommand(ARGS).execute()
-        assert self.mock_manager.method_calls == [
+        # assert mock_call to verify path joins through __truediv__
+        assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(ARGS, "TEAM_ORGA", "TEAM_REPO"),
             call.GitRepoApiFactory.create(ARGS, "ROOT_ORGA", "ROOT_REPO"),
             call.GitRepo(self.team_config_git_repo_api_mock),
+            call.GitRepo_team.__enter__(),
             call.GitRepo(self.root_config_git_repo_api_mock),
+            call.GitRepo_root.__enter__(),
             call.GitRepo_team.get_clone_url(),
             call.logging.info("Team config repository: %s", "https://repository.url/team/team-non-prod.git"),
             call.GitRepo_root.get_clone_url(),
@@ -130,18 +138,20 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo_team.clone(),
             call.GitRepo_team.get_full_file_path("."),
             call.os.listdir("/tmp/team-config-repo/."),
-            call.os.path.join("/tmp/team-config-repo/.", "my-app"),
-            call.os.path.isdir("/tmp/team-config-repo/./my-app"),
+            call.Path("/tmp/team-config-repo/."),
+            call.Path.__truediv__("my-app"),
+            call.Path.is_dir(),
             call.GitRepo_team.get_clone_url(),
             call.GitRepo_team.get_full_file_path("my-app/.config.yaml"),
-            call.os.path.exists("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path.exists(),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
             call.logging.info("Appling changes to: %s", "/tmp/root-config-repo/apps/team-non-prod.yaml"),
             call.yaml_file_dump(
                 {
                     "config": {
                         "repository": "https://repository.url/team/team-non-prod.git",
-                        "applications": {"my-app": ordereddict()},
+                        "applications": {"my-app": {}},
                     }
                 },
                 "/tmp/root-config-repo/apps/team-non-prod.yaml",
@@ -157,6 +167,8 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                 "author updated /tmp/root-config-repo/apps/team-non-prod.yaml",
             ),
             call.GitRepo_root.push(),
+            call.GitRepo_root.__exit__(None, None, None),
+            call.GitRepo_team.__exit__(None, None, None),
         ]
 
     def test_sync_apps_already_up_to_date(self):
@@ -175,11 +187,14 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         }[file_path]
 
         SyncAppsCommand(ARGS).execute()
-        assert self.mock_manager.method_calls == [
+        # assert mock_call to verify path joins through __truediv__
+        assert self.mock_manager.mock_calls == [
             call.GitRepoApiFactory.create(ARGS, "TEAM_ORGA", "TEAM_REPO"),
             call.GitRepoApiFactory.create(ARGS, "ROOT_ORGA", "ROOT_REPO"),
             call.GitRepo(self.team_config_git_repo_api_mock),
+            call.GitRepo_team.__enter__(),
             call.GitRepo(self.root_config_git_repo_api_mock),
+            call.GitRepo_root.__enter__(),
             call.GitRepo_team.get_clone_url(),
             call.logging.info("Team config repository: %s", "https://repository.url/team/team-non-prod.git"),
             call.GitRepo_root.get_clone_url(),
@@ -195,13 +210,17 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo_team.clone(),
             call.GitRepo_team.get_full_file_path("."),
             call.os.listdir("/tmp/team-config-repo/."),
-            call.os.path.join("/tmp/team-config-repo/.", "my-app"),
-            call.os.path.isdir("/tmp/team-config-repo/./my-app"),
+            call.Path("/tmp/team-config-repo/."),
+            call.Path.__truediv__("my-app"),
+            call.Path.is_dir(),
             call.GitRepo_team.get_clone_url(),
             call.GitRepo_team.get_full_file_path("my-app/.config.yaml"),
-            call.os.path.exists("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path("/tmp/team-config-repo/my-app/.config.yaml"),
+            call.Path.exists(),
             call.logging.info("Found %s app(s) in apps repository: %s", 1, "my-app"),
             call.logging.info("No changes applied to %s", "/tmp/root-config-repo/apps/team-non-prod.yaml"),
+            call.GitRepo_root.__exit__(None, None, None),
+            call.GitRepo_team.__exit__(None, None, None),
         ]
 
     def test_sync_apps_bootstrap_chart(self):
