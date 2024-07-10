@@ -73,6 +73,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
         self.root_config_git_repo_mock.get_clone_url.return_value = "https://repository.url/root/root-config.git"
         self.root_config_git_repo_mock.clone.return_value = None
         self.root_config_git_repo_mock.commit.return_value = None
+        self.root_config_git_repo_mock.pull_rebase.return_value = None
         self.root_config_git_repo_mock.push.return_value = None
 
         self.git_repo_api_factory_mock = self.monkey_patch(GitRepoApiFactory)
@@ -166,6 +167,7 @@ class SyncAppsCommandTest(MockMixin, unittest.TestCase):
                 "GIT_AUTHOR_EMAIL",
                 "author updated /tmp/root-config-repo/apps/team-non-prod.yaml",
             ),
+            call.GitRepo_root.pull_rebase(),
             call.GitRepo_root.push(),
             call.GitRepo_root.__exit__(None, None, None),
             call.GitRepo_team.__exit__(None, None, None),

@@ -55,6 +55,7 @@ class DeployCommand(Command):
                 logging.info("All values already up-to-date. I'm done here.")
                 return
 
+            git_repo.pull_rebase()
             git_repo.push()
 
         if self.__args.create_pr:

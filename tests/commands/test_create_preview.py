@@ -107,6 +107,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
         self.template_git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/template-repo/{x}"
         self.template_git_repo_mock.clone.return_value = None
         self.template_git_repo_mock.commit.return_value = None
+        self.template_git_repo_mock.pull_rebase.return_value = None
         self.template_git_repo_mock.push.return_value = None
 
         self.target_git_repo_mock = self.create_mock(GitRepo)
@@ -208,6 +209,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "GIT_AUTHOR_EMAIL",
                 "Create new preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 
@@ -312,6 +314,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "GIT_AUTHOR_EMAIL",
                 "Create new preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 
@@ -381,6 +384,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "GIT_AUTHOR_EMAIL",
                 "Update preview environment for 'my-app' and git hash '3361723dbd91fcfae7b5b8b8b7d462fbc14187a9'.",
             ),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 

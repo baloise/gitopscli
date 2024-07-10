@@ -49,7 +49,7 @@ class GitRepoTest(unittest.TestCase):
         with Path(f"{repo_dir}/README.md").open("w") as readme:
             readme.write("xyz branch readme")
         repo.git.add("--all")
-        repo.git.commit("-m", "xyz brach commit", "--author", f"{git_user} <{git_email}>")
+        repo.git.commit("-m", "initial xyz branch commit", "--author", f"{git_user} <{git_email}>")
 
         repo.git.checkout("master")  # master = default branch
         repo.git.config("receive.denyCurrentBranch", "ignore")
@@ -312,6 +312,102 @@ echo password='Pass'
             self.assertEqual(1, len(commits))
             self.assertEqual("initial commit\n", commits[0].message)
         logging_mock.assert_not_called()
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_pull_rebase_master_single_commit(self, logging_mock):
+        origin_repo = self.__origin
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone()
+
+            # local commit
+            with Path(testee.get_full_file_path("local.md")).open("w") as outfile:
+                outfile.write("local file")
+            local_repo = Repo(testee.get_full_file_path("."))
+            local_repo.git.add("--all")
+            local_repo.git.commit("-m", "local commit", "--author", "local <local@doe.com>")
+
+            # origin commit
+            with Path(f"{origin_repo.working_dir}/origin.md").open("w") as readme:
+                readme.write("origin file")
+            origin_repo.git.add("--all")
+            origin_repo.git.commit("-m", "origin commit", "--author", "origin <origin@doe.com>")
+
+            # pull and rebase from remote
+            logging_mock.reset_mock()
+
+            testee.pull_rebase()
+
+            logging_mock.info.assert_called_once_with("Pull and rebase: %s", "master")
+
+            # then push should work
+            testee.push()
+
+            commits = list(self.__origin.iter_commits("master"))
+            self.assertEqual(3, len(commits))
+            self.assertEqual("initial commit\n", commits[2].message)
+            self.assertEqual("origin commit\n", commits[1].message)
+            self.assertEqual("local commit\n", commits[0].message)
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_pull_rebase_remote_branch_single_commit(self, logging_mock):
+        origin_repo = self.__origin
+        origin_repo.git.checkout("xyz")
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone(branch="xyz")
+
+            # local commit
+            with Path(testee.get_full_file_path("local.md")).open("w") as outfile:
+                outfile.write("local file")
+            local_repo = Repo(testee.get_full_file_path("."))
+            local_repo.git.add("--all")
+            local_repo.git.commit("-m", "local branch commit", "--author", "local <local@doe.com>")
+
+            # origin commit
+            with Path(f"{origin_repo.working_dir}/origin.md").open("w") as readme:
+                readme.write("origin file")
+            origin_repo.git.add("--all")
+            origin_repo.git.commit("-m", "origin branch commit", "--author", "origin <origin@doe.com>")
+
+            # pull and rebase from remote
+            logging_mock.reset_mock()
+
+            testee.pull_rebase()
+
+            logging_mock.info.assert_called_once_with("Pull and rebase: %s", "xyz")
+
+            # then push should work
+            testee.push()
+
+            commits = list(self.__origin.iter_commits("xyz"))
+            self.assertEqual(4, len(commits))
+            self.assertEqual("local branch commit\n", commits[0].message)
+            self.assertEqual("origin branch commit\n", commits[1].message)
+            self.assertEqual("initial xyz branch commit\n", commits[2].message)
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_pull_rebase_without_new_commits(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone()
+
+            # pull and rebase from remote
+            logging_mock.reset_mock()
+
+            testee.pull_rebase()
+
+            logging_mock.info.assert_called_once_with("Pull and rebase: %s", "master")
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_pull_rebase_if_no_remote_branch_is_noop(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone()
+            testee.new_branch("new-branch-only-local")
+
+            # pull and rebase from remote
+            logging_mock.reset_mock()
+
+            testee.pull_rebase()
+
+            logging_mock.assert_not_called()
 
     @patch("gitopscli.git_api.git_repo.logging")
     def test_push(self, logging_mock):
