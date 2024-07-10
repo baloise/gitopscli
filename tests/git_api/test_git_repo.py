@@ -324,13 +324,15 @@ echo password='Pass'
                 outfile.write("local file")
             local_repo = Repo(testee.get_full_file_path("."))
             local_repo.git.add("--all")
-            local_repo.git.commit("-m", "local commit", "--author", "local <local@doe.com>")
+            local_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+            local_repo.git.commit("-m", "local commit")
 
             # origin commit
             with Path(f"{origin_repo.working_dir}/origin.md").open("w") as readme:
                 readme.write("origin file")
             origin_repo.git.add("--all")
-            origin_repo.git.commit("-m", "origin commit", "--author", "origin <origin@doe.com>")
+            origin_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+            origin_repo.git.commit("-m", "origin commit")
 
             # pull and rebase from remote
             logging_mock.reset_mock()
@@ -360,13 +362,15 @@ echo password='Pass'
                 outfile.write("local file")
             local_repo = Repo(testee.get_full_file_path("."))
             local_repo.git.add("--all")
-            local_repo.git.commit("-m", "local branch commit", "--author", "local <local@doe.com>")
+            local_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+            local_repo.git.commit("-m", "local branch commit")
 
             # origin commit
             with Path(f"{origin_repo.working_dir}/origin.md").open("w") as readme:
                 readme.write("origin file")
             origin_repo.git.add("--all")
-            origin_repo.git.commit("-m", "origin branch commit", "--author", "origin <origin@doe.com>")
+            origin_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+            origin_repo.git.commit("-m", "origin branch commit")
 
             # pull and rebase from remote
             logging_mock.reset_mock()
