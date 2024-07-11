@@ -7,8 +7,8 @@ plugins:
 - - "semantic-release-replace-plugin"
   - replacements:
     - files: [ "pyproject.toml" ]
-      from: "version=\"0.0.0\""
-      to: "version=\"${nextRelease.version}\""
+      from: "version = \"0.0.0\""
+      to: "version = \"${nextRelease.version}\""
       countMatches: true
       results:
         - file: "pyproject.toml"
