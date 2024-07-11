@@ -48,6 +48,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.new_branch.return_value = None
         self.example_commit_hash = "5f3a443e7ecb3723c1a71b9744e2993c0b6dfc00"
         self.git_repo_mock.commit.return_value = self.example_commit_hash
+        self.git_repo_mock.pull_rebase.return_value = None
         self.git_repo_mock.push.return_value = None
         self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
 
@@ -101,6 +102,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
                 "GIT_AUTHOR_EMAIL",
                 "changed 'a.b.d' to 'bar' in test/file.yml",
             ),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 
@@ -142,6 +144,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", None, None, "changed 'a.b.c' to 'foo' in test/file.yml"),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
             call.GitRepoApi.create_pull_request_to_default_branch(
                 "gitopscli-deploy-b973b5bb",
@@ -199,6 +202,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", None, None, "changed 'a.b.d' to 'bar' in test/file.yml"),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
             call.GitRepoApi.create_pull_request_to_default_branch(
                 "gitopscli-deploy-b973b5bb",
@@ -259,6 +263,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", None, None, "changed 'a.b.d' to 'bar' in test/file.yml"),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
             call.GitRepoApi.create_pull_request_to_default_branch(
                 "gitopscli-deploy-b973b5bb",
@@ -313,6 +318,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
                 None,
                 "updated 2 values in test/file.yml\n\na.b.c: foo\na.b.d: bar",
             ),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 
@@ -352,6 +358,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
             call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", None, None, "changed 'a.b.c' to 'foo' in test/file.yml"),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 
@@ -393,6 +400,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.d", "bar"),
             call.logging.info("Updated yaml property %s to %s", "a.b.d", "bar"),
             call.GitRepo.commit("GIT_USER", "GIT_EMAIL", None, None, "testcommit"),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 

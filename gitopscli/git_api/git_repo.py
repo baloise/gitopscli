@@ -105,6 +105,14 @@ class GitRepo:
         if (name and not email) or (not name and email):
             raise GitOpsException("Please provide the name and email address of the Git author or provide neither!")
 
+    def pull_rebase(self) -> None:
+        repo = self.__get_repo()
+        branch = repo.git.branch("--show-current")
+        if not self.__remote_branch_exists(branch):
+            return
+        logging.info("Pull and rebase: %s", branch)
+        repo.git.pull("--rebase")
+
     def push(self, branch: str | None = None) -> None:
         repo = self.__get_repo()
         if not branch:
@@ -121,6 +129,10 @@ class GitRepo:
         repo = self.__get_repo()
         last_commit = repo.head.commit
         return str(repo.git.show("-s", "--format=%an <%ae>", last_commit.hexsha))
+
+    def __remote_branch_exists(self, branch: str) -> bool:
+        repo = self.__get_repo()
+        return bool(repo.git.ls_remote("--heads", "origin", f"refs/heads/{branch}").strip() != "")
 
     def __delete_tmp_dir(self) -> None:
         if self.__tmp_dir:

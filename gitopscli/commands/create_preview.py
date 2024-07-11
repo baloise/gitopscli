@@ -101,6 +101,7 @@ class CreatePreviewCommand(Command):
             self.__args.git_author_email,
             message,
         )
+        git_repo.pull_rebase()
         git_repo.push()
 
     def __get_gitops_config(self) -> GitOpsConfig:

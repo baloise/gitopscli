@@ -103,4 +103,5 @@ def __commit_and_push(
         git_author_email,
         f"{author} updated " + app_file_name,
     )
+    root_config_git_repo.pull_rebase()
     root_config_git_repo.push()

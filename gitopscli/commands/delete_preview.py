@@ -74,6 +74,7 @@ class DeletePreviewCommand(Command):
             self.__args.git_author_email,
             message,
         )
+        git_repo.pull_rebase()
         git_repo.push()
 
     @staticmethod

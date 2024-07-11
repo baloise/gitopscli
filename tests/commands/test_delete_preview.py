@@ -63,6 +63,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.get_full_file_path.side_effect = lambda x: f"/tmp/created-tmp-dir/{x}"
         self.git_repo_mock.clone.return_value = None
         self.git_repo_mock.commit.return_value = None
+        self.git_repo_mock.pull_rebase.return_value = None
         self.git_repo_mock.push.return_value = None
 
         self.seal_mocks()
@@ -100,6 +101,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
                 "GIT_AUTHOR_EMAIL",
                 "Delete preview environment for 'APP' and preview id 'PREVIEW_ID'.",
             ),
+            call.GitRepo.pull_rebase(),
             call.GitRepo.push(),
         ]
 
