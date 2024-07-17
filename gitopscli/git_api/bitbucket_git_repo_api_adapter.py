@@ -91,7 +91,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         _merge_method: Literal["squash", "rebase", "merge"] = "merge",
         _merge_parameters: dict[str, Any] | None = None,
     ) -> None:
-        pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
+        pull_request = self.__bitbucket.get_pull_request(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(
             self.__organisation,
             self.__repository_name,
@@ -125,7 +125,7 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
         return str(branches[0]["latestCommit"])
 
     def get_pull_request_branch(self, pr_id: int) -> str:
-        pull_request = self.__bitbucket.get_pullrequest(self.__organisation, self.__repository_name, pr_id)
+        pull_request = self.__bitbucket.get_pull_request(self.__organisation, self.__repository_name, pr_id)
         if "errors" in pull_request:
             raise GitOpsException(pull_request["errors"][0]["message"])
         return str(pull_request["fromRef"]["displayId"])
