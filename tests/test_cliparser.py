@@ -1460,7 +1460,7 @@ class CliParserTest(unittest.TestCase):
         )
 
     def test_git_provider_azure_devops_explicit(self):
-        verbose, args = parse_args(
+        _, args = parse_args(
             [
                 "add-pr-comment",
                 "--git-provider",
@@ -1486,7 +1486,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.git_provider_url, "https://dev.azure.com")
 
     def test_git_provider_azure_devops_deduced_from_dev_azure_com_url(self):
-        verbose, args = parse_args(
+        _, args = parse_args(
             [
                 "add-pr-comment",
                 "--git-provider-url",
