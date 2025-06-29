@@ -7,8 +7,7 @@
 !mkdocs.yml
 !Makefile
 !mypy.ini
-!poetry.lock
-!poetry.toml
+!uv.lock
 !pyproject.toml
 !README.md
 

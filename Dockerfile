@@ -2,8 +2,7 @@
 FROM alpine:3.18 AS base
 
 ENV PATH="/app/.venv/bin:$PATH" \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
+    UV_COMPILE_BYTECODE=1 \
     PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
     PYTHONUNBUFFERED=1
@@ -13,26 +12,34 @@ RUN apk add --no-cache git python3
 FROM base AS dev
 
 WORKDIR /app
-RUN apk add --no-cache gcc linux-headers musl-dev make poetry python3-dev
-COPY pyproject.toml poetry.lock poetry.toml ./
+RUN apk add --no-cache gcc linux-headers musl-dev make python3-dev
 
 # =========
 FROM dev AS deps
 
-RUN poetry install --only main
+RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
+    --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project --no-editable
 
 # =========
 FROM deps AS test
 
-RUN poetry install --with test
 COPY . .
-RUN pip install .
+COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /uvx /bin/
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --group=test
 RUN make checks
 
 # =========
 FROM deps AS docs
 
-RUN poetry install --with docs
+RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
+    --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project --group=docs
 COPY docs ./docs
 COPY CONTRIBUTING.md mkdocs.yml ./
 RUN mkdocs build
@@ -46,11 +53,14 @@ COPY --from=docs /app/site /site
 FROM deps AS install
 
 COPY . .
-RUN poetry build
-RUN pip install dist/gitopscli-*.whl
+RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
+    --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-editable
 
 # =========
-FROM base as final
+FROM base AS final
 
 COPY --from=install /app/.venv /app/.venv
 ENTRYPOINT ["gitopscli"]
