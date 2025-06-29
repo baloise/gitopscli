@@ -9,7 +9,7 @@ dependencies = [
     "gitpython",
     "ruamel.yaml",
     "jsonpath-ng",
-    "atlassian-python-api",
+    "atlassian-python-api>=3,<4",
     "pygithub",
     "python-gitlab>=2.6.0,<3",
     "azure-devops>=7,<8",
@@ -26,10 +26,11 @@ test = [
     "ruff",
     "coverage",
     "pytest",
-    "mypy",
+    "mypy==1.6.1",
     "typeguard>=2.13.3,<3",
     "pre-commit",
     "types-requests",
+    "types-Deprecated",
 ]
 docs = [
     "mkdocs",
@@ -53,7 +54,6 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-    "ANN101", # https://docs.astral.sh/ruff/rules/missing-type-self/
     "ANN401", # https://docs.astral.sh/ruff/rules/any-type/
     "C901", # https://docs.astral.sh/ruff/rules/complex-structure/
     "PLR0913", # https://docs.astral.sh/ruff/rules/too-many-arguments/
@@ -65,6 +65,8 @@ ignore = [
     "S101", # https://docs.astral.sh/ruff/rules/assert/
     "TRY003", # https://docs.astral.sh/ruff/rules/raise-vanilla-args/
     "PD", # https://docs.astral.sh/ruff/rules/#pandas-vet-pd (false positives)
+    "LOG015", # https://docs.astral.sh/ruff/rules/root-logger-call/
+    "PTH208", # https://docs.astral.sh/ruff/rules/os-listdir/
 ]
 
 [tool.ruff.lint.per-file-ignores]

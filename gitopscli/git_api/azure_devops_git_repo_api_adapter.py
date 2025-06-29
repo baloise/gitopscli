@@ -98,7 +98,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                     f"Repository '{self.__project_name}/{self.__repository_name}' does not exist"
                 ) from ex
             raise GitOpsException(f"Error creating pull request: {error_msg}") from ex
-        except Exception as ex:  # noqa: BLE001
+        except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def merge_pull_request(
@@ -146,7 +146,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             if "404" in error_msg:
                 raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist") from ex
             raise GitOpsException(f"Error merging pull request: {error_msg}") from ex
-        except Exception as ex:  # noqa: BLE001
+        except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:  # noqa: ARG002
@@ -174,7 +174,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             if "404" in error_msg:
                 raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist") from ex
             raise GitOpsException(f"Error adding comment: {error_msg}") from ex
-        except Exception as ex:  # noqa: BLE001
+        except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def delete_branch(self, branch: str) -> None:
@@ -215,7 +215,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             if "404" in error_msg:
                 raise GitOpsException(f"Branch '{branch}' does not exist") from ex
             raise GitOpsException(f"Error deleting branch: {error_msg}") from ex
-        except Exception as ex:  # noqa: BLE001
+        except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def get_branch_head_hash(self, branch: str) -> str:
@@ -243,7 +243,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             if "404" in error_msg:
                 raise GitOpsException(f"Branch '{branch}' does not exist") from ex
             raise GitOpsException(f"Error getting branch hash: {error_msg}") from ex
-        except Exception as ex:  # noqa: BLE001
+        except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def get_pull_request_branch(self, pr_id: int) -> str:
@@ -266,7 +266,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             if "404" in error_msg:
                 raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist") from ex
             raise GitOpsException(f"Error getting pull request: {error_msg}") from ex
-        except Exception as ex:  # noqa: BLE001
+        except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def add_pull_request_label(self, pr_id: int, pr_labels: list[str]) -> None:
@@ -296,5 +296,5 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                     f"Repository '{self.__project_name}/{self.__repository_name}' does not exist"
                 ) from ex
             raise GitOpsException(f"Error getting repository info: {error_msg}") from ex
-        except Exception as ex:  # noqa: BLE001
+        except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex

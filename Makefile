@@ -4,13 +4,13 @@ init:
 
 format:
 	uv run ruff format gitopscli tests
-	uv run ruff gitopscli tests --fix
+	uv run ruff check gitopscli tests --fix
 
 format-check:
 	uv run ruff format gitopscli tests --check
 
 lint:
-	uv run ruff gitopscli tests
+	uv run ruff check gitopscli tests
 
 mypy:
 	uv run mypy --install-types --non-interactive .
@@ -33,6 +33,6 @@ docs:
 	uv run mkdocs serve
 
 update:
-	uv lock
+	uv lock -U
 
 .PHONY: init format format-check lint mypy test coverage checks image docs update

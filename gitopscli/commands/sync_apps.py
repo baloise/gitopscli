@@ -34,9 +34,10 @@ class SyncAppsCommand(Command):
 def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
     team_config_git_repo_api = GitRepoApiFactory.create(args, args.organisation, args.repository_name)
     root_config_git_repo_api = GitRepoApiFactory.create(args, args.root_organisation, args.root_repository_name)
-    with GitRepo(team_config_git_repo_api) as team_config_git_repo, GitRepo(
-        root_config_git_repo_api
-    ) as root_config_git_repo:
+    with (
+        GitRepo(team_config_git_repo_api) as team_config_git_repo,
+        GitRepo(root_config_git_repo_api) as root_config_git_repo,
+    ):
         __sync_apps(
             team_config_git_repo,
             root_config_git_repo,

@@ -231,9 +231,9 @@ class GitOpsConfigV1Test(unittest.TestCase):
         self.assertEqual("Invalid character in preview namespace: '*'", str(ex.value))
 
     def test_preview_target_namespace_too_long(self):
-        self.yaml["previewConfig"]["target"][
-            "namespace"
-        ] = "veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long-${PREVIEW_ID}-${PREVIEW_ID_HASH}"
+        self.yaml["previewConfig"]["target"]["namespace"] = (
+            "veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery-long-${PREVIEW_ID}-${PREVIEW_ID_HASH}"
+        )
         config = self.load()
         with pytest.raises(GitOpsException) as ex:
             config.get_preview_namespace("x")
