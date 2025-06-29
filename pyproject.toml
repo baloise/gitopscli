@@ -1,42 +1,47 @@
-[tool.poetry]
+[project]
 name = "gitopscli"
 version = "0.0.0"
 description = "GitOps CLI is a command line interface (CLI) to perform operations on GitOps managed infrastructure repositories, including updates in YAML files."
-authors = ["Christian Siegel <christian.siegel@gmx.net>"]
+authors = [{ name = "Christian Siegel", email = "christian.siegel@gmx.net" }]
+requires-python = ">=3.10, <4"
 readme = "README.md"
-repository = "https://github.com/baloise/gitopscli"
+dependencies = [
+    "gitpython",
+    "ruamel.yaml",
+    "jsonpath-ng",
+    "atlassian-python-api",
+    "pygithub",
+    "python-gitlab>=2.6.0,<3",
+    "azure-devops>=7,<8",
+]
 
-[tool.poetry.scripts]
+[project.urls]
+Repository = "https://github.com/baloise/gitopscli"
+
+[project.scripts]
 gitopscli = "gitopscli.__main__:main"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-gitpython = "*"
-"ruamel.yaml" = "*"
-jsonpath-ng = "*"
-atlassian-python-api = "*"
-pygithub = "*"
-python-gitlab = "^2.6.0"
-azure-devops = "^7.1.0b4"
-
-[tool.poetry.group.test.dependencies]
-ruff = "*"
-coverage = "*"
-pytest = "*"
-mypy = "*"
-typeguard = "^2.13.3"
-pre-commit = "*"
-
-[tool.poetry.group.docs.dependencies]
-mkdocs = "*"
-mkdocs-material = "*"
-markdown-include = "*"
-pymdown-extensions = "*"
-Markdown = "*"
+[dependency-groups]
+test = [
+    "ruff",
+    "coverage",
+    "pytest",
+    "mypy",
+    "typeguard>=2.13.3,<3",
+    "pre-commit",
+    "types-requests",
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "markdown-include",
+    "pymdown-extensions",
+    "Markdown",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [virtualenvs]
 in-project = true
@@ -61,7 +66,8 @@ ignore = [
     "TRY003", # https://docs.astral.sh/ruff/rules/raise-vanilla-args/
     "PD", # https://docs.astral.sh/ruff/rules/#pandas-vet-pd (false positives)
 ]
-[tool.ruff.per-file-ignores]
+
+[tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["F401"]
 "tests/**/*.py" = [
     "S106", # https://docs.astral.sh/ruff/rules/hardcoded-password-func-arg/
