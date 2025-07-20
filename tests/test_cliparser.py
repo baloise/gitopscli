@@ -1458,3 +1458,54 @@ class CliParserTest(unittest.TestCase):
             "gitopscli: error: Cannot deduce git provider from --git-provider-url. Please provide --git-provider",
             last_stderr_line,
         )
+
+    def test_git_provider_azure_devops_explicit(self):
+        verbose, args = parse_args(
+            [
+                "add-pr-comment",
+                "--git-provider",
+                "azure-devops",
+                "--git-provider-url",
+                "https://dev.azure.com",
+                "--username",
+                "user",
+                "--password",
+                "token",
+                "--organisation",
+                "org",
+                "--repository-name",
+                "repo",
+                "--pr-id",
+                "123",
+                "--text",
+                "comment",
+            ]
+        )
+        self.assert_type(args, AddPrCommentCommand.Args)
+        self.assertEqual(args.git_provider, GitProvider.AZURE_DEVOPS)
+        self.assertEqual(args.git_provider_url, "https://dev.azure.com")
+
+    def test_git_provider_azure_devops_deduced_from_dev_azure_com_url(self):
+        verbose, args = parse_args(
+            [
+                "add-pr-comment",
+                "--git-provider-url",
+                "https://dev.azure.com/myorg",
+                "--username",
+                "user",
+                "--password",
+                "token",
+                "--organisation",
+                "org",
+                "--repository-name",
+                "repo",
+                "--pr-id",
+                "123",
+                "--text",
+                "comment",
+            ]
+        )
+        self.assert_type(args, AddPrCommentCommand.Args)
+        self.assertEqual(args.git_provider, GitProvider.AZURE_DEVOPS)
+        self.assertEqual(args.git_provider_url, "https://dev.azure.com/myorg")
+

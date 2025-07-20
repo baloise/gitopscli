@@ -17,6 +17,7 @@ jsonpath-ng = "*"
 atlassian-python-api = "*"
 pygithub = "*"
 python-gitlab = "^2.6.0"
+azure-devops = "^7.1.0b4"
 
 [tool.poetry.group.test.dependencies]
 ruff = "*"
