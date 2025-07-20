@@ -1,11 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from azure.devops.v7_1.git.models import (
-    GitPullRequest,
-    GitRef,
-    GitRepository,
-)
+import pytest
 from msrest.exceptions import ClientException
 
 from gitopscli.git_api.azure_devops_git_repo_api_adapter import AzureDevOpsGitRepoApiAdapter
@@ -41,7 +37,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         self.assertEqual(adapter.get_clone_url(), "https://dev.azure.com/myorg/project/_git/repo")
 
     def test_init_no_password_raises_exception(self):
-        with self.assertRaises(GitOpsException) as context:
+        with pytest.raises(GitOpsException) as context:
             AzureDevOpsGitRepoApiAdapter(
                 git_provider_url="https://dev.azure.com/org",
                 username="user",
@@ -49,7 +45,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
                 organisation="project",
                 repository_name="repo",
             )
-        self.assertEqual(str(context.exception), "Password (Personal Access Token) is required for Azure DevOps")
+        self.assertEqual(str(context.value), "Password (Personal Access Token) is required for Azure DevOps")
 
     def test_get_clone_url(self):
         expected_url = "https://dev.azure.com/testorg/testproject/_git/testrepo"
@@ -59,7 +55,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         mock_pr = MagicMock()
         mock_pr.pull_request_id = 123
         mock_pr.url = "https://dev.azure.com/testorg/testproject/_git/testrepo/pullrequest/123"
-        
+
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_pull_request.return_value = mock_pr
 
         result = self.adapter.create_pull_request(
@@ -74,7 +70,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         call_args = self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_pull_request.call_args
         self.assertEqual(call_args.kwargs["repository_id"], "testrepo")
         self.assertEqual(call_args.kwargs["project"], "testproject")
-        
+
         pr_request = call_args.kwargs["git_pull_request_to_create"]
         self.assertEqual(pr_request.source_ref_name, "refs/heads/feature-branch")
         self.assertEqual(pr_request.target_ref_name, "refs/heads/main")
@@ -85,10 +81,10 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         mock_pr = MagicMock()
         mock_pr.pull_request_id = 123
         mock_pr.url = "test-url"
-        
+
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_pull_request.return_value = mock_pr
 
-        result = self.adapter.create_pull_request(
+        self.adapter.create_pull_request(
             from_branch="refs/heads/feature-branch",
             to_branch="refs/heads/main",
             title="Test PR",
@@ -104,18 +100,18 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
     def test_create_pull_request_unauthorized(self):
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_pull_request.side_effect = ClientException("401")
 
-        with self.assertRaises(GitOpsException) as context:
+        with pytest.raises(GitOpsException) as context:
             self.adapter.create_pull_request("from", "to", "title", "desc")
 
-        self.assertEqual(str(context.exception), "Bad credentials")
+        self.assertEqual(str(context.value), "Bad credentials")
 
     def test_create_pull_request_not_found(self):
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_pull_request.side_effect = ClientException("404")
 
-        with self.assertRaises(GitOpsException) as context:
+        with pytest.raises(GitOpsException) as context:
             self.adapter.create_pull_request("from", "to", "title", "desc")
 
-        self.assertEqual(str(context.exception), "Repository 'testproject/testrepo' does not exist")
+        self.assertEqual(str(context.value), "Repository 'testproject/testrepo' does not exist")
 
     def test_create_pull_request_to_default_branch(self):
         # Mock get repository for default branch
@@ -154,9 +150,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
 
         # Verify get_pull_request was called
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_pull_request.assert_called_once_with(
-            repository_id="testrepo",
-            pull_request_id=123,
-            project="testproject"
+            repository_id="testrepo", pull_request_id=123, project="testproject"
         )
 
         # Verify update_pull_request was called
@@ -164,7 +158,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         self.assertEqual(call_args.kwargs["repository_id"], "testrepo")
         self.assertEqual(call_args.kwargs["pull_request_id"], 123)
         self.assertEqual(call_args.kwargs["project"], "testproject")
-        
+
         pr_update = call_args.kwargs["git_pull_request_to_update"]
         self.assertEqual(pr_update.status, "completed")
         self.assertEqual(pr_update.completion_options.merge_strategy, "squash")
@@ -197,7 +191,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         self.assertEqual(call_args.kwargs["repository_id"], "testrepo")
         self.assertEqual(call_args.kwargs["pull_request_id"], 123)
         self.assertEqual(call_args.kwargs["project"], "testproject")
-        
+
         thread = call_args.kwargs["comment_thread"]
         self.assertEqual(len(thread.comments), 1)
         self.assertEqual(thread.comments[0].content, "Test comment")
@@ -213,18 +207,16 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
 
         self.assertEqual(result, "abc123def456")
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_refs.assert_called_once_with(
-            repository_id="testrepo",
-            project="testproject",
-            filter="heads/main"
+            repository_id="testrepo", project="testproject", filter="heads/main"
         )
 
     def test_get_branch_head_hash_not_found(self):
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_refs.return_value = []
 
-        with self.assertRaises(GitOpsException) as context:
+        with pytest.raises(GitOpsException) as context:
             self.adapter.get_branch_head_hash("nonexistent")
 
-        self.assertEqual(str(context.exception), "Branch 'nonexistent' does not exist")
+        self.assertEqual(str(context.value), "Branch 'nonexistent' does not exist")
 
     def test_get_pull_request_branch_success(self):
         mock_pr = MagicMock()
@@ -235,9 +227,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
 
         self.assertEqual(result, "feature-branch")
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_pull_request.assert_called_once_with(
-            repository_id="testrepo",
-            pull_request_id=123,
-            project="testproject"
+            repository_id="testrepo", pull_request_id=123, project="testproject"
         )
 
     def test_get_pull_request_branch_without_refs_prefix(self):
@@ -262,16 +252,14 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
 
         # Verify get_refs was called
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_refs.assert_called_once_with(
-            repository_id="testrepo",
-            project="testproject",
-            filter="heads/feature-branch"
+            repository_id="testrepo", project="testproject", filter="heads/feature-branch"
         )
 
         # Verify update_refs was called
         call_args = self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.update_refs.call_args
         self.assertEqual(call_args.kwargs["repository_id"], "testrepo")
         self.assertEqual(call_args.kwargs["project"], "testproject")
-        
+
         ref_updates = call_args.kwargs["ref_updates"]
         self.assertEqual(len(ref_updates), 1)
         self.assertEqual(ref_updates[0].name, "refs/heads/feature-branch")
@@ -281,29 +269,31 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
     def test_delete_branch_not_found(self):
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_refs.return_value = []
 
-        with self.assertRaises(GitOpsException) as context:
+        with pytest.raises(GitOpsException) as context:
             self.adapter.delete_branch("nonexistent")
 
-        self.assertEqual(str(context.exception), "Branch 'nonexistent' does not exist")
+        self.assertEqual(str(context.value), "Branch 'nonexistent' does not exist")
 
     def test_add_pull_request_label_does_nothing(self):
         # Labels aren't supported in the SDK implementation, should not raise exception
         try:
             self.adapter.add_pull_request_label(123, ["bug", "enhancement"])
-        except Exception:
-            self.fail("add_pull_request_label should not raise exception")
+        except Exception as ex:  # noqa: BLE001
+            self.fail(f"add_pull_request_label should not raise exception: {ex}")
 
     def test_username_and_password_getters(self):
         self.assertEqual(self.adapter.get_username(), "testuser")
         self.assertEqual(self.adapter.get_password(), "testtoken")
 
     def test_connection_error_handling(self):
-        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_pull_request.side_effect = Exception("Connection failed")
+        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_pull_request.side_effect = Exception(
+            "Connection failed"
+        )
 
-        with self.assertRaises(GitOpsException) as context:
+        with pytest.raises(GitOpsException) as context:
             self.adapter.create_pull_request("from", "to", "title", "desc")
 
-        self.assertIn("Error connecting to 'https://dev.azure.com/testorg'", str(context.exception))
+        self.assertIn("Error connecting to 'https://dev.azure.com/testorg'", str(context.value))
 
     def test_get_default_branch_success(self):
         mock_repo = MagicMock()
@@ -314,8 +304,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
 
         self.assertEqual(result, "main")
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_repository.assert_called_once_with(
-            repository_id="testrepo",
-            project="testproject"
+            repository_id="testrepo", project="testproject"
         )
 
     def test_get_default_branch_fallback(self):

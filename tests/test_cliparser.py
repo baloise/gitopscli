@@ -1508,4 +1508,3 @@ class CliParserTest(unittest.TestCase):
         self.assert_type(args, AddPrCommentCommand.Args)
         self.assertEqual(args.git_provider, GitProvider.AZURE_DEVOPS)
         self.assertEqual(args.git_provider_url, "https://dev.azure.com/myorg")
-

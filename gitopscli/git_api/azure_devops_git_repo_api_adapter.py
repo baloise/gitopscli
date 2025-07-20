@@ -2,16 +2,12 @@ from typing import Any, Literal
 
 from azure.devops.connection import Connection
 from azure.devops.credentials import BasicAuthentication
-from azure.devops.v7_1.git import GitClient
 from azure.devops.v7_1.git.models import (
+    Comment,
     GitPullRequest,
     GitPullRequestCommentThread,
     GitPullRequestCompletionOptions,
-    GitRef,
     GitRefUpdate,
-    GitRefUpdateResult,
-    GitRepository,
-    Comment,
 )
 from msrest.exceptions import ClientException
 
@@ -22,7 +18,7 @@ from .git_repo_api import GitRepoApi
 
 class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
     """Azure DevOps SDK adapter for GitOps CLI operations."""
-    
+
     def __init__(
         self,
         git_provider_url: str,
@@ -40,10 +36,10 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         self.__password = password
         self.__project_name = organisation  # In Azure DevOps, "organisation" param is actually the project
         self.__repository_name = repository_name
-        
+
         if not password:
             raise GitOpsException("Password (Personal Access Token) is required for Azure DevOps")
-        
+
         # Create connection using Basic Authentication with PAT
         credentials = BasicAuthentication(self.__username, password)
         self.__connection = Connection(base_url=self.__base_url, creds=credentials)
@@ -79,36 +75,32 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             # Ensure branch names have proper refs/ prefix
             source_ref = from_branch if from_branch.startswith("refs/") else f"refs/heads/{from_branch}"
             target_ref = to_branch if to_branch.startswith("refs/") else f"refs/heads/{to_branch}"
-            
+
             pull_request = GitPullRequest(
                 source_ref_name=source_ref,
                 target_ref_name=target_ref,
                 title=title,
                 description=description,
             )
-            
+
             created_pr = self.__git_client.create_pull_request(
                 git_pull_request_to_create=pull_request,
                 repository_id=self.__repository_name,
                 project=self.__project_name,
             )
-            
-            return GitRepoApi.PullRequestIdAndUrl(
-                pr_id=created_pr.pull_request_id,
-                url=created_pr.url
-            )
-            
+
+            return GitRepoApi.PullRequestIdAndUrl(pr_id=created_pr.pull_request_id, url=created_pr.url)
+
         except ClientException as ex:
             error_msg = str(ex)
             if "401" in error_msg:
                 raise GitOpsException("Bad credentials") from ex
-            elif "404" in error_msg:
+            if "404" in error_msg:
                 raise GitOpsException(
                     f"Repository '{self.__project_name}/{self.__repository_name}' does not exist"
                 ) from ex
-            else:
-                raise GitOpsException(f"Error creating pull request: {error_msg}") from ex
-        except Exception as ex:
+            raise GitOpsException(f"Error creating pull request: {error_msg}") from ex
+        except Exception as ex:  # noqa: BLE001
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def merge_pull_request(
@@ -124,7 +116,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 pull_request_id=pr_id,
                 project=self.__project_name,
             )
-            
+
             # Map merge methods to Azure DevOps completion options
             completion_options = GitPullRequestCompletionOptions()
             if merge_method == "squash":
@@ -133,67 +125,68 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 completion_options.merge_strategy = "rebase"
             else:  # merge
                 completion_options.merge_strategy = "noFastForward"
-                
+
             # Apply any additional merge parameters
             if merge_parameters:
                 for key, value in merge_parameters.items():
                     setattr(completion_options, key, value)
-            
+
             # Update the pull request to complete it
             pr_update = GitPullRequest(
                 status="completed",
                 last_merge_source_commit=pr.last_merge_source_commit,
                 completion_options=completion_options,
             )
-            
+
             self.__git_client.update_pull_request(
                 git_pull_request_to_update=pr_update,
                 repository_id=self.__repository_name,
                 pull_request_id=pr_id,
                 project=self.__project_name,
             )
-            
+
         except ClientException as ex:
             error_msg = str(ex)
             if "401" in error_msg:
                 raise GitOpsException("Bad credentials") from ex
-            elif "404" in error_msg:
+            if "404" in error_msg:
                 raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist") from ex
-            else:
-                raise GitOpsException(f"Error merging pull request: {error_msg}") from ex
-        except Exception as ex:
+            raise GitOpsException(f"Error merging pull request: {error_msg}") from ex
+        except Exception as ex:  # noqa: BLE001
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
-    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:
+    def add_pull_request_comment(self, pr_id: int, text: str, parent_id: int | None = None) -> None:  # noqa: ARG002
         try:
             comment = Comment(content=text, comment_type="text")
             thread = GitPullRequestCommentThread(
                 comments=[comment],
                 status="active",
             )
-            
+
             # Azure DevOps doesn't support direct reply to comments in the same way as other platforms
             # parent_id is ignored for now
-            
+
             self.__git_client.create_thread(
                 comment_thread=thread,
                 repository_id=self.__repository_name,
                 pull_request_id=pr_id,
                 project=self.__project_name,
             )
-            
+
         except ClientException as ex:
             error_msg = str(ex)
             if "401" in error_msg:
                 raise GitOpsException("Bad credentials") from ex
-            elif "404" in error_msg:
+            if "404" in error_msg:
                 raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist") from ex
-            else:
-                raise GitOpsException(f"Error adding comment: {error_msg}") from ex
-        except Exception as ex:
+            raise GitOpsException(f"Error adding comment: {error_msg}") from ex
+        except Exception as ex:  # noqa: BLE001
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def delete_branch(self, branch: str) -> None:
+        def _raise_branch_not_found() -> None:
+            raise GitOpsException(f"Branch '{branch}' does not exist")
+
         try:
             # Get the branch reference first
             refs = self.__git_client.get_refs(
@@ -201,25 +194,25 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 project=self.__project_name,
                 filter=f"heads/{branch}",
             )
-            
+
             if not refs:
-                raise GitOpsException(f"Branch '{branch}' does not exist")
-            
+                _raise_branch_not_found()
+
             branch_ref = refs[0]
-            
+
             # Create ref update to delete the branch
             ref_update = GitRefUpdate(
                 name=f"refs/heads/{branch}",
                 old_object_id=branch_ref.object_id,
                 new_object_id="0000000000000000000000000000000000000000",
             )
-            
+
             self.__git_client.update_refs(
                 ref_updates=[ref_update],
                 repository_id=self.__repository_name,
                 project=self.__project_name,
             )
-            
+
         except GitOpsException:
             # Re-raise GitOpsException without modification
             raise
@@ -227,26 +220,28 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             error_msg = str(ex)
             if "401" in error_msg:
                 raise GitOpsException("Bad credentials") from ex
-            elif "404" in error_msg:
+            if "404" in error_msg:
                 raise GitOpsException(f"Branch '{branch}' does not exist") from ex
-            else:
-                raise GitOpsException(f"Error deleting branch: {error_msg}") from ex
-        except Exception as ex:
+            raise GitOpsException(f"Error deleting branch: {error_msg}") from ex
+        except Exception as ex:  # noqa: BLE001
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def get_branch_head_hash(self, branch: str) -> str:
+        def _raise_branch_not_found() -> None:
+            raise GitOpsException(f"Branch '{branch}' does not exist")
+
         try:
             refs = self.__git_client.get_refs(
                 repository_id=self.__repository_name,
                 project=self.__project_name,
                 filter=f"heads/{branch}",
             )
-            
+
             if not refs:
-                raise GitOpsException(f"Branch '{branch}' does not exist")
-            
-            return refs[0].object_id
-            
+                _raise_branch_not_found()
+
+            return str(refs[0].object_id)
+
         except GitOpsException:
             # Re-raise GitOpsException without modification
             raise
@@ -254,11 +249,10 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             error_msg = str(ex)
             if "401" in error_msg:
                 raise GitOpsException("Bad credentials") from ex
-            elif "404" in error_msg:
+            if "404" in error_msg:
                 raise GitOpsException(f"Branch '{branch}' does not exist") from ex
-            else:
-                raise GitOpsException(f"Error getting branch hash: {error_msg}") from ex
-        except Exception as ex:
+            raise GitOpsException(f"Error getting branch hash: {error_msg}") from ex
+        except Exception as ex:  # noqa: BLE001
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def get_pull_request_branch(self, pr_id: int) -> str:
@@ -268,22 +262,21 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 pull_request_id=pr_id,
                 project=self.__project_name,
             )
-            
+
             # Extract branch name from sourceRefName (remove refs/heads/ prefix)
-            source_ref = pr.source_ref_name
+            source_ref = str(pr.source_ref_name)
             if source_ref.startswith("refs/heads/"):
                 return source_ref[11:]  # Remove "refs/heads/" prefix
             return source_ref
-            
+
         except ClientException as ex:
             error_msg = str(ex)
             if "401" in error_msg:
                 raise GitOpsException("Bad credentials") from ex
-            elif "404" in error_msg:
+            if "404" in error_msg:
                 raise GitOpsException(f"Pull request with ID '{pr_id}' does not exist") from ex
-            else:
-                raise GitOpsException(f"Error getting pull request: {error_msg}") from ex
-        except Exception as ex:
+            raise GitOpsException(f"Error getting pull request: {error_msg}") from ex
+        except Exception as ex:  # noqa: BLE001
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
     def add_pull_request_label(self, pr_id: int, pr_labels: list[str]) -> None:
@@ -298,22 +291,21 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 repository_id=self.__repository_name,
                 project=self.__project_name,
             )
-            
+
             default_branch = repo.default_branch or "refs/heads/main"
             # Remove refs/heads/ prefix if present
             if default_branch.startswith("refs/heads/"):
                 return default_branch[11:]
             return default_branch
-            
+
         except ClientException as ex:
             error_msg = str(ex)
             if "401" in error_msg:
                 raise GitOpsException("Bad credentials") from ex
-            elif "404" in error_msg:
+            if "404" in error_msg:
                 raise GitOpsException(
                     f"Repository '{self.__project_name}/{self.__repository_name}' does not exist"
                 ) from ex
-            else:
-                raise GitOpsException(f"Error getting repository info: {error_msg}") from ex
-        except Exception as ex:
+            raise GitOpsException(f"Error getting repository info: {error_msg}") from ex
+        except Exception as ex:  # noqa: BLE001
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex

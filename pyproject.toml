@@ -54,6 +54,7 @@ ignore = [
     "PLR0913", # https://docs.astral.sh/ruff/rules/too-many-arguments/
     "D", # https://docs.astral.sh/ruff/rules/#pydocstyle-d
     "COM812", # https://docs.astral.sh/ruff/rules/missing-trailing-comma/ (clashes with formatter)
+    "ISC001", # https://docs.astral.sh/ruff/rules/single-line-implicit-string-concatenation/ (clashes with formatter)
     "EM101", # https://docs.astral.sh/ruff/rules/raw-string-in-exception/
     "EM102", # https://docs.astral.sh/ruff/rules/f-string-in-exception/
     "S101", # https://docs.astral.sh/ruff/rules/assert/
@@ -66,5 +67,9 @@ ignore = [
     "S106", # https://docs.astral.sh/ruff/rules/hardcoded-password-func-arg/
     "S108", # https://docs.astral.sh/ruff/rules/hardcoded-temp-file/
     "ANN", # https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
-    "PT009" # https://docs.astral.sh/ruff/rules/pytest-unittest-assertion/
+    "PT009", # https://docs.astral.sh/ruff/rules/pytest-unittest-assertion/
+    "SLF001", # https://docs.astral.sh/ruff/rules/private-member-access/ (needed for testing private methods)
+]
+"gitopscli/git_api/azure_devops_git_repo_api_adapter.py" = [
+    "TRY300", # https://docs.astral.sh/ruff/rules/try-consider-else/ (conflicts with RET505)
 ]
