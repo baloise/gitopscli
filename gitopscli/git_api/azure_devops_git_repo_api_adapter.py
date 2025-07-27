@@ -40,7 +40,6 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         if not password:
             raise GitOpsException("Password (Personal Access Token) is required for Azure DevOps")
 
-        # Create connection using Basic Authentication with PAT
         credentials = BasicAuthentication(self.__username, password)
         self.__connection = Connection(base_url=self.__base_url, creds=credentials)
         self.__git_client = self.__connection.clients.get_git_client()
@@ -72,7 +71,6 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         description: str,
     ) -> GitRepoApi.PullRequestIdAndUrl:
         try:
-            # Ensure branch names have proper refs/ prefix
             source_ref = from_branch if from_branch.startswith("refs/") else f"refs/heads/{from_branch}"
             target_ref = to_branch if to_branch.startswith("refs/") else f"refs/heads/{to_branch}"
 
@@ -110,14 +108,12 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         try:
-            # Get the pull request to get the last merge source commit
             pr = self.__git_client.get_pull_request(
                 repository_id=self.__repository_name,
                 pull_request_id=pr_id,
                 project=self.__project_name,
             )
 
-            # Map merge methods to Azure DevOps completion options
             completion_options = GitPullRequestCompletionOptions()
             if merge_method == "squash":
                 completion_options.merge_strategy = "squash"
@@ -126,12 +122,10 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             else:  # merge
                 completion_options.merge_strategy = "noFastForward"
 
-            # Apply any additional merge parameters
             if merge_parameters:
                 for key, value in merge_parameters.items():
                     setattr(completion_options, key, value)
 
-            # Update the pull request to complete it
             pr_update = GitPullRequest(
                 status="completed",
                 last_merge_source_commit=pr.last_merge_source_commit,
@@ -188,7 +182,6 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             raise GitOpsException(f"Branch '{branch}' does not exist")
 
         try:
-            # Get the branch reference first
             refs = self.__git_client.get_refs(
                 repository_id=self.__repository_name,
                 project=self.__project_name,
@@ -214,7 +207,6 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             )
 
         except GitOpsException:
-            # Re-raise GitOpsException without modification
             raise
         except ClientException as ex:
             error_msg = str(ex)
@@ -243,7 +235,6 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             return str(refs[0].object_id)
 
         except GitOpsException:
-            # Re-raise GitOpsException without modification
             raise
         except ClientException as ex:
             error_msg = str(ex)
@@ -263,7 +254,6 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 project=self.__project_name,
             )
 
-            # Extract branch name from sourceRefName (remove refs/heads/ prefix)
             source_ref = str(pr.source_ref_name)
             if source_ref.startswith("refs/heads/"):
                 return source_ref[11:]  # Remove "refs/heads/" prefix
@@ -293,7 +283,6 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             )
 
             default_branch = repo.default_branch or "refs/heads/main"
-            # Remove refs/heads/ prefix if present
             if default_branch.startswith("refs/heads/"):
                 return default_branch[11:]
             return default_branch
