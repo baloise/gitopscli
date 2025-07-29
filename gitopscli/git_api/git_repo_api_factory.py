@@ -1,5 +1,6 @@
 from gitopscli.gitops_exception import GitOpsException
 
+from .azure_devops_git_repo_api_adapter import AzureDevOpsGitRepoApiAdapter
 from .bitbucket_git_repo_api_adapter import BitbucketGitRepoApiAdapter
 from .git_api_config import GitApiConfig
 from .git_provider import GitProvider
@@ -36,6 +37,16 @@ class GitRepoApiFactory:
                 provider_url = "https://www.gitlab.com"
             git_repo_api = GitlabGitRepoApiAdapter(
                 git_provider_url=provider_url,
+                username=config.username,
+                password=config.password,
+                organisation=organisation,
+                repository_name=repository_name,
+            )
+        elif config.git_provider is GitProvider.AZURE_DEVOPS:
+            if not config.git_provider_url:
+                raise GitOpsException("Please provide url for Azure DevOps!")
+            git_repo_api = AzureDevOpsGitRepoApiAdapter(
+                git_provider_url=config.git_provider_url,
                 username=config.username,
                 password=config.password,
                 organisation=organisation,

@@ -126,3 +126,47 @@ class GitRepoApiFactoryTest(unittest.TestCase):
             repository_name="REPO",
         )
         mock_logging_proxy_constructor.assert_called_with(mock_gitlab_adapter)
+
+    @patch("gitopscli.git_api.git_repo_api_factory.GitRepoApiLoggingProxy")
+    @patch("gitopscli.git_api.git_repo_api_factory.AzureDevOpsGitRepoApiAdapter")
+    def test_create_azure_devops(self, mock_azure_devops_adapter_constructor, mock_logging_proxy_constructor):
+        mock_azure_devops_adapter = MagicMock()
+        mock_azure_devops_adapter_constructor.return_value = mock_azure_devops_adapter
+
+        mock_logging_proxy = MagicMock()
+        mock_logging_proxy_constructor.return_value = mock_logging_proxy
+
+        git_repo_api = GitRepoApiFactory.create(
+            config=GitApiConfig(
+                username="USER",
+                password="PAT_TOKEN",
+                git_provider=GitProvider.AZURE_DEVOPS,
+                git_provider_url="https://dev.azure.com",
+            ),
+            organisation="ORG",
+            repository_name="REPO",
+        )
+
+        self.assertEqual(git_repo_api, mock_logging_proxy)
+
+        mock_azure_devops_adapter_constructor.assert_called_with(
+            git_provider_url="https://dev.azure.com",
+            username="USER",
+            password="PAT_TOKEN",
+            organisation="ORG",
+            repository_name="REPO",
+        )
+        mock_logging_proxy_constructor.assert_called_with(mock_azure_devops_adapter)
+
+    def test_create_azure_devops_missing_url(self):
+        try:
+            GitRepoApiFactory.create(
+                config=GitApiConfig(
+                    username="USER", password="PAT_TOKEN", git_provider=GitProvider.AZURE_DEVOPS, git_provider_url=None
+                ),
+                organisation="ORG",
+                repository_name="REPO",
+            )
+            self.fail("Expected a GitOpsException")
+        except GitOpsException as ex:
+            self.assertEqual("Please provide url for Azure DevOps!", str(ex))
