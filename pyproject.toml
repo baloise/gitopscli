@@ -24,8 +24,7 @@ gitopscli = "gitopscli.__main__:main"
 [dependency-groups]
 test = [
     "ruff",
-    "coverage",
-    "pytest",
+    "pytest-cov",
     "mypy==1.6.1",
     "typeguard>=2.13.3,<3",
     "pre-commit",
