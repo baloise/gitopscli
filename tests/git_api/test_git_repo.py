@@ -166,6 +166,16 @@ echo password='Pass'
             self.assertEqual("Error cloning 'invalid_url'", str(ex.value))
         logging_mock.info.assert_called_once_with("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
 
+    def test_clone_with_depth_1(self):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone()
+
+            # Verify that the repository was cloned with depth 1
+            repo = Repo(testee.get_full_file_path("."))
+            # A shallow clone with depth 1 should only have the latest commit
+            commits = list(repo.iter_commits("master"))
+            self.assertEqual(1, len(commits), "Clone should be shallow with depth 1")
+
     def test_get_full_file_path(self):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()

@@ -43,7 +43,7 @@ class GitRepo:
     def clone(self, branch: str | None = None) -> None:
         self.__delete_tmp_dir()
         self.__tmp_dir = create_tmp_dir()
-        git_options = []
+        git_options = ["--depth=1"]
         url = self.get_clone_url()
         if branch:
             logging.info("Cloning repository: %s (branch: %s)", url, branch)
