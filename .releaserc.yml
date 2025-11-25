@@ -9,8 +9,8 @@ plugins:
     verifyReleaseCmd: |
       MAJOR_MINOR_PATCH=${/^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)}
       if [ -z $MAJOR_MINOR_PATCH ]; then echo "Only SemVer versions with version core (major.minor.patch) supported!"; exit 1; fi
-    prepareCmd: docker build -t $DOCKER_IMAGE:latest .
     publishCmd: |
+      docker build -t $DOCKER_IMAGE:latest .
       MAJOR_MINOR_PATCH=${/^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)[0]}
       MAJOR_MINOR=${      /^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)[1]}
       MAJOR=${            /^((\d+)\.\d+)\.\d+$/.exec(nextRelease.version)[2]}
