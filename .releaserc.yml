@@ -4,17 +4,6 @@ tagFormat: "v${version}"
 plugins:
 - "@semantic-release/commit-analyzer"
 - "@semantic-release/release-notes-generator"
-- - "semantic-release-replace-plugin"
-  - replacements:
-    - files: [ "pyproject.toml" ]
-      from: "version = \"0.0.0\""
-      to: "version = \"${nextRelease.version}\""
-      countMatches: true
-      results:
-        - file: "pyproject.toml"
-          hasChanged: true
-          numMatches: 1
-          numReplacements: 1
 - - "@semantic-release/exec"
   - verifyConditionsCmd: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     verifyReleaseCmd: |

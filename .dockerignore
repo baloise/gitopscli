@@ -10,5 +10,6 @@
 !uv.lock
 !pyproject.toml
 !README.md
+!.git/
 
 **/__pycache__/

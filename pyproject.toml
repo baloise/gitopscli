@@ -1,6 +1,6 @@
 [project]
 name = "gitopscli"
-version = "0.0.0"
+dynamic = ["version"]
 description = "GitOps CLI is a command line interface (CLI) to perform operations on GitOps managed infrastructure repositories, including updates in YAML files."
 authors = [{ name = "Christian Siegel", email = "christian.siegel@gmx.net" }]
 requires-python = ">=3.10, <4"
@@ -40,11 +40,17 @@ docs = [
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
 
 [virtualenvs]
 in-project = true
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+fallback-version = "0.0.0"
 
 [tool.ruff]
 line-length = 120

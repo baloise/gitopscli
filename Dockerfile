@@ -21,6 +21,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=.git/,target=.git/,ro \
     uv sync --locked --no-install-project --no-editable
 
 # =========
@@ -39,6 +40,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=.git/,target=.git/,ro \
     uv sync --locked --no-install-project --group=docs
 COPY docs ./docs
 COPY CONTRIBUTING.md mkdocs.yml ./
@@ -57,6 +59,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=.git/,target=.git/,ro \
     uv sync --locked --no-editable
 
 # =========
