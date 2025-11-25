@@ -63,4 +63,5 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
 FROM base AS final
 
 COPY --from=install /app/.venv /app/.venv
+ENV AZURE_DEVOPS_CACHE_DIR="/tmp/.azure-devops"
 ENTRYPOINT ["gitopscli"]
