@@ -509,7 +509,6 @@ wheels = [
 
 [[package]]
 name = "gitopscli"
-version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "atlassian-python-api" },
