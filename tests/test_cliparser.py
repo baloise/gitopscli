@@ -78,7 +78,7 @@ options:
   --pr-id PR_ID         the id of the pull request
   --parent-id PARENT_ID
                         the id of the parent comment, in case of a reply
-  -v, --verbose [VERBOSE]
+  -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
   --text TEXT           the text of the comment
 """
@@ -146,7 +146,7 @@ options:
   --git-hash GIT_HASH   the git hash which should be deployed
   --preview-id PREVIEW_ID
                         The user-defined preview ID
-  -v, --verbose [VERBOSE]
+  -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
 
@@ -188,7 +188,7 @@ options:
   --pr-id PR_ID         the id of the pull request
   --parent-id PARENT_ID
                         the id of the parent comment, in case of a reply
-  -v, --verbose [VERBOSE]
+  -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
 
@@ -260,7 +260,7 @@ options:
                         The user-defined preview ID
   --expect-preview-exists [EXPECT_PREVIEW_EXISTS]
                         Fail if preview does not exist
-  -v, --verbose [VERBOSE]
+  -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
 
@@ -303,7 +303,7 @@ options:
   --branch BRANCH       The branch for which the preview was created for
   --expect-preview-exists [EXPECT_PREVIEW_EXISTS]
                         Fail if preview does not exist
-  -v, --verbose [VERBOSE]
+  -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
 
@@ -383,7 +383,7 @@ options:
                         JSON array pr labels (Gitlab, Github supported)
   --merge-parameters MERGE_PARAMETERS
                         JSON object pr parameters (only Gitlab supported)
-  -v, --verbose [VERBOSE]
+  -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
 """
 
@@ -435,7 +435,7 @@ options:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g.
                         https://bitbucket.example.tld)
-  -v, --verbose [VERBOSE]
+  -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
   --root-organisation ROOT_ORGANISATION
                         Root config repository organisation
