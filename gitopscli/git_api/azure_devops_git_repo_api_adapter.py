@@ -1,13 +1,13 @@
+from collections.abc import Callable
 from typing import Any, Literal
 
 from azure.devops.connection import Connection
 from azure.devops.credentials import BasicAuthentication
-from azure.devops.v7_1.git.models import (
+from azure.devops.v7_0.git.models import (
     Comment,
     GitPullRequest,
     GitPullRequestCommentThread,
     GitPullRequestCompletionOptions,
-    GitRefUpdate,
 )
 from msrest.exceptions import ClientException
 
@@ -26,6 +26,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         password: str | None,
         organisation: str,
         repository_name: str,
+        sleep_func: Callable[[int], None] | None,
     ) -> None:
         # In Azure DevOps:
         # git_provider_url = https://dev.azure.com/organization (e.g. https://dev.azure.com/org)
@@ -36,6 +37,11 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         self.__password = password
         self.__project_name = organisation  # In Azure DevOps, "organisation" param is actually the project
         self.__repository_name = repository_name
+
+        if not sleep_func:
+            raise GitOpsException("Sleep function is required for Azure DevOps")
+
+        self.__sleep_func = sleep_func
 
         if not password:
             raise GitOpsException("Password (Personal Access Token) is required for Azure DevOps")
@@ -108,13 +114,23 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         try:
+            # Required because of race-condition before PullRequest is first properly created+queued
+            # and the PullRequest completion can be requested
+            self.__sleep_func(3)
+
             pr = self.__git_client.get_pull_request(
                 repository_id=self.__repository_name,
                 pull_request_id=pr_id,
                 project=self.__project_name,
             )
 
-            completion_options = GitPullRequestCompletionOptions()
+            # Handle deletion of a branch with completion_options instead of delete_pull_request call
+            completion_options = GitPullRequestCompletionOptions(
+                bypass_policy=False,
+                delete_source_branch=True,
+                transition_work_items=False,
+            )
+
             if merge_method == "squash":
                 completion_options.merge_strategy = "squash"
             elif merge_method == "rebase":
@@ -177,46 +193,9 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
-    def delete_branch(self, branch: str) -> None:
-        def _raise_branch_not_found() -> None:
-            raise GitOpsException(f"Branch '{branch}' does not exist")
-
-        try:
-            refs = self.__git_client.get_refs(
-                repository_id=self.__repository_name,
-                project=self.__project_name,
-                filter=f"heads/{branch}",
-            )
-
-            if not refs:
-                _raise_branch_not_found()
-
-            branch_ref = refs[0]
-
-            # Create ref update to delete the branch
-            ref_update = GitRefUpdate(
-                name=f"refs/heads/{branch}",
-                old_object_id=branch_ref.object_id,
-                new_object_id="0000000000000000000000000000000000000000",
-            )
-
-            self.__git_client.update_refs(
-                ref_updates=[ref_update],
-                repository_id=self.__repository_name,
-                project=self.__project_name,
-            )
-
-        except GitOpsException:
-            raise
-        except ClientException as ex:
-            error_msg = str(ex)
-            if "401" in error_msg:
-                raise GitOpsException("Bad credentials") from ex
-            if "404" in error_msg:
-                raise GitOpsException(f"Branch '{branch}' does not exist") from ex
-            raise GitOpsException(f"Error deleting branch: {error_msg}") from ex
-        except Exception as ex:
-            raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
+    def delete_branch(self, _: str) -> None:
+        # branch deletion is set in merge completion_options
+        return
 
     def get_branch_head_hash(self, branch: str) -> str:
         def _raise_branch_not_found() -> None:

@@ -1,4 +1,5 @@
 import unittest
+from time import sleep
 from unittest.mock import MagicMock, patch
 
 from gitopscli.git_api import GitApiConfig, GitProvider, GitRepoApiFactory
@@ -155,6 +156,7 @@ class GitRepoApiFactoryTest(unittest.TestCase):
             password="PAT_TOKEN",
             organisation="ORG",
             repository_name="REPO",
+            sleep_func=sleep,
         )
         mock_logging_proxy_constructor.assert_called_with(mock_azure_devops_adapter)
 

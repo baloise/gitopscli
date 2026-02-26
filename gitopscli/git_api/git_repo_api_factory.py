@@ -1,3 +1,5 @@
+from time import sleep
+
 from gitopscli.gitops_exception import GitOpsException
 
 from .azure_devops_git_repo_api_adapter import AzureDevOpsGitRepoApiAdapter
@@ -51,5 +53,6 @@ class GitRepoApiFactory:
                 password=config.password,
                 organisation=organisation,
                 repository_name=repository_name,
+                sleep_func=sleep,
             )
         return GitRepoApiLoggingProxy(git_repo_api)
