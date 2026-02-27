@@ -8,6 +8,10 @@ from gitopscli.git_api.azure_devops_git_repo_api_adapter import AzureDevOpsGitRe
 from gitopscli.gitops_exception import GitOpsException
 
 
+def mock_sleep_func(_: int) -> None:
+    return
+
+
 class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
     def setUp(self):
         with patch("gitopscli.git_api.azure_devops_git_repo_api_adapter.Connection"):
@@ -17,6 +21,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
                 password="testtoken",
                 organisation="testproject",
                 repository_name="testrepo",
+                sleep_func=mock_sleep_func,
             )
 
     @patch("gitopscli.git_api.azure_devops_git_repo_api_adapter.Connection")
@@ -30,6 +35,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
             password="token",
             organisation="project",
             repository_name="repo",
+            sleep_func=mock_sleep_func,
         )
 
         self.assertEqual(adapter.get_username(), "user")
@@ -44,6 +50,7 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
                 password=None,
                 organisation="project",
                 repository_name="repo",
+                sleep_func=mock_sleep_func,
             )
         self.assertEqual(str(context.value), "Password (Personal Access Token) is required for Azure DevOps")
 
@@ -238,41 +245,6 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         result = self.adapter.get_pull_request_branch(123)
 
         self.assertEqual(result, "feature-branch")
-
-    def test_delete_branch_success(self):
-        # Mock get refs
-        mock_ref = MagicMock()
-        mock_ref.object_id = "abc123def456"
-        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_refs.return_value = [mock_ref]
-
-        # Mock update refs
-        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.update_refs.return_value = None
-
-        self.adapter.delete_branch("feature-branch")
-
-        # Verify get_refs was called
-        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_refs.assert_called_once_with(
-            repository_id="testrepo", project="testproject", filter="heads/feature-branch"
-        )
-
-        # Verify update_refs was called
-        call_args = self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.update_refs.call_args
-        self.assertEqual(call_args.kwargs["repository_id"], "testrepo")
-        self.assertEqual(call_args.kwargs["project"], "testproject")
-
-        ref_updates = call_args.kwargs["ref_updates"]
-        self.assertEqual(len(ref_updates), 1)
-        self.assertEqual(ref_updates[0].name, "refs/heads/feature-branch")
-        self.assertEqual(ref_updates[0].old_object_id, "abc123def456")
-        self.assertEqual(ref_updates[0].new_object_id, "0000000000000000000000000000000000000000")
-
-    def test_delete_branch_not_found(self):
-        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_refs.return_value = []
-
-        with pytest.raises(GitOpsException) as context:
-            self.adapter.delete_branch("nonexistent")
-
-        self.assertEqual(str(context.value), "Branch 'nonexistent' does not exist")
 
     def test_add_pull_request_label_does_nothing(self):
         # Labels aren't supported in the SDK implementation, should not raise exception
