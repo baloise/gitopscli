@@ -2,7 +2,7 @@ import locale
 import logging
 from pathlib import Path
 from types import TracebackType
-from typing import Literal
+from typing import Literal, Self
 
 from git import GitCommandError, GitError, Repo
 
@@ -18,7 +18,7 @@ class GitRepo:
         self.__repo: Repo | None = None
         self.__tmp_dir: str | None = None
 
-    def __enter__(self) -> "GitRepo":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(
