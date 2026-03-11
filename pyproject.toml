@@ -27,7 +27,7 @@ test = [
     "ruff",
     "pytest-cov",
     "ty",
-    "typeguard>=2.13.3,<3",
+    "typeguard>=2.13.3,<5",
     "pre-commit",
 ]
 docs = [
