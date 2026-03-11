@@ -15,12 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run tests
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: test
       - name: Test doc build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: docs-site
