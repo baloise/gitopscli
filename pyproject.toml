@@ -25,7 +25,7 @@ gitopscli = "gitopscli.__main__:main"
 test = [
     "ruff",
     "pytest-cov",
-    "mypy==1.6.1",
+    "mypy==1.19.1",
     "typeguard>=2.13.3,<3",
     "pre-commit",
     "types-requests",
