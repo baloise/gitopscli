@@ -1,5 +1,5 @@
 # =========
-FROM alpine:3.22 AS base
+FROM alpine:3.23 AS base
 
 ENV PATH="/app/.venv/bin:$PATH" \
     UV_COMPILE_BYTECODE=1 \
