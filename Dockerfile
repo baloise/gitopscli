@@ -17,7 +17,7 @@ RUN apk add --no-cache gcc linux-headers musl-dev make python3-dev
 # =========
 FROM dev AS deps
 
-RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
+RUN --mount=from=ghcr.io/astral-sh/uv:0.10,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
@@ -28,7 +28,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
 FROM deps AS test
 
 COPY . .
-COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.10 /uv /uvx /bin/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --group=test
 RUN make checks
@@ -36,7 +36,7 @@ RUN make checks
 # =========
 FROM deps AS docs
 
-RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
+RUN --mount=from=ghcr.io/astral-sh/uv:0.10,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
@@ -55,7 +55,7 @@ COPY --from=docs /app/site /site
 FROM deps AS install
 
 COPY . .
-RUN --mount=from=ghcr.io/astral-sh/uv:0.8,source=/uv,target=/bin/uv \
+RUN --mount=from=ghcr.io/astral-sh/uv:0.10,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
