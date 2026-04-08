@@ -1,7 +1,11 @@
 ## Configuration
 ### Preview Templates
 
-You have to provide a folder with the deployment configuration templates for every application you want to use this command for. By default it is assumed that this folder is located in your *deployment config repository* under the top-level folder `.preview-templates`. For example `.preview-templates/app-xy` for your app `app-xy`. The `create-preview` command simply copies this directory to the root of your *deployment config repository* and replaces e.g. image tag and route host which are specific to this preview.
+You have to provide a folder with the deployment configuration templates for every application you want to use this command for.
+
+By default it is assumed that this folder is located in your *deployment config repository* under the top-level folder `.preview-templates`. For example `.preview-templates/app-xy` for your app `app-xy`. The `create-preview` command simply copies this directory to your *deployment config repository* and replaces e.g. image tag and route host which are specific to this preview.
+
+By default previews are created in the repository root. If `previewConfig.target.path` is set, previews are created below that path instead.
 
 ```
 deployment-config-repo/
@@ -44,6 +48,7 @@ previewConfig:
   target:
     organisation: deployments
     repository: deployment-config-repo
+#   path: custom/${APPLICATION_NAME}     # optional (defaults to repo's root directory)
 #   branch: master                       # optional (defaults to repo's default branch)
 #   namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview'  # optional (default: '${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview',
                                                                 #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be

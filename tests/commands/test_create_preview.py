@@ -78,6 +78,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_branch=None,
             preview_target_namespace_template="my-app-${PREVIEW_ID_HASH}-preview",
             preview_target_max_namespace_length=50,
+            preview_target_path_template="",
             replacements={
                 "Chart.yaml": [GitOpsConfig.Replacement(path="name", value_template="${PREVIEW_NAMESPACE}")],
                 "values.yaml": [
@@ -165,7 +166,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/template-repo/.preview-templates/my-app"),
             call.Path.is_dir(),
@@ -231,6 +234,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_branch=gitops_config.preview_target_branch,
             preview_target_namespace_template=gitops_config.preview_target_namespace_template,
             preview_target_max_namespace_length=gitops_config.preview_target_max_namespace_length,
+            preview_target_path_template=gitops_config.preview_target_path_template,
             replacements=gitops_config.replacements,
         )
 
@@ -270,7 +274,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/target-repo/.preview-templates/my-app"),
             call.Path.is_dir(),
@@ -347,7 +353,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -419,7 +427,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -471,7 +481,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/template-repo/.preview-templates/my-app"),
             call.Path.is_dir(),
@@ -498,7 +510,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -526,7 +540,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -554,7 +570,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -587,7 +605,9 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
+            call.logging.info(
+                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
+            ),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/template-repo/.preview-templates/my-app"),
             call.Path.is_dir(),
@@ -600,3 +620,50 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
             ),
         ]
+
+    def test_create_new_preview_with_target_path(self):
+        gitops_config: GitOpsConfig = self.load_gitops_config_mock.return_value
+        self.load_gitops_config_mock.return_value = GitOpsConfig(
+            api_version=gitops_config.api_version,
+            application_name=gitops_config.application_name,
+            messages_created_template=gitops_config.messages_created_template,
+            messages_updated_template=gitops_config.messages_updated_template,
+            messages_uptodate_template=gitops_config.messages_uptodate_template,
+            preview_host_template=gitops_config.preview_host_template,
+            preview_template_organisation=gitops_config.preview_template_organisation,
+            preview_template_repository=gitops_config.preview_template_repository,
+            preview_template_path_template=gitops_config.preview_template_path_template,
+            preview_template_branch=gitops_config.preview_template_branch,
+            preview_target_organisation=gitops_config.preview_target_organisation,
+            preview_target_repository=gitops_config.preview_target_repository,
+            preview_target_branch=gitops_config.preview_target_branch,
+            preview_target_namespace_template=gitops_config.preview_target_namespace_template,
+            preview_target_max_namespace_length=gitops_config.preview_target_max_namespace_length,
+            preview_target_path_template="preview-envs/${APPLICATION_NAME}",
+            replacements=gitops_config.replacements,
+        )
+
+        self.path_mock.is_dir.side_effect = [
+            False,  # /tmp/target-repo/preview-envs/my-app/my-app-685912d3-preview, doesn't exist yet -> create
+            True,  # /tmp/template-repo/.preview-templates/my-app
+        ]
+
+        deployment_created_callback = Mock(return_value=None)
+
+        command = CreatePreviewCommand(ARGS)
+        command.register_callbacks(
+            deployment_already_up_to_date_callback=lambda _: self.fail("should not be called"),
+            deployment_updated_callback=lambda _: self.fail("should not be called"),
+            deployment_created_callback=deployment_created_callback,
+        )
+        command.execute()
+
+        deployment_created_callback.assert_called_once_with("created template 685912d3")
+        self.target_git_repo_mock.get_full_file_path.assert_any_call("preview-envs/my-app/my-app-685912d3-preview")
+        self.target_git_repo_mock.get_full_file_path.assert_any_call(
+            "preview-envs/my-app/my-app-685912d3-preview/Chart.yaml"
+        )
+        self.shutil_mock.copytree.assert_called_once_with(
+            "/tmp/template-repo/.preview-templates/my-app",
+            "/tmp/target-repo/preview-envs/my-app/my-app-685912d3-preview",
+        )

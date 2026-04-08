@@ -69,12 +69,17 @@ class GitOpsConfig:
     preview_target_branch: str | None
     preview_target_namespace_template: str
     preview_target_max_namespace_length: int
+    preview_target_path_template: str
 
     replacements: dict[str, list[Replacement]]
 
     @property
     def preview_template_path(self) -> str:
         return self.preview_template_path_template.replace("${APPLICATION_NAME}", self.application_name)
+
+    @property
+    def preview_target_path(self) -> str:
+        return self.preview_target_path_template.replace("${APPLICATION_NAME}", self.application_name)
 
     def __post_init__(self) -> None:
         assert isinstance(self.application_name, str), "application_name of wrong type!"
@@ -106,6 +111,8 @@ class GitOpsConfig:
             int,
         ), "preview_target_max_namespace_length of wrong type!"
         assert self.preview_target_max_namespace_length >= 1, "preview_target_max_namespace_length is < 1!"
+        assert isinstance(self.preview_target_path_template, str), "preview_target_path_template of wrong type!"
+        self.__assert_variables(self.preview_target_path_template, {"APPLICATION_NAME"})
         assert isinstance(self.replacements, dict), "replacements of wrong type!"
         for file, replacements in self.replacements.items():
             assert isinstance(file, str), f"replacement file '{file}' of wrong type!"
@@ -119,6 +126,12 @@ class GitOpsConfig:
         preview_host = preview_host.replace("${PREVIEW_ID_HASH_SHORT}", self.create_preview_id_hash_short(preview_id))
         preview_host = preview_host.replace("${PREVIEW_ID}", self.__sanitize(preview_id))
         return preview_host.replace("${PREVIEW_NAMESPACE}", self.get_preview_namespace(preview_id))
+
+    def get_preview_folder_path(self, preview_id: str) -> str:
+        preview_namespace = self.get_preview_namespace(preview_id)
+        if self.preview_target_path:
+            return f"{self.preview_target_path}/{preview_namespace}"
+        return preview_namespace
 
     def get_preview_namespace(self, preview_id: str) -> str:
         preview_namespace = self.preview_target_namespace_template
@@ -325,6 +338,7 @@ class _GitOpsConfigYamlParser:
             preview_target_branch=None,  # use default branch
             preview_target_namespace_template="${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview",
             preview_target_max_namespace_length=63,
+            preview_target_path_template="",
             replacements=replacements,
         )
 
@@ -364,6 +378,9 @@ class _GitOpsConfigYamlParser:
                 ),
             ),
             preview_target_max_namespace_length=63,
+            preview_target_path_template=add_var_dollar(
+                self.__get_string_value_or_default("previewConfig.target.path", ""),
+            ),
             replacements=replacements,
         )
 
@@ -439,5 +456,9 @@ class _GitOpsConfigYamlParser:
                 "${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview",
             ),
             preview_target_max_namespace_length=preview_target_max_namespace_length,
+            preview_target_path_template=self.__get_string_value_or_default(
+                "previewConfig.target.path",
+                "",
+            ),
             replacements=replacements,
         )

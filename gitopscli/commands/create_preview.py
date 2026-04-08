@@ -128,12 +128,13 @@ class CreatePreviewCommand(Command):
         gitops_config: GitOpsConfig,
     ) -> bool:
         preview_namespace = gitops_config.get_preview_namespace(self.__args.preview_id)
-        full_preview_folder_path = target_git_repo.get_full_file_path(preview_namespace)
+        preview_folder_path = gitops_config.get_preview_folder_path(self.__args.preview_id)
+        full_preview_folder_path = target_git_repo.get_full_file_path(preview_folder_path)
         preview_env_already_exist = Path(full_preview_folder_path).is_dir()
         if preview_env_already_exist:
-            logging.info("Use existing folder for preview: %s", preview_namespace)
+            logging.info("Use existing folder for preview: %s (path: %s)", preview_namespace, preview_folder_path)
             return False
-        logging.info("Create new folder for preview: %s", preview_namespace)
+        logging.info("Create new folder for preview: %s (path: %s)", preview_namespace, preview_folder_path)
         full_preview_template_folder_path = template_git_repo.get_full_file_path(gitops_config.preview_template_path)
         if not Path(full_preview_template_folder_path).is_dir():
             raise GitOpsException(f"The preview template folder does not exist: {gitops_config.preview_template_path}")
@@ -143,7 +144,7 @@ class CreatePreviewCommand(Command):
 
     def __replace_values(self, git_repo: GitRepo, gitops_config: GitOpsConfig) -> bool:
         preview_id = self.__args.preview_id
-        preview_folder_name = gitops_config.get_preview_namespace(self.__args.preview_id)
+        preview_folder_path = gitops_config.get_preview_folder_path(self.__args.preview_id)
         context = GitOpsConfig.Replacement.PreviewContext(gitops_config, preview_id, self.__args.git_hash)
         any_value_replaced = False
         for file, replacements in gitops_config.replacements.items():
@@ -151,7 +152,7 @@ class CreatePreviewCommand(Command):
                 replacement_value = replacement.get_value(context)
                 value_replaced = self.__update_yaml_file(
                     git_repo,
-                    f"{preview_folder_name}/{file}",
+                    f"{preview_folder_path}/{file}",
                     replacement.path,
                     replacement_value,
                 )

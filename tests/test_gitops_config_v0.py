@@ -153,3 +153,8 @@ class GitOpsConfigV0Test(unittest.TestCase):
     def test_replacements_invalid_list_items_invalid_variable(self):
         self.yaml["previewConfig"]["replace"][0]["variable"] = "{FOO"
         self.assert_load_error("Item 'previewConfig.replace.[0].variable' must not contain '{' or '}'!")
+
+    def test_preview_target_path_defaults_to_root(self):
+        config = self.load()
+        self.assertEqual(config.preview_target_path_template, "")
+        self.assertEqual(config.preview_target_path, "")

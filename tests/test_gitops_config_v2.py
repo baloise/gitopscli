@@ -324,3 +324,27 @@ class GitOpsConfigV2Test(unittest.TestCase):
     def test_replacements_invalid_list_items_unknown_variable(self):
         self.yaml["previewConfig"]["replace"]["file_2.yaml"][0]["value"] = "${FOO}bar"
         self.assert_load_error("Replacement value '${FOO}bar' for path 'e.f' contains invalid variable: FOO")
+
+    def test_preview_target_path(self):
+        self.yaml["previewConfig"]["target"]["path"] = "preview-envs/${APPLICATION_NAME}"
+        config = self.load()
+        self.assertEqual(config.preview_target_path_template, "preview-envs/${APPLICATION_NAME}")
+        self.assertEqual(config.preview_target_path, "preview-envs/my-app")
+
+    def test_preview_target_path_default(self):
+        config = self.load()
+        self.assertEqual(config.preview_target_path_template, "")
+        self.assertEqual(config.preview_target_path, "")
+
+    def test_preview_target_path_not_a_string(self):
+        self.yaml["previewConfig"]["target"]["path"] = []
+        self.assert_load_error("Item 'previewConfig.target.path' should be a string in GitOps config!")
+
+    def test_preview_target_path_contains_invalid_variable(self):
+        self.yaml["previewConfig"]["target"]["path"] = "${FOO}-bar"
+        self.assert_load_error("GitOps config template '${FOO}-bar' contains invalid variable: FOO")
+
+    def test_preview_target_path_with_application_name(self):
+        self.yaml["previewConfig"]["target"]["path"] = "custom-${APPLICATION_NAME}"
+        config = self.load()
+        self.assertEqual(config.preview_target_path, "custom-my-app")
