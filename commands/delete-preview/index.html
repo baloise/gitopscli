@@ -807,18 +807,19 @@
 <h1 id="delete-preview">delete-preview<a class="headerlink" href="#delete-preview" title="Permanent link">&para;</a></h1>
 <p>The <code>delete-preview</code> command can be used to delete a preview previously created with the <a href="/gitopscli/commands/create-preview/"><code>create-preview</code> command</a>. Please refer to <code>create-preview</code> documentation for the needed configuration files.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>delete-preview<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;my-team&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;app-xy&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--preview-id<span class="w"> </span><span class="s2">&quot;test123&quot;</span><span class="w"> </span><span class="se">\</span>
-</code></pre></div>
+<p><code>bash
+gitopscli delete-preview \
+  --git-provider-url https://bitbucket.baloise.dev \
+  --username $GIT_USERNAME \
+  --password $GIT_PASSWORD \
+  --git-user "GitOps CLI" \
+  --git-email "gitopscli@baloise.dev" \
+  --organisation "my-team" \
+  --repository-name "app-xy" \
+  --preview-id "test123" \</code></p>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
+<p>```
+usage: gitopscli delete-preview [-h] --username USERNAME --password PASSWORD
                                 [--git-user GIT_USER] [--git-email GIT_EMAIL]
                                 [--git-author-name GIT_AUTHOR_NAME]
                                 [--git-author-email GIT_AUTHOR_EMAIL]
@@ -827,9 +828,8 @@
                                 [--git-provider-url GIT_PROVIDER_URL]
                                 --preview-id PREVIEW_ID
                                 [--expect-preview-exists [EXPECT_PREVIEW_EXISTS]]
-                                [-v [VERBOSE]]
-
-options:
+                                [-v [VERBOSE]]</p>
+<p>options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -857,7 +857,7 @@ options:
                         Fail if preview does not exist
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
-</code></pre></div>
+```</p>
 
 
 
