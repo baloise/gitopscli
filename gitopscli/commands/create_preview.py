@@ -127,7 +127,6 @@ class CreatePreviewCommand(Command):
         target_git_repo: GitRepo,
         gitops_config: GitOpsConfig,
     ) -> bool:
-        preview_namespace = gitops_config.get_preview_namespace(self.__args.preview_id)
         preview_folder_path = gitops_config.get_preview_folder_path(self.__args.preview_id)
         full_preview_folder_path = target_git_repo.get_full_file_path(preview_folder_path)
         preview_env_already_exist = Path(full_preview_folder_path).is_dir()
