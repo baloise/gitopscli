@@ -45,6 +45,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             preview_target_branch="target-branch",
             preview_target_namespace_template="APP-${PREVIEW_ID_HASH}-preview",
             preview_target_max_namespace_length=50,
+            preview_target_path_template="",
             replacements={},
         )
 
@@ -89,7 +90,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone("target-branch"),
-            call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
+            call.logging.info("Preview folder: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
             call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
             call.Path.exists(),
@@ -128,7 +129,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone("target-branch"),
-            call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
+            call.logging.info("Preview folder: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
             call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
             call.Path.exists(),
@@ -156,14 +157,14 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         )
         with pytest.raises(GitOpsException) as ex:
             DeletePreviewCommand(args).execute()
-        self.assertEqual(str(ex.value), "There was no preview with name: app-685912d3-preview")
+        self.assertEqual(str(ex.value), "There was no preview at path: app-685912d3-preview")
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
             call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone("target-branch"),
-            call.logging.info("Preview folder name: %s", "app-685912d3-preview"),
+            call.logging.info("Preview folder: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
             call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
             call.Path.exists(),
@@ -191,3 +192,47 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
         ]
+
+    def test_delete_existing_with_target_path(self):
+        gitops_config: GitOpsConfig = self.load_gitops_config_mock.return_value
+        self.load_gitops_config_mock.return_value = GitOpsConfig(
+            api_version=gitops_config.api_version,
+            application_name=gitops_config.application_name,
+            messages_created_template=gitops_config.messages_created_template,
+            messages_updated_template=gitops_config.messages_updated_template,
+            messages_uptodate_template=gitops_config.messages_uptodate_template,
+            preview_host_template=gitops_config.preview_host_template,
+            preview_template_organisation=gitops_config.preview_template_organisation,
+            preview_template_repository=gitops_config.preview_template_repository,
+            preview_template_path_template=gitops_config.preview_template_path_template,
+            preview_template_branch=gitops_config.preview_template_branch,
+            preview_target_organisation=gitops_config.preview_target_organisation,
+            preview_target_repository=gitops_config.preview_target_repository,
+            preview_target_branch=gitops_config.preview_target_branch,
+            preview_target_namespace_template=gitops_config.preview_target_namespace_template,
+            preview_target_max_namespace_length=gitops_config.preview_target_max_namespace_length,
+            preview_target_path_template="preview-envs/${APPLICATION_NAME}",
+            replacements=gitops_config.replacements,
+        )
+
+        args = DeletePreviewCommand.Args(
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            git_author_name="GIT_AUTHOR_NAME",
+            git_author_email="GIT_AUTHOR_EMAIL",
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            preview_id="PREVIEW_ID",
+            expect_preview_exists=False,
+        )
+        DeletePreviewCommand(args).execute()
+
+        self.git_repo_mock.get_full_file_path.assert_called_with("preview-envs/APP/app-685912d3-preview")
+        self.shutil_mock.rmtree.assert_called_once_with(
+            "/tmp/created-tmp-dir/preview-envs/APP/app-685912d3-preview",
+            ignore_errors=True,
+        )
