@@ -166,9 +166,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/template-repo/.preview-templates/my-app"),
             call.Path.is_dir(),
@@ -274,9 +272,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/target-repo/.preview-templates/my-app"),
             call.Path.is_dir(),
@@ -353,9 +349,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -427,9 +421,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -481,9 +473,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/template-repo/.preview-templates/my-app"),
             call.Path.is_dir(),
@@ -510,9 +500,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -540,9 +528,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -570,9 +556,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Use existing folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Use existing folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path("my-app-685912d3-preview/Chart.yaml"),
             call.update_yaml_file(
                 "/tmp/target-repo/my-app-685912d3-preview/Chart.yaml", "name", "my-app-685912d3-preview"
@@ -605,9 +589,7 @@ class CreatePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepo.get_full_file_path("my-app-685912d3-preview"),
             call.Path("/tmp/target-repo/my-app-685912d3-preview"),
             call.Path.is_dir(),
-            call.logging.info(
-                "Create new folder for preview: %s (path: %s)", "my-app-685912d3-preview", "my-app-685912d3-preview"
-            ),
+            call.logging.info("Create new folder for preview: %s", "my-app-685912d3-preview"),
             call.GitRepo.get_full_file_path(".preview-templates/my-app"),
             call.Path("/tmp/template-repo/.preview-templates/my-app"),
             call.Path.is_dir(),

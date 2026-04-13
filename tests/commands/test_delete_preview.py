@@ -90,7 +90,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone("target-branch"),
-            call.logging.info("Preview folder name: %s (path: %s)", "app-685912d3-preview", "app-685912d3-preview"),
+            call.logging.info("Preview folder: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
             call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
             call.Path.exists(),
@@ -129,7 +129,7 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
             call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone("target-branch"),
-            call.logging.info("Preview folder name: %s (path: %s)", "app-685912d3-preview", "app-685912d3-preview"),
+            call.logging.info("Preview folder: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
             call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
             call.Path.exists(),
@@ -157,14 +157,14 @@ class DeletePreviewCommandTest(MockMixin, unittest.TestCase):
         )
         with pytest.raises(GitOpsException) as ex:
             DeletePreviewCommand(args).execute()
-        self.assertEqual(str(ex.value), "There was no preview with name: app-685912d3-preview")
+        self.assertEqual(str(ex.value), "There was no preview at path: app-685912d3-preview")
 
         assert self.mock_manager.method_calls == [
             call.load_gitops_config(args, "ORGA", "REPO"),
             call.GitRepoApiFactory.create(args, "PREVIEW_TARGET_ORG", "PREVIEW_TARGET_REPO"),
             call.GitRepo(self.git_repo_api_mock),
             call.GitRepo.clone("target-branch"),
-            call.logging.info("Preview folder name: %s (path: %s)", "app-685912d3-preview", "app-685912d3-preview"),
+            call.logging.info("Preview folder: %s", "app-685912d3-preview"),
             call.GitRepo.get_full_file_path("app-685912d3-preview"),
             call.Path("/tmp/created-tmp-dir/app-685912d3-preview"),
             call.Path.exists(),
