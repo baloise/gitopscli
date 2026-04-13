@@ -39,7 +39,7 @@ class DeletePreviewCommand(Command):
 
             preview_namespace = gitops_config.get_preview_namespace(preview_id)
             preview_folder_path = gitops_config.get_preview_folder_path(preview_id)
-            logging.info("Preview folder name: %s (path: %s)", preview_namespace, preview_folder_path)
+            logging.info("Preview folder: %s", preview_folder_path)
 
             preview_folder_exists = self.__delete_folder_if_exists(preview_target_git_repo, preview_folder_path)
             if not preview_folder_exists:
