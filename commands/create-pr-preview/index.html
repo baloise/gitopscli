@@ -843,7 +843,9 @@
 <p>You need to provide some additional configuration files in your repositories for this command to work. </p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <h3 id="preview-templates">Preview Templates<a class="headerlink" href="#preview-templates" title="Permanent link">&para;</a></h3>
-<p>You have to provide a folder with the deployment configuration templates for every application you want to use this command for. By default it is assumed that this folder is located in your <em>deployment config repository</em> under the top-level folder <code>.preview-templates</code>. For example <code>.preview-templates/app-xy</code> for your app <code>app-xy</code>. The <code>create-preview</code> command simply copies this directory to the root of your <em>deployment config repository</em> and replaces e.g. image tag and route host which are specific to this preview.</p>
+<p>You have to provide a folder with the deployment configuration templates for every application you want to use this command for.</p>
+<p>By default it is assumed that this folder is located in your <em>deployment config repository</em> under the top-level folder <code>.preview-templates</code>. For example <code>.preview-templates/app-xy</code> for your app <code>app-xy</code>. The <code>create-preview</code> command simply copies this directory to your <em>deployment config repository</em> and replaces e.g. image tag and route host which are specific to this preview.</p>
+<p>By default previews are created in the repository root. If <code>previewConfig.target.path</code> is set, previews are created below that path instead.</p>
 <p><code>deployment-config-repo/
 ├── .preview-templates
 │   └── app-xy                        &lt;- Can contain any files and folders
@@ -881,6 +883,7 @@ applicationName: app-xy</p>
 <p>target:
     organisation: deployments
     repository: deployment-config-repo</p>
+<h1 id="path-customapplication_name-optional-defaults-to-repos-root-directory">path: custom/${APPLICATION_NAME}     # optional (defaults to repo's root directory)<a class="headerlink" href="#path-customapplication_name-optional-defaults-to-repos-root-directory" title="Permanent link">&para;</a></h1>
 <h1 id="branch-master-optional-defaults-to-repos-default-branch">branch: master                       # optional (defaults to repo's default branch)<a class="headerlink" href="#branch-master-optional-defaults-to-repos-default-branch" title="Permanent link">&para;</a></h1>
 <h1 id="namespace-application_name-preview_id_hash-preview-optional-default-application_name-preview_id-preview_id_hash_short-preview">namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview'  # optional (default: '${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview',<a class="headerlink" href="#namespace-application_name-preview_id_hash-preview-optional-default-application_name-preview_id-preview_id_hash_short-preview" title="Permanent link">&para;</a></h1>
 <div class="codehilite"><pre><span></span><code>                                                            #           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be
