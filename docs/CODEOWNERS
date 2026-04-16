@@ -1,2 +1,5 @@
 # see: https://help.github.com/articles/about-codeowners/
 * @christiansiegel @niiku
+
+# Dependencies
+uv.lock @niiku
