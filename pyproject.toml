@@ -26,7 +26,7 @@ test = [
     "ruff",
     "pytest-cov",
     "mypy==1.19.1",
-    "typeguard>=2.13.3,<3",
+    "typeguard>=2.13.3,<5",
     "pre-commit",
     "types-requests",
     "types-Deprecated",
