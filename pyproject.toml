@@ -11,7 +11,7 @@ dependencies = [
     "jsonpath-ng",
     "atlassian-python-api>=3,<4",
     "pygithub",
-    "python-gitlab>=2.6.0,<3",
+    "python-gitlab>=8.2.0,<9",
     "azure-devops>=7,<8",
 ]
 
