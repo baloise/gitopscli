@@ -906,15 +906,15 @@
 <p>The GitOps CLI can be used in multiple ways depending on your needs: via Docker, using Astral’s uvx, or by installing it from source for local development.</p>
 <h2 id="option-1-use-via-docker-recommended">Option 1: Use via Docker (Recommended)<a class="headerlink" href="#option-1-use-via-docker-recommended" title="Permanent link">&para;</a></h2>
 <p>The official GitOps CLI Docker image comes with all dependencies pre-installed and ready-to-use. Pull it with:
-<code>bash
-docker pull baloise/gitopscli</code>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>pull<span class="w"> </span>baloise/gitopscli
+</code></pre></div>
 Start the CLI and the print the help page with:
-<code>bash
-docker run --rm -it baloise/gitopscli --help</code></p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>baloise/gitopscli<span class="w"> </span>--help
+</code></pre></div></p>
 <h2 id="option-2-run-as-tool-via-uvx">Option 2: Run as Tool via uvx<a class="headerlink" href="#option-2-run-as-tool-via-uvx" title="Permanent link">&para;</a></h2>
 <p>Astral's <a href="https://docs.astral.sh/uv/guides/tools/">uvx</a> allows you to run the CLI without installing it.</p>
-<p><code>bash
-uvx https://github.com/baloise/gitopscli.git --help</code></p>
+<div class="highlight"><pre><span></span><code>uvx<span class="w"> </span>https://github.com/baloise/gitopscli.git<span class="w"> </span>--help
+</code></pre></div>
 <h2 id="option-3-from-source-for-local-development">Option 3: From Source For Local Development<a class="headerlink" href="#option-3-from-source-for-local-development" title="Permanent link">&para;</a></h2>
 <p>Use this method if you're contributing to the project or want to develop it on your own.</p>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
@@ -922,24 +922,24 @@ uvx https://github.com/baloise/gitopscli.git --help</code></p>
 <h3 id="steps">Steps<a class="headerlink" href="#steps" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Clone the repository:
-<code>bash
-git clone https://github.com/baloise/gitopscli.git
-cd gitopscli/</code></li>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/baloise/gitopscli.git
+<span class="nb">cd</span><span class="w"> </span>gitopscli/
+</code></pre></div></li>
 <li>
 <p>Install dependencies:
-<code>bash
-uv sync --locked --all-groups</code></p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>sync<span class="w"> </span>--locked<span class="w"> </span>--all-groups
+</code></pre></div></p>
 </li>
 <li>
 <p>Run the CLI:
-<code>bash
-uv run gitopscli --help</code></p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>gitopscli<span class="w"> </span>--help
+</code></pre></div></p>
 </li>
 </ol>
 <h3 id="updating-uv">Updating uv<a class="headerlink" href="#updating-uv" title="Permanent link">&para;</a></h3>
 <p>If you're using an older version of uv, you can update it with:
-<code>bash
-uv self upgrade</code></p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>self<span class="w"> </span>upgrade
+</code></pre></div></p>
 
 
 

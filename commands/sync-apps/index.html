@@ -639,6 +639,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -840,6 +862,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -865,78 +909,79 @@
 <h2 id="repository-structure">Repository Structure<a class="headerlink" href="#repository-structure" title="Permanent link">&para;</a></h2>
 <h3 id="app-config-repositories">App Config Repositories<a class="headerlink" href="#app-config-repositories" title="Permanent link">&para;</a></h3>
 <p>You have <code>1..n</code> config repositories for the deployment configurations of your applications (e.g. one per team). Every <em>app config repository</em> can contain <code>0..n</code> directories (e.g. containing <a href="https://helm.sh/">Helm</a> charts). Directories starting with a dot will be ignored. Example:</p>
-<p><code>team-1-app-config-repo/
+<div class="highlight"><pre><span></span><code>team-1-app-config-repo/
 ├── .this-will-be-ignored
 ├── app-xy-production
 ├── app-xy-staging
-└── app-xy-test</code></p>
+└── app-xy-test
+</code></pre></div>
 <h3 id="root-config-repository">Root Config Repository<a class="headerlink" href="#root-config-repository" title="Permanent link">&para;</a></h3>
 <p>The <em>root config repository</em> acts as a single entrypoint for your GitOps continous delivery tool (e.g. <a href="https://argoproj.github.io/argo-cd/">Argo CD</a>). Here you define all applications in your cluster and link to the <em>app config repositories</em> with their deployment configurations. It is structured in the following way:</p>
-<p><code>root-config-repo/
+<div class="highlight"><pre><span></span><code>root-config-repo/
 ├── apps
 │   ├── team-a.yaml
 │   └── team-b.yaml
 └── bootstrap
-    └── values.yaml</code></p>
+    └── values.yaml
+</code></pre></div>
 <h3 id="app-specific-values">app specific values<a class="headerlink" href="#app-specific-values" title="Permanent link">&para;</a></h3>
 <p>app specific values may be set using a .config.yaml file directly in the app directory. gitopscli will process these values and add them under customAppConfig parameter of application
 <strong>tenantrepo.git/app1/app_value_file.yaml</strong>
-<code>yaml
-customvalue: test</code>
+<div class="highlight"><pre><span></span><code><span class="nt">customvalue</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+</code></pre></div>
 <strong>rootrepo.git/apps/tenantrepo.yaml</strong>
-<code>yaml
-config:
-  repository: https://tenantrepo.git
-  applications:
-    app1:
-      customAppConfig:
-        customvalue: test
-    app2: {}</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://tenantrepo.git</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app1</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">customAppConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">customvalue</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="w">    </span><span class="nt">app2</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+</code></pre></div></p>
 <p><strong>bootstrap/values.yaml</strong>
-<code>yaml
-bootstrap:
-  - name: team-a # &lt;- every entry links to a YAML file in the `apps/` directory
-  - name: team-b</code>
+<div class="highlight"><pre><span></span><code><span class="nt">bootstrap</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span>
+</code></pre></div>
 Alternative, when using a Chart as dependency with an alias 'config':
-<code>yaml
-config:
-  bootstrap:
-   - name: team-a # &lt;- every entry links to a YAML file in the `apps/` directory
-   - name: team-b</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">bootstrap</span><span class="p">:</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-a</span><span class="w"> </span><span class="c1"># &lt;- every entry links to a YAML file in the `apps/` directory</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-b</span>
+</code></pre></div></p>
 <p><strong>apps/team-a.yaml</strong>
-```yaml
-repository: https://github.com/company-deployments/team-1-app-config-repo.git # link to your apps root repository</p>
-<h1 id="the-applications-that-are-synced-by-the-sync-app-command">The applications that are synced by the <code>sync-app</code> command:<a class="headerlink" href="#the-applications-that-are-synced-by-the-sync-app-command" title="Permanent link">&para;</a></h1>
-<p>applications:
-  app-xy-production: # &lt;- every entry corresponds to a directory in the apps root repository
-  app-xy-staging:
-  app-xy-test:
-```
+<div class="highlight"><pre><span></span><code><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span><span class="w"> </span><span class="c1"># link to your apps root repository</span>
+
+<span class="c1"># The applications that are synced by the `sync-app` command:</span>
+<span class="nt">applications</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">app-xy-production</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span>
+<span class="w">  </span><span class="nt">app-xy-staging</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">app-xy-test</span><span class="p">:</span>
+</code></pre></div>
 or</p>
-<p>```yaml
-config:
-  repository: https://github.com/company-deployments/team-1-app-config-repo.git # link to your apps root repository</p>
-<h1 id="the-applications-that-are-synced-by-the-sync-app-command_1">The applications that are synced by the <code>sync-app</code> command:<a class="headerlink" href="#the-applications-that-are-synced-by-the-sync-app-command_1" title="Permanent link">&para;</a></h1>
-<p>applications:
-   app-xy-production: # &lt;- every entry corresponds to a directory in the apps root repository
-   app-xy-staging:
-   app-xy-test:
-```</p>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/company-deployments/team-1-app-config-repo.git</span><span class="w"> </span><span class="c1"># link to your apps root repository</span>
+
+<span class="c1"># The applications that are synced by the `sync-app` command:</span>
+<span class="w">  </span><span class="nt">applications</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">app-xy-production</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- every entry corresponds to a directory in the apps root repository</span>
+<span class="w">   </span><span class="nt">app-xy-staging</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">app-xy-test</span><span class="p">:</span>
+</code></pre></div>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p><code>bash
-gitopscli sync-apps \
-  --git-provider-url github \
-  --username $GIT_USERNAME \
-  --password $GIT_PASSWORD \
-  --git-user "GitOps CLI" \
-  --git-email "gitopscli@baloise.dev" \
-  --organisation "company-deployments" \
-  --repository-name "team-1-app-config-repo" \
-  --root-organisation "company-deployments" \
-  --root-repository-name "root-config-repo"</code></p>
+<div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>sync-apps<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-provider-url<span class="w"> </span>github<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;company-deployments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;team-1-app-config-repo&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--root-organisation<span class="w"> </span><span class="s2">&quot;company-deployments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--root-repository-name<span class="w"> </span><span class="s2">&quot;root-config-repo&quot;</span>
+</code></pre></div>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<p>```
-usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
+<div class="highlight"><pre><span></span><code>usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-user GIT_USER] [--git-email GIT_EMAIL]
                            [--git-author-name GIT_AUTHOR_NAME]
                            [--git-author-email GIT_AUTHOR_EMAIL]
@@ -945,8 +990,9 @@ usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                            [--git-provider-url GIT_PROVIDER_URL]
                            [-v [VERBOSE]] --root-organisation
                            ROOT_ORGANISATION --root-repository-name
-                           ROOT_REPOSITORY_NAME</p>
-<p>options:
+                           ROOT_REPOSITORY_NAME
+
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -974,7 +1020,7 @@ usage: gitopscli sync-apps [-h] --username USERNAME --password PASSWORD
                         Root config repository organisation
   --root-repository-name ROOT_REPOSITORY_NAME
                         Root config repository name
-```</p>
+</code></pre></div>
 
 
 

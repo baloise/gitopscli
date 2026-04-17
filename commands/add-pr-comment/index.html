@@ -807,24 +807,24 @@
 <h1 id="add-pr-comment">add-pr-comment<a class="headerlink" href="#add-pr-comment" title="Permanent link">&para;</a></h1>
 <p>The <code>add-pr-comment</code> command adds a comment to a pull request. You can also reply to an existing comment by providing the <code>--parent-id</code>.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p><code>bash
-gitopscli add-pr-comment \
-  --git-provider-url https://bitbucket.baloise.dev \
-  --username $GIT_USERNAME \
-  --password $GIT_PASSWORD \
-  --organisation "my-team" \
-  --repository-name "my-app" \
-  --pr-id 4711 \
-  --text "this is a comment"</code></p>
+<div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>add-pr-comment<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;my-team&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;my-app&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pr-id<span class="w"> </span><span class="m">4711</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--text<span class="w"> </span><span class="s2">&quot;this is a comment&quot;</span><span class="w"> </span>
+</code></pre></div>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<p>```
-usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
+<div class="highlight"><pre><span></span><code>usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
                                 --organisation ORGANISATION --repository-name
                                 REPOSITORY_NAME [--git-provider GIT_PROVIDER]
                                 [--git-provider-url GIT_PROVIDER_URL] --pr-id
                                 PR_ID [--parent-id PARENT_ID] [-v [VERBOSE]]
-                                --text TEXT</p>
-<p>options:
+                                --text TEXT
+
+options:
   -h, --help            show this help message and exit
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
@@ -845,7 +845,7 @@ usage: gitopscli add-pr-comment [-h] --username USERNAME --password PASSWORD
   -v [VERBOSE], --verbose [VERBOSE]
                         Verbose exception logging
   --text TEXT           the text of the comment
-```</p>
+</code></pre></div>
 
 
 
