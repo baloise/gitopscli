@@ -3,7 +3,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from string import Template
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 from gitopscli.gitops_exception import GitOpsException
 
@@ -406,6 +406,7 @@ class _GitOpsConfigYamlParser:
                 key = f"{file_key}.[{index}]"
                 if not isinstance(file_replacement, dict):
                     raise GitOpsException(f"Item '{key}' should be an object in GitOps config!")
+                file_replacement = cast("dict[str, Any]", file_replacement)
                 if "path" not in file_replacement:
                     raise GitOpsException(f"Key '{key}.path' not found in GitOps config!")
                 if "value" not in file_replacement:

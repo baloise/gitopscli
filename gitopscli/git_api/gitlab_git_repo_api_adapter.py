@@ -102,7 +102,7 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
         self,
         pr_id: int,
         text: str,
-        _parent_id: int | None = None,
+        parent_id: int | None = None,  # noqa: ARG002
     ) -> None:
         merge_request = self.__project.mergerequests.get(pr_id)
         merge_request.notes.create({"body": text})

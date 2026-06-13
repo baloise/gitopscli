@@ -12,8 +12,8 @@ format-check:
 lint:
 	uv run ruff check gitopscli tests
 
-mypy:
-	uv run mypy --install-types --non-interactive .
+typecheck:
+	uv run ty check
 
 
 test:
@@ -24,7 +24,7 @@ coverage:
 	uv run coverage html
 	uv run coverage report
 
-checks: format-check lint mypy test
+checks: format-check lint typecheck test
 
 image:
 	DOCKER_BUILDKIT=1 docker build --progress=plain -t gitopscli:latest .
@@ -35,4 +35,4 @@ docs:
 update:
 	uv lock -U
 
-.PHONY: init format format-check lint mypy test coverage checks image docs update
+.PHONY: init format format-check lint typecheck test coverage checks image docs update

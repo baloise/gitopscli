@@ -13,6 +13,7 @@ dependencies = [
     "pygithub",
     "python-gitlab>=2.6.0,<3",
     "azure-devops>=7,<8",
+    "typing_extensions>=4",
 ]
 
 [project.urls]
@@ -25,11 +26,9 @@ gitopscli = "gitopscli.__main__:main"
 test = [
     "ruff",
     "pytest-cov",
-    "mypy==1.19.1",
+    "ty",
     "typeguard>=2.13.3,<3",
     "pre-commit",
-    "types-requests",
-    "types-Deprecated",
 ]
 docs = [
     "mkdocs",
@@ -87,3 +86,17 @@ ignore = [
 "gitopscli/git_api/azure_devops_git_repo_api_adapter.py" = [
     "TRY300", # https://docs.astral.sh/ruff/rules/try-consider-else/ (conflicts with RET505)
 ]
+
+[tool.ty.environment]
+python-version = "3.10"
+python = ".venv/bin/python"
+
+[tool.ty.src]
+exclude = [
+    "build",
+    "tests",
+]
+
+[tool.ty.terminal]
+output-format = "concise"
+error-on-warning = true

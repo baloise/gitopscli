@@ -193,7 +193,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         except Exception as ex:
             raise GitOpsException(f"Error connecting to '{self.__base_url}'") from ex
 
-    def delete_branch(self, _: str) -> None:
+    def delete_branch(self, branch: str) -> None:  # noqa: ARG002
         # branch deletion is set in merge completion_options
         return
 
