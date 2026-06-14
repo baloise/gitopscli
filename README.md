@@ -46,10 +46,10 @@ make init  # install dependencies, setup dev gitopscli, install pre-commit hooks
 make format  # format code
 make format-check  # check formatting
 make lint  # run linter
-make mypy  # run type checks
+make typecheck  # run type checks
 make test  # run unit tests
 make coverage  # run unit tests and create coverage report
-make checks  # run all checks (format-check + lint + mypy + test)
+make checks  # run all checks (format-check + lint + typecheck + test)
 make image  # build docker image
 make docs  # serves web docs
 make update  # update package dependencies

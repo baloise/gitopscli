@@ -14,9 +14,9 @@ repos:
     language: system
     pass_filenames: false
     always_run: true
-  - id: mypy
-    name: make mypy
-    entry: make mypy
+  - id: typecheck
+    name: make typecheck
+    entry: make typecheck
     language: system
     pass_filenames: false
     always_run: true

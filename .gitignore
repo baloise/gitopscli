@@ -11,5 +11,4 @@ testrepo/
 .eggs/
 site/
 build/
-.mypy_cache
 .ruff_cache

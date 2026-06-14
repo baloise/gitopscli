@@ -88,8 +88,8 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
     def merge_pull_request(
         self,
         pr_id: int,
-        _merge_method: Literal["squash", "rebase", "merge"] = "merge",
-        _merge_parameters: dict[str, Any] | None = None,
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",  # noqa: ARG002
+        merge_parameters: dict[str, Any] | None = None,  # noqa: ARG002
     ) -> None:
         pull_request = self.__bitbucket.get_pull_request(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(

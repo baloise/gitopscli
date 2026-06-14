@@ -2,9 +2,10 @@ import locale
 import logging
 from pathlib import Path
 from types import TracebackType
-from typing import Literal, Self
+from typing import Literal
 
 from git import GitCommandError, GitError, Repo
+from typing_extensions import Self  # noqa: UP035
 
 from gitopscli.gitops_exception import GitOpsException
 from gitopscli.io_api.tmp_dir import create_tmp_dir, delete_tmp_dir
