@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import logging
 import shutil
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
 from gitopscli.gitops_config import GitOpsConfig
@@ -12,6 +13,9 @@ from gitopscli.io_api.yaml_util import YAMLException, update_yaml_file, yaml_fil
 
 from .command import Command
 from .common import load_gitops_config
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class CreatePreviewCommand(Command):
@@ -29,7 +33,7 @@ class CreatePreviewCommand(Command):
         git_hash: str
         preview_id: str
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: CreatePreviewCommand.Args) -> None:
         self.__args = args
         self.__deployment_already_up_to_date_callback: Callable[[str], None] = lambda _: None
         self.__deployment_updated_callback: Callable[[str], None] = lambda _: None

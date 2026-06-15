@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from gitopscli.git_api import GitApiConfig, GitRepoApiFactory
@@ -15,7 +17,7 @@ class AddPrCommentCommand(Command):
         parent_id: int | None
         text: str
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: AddPrCommentCommand.Args) -> None:
         self.__args = args
 
     def execute(self) -> None:

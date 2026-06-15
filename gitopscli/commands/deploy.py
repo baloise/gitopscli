@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import uuid
@@ -37,7 +39,7 @@ class DeployCommand(Command):
         merge_parameters: Any | None
         merge_method: Literal["squash", "rebase", "merge"] = "merge"
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: DeployCommand.Args) -> None:
         self.__args = args
         self.__commit_hashes: list[str] = []
 

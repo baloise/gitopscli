@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from dataclasses import dataclass
 
@@ -24,7 +26,7 @@ class SyncAppsCommand(Command):
         root_organisation: str
         root_repository_name: str
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: SyncAppsCommand.Args) -> None:
         self.__args = args
 
     def execute(self) -> None:

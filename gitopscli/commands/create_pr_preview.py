@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from gitopscli.git_api import GitApiConfig, GitRepoApiFactory
@@ -21,7 +23,7 @@ class CreatePrPreviewCommand(Command):
         pr_id: int
         parent_id: int | None
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: CreatePrPreviewCommand.Args) -> None:
         self.__args = args
 
     def execute(self) -> None:
