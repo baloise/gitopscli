@@ -13,7 +13,6 @@ dependencies = [
     "pygithub",
     "python-gitlab>=2.6.0,<3",
     "azure-devops>=7,<8",
-    "typing_extensions>=4",
 ]
 
 [project.urls]

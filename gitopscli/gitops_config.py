@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import hashlib
 import re
-from collections.abc import Callable
 from dataclasses import dataclass
 from string import Template
-from typing import Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from gitopscli.gitops_exception import GitOpsException
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _VARIABLE_REGEX = re.compile(r"\${(\w+)}")
 
@@ -15,11 +19,11 @@ class GitOpsConfig:
     class Replacement:
         @dataclass(frozen=True)
         class PreviewContext:
-            gitops_config: "GitOpsConfig"
+            gitops_config: GitOpsConfig
             preview_id: str
             git_hash: str
 
-        __VARIABLE_MAPPERS: ClassVar[dict[str, Callable[["GitOpsConfig.Replacement.PreviewContext"], str]]] = {
+        __VARIABLE_MAPPERS: ClassVar[dict[str, Callable[[GitOpsConfig.Replacement.PreviewContext], str]]] = {
             "GIT_HASH": lambda context: context.git_hash,
             "PREVIEW_HOST": lambda context: context.gitops_config.get_preview_host(context.preview_id),
             "PREVIEW_NAMESPACE": lambda context: context.gitops_config.get_preview_namespace(context.preview_id),
@@ -44,7 +48,7 @@ class GitOpsConfig:
                         f"contains invalid variable: {var}",
                     )
 
-        def get_value(self, context: PreviewContext) -> str:
+        def get_value(self, context: GitOpsConfig.Replacement.PreviewContext) -> str:
             val = self.value_template
             for variable, value_func in self.__VARIABLE_MAPPERS.items():
                 val = val.replace(f"${{{variable}}}", value_func(context))
@@ -162,16 +166,16 @@ class GitOpsConfig:
             raise GitOpsException(f"Invalid character in preview namespace: '{invalid_character[0]}'")
         return preview_namespace
 
-    def get_created_message(self, context: Replacement.PreviewContext) -> str:
+    def get_created_message(self, context: GitOpsConfig.Replacement.PreviewContext) -> str:
         return self.fill_template(self.messages_created_template, context)
 
-    def get_updated_message(self, context: Replacement.PreviewContext) -> str:
+    def get_updated_message(self, context: GitOpsConfig.Replacement.PreviewContext) -> str:
         return self.fill_template(self.messages_updated_template, context)
 
-    def get_uptodate_message(self, context: Replacement.PreviewContext) -> str:
+    def get_uptodate_message(self, context: GitOpsConfig.Replacement.PreviewContext) -> str:
         return self.fill_template(self.messages_uptodate_template, context)
 
-    def fill_template(self, template: str, context: Replacement.PreviewContext) -> str:
+    def fill_template(self, template: str, context: GitOpsConfig.Replacement.PreviewContext) -> str:
         return Template(template).substitute(
             APPLICATION_NAME=self.application_name,
             PREVIEW_ID_HASH=self.create_preview_id_hash(context.preview_id),
@@ -213,7 +217,7 @@ class GitOpsConfig:
         return GitOpsConfig.create_preview_id_hash(preview_id)[:3]
 
     @staticmethod
-    def from_yaml(yaml: Any) -> "GitOpsConfig":
+    def from_yaml(yaml: Any) -> GitOpsConfig:
         return _GitOpsConfigYamlParser(yaml).parse()
 
 

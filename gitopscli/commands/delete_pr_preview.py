@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from gitopscli.git_api import GitApiConfig
@@ -21,7 +23,7 @@ class DeletePrPreviewCommand(Command):
         branch: str
         expect_preview_exists: bool
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: DeletePrPreviewCommand.Args) -> None:
         self.__args = args
 
     def execute(self) -> None:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib.metadata
 from dataclasses import dataclass
 
@@ -9,7 +11,7 @@ class VersionCommand(Command):
     class Args:
         pass
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: VersionCommand.Args) -> None:
         pass
 
     def execute(self) -> None:

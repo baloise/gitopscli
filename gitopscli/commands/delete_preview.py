@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import logging
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from gitopscli.git_api import GitApiConfig, GitRepo, GitRepoApi, GitRepoApiFactory
-from gitopscli.gitops_config import GitOpsConfig
 from gitopscli.gitops_exception import GitOpsException
 
 from .command import Command
 from .common import load_gitops_config
+
+if TYPE_CHECKING:
+    from gitopscli.gitops_config import GitOpsConfig
 
 
 class DeletePreviewCommand(Command):
@@ -26,7 +31,7 @@ class DeletePreviewCommand(Command):
         preview_id: str
         expect_preview_exists: bool
 
-    def __init__(self, args: Args) -> None:
+    def __init__(self, args: DeletePreviewCommand.Args) -> None:
         self.__args = args
 
     def execute(self) -> None:
