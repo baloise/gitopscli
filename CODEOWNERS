@@ -1,2 +1,3 @@
 # see: https://help.github.com/articles/about-codeowners/
 * @christiansiegel @niiku
+uv.lock @niiku
