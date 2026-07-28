@@ -9,7 +9,7 @@ dependencies = [
     "gitpython",
     "ruamel.yaml",
     "jsonpath-ng",
-    "atlassian-python-api>=3,<4",
+    "atlassian-python-api>=3,<5",
     "pygithub",
     "python-gitlab>=2.6.0,<3",
     "azure-devops>=7,<8",
