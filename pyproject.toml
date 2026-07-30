@@ -35,7 +35,7 @@ docs = [
     "markdown-include",
     "pymdown-extensions",
     "Markdown",
-    "pygments<2.20",
+    "pygments<2.21",
 ]
 
 [build-system]
