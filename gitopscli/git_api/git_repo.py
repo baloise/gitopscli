@@ -133,7 +133,10 @@ class GitRepo:
 
     def __remote_branch_exists(self, branch: str) -> bool:
         repo = self.__get_repo()
-        return bool(repo.git.ls_remote("--heads", "origin", f"refs/heads/{branch}").strip() != "")
+        result = repo.git.ls_remote("--heads", "origin", f"refs/heads/{branch}")
+        if isinstance(result, str):
+            return result.strip() != ""
+        return bool(result)
 
     def __delete_tmp_dir(self) -> None:
         if self.__tmp_dir:
