@@ -71,6 +71,7 @@ ignore = [
     "PD", # https://docs.astral.sh/ruff/rules/#pandas-vet-pd (false positives)
     "LOG015", # https://docs.astral.sh/ruff/rules/root-logger-call/
     "PTH208", # https://docs.astral.sh/ruff/rules/os-listdir/
+    "CPY001", # https://docs.astral.sh/ruff/rules/missing-copyright-notice/
 ]
 
 [tool.ruff.lint.per-file-ignores]

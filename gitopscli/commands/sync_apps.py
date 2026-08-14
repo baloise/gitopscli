@@ -50,7 +50,7 @@ def _sync_apps_command(args: SyncAppsCommand.Args) -> None:
         )
 
 
-def __sync_apps(
+def __sync_apps(  # noqa: PLR0917
     tenant_git_repo: GitRepo,
     root_git_repo: GitRepo,
     git_user: str,
@@ -89,7 +89,7 @@ def __sync_apps(
         logging.info("No changes applied to %s", root_repo_tenant.file_path)
 
 
-def __commit_and_push(
+def __commit_and_push(  # noqa: PLR0917
     team_config_git_repo: GitRepo,
     root_config_git_repo: GitRepo,
     git_user: str,

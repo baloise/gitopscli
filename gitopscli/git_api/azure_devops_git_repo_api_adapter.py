@@ -19,7 +19,7 @@ from .git_repo_api import GitRepoApi
 class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
     """Azure DevOps SDK adapter for GitOps CLI operations."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0917
         self,
         git_provider_url: str,
         username: str | None,
