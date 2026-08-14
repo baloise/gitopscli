@@ -572,7 +572,7 @@ requires-dist = [
     { name = "gitpython" },
     { name = "jsonpath-ng" },
     { name = "pygithub" },
-    { name = "python-gitlab", specifier = ">=2.6.0,<3" },
+    { name = "python-gitlab", specifier = ">=8.5.0,<9" },
     { name = "ruamel-yaml" },
 ]
 
@@ -1108,15 +1108,15 @@ wheels = [
 
 [[package]]
 name = "python-gitlab"
-version = "2.10.1"
+version = "8.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
     { name = "requests-toolbelt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/47/5c51420baf1ea3141d7da32a0a92541a5073491c8da8bd309e9ca52c5e8d/python-gitlab-2.10.1.tar.gz", hash = "sha256:7afa7d7c062fa62c173190452265a30feefb844428efc58ea5244f3b9fc0d40f", size = 178899, upload-time = "2021-08-28T00:15:54.362Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/55/8050293b360a29218a15892c2b936e286a69fd4f5d2cf54c7cbe19d34b47/python_gitlab-8.5.0.tar.gz", hash = "sha256:628529ec4ce1f9a7ba2c145b2cf5e4eeca3015418e504b2e6fba70171b6b1b59", size = 411497, upload-time = "2026-07-28T02:04:30.015Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/90/eed6dd7eda176cb6e7300e27f9f7f94ac917df9dc1bb1553924af271f01a/python_gitlab-2.10.1-py3-none-any.whl", hash = "sha256:581a219759515513ea9399e936ed7137437cfb681f52d2641626685c492c999d", size = 197135, upload-time = "2021-08-28T00:15:51.71Z" },
+    { url = "https://files.pythonhosted.org/packages/93/3d/fb547ed2ac318132517e001b74b09d1f17d2c2c681cad1e32a8b84139867/python_gitlab-8.5.0-py3-none-any.whl", hash = "sha256:94228973c54f09eccd30f5160eca91200adc31d6ed0c894221a3865b90f96426", size = 148234, upload-time = "2026-07-28T02:04:28.454Z" },
 ]
 
 [[package]]
