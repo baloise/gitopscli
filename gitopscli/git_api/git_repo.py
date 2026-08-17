@@ -77,6 +77,26 @@ class GitRepo:
         except GitError as ex:
             raise GitOpsException(f"Error creating new branch '{branch}'.") from ex
 
+    def checkout(self, branch: str) -> None:
+        logging.info("Checking out branch: %s", branch)
+        repo = self.__get_repo()
+        try:
+            current_branch = repo.git.branch("--show-current")
+            if current_branch == branch:
+                return
+            repo.git.fetch("origin", f"+refs/heads/{branch}:refs/remotes/origin/{branch}", "--depth=1")
+            repo.git.checkout("-B", branch, f"origin/{branch}")
+            repo.git.config(f"branch.{branch}.remote", "origin")
+            repo.git.config(f"branch.{branch}.merge", f"refs/heads/{branch}")
+        except GitError as ex:
+            raise GitOpsException(f"Error checking out branch '{branch}'.") from ex
+
+    def checkout_or_create_branch(self, branch: str) -> None:
+        if self.__remote_branch_exists(branch):
+            self.checkout(branch)
+        else:
+            self.new_branch(branch)
+
     def commit(
         self,
         git_user: str,

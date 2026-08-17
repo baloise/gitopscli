@@ -46,6 +46,7 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
         self.git_repo_mock.__exit__.return_value = False
         self.git_repo_mock.clone.return_value = None
         self.git_repo_mock.new_branch.return_value = None
+        self.git_repo_mock.checkout_or_create_branch.return_value = None
         self.example_commit_hash = "5f3a443e7ecb3723c1a71b9744e2993c0b6dfc00"
         self.git_repo_mock.commit.return_value = self.example_commit_hash
         self.git_repo_mock.pull_rebase.return_value = None
@@ -272,6 +273,95 @@ class DeployCommandTest(MockMixin, unittest.TestCase):
             ),
             call.GitRepoApi.merge_pull_request(42, "merge"),
             call.GitRepoApi.delete_branch("gitopscli-deploy-b973b5bb"),
+        ]
+
+        no_output = ""
+        self.assertMultiLineEqual(mock_print.getvalue(), no_output)
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_create_pr_with_custom_branch(self, mock_print):
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            git_author_name=None,
+            git_author_email=None,
+            create_pr=True,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+            json=False,
+            pr_labels=None,
+            merge_parameters=None,
+            branch="my-custom-branch",
+        )
+        DeployCommand(args).execute()
+
+        assert self.mock_manager.method_calls == [
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.clone(),
+            call.GitRepo.checkout_or_create_branch("my-custom-branch"),
+            call.GitRepo.get_full_file_path("test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
+            call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
+            call.GitRepo.commit("GIT_USER", "GIT_EMAIL", None, None, "changed 'a.b.c' to 'foo' in test/file.yml"),
+            call.GitRepo.pull_rebase(),
+            call.GitRepo.push(),
+            call.GitRepoApi.create_pull_request_to_default_branch(
+                "my-custom-branch",
+                "Updated value in test/file.yml",
+                "Updated 1 value in `test/file.yml`:\n```yaml\na.b.c: foo\n```\n",
+            ),
+        ]
+
+        no_output = ""
+        self.assertMultiLineEqual(mock_print.getvalue(), no_output)
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    def test_custom_branch_without_create_pr(self, mock_print):
+        args = DeployCommand.Args(
+            file="test/file.yml",
+            values={"a.b.c": "foo"},
+            username="USERNAME",
+            password="PASSWORD",
+            git_user="GIT_USER",
+            git_email="GIT_EMAIL",
+            git_author_name=None,
+            git_author_email=None,
+            create_pr=False,
+            auto_merge=False,
+            single_commit=False,
+            organisation="ORGA",
+            repository_name="REPO",
+            git_provider=GitProvider.GITHUB,
+            git_provider_url=None,
+            commit_message=None,
+            json=False,
+            pr_labels=None,
+            merge_parameters=None,
+            branch="my-custom-branch",
+        )
+        DeployCommand(args).execute()
+
+        assert self.mock_manager.method_calls == [
+            call.GitRepoApiFactory.create(args, "ORGA", "REPO"),
+            call.GitRepo(self.git_repo_api_mock),
+            call.GitRepo.clone(),
+            call.GitRepo.checkout_or_create_branch("my-custom-branch"),
+            call.GitRepo.get_full_file_path("test/file.yml"),
+            call.update_yaml_file("/tmp/created-tmp-dir/test/file.yml", "a.b.c", "foo"),
+            call.logging.info("Updated yaml property %s to %s", "a.b.c", "foo"),
+            call.GitRepo.commit("GIT_USER", "GIT_EMAIL", None, None, "changed 'a.b.c' to 'foo' in test/file.yml"),
+            call.GitRepo.pull_rebase(),
+            call.GitRepo.push(),
         ]
 
         no_output = ""
