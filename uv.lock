@@ -4,7 +4,7 @@ requires-python = ">=3.10, <4"
 
 [[package]]
 name = "atlassian-python-api"
-version = "3.41.21"
+version = "5.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -13,11 +13,11 @@ dependencies = [
     { name = "oauthlib" },
     { name = "requests" },
     { name = "requests-oauthlib" },
-    { name = "six" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/f7/c048201e0e4ff9f3d88af2c8bed5f24d5f2a45ece9a4686c42d0c6bfbf5a/atlassian_python_api-3.41.21.tar.gz", hash = "sha256:30117504ebdcbe229c6a15f7a6b89076e7f20e5feeb425fbce2b4b0b18b0e639", size = 236609, upload-time = "2025-03-17T08:04:11.338Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/66/b8/6a597a1d31329bd26d6dc6769d49bbd3cf173221322b4de0af3351133c74/atlassian_python_api-5.0.3.tar.gz", hash = "sha256:7d0443a01568cdbf9af45efd30980472979923f6b605f2640e0e80dd02c1dc8a", size = 1257894, upload-time = "2026-08-17T09:22:11.355Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c8/a5/2e4c6fbaf586f9f0f2b5f364c19a1d467280bc28973b94dab5175b47056c/atlassian_python_api-3.41.21-py3-none-any.whl", hash = "sha256:6397bfa08d19acf08a766d3db5dd782348e8a3efca49cbf4ada870290a7fcf07", size = 183701, upload-time = "2025-03-17T08:04:09.589Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/47/ab11677bb9f879719e1b8123a2c953ebc88a2b63f15c7f0f7f84a15e623d/atlassian_python_api-5.0.3-py3-none-any.whl", hash = "sha256:c5265c39a8bceb7c3b254d768b4a006a63c7fd80153d293a686fa4e31d52e3c2", size = 331473, upload-time = "2026-08-17T09:22:09.655Z" },
 ]
 
 [[package]]
@@ -507,7 +507,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -579,7 +579,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atlassian-python-api", specifier = ">=3,<4" },
+    { name = "atlassian-python-api", specifier = ">=3,<6" },
     { name = "azure-devops", specifier = ">=7,<8" },
     { name = "gitpython" },
     { name = "jsonpath-ng" },
