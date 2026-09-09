@@ -149,8 +149,7 @@ options:
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
   --branch BRANCH       Specify the branch where the changes should be
-                        committed to. If omitted with --create-pr, a random
-                        branch is created.
+                        committed to. Creates a new branch if it doesn't exist yet.
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
   --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
