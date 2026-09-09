@@ -47,16 +47,17 @@ class DeployCommand(Command):
     def execute(self) -> None:
         git_repo_api = self.__create_git_repo_api()
         with GitRepo(git_repo_api) as git_repo:
-            git_repo.clone()
-
             if self.__args.create_pr:
                 pr_branch = self.__args.branch or f"gitopscli-deploy-{str(uuid.uuid4())[:8]}"
                 if self.__args.branch:
                     git_repo.checkout_or_create_branch(pr_branch)
                 else:
+                    git_repo.clone()
                     git_repo.new_branch(pr_branch)
             elif self.__args.branch:
                 git_repo.checkout_or_create_branch(self.__args.branch)
+            else:
+                git_repo.clone()
 
             updated_values = self.__update_values(git_repo)
             if not updated_values:

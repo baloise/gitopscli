@@ -4,7 +4,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Literal
 
-from git import GitCommandError, GitError, Repo
+from git import Git, GitCommandError, GitError, Repo
 from typing_extensions import Self  # noqa: UP035
 
 from gitopscli.gitops_exception import GitOpsException
@@ -92,9 +92,11 @@ class GitRepo:
             raise GitOpsException(f"Error checking out branch '{branch}'.") from ex
 
     def checkout_or_create_branch(self, branch: str) -> None:
-        if self.__remote_branch_exists(branch):
-            self.checkout(branch)
+        url = self.__api.get_clone_url()
+        if self.__remote_branch_exists(branch, remote=url):
+            self.clone(branch)
         else:
+            self.clone()
             self.new_branch(branch)
 
     def commit(
@@ -151,9 +153,27 @@ class GitRepo:
         last_commit = repo.head.commit
         return str(repo.git.show("-s", "--format=%an <%ae>", last_commit.hexsha))
 
-    def __remote_branch_exists(self, branch: str) -> bool:
-        repo = self.__get_repo()
-        result = repo.git.ls_remote("--heads", "origin", f"refs/heads/{branch}")
+    def __remote_branch_exists(self, branch: str, remote: str = "origin") -> bool:
+        if remote == "origin":
+            repo = self.__get_repo()
+            result = repo.git.ls_remote("--heads", remote, f"refs/heads/{branch}")
+        else:
+            username = self.__api.get_username()
+            password = self.__api.get_password()
+            try:
+                g = Git()
+                if username is not None and password is not None:
+                    if not self.__tmp_dir:
+                        self.__tmp_dir = create_tmp_dir()
+                    credentials_file = self.__create_credentials_file(username, password)
+                    result = g.execute([
+                        "git", "-c", f"credential.helper={credentials_file}",
+                        "ls-remote", "--heads", remote, f"refs/heads/{branch}",
+                    ])
+                else:
+                    result = g.ls_remote("--heads", remote, f"refs/heads/{branch}")
+            except GitError as ex:
+                raise GitOpsException(f"Error checking remote branch '{branch}' at '{remote}'.") from ex
         if isinstance(result, str):
             return result.strip() != ""
         return bool(result)
