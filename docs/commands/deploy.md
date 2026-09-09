@@ -170,7 +170,7 @@ options:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g. https://bitbucket.example.tld)
   --create-pr [CREATE_PR]
-                        Creates a Pull Request
+                        Creates a Pull Request from a random new branch. Use --branch to use a specific branch name instead.
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with --create-pr)
   --merge-method MERGE_METHOD
