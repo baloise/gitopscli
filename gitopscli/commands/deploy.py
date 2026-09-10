@@ -49,13 +49,9 @@ class DeployCommand(Command):
         with GitRepo(git_repo_api) as git_repo:
             if self.__args.create_pr:
                 pr_branch = self.__args.branch or f"gitopscli-deploy-{str(uuid.uuid4())[:8]}"
-                if self.__args.branch:
-                    git_repo.checkout_or_create_branch(pr_branch)
-                else:
-                    git_repo.clone()
-                    git_repo.new_branch(pr_branch)
+                git_repo.clone(pr_branch, create=True)
             elif self.__args.branch:
-                git_repo.checkout_or_create_branch(self.__args.branch)
+                git_repo.clone(self.__args.branch, create=True)
             else:
                 git_repo.clone()
 

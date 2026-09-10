@@ -41,13 +41,18 @@ class GitRepo:
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
 
-    def clone(self, branch: str | None = None) -> None:
+    def clone(self, branch: str | None = None, create: bool = False) -> None:
         self.__delete_tmp_dir()
         self.__tmp_dir = create_tmp_dir()
         git_options = ["--depth=1"]
         url = self.get_clone_url()
-        if branch:
-            logging.info("Cloning repository: %s (branch: %s)", url, branch)
+
+        clone_branch = branch
+        if create and branch and not self.__remote_branch_exists(branch, remote=url):
+            clone_branch = None  # clone default branch; new branch created after
+
+        if clone_branch:
+            logging.info("Cloning repository: %s (branch: %s)", url, clone_branch)
         else:
             logging.info("Cloning repository: %s", url)
         username = self.__api.get_username()
@@ -56,8 +61,8 @@ class GitRepo:
             if username is not None and password is not None:
                 credentials_file = self.__create_credentials_file(username, password)
                 git_options.append(f"--config credential.helper={credentials_file}")
-            if branch:
-                git_options.append(f"--branch {branch}")
+            if clone_branch:
+                git_options.append(f"--branch {clone_branch}")
             self.__repo = Repo.clone_from(
                 url=url,
                 to_path=f"{self.__tmp_dir}/repo",
@@ -65,9 +70,12 @@ class GitRepo:
                 allow_unsafe_options=True,
             )
         except GitError as ex:
-            if branch:
-                raise GitOpsException(f"Error cloning branch '{branch}' of '{url}'") from ex
+            if clone_branch:
+                raise GitOpsException(f"Error cloning branch '{clone_branch}' of '{url}'") from ex
             raise GitOpsException(f"Error cloning '{url}'") from ex
+
+        if create and branch and clone_branch is None:
+            self.new_branch(branch)
 
     def new_branch(self, branch: str) -> None:
         logging.info("Creating new branch: %s", branch)
@@ -76,28 +84,6 @@ class GitRepo:
             repo.git.checkout("-b", branch)
         except GitError as ex:
             raise GitOpsException(f"Error creating new branch '{branch}'.") from ex
-
-    def checkout(self, branch: str) -> None:
-        logging.info("Checking out branch: %s", branch)
-        repo = self.__get_repo()
-        try:
-            current_branch = repo.git.branch("--show-current")
-            if current_branch == branch:
-                return
-            repo.git.fetch("origin", f"+refs/heads/{branch}:refs/remotes/origin/{branch}", "--depth=1")
-            repo.git.checkout("-B", branch, f"origin/{branch}")
-            repo.git.config(f"branch.{branch}.remote", "origin")
-            repo.git.config(f"branch.{branch}.merge", f"refs/heads/{branch}")
-        except GitError as ex:
-            raise GitOpsException(f"Error checking out branch '{branch}'.") from ex
-
-    def checkout_or_create_branch(self, branch: str) -> None:
-        url = self.__api.get_clone_url()
-        if self.__remote_branch_exists(branch, remote=url):
-            self.clone(branch)
-        else:
-            self.clone()
-            self.new_branch(branch)
 
     def commit(
         self,
