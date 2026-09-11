@@ -41,7 +41,7 @@ class GitRepo:
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
 
-    def clone(self, branch: str | None = None, create: bool = False) -> None:
+    def clone(self, branch: str | None = None, *, create: bool = False) -> None:
         self.__delete_tmp_dir()
         self.__tmp_dir = create_tmp_dir()
         git_options = ["--depth=1"]
@@ -152,10 +152,17 @@ class GitRepo:
                     if not self.__tmp_dir:
                         self.__tmp_dir = create_tmp_dir()
                     credentials_file = self.__create_credentials_file(username, password)
-                    result = g.execute([
-                        "git", "-c", f"credential.helper={credentials_file}",
-                        "ls-remote", "--heads", remote, f"refs/heads/{branch}",
-                    ])
+                    result = g.execute(
+                        [
+                            "git",
+                            "-c",
+                            f"credential.helper={credentials_file}",
+                            "ls-remote",
+                            "--heads",
+                            remote,
+                            f"refs/heads/{branch}",
+                        ]
+                    )
                 else:
                     result = g.ls_remote("--heads", remote, f"refs/heads/{branch}")
             except GitError as ex:

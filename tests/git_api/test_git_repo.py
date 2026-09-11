@@ -285,6 +285,11 @@ echo password='Pass'
             self.assertEqual("xyz", repo.git.branch("--show-current"))
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("xyz branch readme", readme)
+        logging_mock.info.assert_called_once_with(
+            "Cloning repository: %s (branch: %s)",
+            self.__mock_repo_api.get_clone_url(),
+            "xyz",
+        )
 
     @patch("gitopscli.git_api.git_repo.logging")
     def test_clone_create_with_credentials_new_branch(self, logging_mock):
@@ -297,6 +302,8 @@ echo password='Pass'
             self.assertEqual("brand-new-branch", repo.git.branch("--show-current"))
             readme = self.__read_file(testee.get_full_file_path("README.md"))
             self.assertEqual("master branch readme", readme)
+        logging_mock.info.assert_any_call("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
+        logging_mock.info.assert_any_call("Creating new branch: %s", "brand-new-branch")
 
     def test_clone_create_raises_on_remote_lookup_failure(self):
         self.__mock_repo_api.get_clone_url.return_value = "invalid_url"
