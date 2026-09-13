@@ -12,3 +12,4 @@ testrepo/
 site/
 build/
 .ruff_cache
+node_modules/

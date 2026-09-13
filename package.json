@@ -1,0 +1,9 @@
+{
+  "name": "gitopscli-release",
+  "private": true,
+  "devDependencies": {
+    "@semantic-release/exec": "7.x",
+    "conventional-changelog-conventionalcommits": "9.x",
+    "semantic-release": "25.x"
+  }
+}
