@@ -38,6 +38,7 @@ class DeployCommand(Command):
         pr_labels: list[str] | None
         merge_parameters: Any | None
         merge_method: Literal["squash", "rebase", "merge"] = "merge"
+        branch: str | None = None
 
     def __init__(self, args: DeployCommand.Args) -> None:
         self.__args = args
@@ -46,11 +47,13 @@ class DeployCommand(Command):
     def execute(self) -> None:
         git_repo_api = self.__create_git_repo_api()
         with GitRepo(git_repo_api) as git_repo:
-            git_repo.clone()
-
             if self.__args.create_pr:
-                pr_branch = f"gitopscli-deploy-{str(uuid.uuid4())[:8]}"
-                git_repo.new_branch(pr_branch)
+                pr_branch = self.__args.branch or f"gitopscli-deploy-{str(uuid.uuid4())[:8]}"
+                git_repo.clone(pr_branch, create=True)
+            elif self.__args.branch:
+                git_repo.clone(self.__args.branch, create=True)
+            else:
+                git_repo.clone()
 
             updated_values = self.__update_values(git_repo)
             if not updated_values:

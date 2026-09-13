@@ -310,9 +310,9 @@ options:
 EXPECTED_DEPLOY_NO_ARGS_ERROR = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--single-commit [SINGLE_COMMIT]]
-                        [--commit-message COMMIT_MESSAGE] --username USERNAME
-                        --password PASSWORD [--git-user GIT_USER]
-                        [--git-email GIT_EMAIL]
+                        [--commit-message COMMIT_MESSAGE] [--branch BRANCH]
+                        --username USERNAME --password PASSWORD
+                        [--git-user GIT_USER] [--git-email GIT_EMAIL]
                         [--git-author-name GIT_AUTHOR_NAME]
                         [--git-author-email GIT_AUTHOR_EMAIL]
                         --organisation ORGANISATION --repository-name
@@ -328,9 +328,9 @@ gitopscli deploy: error: the following arguments are required: --file, --values,
 EXPECTED_DEPLOY_HELP = """\
 usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--single-commit [SINGLE_COMMIT]]
-                        [--commit-message COMMIT_MESSAGE] --username USERNAME
-                        --password PASSWORD [--git-user GIT_USER]
-                        [--git-email GIT_EMAIL]
+                        [--commit-message COMMIT_MESSAGE] [--branch BRANCH]
+                        --username USERNAME --password PASSWORD
+                        [--git-user GIT_USER] [--git-email GIT_EMAIL]
                         [--git-author-name GIT_AUTHOR_NAME]
                         [--git-author-email GIT_AUTHOR_EMAIL]
                         --organisation ORGANISATION --repository-name
@@ -350,6 +350,9 @@ options:
                         Create only single commit for all updates
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
+  --branch BRANCH       Specify the branch where the changes should be
+                        committed to. If omitted with --create-pr, a random
+                        branch is created.
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
   --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
@@ -1109,6 +1112,7 @@ class CliParserTest(unittest.TestCase):
         self.assertEqual(args.values, {"a.b": 42})
 
         self.assertIsNone(args.git_provider_url)
+        self.assertIsNone(args.branch)
         self.assertFalse(args.create_pr)
         self.assertFalse(args.auto_merge)
         self.assertFalse(args.single_commit)
@@ -1142,6 +1146,8 @@ class CliParserTest(unittest.TestCase):
                 "FILE",
                 "--values",
                 "{a.b: 42}",  # yaml
+                "--branch",
+                "BRANCH",
                 "--create-pr",
                 "--auto-merge",
                 "--single-commit",
@@ -1164,6 +1170,7 @@ class CliParserTest(unittest.TestCase):
 
         self.assertEqual(args.git_provider, GitProvider.BITBUCKET)
         self.assertEqual(args.git_provider_url, "GIT_PROVIDER_URL")
+        self.assertEqual(args.branch, "BRANCH")
         self.assertTrue(args.create_pr)
         self.assertTrue(args.auto_merge)
         self.assertTrue(args.single_commit)

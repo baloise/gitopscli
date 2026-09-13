@@ -209,6 +209,110 @@ echo password='Pass'
         logging_mock.info.assert_called_once_with("Creating new branch: %s", "master")
 
     @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_creates_when_missing(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("foo", create=True)
+
+            repo = Repo(testee.get_full_file_path("."))
+            self.assertEqual("foo", repo.git.branch("--show-current"))
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("master branch readme", readme)
+        logging_mock.info.assert_any_call("Creating new branch: %s", "foo")
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_checks_out_existing(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("xyz", create=True)
+
+            repo = Repo(testee.get_full_file_path("."))
+            self.assertEqual("xyz", repo.git.branch("--show-current"))
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("xyz branch readme", readme)
+        logging_mock.info.assert_called_once_with(
+            "Cloning repository: %s (branch: %s)",
+            self.__mock_repo_api.get_clone_url(),
+            "xyz",
+        )
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_current_branch(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("master", create=True)
+
+            repo = Repo(testee.get_full_file_path("."))
+            self.assertEqual("master", repo.git.branch("--show-current"))
+        logging_mock.info.assert_called_once_with(
+            "Cloning repository: %s (branch: %s)",
+            self.__mock_repo_api.get_clone_url(),
+            "master",
+        )
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_clones_existing_branch_directly(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("xyz", create=True)
+
+            repo = Repo(testee.get_full_file_path("."))
+            self.assertEqual("xyz", repo.git.branch("--show-current"))
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("xyz branch readme", readme)
+        logging_mock.info.assert_called_once_with(
+            "Cloning repository: %s (branch: %s)",
+            self.__mock_repo_api.get_clone_url(),
+            "xyz",
+        )
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_clones_default_and_creates_when_missing(self, logging_mock):
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("brand-new-branch", create=True)
+
+            repo = Repo(testee.get_full_file_path("."))
+            self.assertEqual("brand-new-branch", repo.git.branch("--show-current"))
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("master branch readme", readme)
+        logging_mock.info.assert_any_call("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
+        logging_mock.info.assert_any_call("Creating new branch: %s", "brand-new-branch")
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_with_credentials_existing_branch(self, logging_mock):
+        self.__mock_repo_api.get_username.return_value = "User"
+        self.__mock_repo_api.get_password.return_value = "Pass"
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("xyz", create=True)
+
+            repo = Repo(testee.get_full_file_path("."))
+            self.assertEqual("xyz", repo.git.branch("--show-current"))
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("xyz branch readme", readme)
+        logging_mock.info.assert_called_once_with(
+            "Cloning repository: %s (branch: %s)",
+            self.__mock_repo_api.get_clone_url(),
+            "xyz",
+        )
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_with_credentials_new_branch(self, logging_mock):
+        self.__mock_repo_api.get_username.return_value = "User"
+        self.__mock_repo_api.get_password.return_value = "Pass"
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("brand-new-branch", create=True)
+
+            repo = Repo(testee.get_full_file_path("."))
+            self.assertEqual("brand-new-branch", repo.git.branch("--show-current"))
+            readme = self.__read_file(testee.get_full_file_path("README.md"))
+            self.assertEqual("master branch readme", readme)
+        logging_mock.info.assert_any_call("Cloning repository: %s", self.__mock_repo_api.get_clone_url())
+        logging_mock.info.assert_any_call("Creating new branch: %s", "brand-new-branch")
+
+    def test_clone_create_raises_on_remote_lookup_failure(self):
+        self.__mock_repo_api.get_clone_url.return_value = "invalid_url"
+        with GitRepo(self.__mock_repo_api) as testee:
+            with pytest.raises(GitOpsException) as ex:
+                testee.clone("some-branch", create=True)
+            self.assertIn("invalid_url", str(ex.value))
+
+    @patch("gitopscli.git_api.git_repo.logging")
     def test_commit(self, logging_mock):
         with GitRepo(self.__mock_repo_api) as testee:
             testee.clone()
@@ -390,6 +494,40 @@ echo password='Pass'
             logging_mock.info.assert_called_once_with("Pull and rebase: %s", "xyz")
 
             # then push should work
+            testee.push()
+
+            commits = list(self.__origin.iter_commits("xyz"))
+            self.assertEqual(4, len(commits))
+            self.assertEqual("local branch commit\n", commits[0].message)
+            self.assertEqual("origin branch commit\n", commits[1].message)
+            self.assertEqual("initial xyz branch commit\n", commits[2].message)
+
+    @patch("gitopscli.git_api.git_repo.logging")
+    def test_clone_create_existing_branch_then_pull_rebase_and_push(self, logging_mock):
+        origin_repo = self.__origin
+        with GitRepo(self.__mock_repo_api) as testee:
+            testee.clone("xyz", create=True)
+
+            with Path(testee.get_full_file_path("local.md")).open("w") as outfile:
+                outfile.write("local file")
+            local_repo = Repo(testee.get_full_file_path("."))
+            local_repo.git.add("--all")
+            local_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+            local_repo.git.commit("-m", "local branch commit")
+
+            origin_repo.git.checkout("xyz")
+            with Path(f"{origin_repo.working_dir}/origin.md").open("w") as readme:
+                readme.write("origin file")
+            origin_repo.git.add("--all")
+            origin_repo.config_writer().set_value("user", "email", "unit@tester.com").release()
+            origin_repo.git.commit("-m", "origin branch commit")
+
+            logging_mock.reset_mock()
+
+            testee.pull_rebase()
+
+            logging_mock.info.assert_called_once_with("Pull and rebase: %s", "xyz")
+
             testee.push()
 
             commits = list(self.__origin.iter_commits("xyz"))

@@ -103,6 +103,15 @@ def __create_deploy_parser() -> ArgumentParser:
         type=str,
         default=None,
     )
+    parser.add_argument(
+        "--branch",
+        help=(
+            "Specify the branch where the changes should be committed to. "
+            "If omitted with --create-pr, a random branch is created."
+        ),
+        type=str,
+        default=None,
+    )
     __add_git_credentials_args(parser)
     __add_git_commit_user_args(parser)
     __add_git_org_and_repo_args(parser)

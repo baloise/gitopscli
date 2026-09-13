@@ -18,7 +18,7 @@ backend:
     value: foo # <- and this one in a list, selected via sibling value 'TEST'
 ```
 
-With the following command GitOps CLI will update all values on the default branch.
+With the following command GitOps CLI will update all values on the default branch. Use `--branch` to commit on an existing branch, or to create that branch if it does not exist yet.
 
 ```bash
 gitopscli deploy \
@@ -99,6 +99,8 @@ This will end up in one single commit with your specified commit-message.
 
 In some cases you might want to create a pull request for your updates. You can achieve this by adding `--create-pr` to the command. The pull request can be left open or merged directly with `--auto-merge`.
 
+By default GitOps CLI creates a random branch for the pull request (e.g. `gitopscli-deploy-b973b5bb`). Use `--branch` to specify that branch name instead: an existing remote branch is checked out, otherwise a new branch is created. `--branch` also works without `--create-pr`.
+
 ```bash
 gitopscli deploy \
   --git-provider-url https://bitbucket.baloise.dev \
@@ -111,6 +113,7 @@ gitopscli deploy \
   --file "example/values.yaml" \
   --values "{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env[?name==''TEST''].value': bar}" \
   --create-pr \
+  --branch "deploy/myapp" \
   --auto-merge
 ```
 
@@ -123,9 +126,9 @@ gitopscli deploy \
 ```
 usage: gitopscli deploy [-h] --file FILE --values VALUES
                         [--single-commit [SINGLE_COMMIT]]
-                        [--commit-message COMMIT_MESSAGE] --username USERNAME
-                        --password PASSWORD [--git-user GIT_USER]
-                        [--git-email GIT_EMAIL]
+                        [--commit-message COMMIT_MESSAGE] [--branch BRANCH]
+                        --username USERNAME --password PASSWORD
+                        [--git-user GIT_USER] [--git-email GIT_EMAIL]
                         [--git-author-name GIT_AUTHOR_NAME]
                         [--git-author-email GIT_AUTHOR_EMAIL]
                         --organisation ORGANISATION --repository-name
@@ -145,6 +148,8 @@ options:
                         Create only single commit for all updates
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
+  --branch BRANCH       Specify the branch where the changes should be
+                        committed to. Creates a new branch if it doesn't exist yet.
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
   --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
@@ -165,7 +170,7 @@ options:
   --git-provider-url GIT_PROVIDER_URL
                         Git provider base API URL (e.g. https://bitbucket.example.tld)
   --create-pr [CREATE_PR]
-                        Creates a Pull Request
+                        Creates a Pull Request from a random new branch. Use --branch to use a specific branch name instead.
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with --create-pr)
   --merge-method MERGE_METHOD

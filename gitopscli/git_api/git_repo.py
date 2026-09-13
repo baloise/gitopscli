@@ -4,7 +4,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Literal
 
-from git import GitCommandError, GitError, Repo
+from git import Git, GitCommandError, GitError, Repo
 from typing_extensions import Self  # noqa: UP035
 
 from gitopscli.gitops_exception import GitOpsException
@@ -41,13 +41,18 @@ class GitRepo:
     def get_clone_url(self) -> str:
         return self.__api.get_clone_url()
 
-    def clone(self, branch: str | None = None) -> None:
+    def clone(self, branch: str | None = None, *, create: bool = False) -> None:
         self.__delete_tmp_dir()
         self.__tmp_dir = create_tmp_dir()
         git_options = ["--depth=1"]
         url = self.get_clone_url()
-        if branch:
-            logging.info("Cloning repository: %s (branch: %s)", url, branch)
+
+        clone_branch = branch
+        if create and branch and not self.__remote_branch_exists(branch, remote=url):
+            clone_branch = None  # clone default branch; new branch created after
+
+        if clone_branch:
+            logging.info("Cloning repository: %s (branch: %s)", url, clone_branch)
         else:
             logging.info("Cloning repository: %s", url)
         username = self.__api.get_username()
@@ -56,8 +61,8 @@ class GitRepo:
             if username is not None and password is not None:
                 credentials_file = self.__create_credentials_file(username, password)
                 git_options.append(f"--config credential.helper={credentials_file}")
-            if branch:
-                git_options.append(f"--branch {branch}")
+            if clone_branch:
+                git_options.append(f"--branch {clone_branch}")
             self.__repo = Repo.clone_from(
                 url=url,
                 to_path=f"{self.__tmp_dir}/repo",
@@ -65,9 +70,12 @@ class GitRepo:
                 allow_unsafe_options=True,
             )
         except GitError as ex:
-            if branch:
-                raise GitOpsException(f"Error cloning branch '{branch}' of '{url}'") from ex
+            if clone_branch:
+                raise GitOpsException(f"Error cloning branch '{clone_branch}' of '{url}'") from ex
             raise GitOpsException(f"Error cloning '{url}'") from ex
+
+        if create and branch and clone_branch is None:
+            self.new_branch(branch)
 
     def new_branch(self, branch: str) -> None:
         logging.info("Creating new branch: %s", branch)
@@ -131,9 +139,34 @@ class GitRepo:
         last_commit = repo.head.commit
         return str(repo.git.show("-s", "--format=%an <%ae>", last_commit.hexsha))
 
-    def __remote_branch_exists(self, branch: str) -> bool:
-        repo = self.__get_repo()
-        result = repo.git.ls_remote("--heads", "origin", f"refs/heads/{branch}")
+    def __remote_branch_exists(self, branch: str, remote: str = "origin") -> bool:
+        if remote == "origin":
+            repo = self.__get_repo()
+            result = repo.git.ls_remote("--heads", remote, f"refs/heads/{branch}")
+        else:
+            username = self.__api.get_username()
+            password = self.__api.get_password()
+            try:
+                g = Git()
+                if username is not None and password is not None:
+                    if not self.__tmp_dir:
+                        self.__tmp_dir = create_tmp_dir()
+                    credentials_file = self.__create_credentials_file(username, password)
+                    result = g.execute(
+                        [
+                            "git",
+                            "-c",
+                            f"credential.helper={credentials_file}",
+                            "ls-remote",
+                            "--heads",
+                            remote,
+                            f"refs/heads/{branch}",
+                        ]
+                    )
+                else:
+                    result = g.ls_remote("--heads", remote, f"refs/heads/{branch}")
+            except GitError as ex:
+                raise GitOpsException(f"Error checking remote branch '{branch}' at '{remote}'.") from ex
         if isinstance(result, str):
             return result.strip() != ""
         return bool(result)
