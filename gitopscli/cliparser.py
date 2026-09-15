@@ -134,7 +134,7 @@ def __create_deploy_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "--merge-method",
-        help="Merge Method (e.g., 'squash', 'rebase', 'merge') (default: merge)",
+        help="Merge Method (e.g., 'squash', 'rebase', 'merge', 'auto-merge') (default: merge)",
         type=str,
         default="merge",
     )

@@ -188,6 +188,36 @@ class AzureDevOpsGitRepoApiAdapterTest(unittest.TestCase):
         pr_update = call_args.kwargs["git_pull_request_to_update"]
         self.assertEqual(pr_update.completion_options.merge_strategy, "rebase")
 
+    def test_merge_pull_request_auto_merge(self):
+        mock_pr = MagicMock()
+        mock_pr.last_merge_source_commit = MagicMock()
+        mock_pr.created_by = MagicMock()
+        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_pull_request.return_value = mock_pr
+
+        self.adapter.merge_pull_request(123, "auto-merge")
+
+        call_args = self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.update_pull_request.call_args
+        pr_update = call_args.kwargs["git_pull_request_to_update"]
+
+        self.assertEqual(pr_update.auto_complete_set_by, mock_pr.created_by)
+        self.assertIsNone(pr_update.status)
+        self.assertIsNotNone(pr_update.completion_options)
+
+    def test_merge_pull_request_auto_merge_preserves_completion_options(self):
+        mock_pr = MagicMock()
+        mock_pr.last_merge_source_commit = MagicMock()
+        mock_pr.created_by = MagicMock()
+        self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.get_pull_request.return_value = mock_pr
+
+        self.adapter.merge_pull_request(123, "auto-merge", merge_parameters={"merge_strategy": "squash"})
+
+        call_args = self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.update_pull_request.call_args
+        pr_update = call_args.kwargs["git_pull_request_to_update"]
+
+        self.assertEqual(pr_update.auto_complete_set_by, mock_pr.created_by)
+        self.assertEqual(pr_update.completion_options.merge_strategy, "squash")
+        self.assertTrue(pr_update.completion_options.delete_source_branch)
+
     def test_add_pull_request_comment_success(self):
         self.adapter._AzureDevOpsGitRepoApiAdapter__git_client.create_thread.return_value = None
 

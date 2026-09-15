@@ -37,7 +37,7 @@ class DeployCommand(Command):
 
         pr_labels: list[str] | None
         merge_parameters: Any | None
-        merge_method: Literal["squash", "rebase", "merge"] = "merge"
+        merge_method: Literal["squash", "rebase", "merge", "auto-merge"] = "merge"
         branch: str | None = None
 
     def __init__(self, args: DeployCommand.Args) -> None:

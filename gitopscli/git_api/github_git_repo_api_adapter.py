@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Literal
 
 from github import (
@@ -60,9 +61,12 @@ class GithubGitRepoApiAdapter(GitRepoApi):
     def merge_pull_request(
         self,
         pr_id: int,
-        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+        merge_method: Literal["squash", "rebase", "merge", "auto-merge"] = "merge",
         merge_parameters: dict[str, Any] | None = None,  # noqa: ARG002
     ) -> None:
+        if merge_method == "auto-merge":
+            logging.info("Auto-merge is not natively supported for this git provider; falling back to immediate merge.")
+            merge_method = "merge"
         pull_request = self.__get_pull_request(pr_id)
         pull_request.merge(merge_method=merge_method)
 

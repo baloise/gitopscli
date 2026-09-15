@@ -110,7 +110,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
     def merge_pull_request(
         self,
         pr_id: int,
-        merge_method: Literal["squash", "rebase", "merge"] = "merge",
+        merge_method: Literal["squash", "rebase", "merge", "auto-merge"] = "merge",
         merge_parameters: dict[str, Any] | None = None,
     ) -> None:
         try:
@@ -135,18 +135,27 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 completion_options.merge_strategy = "squash"
             elif merge_method == "rebase":
                 completion_options.merge_strategy = "rebase"
-            else:  # merge
+            else:  # merge and auto-merge both default to noFastForward
                 completion_options.merge_strategy = "noFastForward"
 
             if merge_parameters:
                 for key, value in merge_parameters.items():
                     setattr(completion_options, key, value)
 
-            pr_update = GitPullRequest(
-                status="completed",
-                last_merge_source_commit=pr.last_merge_source_commit,
-                completion_options=completion_options,
-            )
+            if merge_method == "auto-merge":
+                # Queue the PR to complete automatically once all branch policies are satisfied.
+                # Setting auto_complete_set_by (without status="completed") tells ADO to merge
+                # when policies pass, rather than attempting an immediate merge that would fail.
+                pr_update = GitPullRequest(
+                    auto_complete_set_by=pr.created_by,
+                    completion_options=completion_options,
+                )
+            else:
+                pr_update = GitPullRequest(
+                    status="completed",
+                    last_merge_source_commit=pr.last_merge_source_commit,
+                    completion_options=completion_options,
+                )
 
             self.__git_client.update_pull_request(
                 git_pull_request_to_update=pr_update,
