@@ -8,6 +8,7 @@ from azure.devops.v7_0.git.models import (
     GitPullRequest,
     GitPullRequestCommentThread,
     GitPullRequestCompletionOptions,
+    IdentityRef,
 )
 from msrest.exceptions import ClientException
 
@@ -49,6 +50,8 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         credentials = BasicAuthentication(self.__username, password)
         self.__connection = Connection(base_url=self.__base_url, creds=credentials)
         self.__git_client = self.__connection.clients.get_git_client()
+        profile = self.__connection.clients.get_profile_client().get_profile("me")
+        self.__current_user_identity = IdentityRef(id=profile.id)
 
     def get_username(self) -> str | None:
         return self.__username
@@ -118,7 +121,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             # and the PullRequest completion can be requested
             self.__sleep_func(3)
 
-            pr = self.__git_client.get_pull_request(
+            self.__git_client.get_pull_request(
                 repository_id=self.__repository_name,
                 pull_request_id=pr_id,
                 project=self.__project_name,
@@ -142,9 +145,10 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 for key, value in merge_parameters.items():
                     setattr(completion_options, key, value)
 
+            # Queue the PR to complete automatically once all branch policies are satisfied.
+            # If no policies are configured, ADO merges immediately — same behaviour as before.
             pr_update = GitPullRequest(
-                status="completed",
-                last_merge_source_commit=pr.last_merge_source_commit,
+                auto_complete_set_by=self.__current_user_identity,
                 completion_options=completion_options,
             )
 
