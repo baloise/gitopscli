@@ -99,8 +99,8 @@ This will end up in one single commit with your specified commit-message.
 
 In some cases you might want to create a pull request for your updates. You can achieve this by adding `--create-pr` to the command. The pull request can be left open or merged directly with `--auto-merge`.
 
-!!! note "Azure DevOps: auto-merge uses native auto-complete"
-    On Azure DevOps, `--auto-merge` sets the PR to [auto-complete](https://learn.microsoft.com/en-us/azure/devops/repos/git/complete-pull-requests) rather than attempting an immediate merge. This means the PR will be completed automatically once all branch policies (e.g. build validation, required reviewers) are satisfied. If no policies are configured the PR merges immediately. The merge strategy is controlled as usual via `--merge-method`.
+> [!NOTE]  
+> On Azure DevOps, `--auto-merge` uses the platform's native [auto-complete](https://learn.microsoft.com/en-us/azure/devops/repos/git/complete-pull-requests) feature. The PR is completed automatically once all branch policies (e.g. build validation, required reviewers) are satisfied — or immediately if no policies are configured. Use `--merge-method` to control the merge strategy.
 
 By default GitOps CLI creates a random branch for the pull request (e.g. `gitopscli-deploy-b973b5bb`). Use `--branch` to specify that branch name instead: an existing remote branch is checked out, otherwise a new branch is created. `--branch` also works without `--create-pr`.
 
