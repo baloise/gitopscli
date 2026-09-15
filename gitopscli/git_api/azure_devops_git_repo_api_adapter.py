@@ -121,7 +121,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
             # and the PullRequest completion can be requested
             self.__sleep_func(3)
 
-            pr = self.__git_client.get_pull_request(
+            self.__git_client.get_pull_request(
                 repository_id=self.__repository_name,
                 pull_request_id=pr_id,
                 project=self.__project_name,
