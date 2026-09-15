@@ -39,7 +39,7 @@ class GitRepoApiLoggingProxy(GitRepoApi):
     def merge_pull_request(
         self,
         pr_id: int,
-        merge_method: Literal["squash", "rebase", "merge", "auto-merge"] = "merge",
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
         merge_parameters: dict[str, Any] | None = None,  # noqa: ARG002
     ) -> None:
         logging.info("Merging pull request %s", pr_id)

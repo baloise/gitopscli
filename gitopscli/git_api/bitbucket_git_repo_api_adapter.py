@@ -1,4 +1,3 @@
-import logging
 from typing import Any, Literal
 
 import requests
@@ -89,11 +88,9 @@ class BitbucketGitRepoApiAdapter(GitRepoApi):
     def merge_pull_request(
         self,
         pr_id: int,
-        merge_method: Literal["squash", "rebase", "merge", "auto-merge"] = "merge",  # noqa: ARG002
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",  # noqa: ARG002
         merge_parameters: dict[str, Any] | None = None,  # noqa: ARG002
     ) -> None:
-        if merge_method == "auto-merge":
-            logging.info("Auto-merge is not natively supported for this git provider; falling back to immediate merge.")
         pull_request = self.__bitbucket.get_pull_request(self.__organisation, self.__repository_name, pr_id)
         self.__bitbucket.merge_pull_request(
             self.__organisation,

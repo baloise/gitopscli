@@ -379,8 +379,8 @@ options:
                         Automatically merge the created PR (only valid with
                         --create-pr)
   --merge-method MERGE_METHOD
-                        Merge Method (e.g., 'squash', 'rebase', 'merge',
-                        'auto-merge') (default: merge)
+                        Merge Method (e.g., 'squash', 'rebase', 'merge')
+                        (default: merge)
   --json [JSON]         Print a JSON object containing deployment information
   --pr-labels PR_LABELS
                         JSON array pr labels (Gitlab, Github supported)

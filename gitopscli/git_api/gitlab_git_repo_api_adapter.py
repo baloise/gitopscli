@@ -71,12 +71,9 @@ class GitlabGitRepoApiAdapter(GitRepoApi):
     def merge_pull_request(
         self,
         pr_id: int,
-        merge_method: Literal["squash", "rebase", "merge", "auto-merge"] = "merge",
+        merge_method: Literal["squash", "rebase", "merge"] = "merge",
         merge_parameters: dict[str, Any] | None = None,
     ) -> None:
-        if merge_method == "auto-merge":
-            logging.info("Auto-merge is not natively supported for this git provider; falling back to immediate merge.")
-            merge_method = "merge"
         merge_request = self.__project.mergerequests.get(pr_id)
 
         max_retries = MAX_MERGE_RETRIES
