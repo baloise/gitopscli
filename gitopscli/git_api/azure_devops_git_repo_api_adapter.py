@@ -8,6 +8,7 @@ from azure.devops.v7_0.git.models import (
     GitPullRequest,
     GitPullRequestCommentThread,
     GitPullRequestCompletionOptions,
+    IdentityRef,
 )
 from msrest.exceptions import ClientException
 
@@ -49,6 +50,8 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
         credentials = BasicAuthentication(self.__username, password)
         self.__connection = Connection(base_url=self.__base_url, creds=credentials)
         self.__git_client = self.__connection.clients.get_git_client()
+        profile = self.__connection.clients.get_profile_client().get_profile("me")
+        self.__current_user_identity = IdentityRef(id=profile.id)
 
     def get_username(self) -> str | None:
         return self.__username
@@ -147,7 +150,7 @@ class AzureDevOpsGitRepoApiAdapter(GitRepoApi):
                 # Setting auto_complete_set_by (without status="completed") tells ADO to merge
                 # when policies pass, rather than attempting an immediate merge that would fail.
                 pr_update = GitPullRequest(
-                    auto_complete_set_by=pr.created_by,
+                    auto_complete_set_by=self.__current_user_identity,
                     completion_options=completion_options,
                 )
             else:
