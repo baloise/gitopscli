@@ -959,6 +959,10 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 <p>This will end up in one single commit with your specified commit-message.</p>
 <h3 id="create-pull-request">Create Pull Request<a class="headerlink" href="#create-pull-request" title="Permanent link">&para;</a></h3>
 <p>In some cases you might want to create a pull request for your updates. You can achieve this by adding <code>--create-pr</code> to the command. The pull request can be left open or merged directly with <code>--auto-merge</code>.</p>
+<blockquote>
+<p>[!NOTE]<br />
+On Azure DevOps, <code>--auto-merge</code> uses the platform's native <a href="https://learn.microsoft.com/en-us/azure/devops/repos/git/complete-pull-requests">auto-complete</a> feature. The PR is completed automatically once all branch policies (e.g. build validation, required reviewers) are satisfied — or immediately if no policies are configured. Use <code>--merge-method</code> to control the merge strategy.</p>
+</blockquote>
 <p>By default GitOps CLI creates a random branch for the pull request (e.g. <code>gitopscli-deploy-b973b5bb</code>). Use <code>--branch</code> to specify that branch name instead: an existing remote branch is checked out, otherwise a new branch is created. <code>--branch</code> also works without <code>--create-pr</code>.</p>
 <div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>deploy<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
