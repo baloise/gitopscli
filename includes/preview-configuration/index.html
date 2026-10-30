@@ -792,22 +792,22 @@
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span>
 <span class="nt">applicationName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-xy</span>
 <span class="c1"># messages:                              # optional section</span>
-<span class="c1">#   previewEnvCreated: &quot;Created preview at revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path&quot;    # optional (default: &quot;New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}&quot;)</span>
-<span class="c1">#   previewEnvUpdated: &quot;Updated preview to revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path&quot;    # optional (default: &quot;Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}&quot;)</span>
-<span class="c1">#   previewEnvAlreadyUpToDate: &quot;Your preview is already up-to-date with revision ${GIT_HASH}.&quot;                                       # optional (default: &quot;The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}&quot;)</span>
+<span class="c1">#   previewEnvCreated: "Created preview at revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path"    # optional (default: "New preview environment created for version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}")</span>
+<span class="c1">#   previewEnvUpdated: "Updated preview to revision ${GIT_HASH}. You can access it here: https://${PREVIEW_HOST}/some-fancy-path"    # optional (default: "Preview environment updated to version `${GIT_HASH}`. Access it here: https://${PREVIEW_HOST}")</span>
+<span class="c1">#   previewEnvAlreadyUpToDate: "Your preview is already up-to-date with revision ${GIT_HASH}."                                       # optional (default: "The version `${GIT_HASH}` has already been deployed. Access it here: https://${PREVIEW_HOST}")</span>
 <span class="nt">previewConfig</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${PREVIEW_NAMESPACE}.example.tld</span>
 <span class="c1"># template:                              # optional section</span>
 <span class="c1">#   organisation: templates              # optional (default: target.organisation)</span>
 <span class="c1">#   repository: template-repo            # optional (default: target.repository)</span>
 <span class="c1">#   branch: master                       # optional (default: target.branch)</span>
-<span class="c1">#   path: custom/${APPLICATION_NAME}     # optional (default: &#39;.preview-templates/${APPLICATION_NAME}&#39;)</span>
+<span class="c1">#   path: custom/${APPLICATION_NAME}     # optional (default: '.preview-templates/${APPLICATION_NAME}')</span>
 <span class="w">  </span><span class="nt">target</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">organisation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span>
 <span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>
-<span class="c1">#   path: custom/${APPLICATION_NAME}     # optional (defaults to repo&#39;s root directory)</span>
-<span class="c1">#   branch: master                       # optional (defaults to repo&#39;s default branch)</span>
-<span class="c1">#   namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview&#39;  # optional (default: &#39;${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview&#39;,</span>
+<span class="c1">#   path: custom/${APPLICATION_NAME}     # optional (defaults to repo's root directory)</span>
+<span class="c1">#   branch: master                       # optional (defaults to repo's default branch)</span>
+<span class="c1">#   namespace: ${APPLICATION_NAME}-${PREVIEW_ID_HASH}-preview'  # optional (default: '${APPLICATION_NAME}-${PREVIEW_ID}-${PREVIEW_ID_HASH_SHORT}-preview',</span>
 <span class="w">                                                                </span><span class="c1">#           Invalid characters in PREVIEW_ID will be replaced. PREVIEW_ID will be</span>
 <span class="w">                                                                </span><span class="c1">#           truncated if max namespace length exceeds `maxNamespaceLength` chars.)</span>
 <span class="c1">#   maxNamespaceLength: 63               # optional (default: 53)</span>
@@ -829,7 +829,7 @@
 <p>The <em>old</em> (<em>v0</em>) version and <code>apiVersion v1</code> are marked deprecated and will be removed in <code>gitopscli</code> version 6.0.0.</p>
 </div>
 <p>Equivalent example:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># old &#39;v0&#39; format</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># old 'v0' format</span>
 <span class="nt">deploymentConfig</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">org</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployments</span>
 <span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deployment-config-repo</span>

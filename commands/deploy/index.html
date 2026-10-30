@@ -895,19 +895,19 @@
 <span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span><span class="w"> </span><span class="c1"># &lt;- and this one</span>
 <span class="w">  </span><span class="nt">env</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TEST</span>
-<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"> </span><span class="c1"># &lt;- and this one in a list, selected via sibling value &#39;TEST&#39;</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"> </span><span class="c1"># &lt;- and this one in a list, selected via sibling value 'TEST'</span>
 </code></pre></div>
 <p>With the following command GitOps CLI will update all values on the default branch. Use <code>--branch</code> to commit on an existing branch, or to create that branch if it does not exist yet.</p>
 <div class="highlight"><pre><span></span><code>gitopscli<span class="w"> </span>deploy<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;deployment&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;myapp-non-prod&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--file<span class="w"> </span><span class="s2">&quot;example/values.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--values<span class="w"> </span><span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">"GitOps CLI"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">"gitopscli@baloise.dev"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">"deployment"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">"myapp-non-prod"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span><span class="s2">"example/values.yaml"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--values<span class="w"> </span><span class="s2">"{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env[?name==''TEST''].value': bar}"</span>
 </code></pre></div>
 <p>You could also use the list index to replace the latter (<code>my-app.env.[0].value</code>). For more details on the underlying <em>JSONPath</em> syntax, please refer to the <a href="https://github.com/h2non/jsonpath-ng#jsonpath-syntax">documenatation of the used library <em>jsonpath-ng</em></a>.</p>
 <h3 id="number-of-commits">Number Of Commits<a class="headerlink" href="#number-of-commits" title="Permanent link">&para;</a></h3>
@@ -916,19 +916,19 @@
 Author: GitOpsCLI &lt;gitopscli@baloise.dev&gt;
 Date:   Thu Mar 12 15:30:32 2020 +0100
 
-    changed &#39;backend.env[?name==&#39;TEST&#39;].value&#39; to &#39;bar&#39; in example/values.yaml
+    changed 'backend.env[?name=='TEST'].value' to 'bar' in example/values.yaml
 
 commit d98913ad8fecf571d5f8c3635f8070b05c43a9ca
 Author: GitOpsCLI &lt;gitopscli@baloise.dev&gt;
 Date:   Thu Mar 12 15:30:32 2020 +0100
 
-    changed &#39;backend.tag&#39; to &#39;1.1.0&#39; in example/values.yaml
+    changed 'backend.tag' to '1.1.0' in example/values.yaml
 
 commit 649bc72fe798891244c11809afc9fae83309772a
 Author: GitOpsCLI &lt;gitopscli@baloise.dev&gt;
 Date:   Thu Mar 12 15:30:32 2020 +0100
 
-    changed &#39;frontend.tag&#39; to &#39;1.1.0&#39; in example/values.yaml
+    changed 'frontend.tag' to '1.1.0' in example/values.yaml
 </code></pre></div>
 <p>If you prefer to create a single commit for all changes add <code>--single-commit</code> to the command:</p>
 <div class="highlight"><pre><span></span><code>commit 3b96839e90c35b8decf89f34a65ab6d66c8bab28
@@ -937,9 +937,9 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 
     updated 3 values in example/values.yaml
 
-    frontend.tag: &#39;1.1.0&#39;
-    backend.tag: &#39;1.1.0&#39;
-    &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: &#39;bar&#39;
+    frontend.tag: '1.1.0'
+    backend.tag: '1.1.0'
+    'backend.env[?name==''TEST''].value': 'bar'
 </code></pre></div>
 <h3 id="specific-commit-message">Specific Commit Message<a class="headerlink" href="#specific-commit-message" title="Permanent link">&para;</a></h3>
 <p>If you want to specify the commit message of the deployment then you can use the following param:</p>
@@ -948,13 +948,13 @@ Date:   Thu Mar 12 15:30:00 2020 +0100
 <span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;deployment&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;myapp-non-prod&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--commit-message<span class="w"> </span><span class="s2">&quot;test commit message&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--file<span class="w"> </span><span class="s2">&quot;example/values.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--values<span class="w"> </span><span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">"GitOps CLI"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">"gitopscli@baloise.dev"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">"deployment"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">"myapp-non-prod"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--commit-message<span class="w"> </span><span class="s2">"test commit message"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span><span class="s2">"example/values.yaml"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--values<span class="w"> </span><span class="s2">"{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env[?name==''TEST''].value': bar}"</span>
 </code></pre></div>
 <p>This will end up in one single commit with your specified commit-message.</p>
 <h3 id="create-pull-request">Create Pull Request<a class="headerlink" href="#create-pull-request" title="Permanent link">&para;</a></h3>
@@ -968,14 +968,14 @@ On Azure DevOps, <code>--auto-merge</code> uses the platform's native <a href="h
 <span class="w">  </span>--git-provider-url<span class="w"> </span>https://bitbucket.baloise.dev<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--username<span class="w"> </span><span class="nv">$GIT_USERNAME</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--password<span class="w"> </span><span class="nv">$GIT_PASSWORD</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">&quot;GitOps CLI&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">&quot;gitopscli@baloise.dev&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">&quot;deployment&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">&quot;myapp-non-prod&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--file<span class="w"> </span><span class="s2">&quot;example/values.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--values<span class="w"> </span><span class="s2">&quot;{frontend.tag: 1.1.0, backend.tag: 1.1.0, &#39;backend.env[?name==&#39;&#39;TEST&#39;&#39;].value&#39;: bar}&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-user<span class="w"> </span><span class="s2">"GitOps CLI"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--git-email<span class="w"> </span><span class="s2">"gitopscli@baloise.dev"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--organisation<span class="w"> </span><span class="s2">"deployment"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-name<span class="w"> </span><span class="s2">"myapp-non-prod"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span><span class="s2">"example/values.yaml"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--values<span class="w"> </span><span class="s2">"{frontend.tag: 1.1.0, backend.tag: 1.1.0, 'backend.env[?name==''TEST''].value': bar}"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--create-pr<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--branch<span class="w"> </span><span class="s2">&quot;deploy/myapp&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--branch<span class="w"> </span><span class="s2">"deploy/myapp"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--auto-merge
 </code></pre></div>
 <p><img alt="Example PR Overview" src="../../assets/images/screenshots/example-pr-overview.png?raw=true" title="Example of the created PR" />
@@ -1007,7 +1007,7 @@ options:
   --commit-message COMMIT_MESSAGE
                         Specify exact commit message of deployment commit
   --branch BRANCH       Specify the branch where the changes should be
-                        committed to. Creates a new branch if it doesn&#39;t exist yet.
+                        committed to. Creates a new branch if it doesn't exist yet.
   --username USERNAME   Git username (alternative: GITOPSCLI_USERNAME env
                         variable)
   --password PASSWORD   Git password or token (alternative: GITOPSCLI_PASSWORD
@@ -1032,7 +1032,7 @@ options:
   --auto-merge [AUTO_MERGE]
                         Automatically merge the created PR (only valid with --create-pr)
   --merge-method MERGE_METHOD
-                        Merge Method (e.g., &#39;squash&#39;, &#39;rebase&#39;, &#39;merge&#39;) (default: merge)
+                        Merge Method (e.g., 'squash', 'rebase', 'merge') (default: merge)
   --json [JSON]         Print a JSON object containing deployment information
   --pr-labels PR_LABELS
                         JSON array pr labels (Gitlab, Github supported)
